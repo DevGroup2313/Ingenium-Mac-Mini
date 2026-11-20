@@ -1338,8 +1338,8 @@ edit("""Every model in Ingenium starts each chat with Ingenium's own instruction
 #      Ingenium and Author key function are only reserved for my master edition and the "Full" edition with some limitations". ----
 edit('var ING_EDITION="master";\n',
      'var ING_EDITION="master";\nvar ING_HAS=function(p){var e=ING_EDITION;if(p==="author"||p==="rename"||p==="ownerkey")return e==="master";'
-     'if(p==="fabrica"||p==="desk"||p==="lector"||p==="career")return e==="master"||e==="full";return true;};\n',
-     "6.27 what each edition carries")
+     'if(p==="desk")return e==="master";if(p==="fabrica"||p==="lector"||p==="career")return e==="master"||e==="full";return true;};\n',
+     "6.27 what each edition carries (7.49: the five apps of the Desk, the master's alone)")
 
 # ---- R331 (Ingenium 7.44, 19 November 2026): local profiles (boot/profiles_boot.js, modules/r331.js, desktop/app_profiles_744.py). Her
 #      words, on the live preview she approved ("I approve of the preview ... Just add it to the damn app and let's move on. Put the drop down

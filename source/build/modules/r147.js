@@ -338,6 +338,10 @@ var APPS=[
   {k:"slides",t:"Imago",d:"Slides",c:"#b34a3c",go:"slides"},{k:"scriba",t:"Scriba",d:"Recordings",c:"#2f5f9e",go:"scriba"},
   {k:"fontes",t:"Fontes",d:"Sources",c:"#c9a14a",go:"fontes"},
   {k:"schedae",t:"Schedae",d:"Loose notes",c:"#6a3fb5",fn:"openSchedae"},{k:"clepsydra",t:"Clepsydra",d:"Short sprints",c:"#b88a3a",fn:"openClepsydra"}];
+/* 7.52 (her answer, 20 November 2026: "Yes for the mini app question"): the five apps of the Desk only where the Desk is, her master
+   in her own profile. Another person's profile on her master copy runs as the full edition, which carries none of them (build/editions.py
+   takes them out of the other editions' pages; there this does nothing more) */
+var DESK=(typeof ING_HAS!=="function")||ING_HAS("desk");if(!DESK)APPS=APPS.filter(function(A){return !A.go;});
 var R={};
 function build(){
   /* what the old page held and others still use: taken across as they are, their handlers with them */
@@ -401,6 +405,7 @@ function build(){
   /* the apps and the instruments */
   var as=mk("section","hx-appsec");as.setAttribute("aria-labelledby","hxAppsH");
   var ah=mk("div","hx-sech");var ah2=mk("h2",null,"Your apps");ah2.id="hxAppsH";ah.appendChild(ah2);ah.appendChild(mk("p",null,"Carpe Diem's own apps open on the Desk; the instruments open over this page."));as.appendChild(ah);
+  if(!DESK){ah2.textContent="Your instruments";ah.lastChild.textContent="The instruments open over this page: loose notes, and sprints of focus.";}
   var ag=mk("div","hx-apps");
   APPS.forEach(function(A,i){var b=mk("button","hx-app");b.type="button";b.setAttribute("data-app",A.k);b.style.setProperty("--c",A.c);b.style.animationDelay=(i*.035).toFixed(3)+"s";
     b.innerHTML='<span class="hx-stone"><span class="hx-an"></span></span>';

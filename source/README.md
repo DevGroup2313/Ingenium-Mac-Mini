@@ -395,6 +395,28 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.52 (20 November 2026): the Desk's five apps, the master's alone.
+Her words (19 November 2026): "I do not want any of my apps built-in any editions outside of the master edition. Ingenium itself is not
+exempt from that, I want it removed plus any other functions inside of it that give ownership accesss and capabilities for any of my apps
+and mini app." Asked whether the mini apps were the Desk's five apps (Tabula, Abacus, Imago, Scriba, Fontes), which the full edition still
+carried as she asked on 5 November, and whether they should stay or go, she answered (20 November 2026): "Yes for the mini app question."
+- `build/editions.py`: carries_desk() is the master's alone. The five apps' own edits (their keys, routes, words; Home's instruments alone;
+  nothing sent to an app the edition lacks) leave _public() for _no_desk(), which every edition but the master takes, the full edition
+  now too; with three lines of What is new said without them (6.74, 6.49 and 6.56, which the full edition shows with Vocatio). Their
+  modules r118, r123, r193 and r194 are left out of the full edition as of the gift and demo editions, and in the master page they are its
+  owner's alone (build_page.py's _OWNER_ONLY), so another person's profile there never runs them. r231 rides in the master page too: it
+  acts only where the Desk (or Fabrica) is missing, so in another person's profile there, never in hers.
+- `build/build_page.py`: ING_HAS("desk") is true in the master alone; another person's profile on her master copy runs as the full edition.
+- `build/modules/r147.js`: Home draws the five apps only where ING_HAS("desk"), else the instruments alone, under Your instruments (the
+  editions' pages already said so; another person's profile now does too). `r108.js` and `r188.js`: Lector's and Vocatio's Open in Tabula
+  only where ING_HAS("desk"). `r336.js` (another person's profile only): the Desk's sentences said as the other editions say them, and the
+  keys that send something to the Desk's apps (Send to Tabula, To Tabula, My Tabula page, Blend's Tabula) and the Guide's tip on them
+  taken away. Ingenium's own reference database (Fontes, the chat's My sources) and its model house (Scriba) stay in every edition.
+- What is new (r222): one line, for the master edition.
+- rig: `t_627_editions.js` expects the full edition without the five apps (its pages, its words: the same names the gift and demo
+  editions may not show); `t_746_no_apps.js` has a fourth part, the Desk: in each edition and in another person's profile no key, tile,
+  route, sending key or word of the five apps, and in her own profile all of them (the control).
+
 Ingenium 7.51 (20 November 2026): Ask before each export.
 Her security request (18 November 2026, 7.36) and the approved live preview (https://claude.ai/artifact/H4ieskf4TqQR7DXc6YSeAQ,
 source/previews/security), More protection: "Ask before each export. A plain copy (a backup without its seal, a plain export of an app)

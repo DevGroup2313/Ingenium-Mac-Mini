@@ -1419,7 +1419,8 @@ function wireFrame(){var U=L7().ui;wireFolds();wireZoom();
   var fmt=$("l7Fmt");[].forEach.call(fmt.querySelectorAll("button"),function(b){b.setAttribute("aria-pressed",(L7().brief.fmt||"docx")===b.getAttribute("data-v")?"true":"false");
     b.onclick=function(){L7().brief.fmt=b.getAttribute("data-v");[].forEach.call(fmt.querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});segThumbs(fmt.parentNode);saveSoon();};});
   $("l7Save").onclick=save;$("l7Copy").onclick=function(){curDoc().then(function(d){if(d)lxCopy(d.md);else ingToast("There is nothing to copy yet.");});};
-  if($("l7Open"))$("l7Open").onclick=openInTabula;
+  /* 7.52: Open in Tabula only where the Desk is (her master, in her own profile); elsewhere Tabula is not part of the copy, so no key */
+  if($("l7Open")){if((typeof ING_HAS!=="function")||ING_HAS("desk"))$("l7Open").onclick=openInTabula;else $("l7Open").remove();}
   /* 6.44: the document shown, handed to the Career Studio, which looks at it against her profile with suggestions, never rewriting it */
   if($("l7Advise"))$("l7Advise").onclick=function(){if(!(window.IngCareer&&IngCareer.adviseDoc)){ingToast("Vocatio is not part of this copy of Ingenium.");return;}
     curDoc().then(function(d){if(!d){ingToast("There is nothing to look at yet: this document is written after the reading.");return;}var apps=sorted(curApps()),j=job(),name=j&&j.doc?(lxRun(j.doc)||{}).name:setName(apps);

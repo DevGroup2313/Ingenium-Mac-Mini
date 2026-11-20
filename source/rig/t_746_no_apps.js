@@ -12,6 +12,8 @@
 //   2. work brought in from her master copy (a CV naming her apps, Lector's readings of them, the library's copies of them, Lakay's
 //      included) brings none of her apps into any list
 //   3. a page the person adds is listed, whatever app it is ("unless I upload them on there"), where the edition has an app library
+//   4. 7.52 (her answer, 20 November 2026: "Yes for the mini app question"): none of the Desk's five apps (Tabula, Abacus, Imago, Scriba,
+//      Fontes): no key, no Home tile, no route, no key that sends to one, no word naming one; in her own profile, all of them
 // Invented apps only (Tide Clock); no one's data.
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path');
 const [URL_, OUT, MODE] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true });
@@ -101,6 +103,34 @@ const HERS = /Carpe Diem|The Forge|\bthe Forge\b|Inkwell|Lakay|Offline Project/;
       ok(added.apps.some((n) => /Carpe Diem/.test(n)), '   and a page of one of her apps, added by the person, is listed as any other app ("unless I upload them on there")', added.apps);
       ok(added.offer.some((x) => /^Tide Clock \(In your app library\)$/.test(x)), '   Folders, Your apps offers what was added here', added.offer);
     } else if (!OWNER) console.log('NOTE this edition has no app library (the gift and demo editions): nothing to add');
+    // ---------------------------------------------------------------- 4. the Desk's five apps (7.52, her answer: "Yes for the mini app question")
+    const d = await p.evaluate(async () => {
+      const DESK = ['tabula', 'abacus', 'slides', 'scriba', 'fontes'], r = { said: {} };
+      const NAMES = /\b(Tabula|Abacus|Imago)\b|Scriba for recordings|Scriba \(recordings|Scriba's own speech models|\(Scriba's,|Fontes for sources|Fontes \(sources\) are/;
+      const visible = (root) => { const out = []; const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n;
+        while ((n = w.nextNode())) { const e = n.parentElement; if (!e || !e.offsetParent || e.closest('.msg,textarea,input,pre,code')) continue; const t = n.nodeValue.trim(); if (t && NAMES.test(t)) out.push(t.slice(0, 160)); } return out; };
+      r.keys = [...document.querySelectorAll('.nav-btn[data-page]')].map((b) => b.getAttribute('data-page')).filter((x) => DESK.indexOf(x) >= 0);
+      r.group = [...document.querySelectorAll('.grp-label')].map((g) => g.textContent.trim()).filter((t) => /^apps$/i.test(t));
+      try { go('home'); } catch (e) {} await new Promise((s) => setTimeout(s, 1200));
+      r.tiles = [...document.querySelectorAll('.hx-app[data-app]')].map((b) => b.getAttribute('data-app')).filter((x) => DESK.indexOf(x) >= 0);
+      r.head = (document.getElementById('hxAppsH') || {}).textContent || null;
+      r.routes = DESK.filter((x) => { try { go(x); const a = document.querySelector('section.section.active'); return !!(a && a.id === 'page-' + x); } catch (e) { return false; } });
+      for (const pg of ['home', 'chat', 'folders', 'blend', 'build', 'lector', 'career', 'fabrica', 'focus', 'settings', 'guide']) { try { go(pg); } catch (e) { continue; } await new Promise((s) => setTimeout(s, 1400));
+        const sec = document.querySelector('section.section.active'); if (sec && sec.id === 'page-' + pg) r.said[pg] = visible(sec); }
+      r.sendKeys = [...document.querySelectorAll('button')].filter((b) => b.offsetParent && /^(?:📝\s*)?(?:Send to Tabula|To Tabula|My Tabula page|Open in Tabula)$/.test(b.textContent.trim())).map((b) => b.textContent.trim());
+      r.tip = [...document.querySelectorAll('.tip')].some((t) => /Tabula is the writing tablet/.test(t.textContent));
+      try { go('home'); } catch (e) {}
+      return r; });
+    if (OWNER) {
+      ok(d.keys.indexOf('tabula') >= 0 && d.keys.indexOf('abacus') >= 0 && d.tiles.length === 5 && d.routes.length >= 2, 'control: in her own profile the Desk is all there: Tabula and Abacus in the side bar, the five apps on Home, their pages open', d);
+    } else {
+      ok(d.keys.length === 0 && d.group.length === 0, '4. the Desk (7.52): no key to any of its five apps in the side bar, and no Apps group', { keys: d.keys, group: d.group });
+      ok(d.tiles.length === 0 && d.head === 'Your instruments', '   Home shows the instruments alone, under Your instruments', { tiles: d.tiles, head: d.head });
+      ok(d.routes.length === 0, '   no route opens one of the five apps\' pages', d.routes);
+      const named = Object.entries(d.said).filter(([k, v]) => v.length);
+      ok(named.length === 0 && !d.tip, '   no page, nor the Guide\'s tip, names Tabula, Abacus, Imago, or Scriba and Fontes as apps', { named, tip: d.tip });
+      ok(d.sendKeys.length === 0, '   no key sends anything to one of them (Send to Tabula, To Tabula, My Tabula page, Open in Tabula)', d.sendKeys);
+    }
   } catch (e) { ok(false, 'the run finished', e.message); }
   ok(errs.length === 0, 'no page error', errs.slice(0, 5));
   console.log(pass + ' passed, ' + fail + ' failed'); await b.close(); process.exit(fail ? 1 : 0);

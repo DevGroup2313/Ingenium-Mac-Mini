@@ -13,14 +13,15 @@ const [OUT, ...pairs] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: tr
 const URLS = Object.fromEntries(pairs.map(s => s.split(/=(.*)/s).slice(0, 2)));
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + String(typeof d === 'string' ? d : JSON.stringify(d)).slice(0, 1800))); c ? pass++ : fail++; };
 const PUBLIC_PAGES = ['home', 'chat', 'code', 'folders', 'focus', 'models', 'blend', 'build', 'guide', 'settings'];
-const FULL_PAGES = ['home', 'chat', 'code', 'folders', 'focus', 'models', 'blend', 'lector', 'career', 'build', 'fabrica', 'tabula', 'abacus', 'slides', 'scriba', 'fontes', 'guide', 'settings'];
+// 7.52 (her answer, 20 November 2026: "Yes for the mini app question"): the full edition carries none of the Desk's five apps either
+const FULL_PAGES = ['home', 'chat', 'code', 'folders', 'focus', 'models', 'blend', 'lector', 'career', 'build', 'fabrica', 'guide', 'settings'];
 // what an edition must not show or name. The copyright line and the licence, which every edition keeps, are taken out of the words first.
 const OWNERS = /Designed and built by Yannie D\. Forest|© 2026 Yannie D\. Forest|Copyright \(c\) 2026 Yannie D\. Forest|Yannie D\. Forest\b(?=[^.]{0,80}(All rights reserved|licen[cs]e|Licen[cs]e|owner|Owner))/g;
 const NOT = {
   // Scriba and Fontes are also Ingenium's own model house and its reference database (the chat's My sources), which every edition keeps:
   // they count here only in the words that mean the apps of those names
   public: /\b(Fabrica|Tabula|Abacus|Imago|Scriba for recordings|Scriba \(recordings|Scriba's speech model|Fontes \(sources\) are|Fontes for sources|Lector|Career Studio|Vocatio|Author Studio|Workshop|Carpe Diem|The Forge|Inkwell|Offline Project|Yannie)\b/,
-  full: /\b(Author Studio|Workshop|Carpe Diem|The Forge|Inkwell|Offline Project|Yannie)\b/
+  full: /\b(Tabula|Abacus|Imago|Scriba for recordings|Scriba \(recordings|Scriba's speech model|Scriba's own speech models|Fontes \(sources\) are|Fontes for sources|Author Studio|Workshop|Carpe Diem|The Forge|Inkwell|Offline Project|Yannie)\b/
 };
 async function survey(b, ed, url) {
   const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } }); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 240)));
@@ -74,8 +75,8 @@ async function survey(b, ed, url) {
       ok(!r.nameCard && !r.ownerKey && !r.workshop, ed + ': no renaming, no author key, no Author Studio', r);
       ok(mentions.length === 0, ed + ': no page, the tour or the help names a page or an app this edition does not have, nor the owner', mentions.slice(0, 40));
     } else if (kind === 'full') {
-      ok(r.ed === 'full' && JSON.stringify(r.nav) === JSON.stringify(FULL_PAGES), 'full: the side bar holds every page but the Author Studio, with Lector, the Career Studio, Fabrica and the five apps', r.nav);
-      ok(r.desk.length === 5, 'full: the five apps are carried', r.desk);
+      ok(r.ed === 'full' && JSON.stringify(r.nav) === JSON.stringify(FULL_PAGES), 'full: the side bar holds every page but the Author Studio, with Lector, the Career Studio and Fabrica, and none of the five apps (7.52)', r.nav);
+      ok(r.desk.length === 0 && !r.groups.some(g => /apps/i.test(g)) && !r.stray.some(x => /^(tabula|abacus|slides|scriba|fontes)$/.test(x)), 'full: none of the five apps is carried, no Apps group, and no route leads to one (7.52)', { desk: r.desk, groups: r.groups, stray: r.stray });
       ok(!r.nameCard && !r.ownerKey && !r.workshop, 'full: no renaming Ingenium, no author key, no Author Studio', { nameCard: r.nameCard, ownerKey: r.ownerKey, workshop: r.workshop });
       ok(r.carried.every(n => !/Carpe Diem|Forge|Inkwell/i.test(n)), 'full: none of the Offline Project\'s apps is carried', r.carried);
       ok(mentions.length === 0, 'full: nothing names the Offline Project\'s apps, the Author Studio or the owner', mentions.slice(0, 40));
