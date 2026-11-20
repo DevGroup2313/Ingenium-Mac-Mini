@@ -415,10 +415,14 @@ when it ends." Kept readable on purpose: an app served for the Home Screen and t
 - `build/modules/r318.js`: Security, The computer's disk shows its true state (On, Off, or a copy without a computer app), what is sealed,
   how many files, Seal them now, and what is not sealed yet: Fabrica apps kept on a drive, the folder search's index and texts for
   training (the next stage). Its overview no longer names a release that has passed.
+- Found on the test build, before any release: with no computer app (a browser, the Fire tablet, the iPhone), the room asked r340 for
+  its words as it painted, r340 asked the absent app for its count, and the answer painted the room again, a loop of promises that
+  never let the page finish loading. r340 asks only where there is a computer app, at most every four seconds, and paints the room again
+  only when the answer changed.
 - What is new (r222): one line, where Fabrica is.
 - rig: `t_749_disk_app.py` (new, 19 checks, a copy of the real computer app: a waiting app sealed and opened for a device, a run sealed
   when it ends and read in parts across chunks, locked, a changed byte and another key refused, a copy added to after sealing, everything
-  opened again); `t_749_disk_page.js` (new, 13 checks, a stand-in computer app recording each call: no key without a sign-in, the key
+  opened again); `t_749_disk_page.js` (new, 15 checks: first a page with no computer app at all, which starts and says so; then a stand-in computer app recording each call: no key without a sign-in, the key
   handed over when protected and not the password, dropped on Lock now before the page goes to its door, the same key back after signing
   in, dropped by a page opened locked, Seal them now, and everything opened again before the key is dropped when protection is turned off).
 
