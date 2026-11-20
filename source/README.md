@@ -395,6 +395,22 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.56 (20 November 2026): purple words that can be pressed, the rest of them underlined.
+Her rule (20 November 2026, kept in her ways of working since 7.54): "Purple words that can be pressed are underlined." 7.53's list in
+`build/modules/r343.js` names the keys found then; a scan of 7.55's release page, every page by day and by night (elements one can press,
+drawn as purple words with no fill, border or shadow, and no line), still found some without it: "Take the guided tour", the model names
+on the Models page, and disclosures such as "About this model".
+- `build/modules/r343.js`: the list stays; a finder gives the same line (.ing-ul: 1px, 3px under the words, their own colour) to any key
+  or link drawn as bare purple words that no rule has lined, as it is drawn (a MutationObserver, before the page is painted) and again
+  when the theme changes, so a key added later has it too. Nothing else changes: no colour, size, weight or motion. Left as the list
+  leaves them: keys with a face, the strips' choices and tabs (aria-pressed, role tab), menus and their rows, chips, the left menu. Its
+  cost, measured on 7.53's test build: about 0.3 ms for each update of a reply being written, nothing measurable when moving between pages.
+- What is new (r222): one line, for every edition.
+- rig: `t_756_underline.js` (22 checks: 7.53's keys and the ones it missed, by day and by night; the line's look and that nothing moves
+  with it; a key drawn later; what is left as it is; every page by day and by night with no purple word key left bare).
+- `previews/fabrica_stage3b/compose_cards.py`: one picture for each step of a preview, her rule (one by one, at full size, never one
+  tall sheet).
+
 Ingenium 7.55 (20 November 2026): the record of Ingenium's security, profiles and design, in Ingenium's folder.
 - Her words (20 November 2026): "I want you to document the sign-in and sign-out functions of Ingenium and its entire security system and
   structure, as well as the different profiles and and data storage per profiles and everything associated with it into Ingenia's folders
