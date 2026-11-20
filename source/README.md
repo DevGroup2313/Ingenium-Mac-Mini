@@ -395,7 +395,7 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.48 (20 November 2026): Fabrica's plan, stage 2, one ecosystem.
+Ingenium 7.48 (20 November 2026): Fabrica's plan, stage 2, one ecosystem; the profile key inside the Status panel.
 
 Her word on its pictures (19 November 2026): "I approve of the preview, please commit and push it everywhere" (the audit's recommendations
 5 to 7, approved in full the same day). Its first preview, a live page made of whole captured pages, "is glitching and makes no sense to me":
@@ -412,6 +412,14 @@ each (`previews/fabrica_stage2`: capture_pics.js, compose_pics.py).
   Adamas (r138's `bdOpenRepo`), Open in Code; reached from the folder's head, Fabrica's app page, Code, Chat (its top row, beside Controls)
   and Adamas. In the gift and demo editions, which have no Fabrica, only the folder in Code is kept.
   `rig/t_748_ecosystem.js` 15/15.
+- The profile key inside the Status panel. Her words (20 November 2026): "please remove the profile toggle from the side navigation bar,
+  instead put it inside of the Status panel on the top bar since it makes the most sense and cleanly removes it from messing with the
+  design and template of the app"; on its pictures: "I approve of the preview, please commit and push it everywhere". `build/modules/r338.js`:
+  the left menu shows no profile key (r331's #profKey stays in the page, out of sight); the Status panel (openPresenceMenu) ends with Who
+  is using Ingenium, each profile a row of the panel's own kind (data-who) with r331's round tile, then Lock Ingenium (#r338Lock) and, in
+  her own profile, Manage profiles (#r338Manage); each row is pressed in r331's own menu, so it does what that row does. `rig/t_744_profiles.js`
+  and `rig/t_746_film_key.js` reach the profiles through the Status panel now.
+
 Ingenium 7.47 (19 November 2026): Code's start window in Vocatio's drop zone, flat until the pointer is on it.
 Her words (19 November 2026), with a picture of Vocatio's "Drop your files here" and one of Code's start window: "I want you to give the
 new Code panel for Fabrica the same raised 3D effect as the "Drop your files" section of the Vocatio page, it looks that much better than

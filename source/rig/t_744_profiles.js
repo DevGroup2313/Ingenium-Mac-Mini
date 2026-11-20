@@ -27,28 +27,26 @@ async function setupLock(p, name, pwd) { await p.waitForSelector('#ingLockDoor #
   await p.click('#ingLockDoor #ildDone'); await p.waitForTimeout(800); return words; }
 async function signIn(p, pwd) { await p.waitForSelector('#ingLockDoor:not([hidden]) #ildPw', { timeout: 60000 }); await p.fill('#ingLockDoor #ildPw', pwd); await p.click('#ingLockDoor #ildGo');
   await p.waitForFunction(() => window.__ingReady === true && !(document.querySelector('#ingLockDoor') && !document.querySelector('#ingLockDoor').hidden), null, { timeout: 120000 }); await p.waitForTimeout(1500); }
-async function chooseFromKey(p, name) { await p.click('#profKey'); await p.waitForSelector('#profPop:not([hidden]) .r331-who', { timeout: 10000 });
-  const id = await p.evaluate((n) => { const b = n === null ? document.querySelector('#profPop .r331-who[data-who="owner"]') : [...document.querySelectorAll('#profPop .r331-who')].find((x) => x.querySelector('b').textContent === n); return b ? b.getAttribute('data-who') : null; }, name);
-  await Promise.all([p.waitForNavigation({ timeout: 120000 }).catch(() => {}), p.click('#profPop .r331-who[data-who="' + id + '"]')]); return id; }
+// 7.48 (r338): the profile key is inside the Status panel (the top bar's status key), at its foot: Who is using Ingenium
+async function openWho(p) { await p.click('#statusPill'); await p.waitForSelector('.pres-menu .r338-who', { timeout: 10000 }); }
+async function chooseFromKey(p, name) { await openWho(p);
+  const id = await p.evaluate((n) => { const rows = [...document.querySelectorAll('.pres-menu .r338-who[data-who]')]; const b = n === null ? rows.find((x) => x.getAttribute('data-who') === 'owner') : rows.find((x) => x.querySelector('.pres-name').textContent === n); return b ? b.getAttribute('data-who') : null; }, name);
+  await Promise.all([p.waitForNavigation({ timeout: 120000 }).catch(() => {}), p.click('.pres-menu .r338-who[data-who="' + id + '"]')]); return id; }
 (async () => {
   const b = await pw.chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1360, height: 900 } }); const p = await ctx.newPage();
   const errs = []; p.on('pageerror', (e) => errs.push(e.message.slice(0, 240)));
   try {
     // ---------------------------------------------------------------- 1. the owner's profile
     await p.goto(URL_); await boot(p); await inside(p);
-    const k1 = await p.evaluate(() => { const k = document.getElementById('profKey'), s = document.getElementById('brandSealBtn'); const g = k && getComputedStyle(k);
-      return { name: (k && k.querySelector('.r331-nm') || {}).textContent, owner: window.__ingProfile && window.__ingProfile.owner, beside: !!(k && k.parentElement && k.parentElement.matches('nav.dock') && !document.querySelector('.topbar #profKey')), tile: !!(k && k.querySelector('.r331-mk.round')), raised: !!(k && k.classList.contains('nav-btn')), ed: ING_EDITION }; });
-    ok(k1.owner && k1.beside && k1.tile && k1.raised && k1.ed === 'master' && k1.name === 'Yannie', '1. the owner\'s profile: the key stands at the foot of the left menu (not in the top bar), with her tile and her name as Home greets her', k1);
-    const y0 = await p.evaluate(() => document.getElementById('profKey').getBoundingClientRect().top); await p.hover('#profKey'); await p.waitForTimeout(500);
-    const y1 = await p.evaluate(() => document.getElementById('profKey').getBoundingClientRect().top);
-    await p.click('#profKey'); await p.waitForTimeout(700);
-    const m1 = await p.evaluate(() => { const d = document.getElementById('profPop'); return { open: !!(d && !d.hidden), h: (d.querySelector('h4') || {}).textContent, rows: d.querySelectorAll('.r331-who').length, inUse: (d.querySelector('.r331-who[aria-current="true"] .r331-chip') || {}).textContent, keys: [...d.querySelectorAll('.r331-foot .r331-k')].map((x) => x.textContent.trim()), sound: (window.IngSound && IngSound.history().map((h) => h.voice)) || [] }; });
-    ok(y0 - y1 >= 1 && m1.open && m1.h === 'Who is using Ingenium' && m1.rows === 1 && m1.inUse === 'In use' && m1.keys.join('|') === 'Lock Ingenium|Manage profiles', '   it lifts under the pointer; pressed, its menu: Who is using Ingenium, the profile In use, Lock Ingenium and Manage profiles', { lift: y0 - y1, m1 });
-    ok(m1.sound.indexOf('cardLift') >= 0 && m1.sound.indexOf('keyPress') >= 0, '   with Ingenium\'s own sounds: the key\'s press and a card lifting', m1.sound);
-    await p.screenshot({ path: path.join(OUT, 'owner_menu.png'), clip: { x: 0, y: 0, width: 760, height: 360 } });
+    const k1 = await p.evaluate(() => { const k = document.getElementById('profKey'); return { name: (k && k.querySelector('.r331-nm') || {}).textContent, owner: window.__ingProfile && window.__ingProfile.owner, dockShows: !!(k && k.offsetParent), top: !!document.querySelector('.topbar #profKey'), ed: ING_EDITION }; });
+    ok(k1.owner && !k1.dockShows && !k1.top && k1.ed === 'master' && k1.name === 'Yannie', '1. the owner\'s profile: no profile key in the left menu or the top bar (7.48: it is inside the Status panel), her name as Home greets her', k1);
+    await openWho(p); await p.waitForTimeout(400);
+    const m1 = await p.evaluate(() => { const m = document.querySelector('.pres-menu'), r = m.getBoundingClientRect(), heads = [...m.querySelectorAll('.pres-head')].map((x) => x.textContent.trim());
+      const rows = [...m.querySelectorAll('.r338-who[data-who]')]; return { heads, inside: r.top >= 0 && r.bottom <= innerHeight + 1, rows: rows.length, inUse: rows.filter((x) => /In use/.test(x.textContent)).map((x) => x.querySelector('.pres-name').textContent), tile: !!m.querySelector('.r338-who .r331-mk.round'), keys: [...m.querySelectorAll('#r338Lock,#r338Manage')].map((x) => x.textContent.trim()) }; });
+    ok(m1.heads.join('|') === 'Status|Who is using Ingenium' && m1.inside && m1.rows === 1 && m1.inUse.join() === 'Yannie' && m1.tile && m1.keys.join('|') === 'Lock Ingenium|Manage profiles', '   the Status panel ends with Who is using Ingenium: the profile In use, with its tile, Lock Ingenium and Manage profiles', m1);
     await p.evaluate(() => { const c = { id: 'cOWN', title: 'Owner marker', messages: [{ role: 'me', text: 'owner secret 4471' }] }; state.chats.push(c); saveState(); });
     // ---------------------------------------------------------------- 2. Profiles on this device
-    await p.click('#profManage'); await p.waitForTimeout(1500);
+    await openWho(p); await p.waitForTimeout(400); await p.click('#r338Manage'); await p.waitForTimeout(1500);  // 7.48: Manage profiles, in the Status panel
     const c2 = await p.evaluate(() => { const c = document.getElementById('profCard'); return { shown: !!(c && c.offsetParent), rows: c ? c.querySelectorAll('.r331-prow').length : 0, needs: !!(c && /Profiles need your sign-in/.test(c.textContent)), form: !!document.getElementById('profAdd') }; });
     ok(c2.shown && c2.rows === 1 && c2.needs && !c2.form, '2. Manage profiles opens Settings, Security: Profiles on this device, and adding one asks for the owner\'s sign-in first', c2);
     await p.click('#profLockSetup'); await setupLock(p, 'Ada Lindqvist', PW_OWNER);
@@ -84,7 +82,7 @@ async function chooseFromKey(p, name) { await p.click('#profKey'); await p.waitF
     const e5b = await p.evaluate(() => (IngProfiles.list().find((x) => x.name === 'Elias') || {}).sealed);
     ok(e5.on && e5.rec && !e5.mine && e5b === true, '   Elias is sealed with its own password, and holds nothing of the owner\'s', Object.assign(e5, { sealedNow: e5b }));
     // ---------------------------------------------------------------- 6. Lock Ingenium, Someone else
-    await p.click('#profKey'); await p.waitForTimeout(500); await Promise.all([p.waitForNavigation({ timeout: 120000 }).catch(() => {}), p.click('#profLock')]); await boot(p);
+    await openWho(p); await p.waitForTimeout(400); await Promise.all([p.waitForNavigation({ timeout: 120000 }).catch(() => {}), p.click('#r338Lock')]); await boot(p);
     await p.waitForSelector('#ingLockDoor:not([hidden]) .r331-else', { timeout: 30000 }).catch(() => {});
     const d6 = await p.evaluate(() => ({ pw: !!document.querySelector('#ingLockDoor:not([hidden]) #ildPw'), other: !!document.querySelector('#ingLockDoor .r331-else') }));
     ok(d6.pw && d6.other, '6. Lock Ingenium: the sign-in\'s door, with Someone else? Choose a profile', d6);

@@ -32,18 +32,16 @@ const violet = (v) => { const m = String(v).match(/rgba?\((\d+), (\d+), (\d+)(?:
     await p.screenshot({ path: path.join(OUT, 'fabrica_no_film.png') });
     await p.keyboard.press('Escape'); await p.evaluate(() => { go('home'); }); await p.waitForTimeout(700);
     // ---------------------------------------------------------------- 2. the profile key
-    const k2 = await p.evaluate(() => { const k = document.getElementById('profKey'), d = document.querySelector('nav.dock'), kr = k && k.getBoundingClientRect(), dr = d && d.getBoundingClientRect();
-      return { inTop: !!document.querySelector('.topbar #profKey'), inDock: !!(k && d && d.contains(k)), last: !!(k && d && d.lastElementChild === k), foot: kr && dr ? Math.round(dr.bottom - kr.bottom) : null, name: k && (k.querySelector('.r331-nm') || {}).textContent }; });
-    ok(!k2.inTop && k2.inDock && k2.last && k2.foot !== null && k2.foot < 40, '2. no profile key in the top bar: it is the last row of the left menu, at its foot', k2);
-    const y0 = await p.evaluate(() => document.getElementById('profKey').getBoundingClientRect().top); await p.hover('#profKey'); await p.waitForTimeout(450);
-    const h2 = await p.evaluate(() => { const k = document.getElementById('profKey'), cs = getComputedStyle(k); return { top: k.getBoundingClientRect().top, bg: cs.backgroundColor + ' ' + cs.backgroundImage }; });
-    ok(y0 - h2.top >= 1 && !violet(h2.bg.split(' linear')[0]), '   under the pointer it lifts, with no violet wash', { lift: y0 - h2.top, bg: h2.bg.slice(0, 120) });
-    await p.click('#profKey'); await p.waitForTimeout(700);
-    const m2 = await p.evaluate(() => { const d = document.getElementById('profPop'), k = document.getElementById('profKey'), dr = d.getBoundingClientRect(), kr = k.getBoundingClientRect();
-      return { open: !d.hidden, above: dr.bottom <= kr.top + 1, inside: dr.top >= 0 && dr.left >= 0 && dr.right <= innerWidth, h: d.querySelector('h4').textContent, keys: [...d.querySelectorAll('.r331-k')].map((x) => x.textContent.trim()) }; });
-    ok(m2.open && m2.above && m2.inside && m2.h === 'Who is using Ingenium' && m2.keys.join('|') === 'Lock Ingenium|Manage profiles', '   its menu (version 3) opens above it, inside the window', m2);
-    await p.screenshot({ path: path.join(OUT, 'profile_key_dock.png'), clip: { x: 0, y: 360, width: 460, height: 500 } });
-    await p.keyboard.press('Escape');
+    // 7.48 (r338, her words of 20 November 2026: "please remove the profile toggle from the side navigation bar, instead put it inside of the
+    // Status panel on the top bar"): neither the top bar nor the left menu shows a profile key; the Status panel holds Who is using Ingenium
+    const k2 = await p.evaluate(() => { const k = document.getElementById('profKey'); return { top: !!document.querySelector('.topbar #profKey'), dockShows: !!(k && k.offsetParent) }; });
+    ok(!k2.top && !k2.dockShows, '2. no profile key in the top bar or the left menu', k2);
+    await p.click('#statusPill'); await p.waitForTimeout(700);
+    const m2 = await p.evaluate(() => { const m = document.querySelector('.pres-menu'), r = m.getBoundingClientRect(), cs = getComputedStyle(m);
+      return { heads: [...m.querySelectorAll('.pres-head')].map((x) => x.textContent.trim()), inside: r.top >= 0 && r.bottom <= innerHeight + 1 && r.left >= 0 && r.right <= innerWidth, keys: [...m.querySelectorAll('#r338Lock,#r338Manage')].map((x) => x.textContent.trim()), rows: m.querySelectorAll('.r338-who[data-who]').length }; });
+    ok(m2.heads.join('|') === 'Status|Who is using Ingenium' && m2.inside && m2.rows >= 1 && m2.keys.join('|') === 'Lock Ingenium|Manage profiles', '   the Status panel ends with Who is using Ingenium, inside the window', m2);
+    await p.screenshot({ path: path.join(OUT, 'profile_in_status.png'), clip: { x: 700, y: 0, width: 660, height: 860 } });
+    await p.evaluate(() => { try { closePresenceMenu(); } catch (e) {} });
     // ---------------------------------------------------------------- 3. stage 1's parts, where r333 is
     const has333 = await p.evaluate(() => !!window.IngRepoWork);
     if (has333) {
