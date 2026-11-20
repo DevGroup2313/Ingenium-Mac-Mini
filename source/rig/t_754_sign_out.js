@@ -63,7 +63,12 @@ const NAME = 'Ada Example', PW = 'tide-clock-harbour-41';
   // 3. sign out
   rows = await panel();
   ok(rows.some((x) => /#r344Out Sign out/.test(x)), 'signed in, the Status panel offers Sign out', rows);
+  // from the first frame of the page started again, until Who is using Ingenium is up: the sign-in card must never show first
+  await p.addInitScript(() => { window.__flash = null; const look = () => { if (window.__flash !== null) return; if (document.querySelector('#profDoor:not([hidden]) .r331-door')) { window.__flash = false; return; }
+    const c = document.querySelector('#ingLockDoor:not([hidden]) .ild-card'); if (c && getComputedStyle(c).visibility === 'visible' && c.getBoundingClientRect().height > 0) { window.__flash = true; return; } requestAnimationFrame(look); }; requestAnimationFrame(look); });
   await p.evaluate(() => { window.__pvOld = 1; document.getElementById('r344Out').click(); }); await fresh();
+  await p.waitForSelector('#profDoor:not([hidden]) .r331-door .r344-door-out', { timeout: 120000 }).catch(() => {}); await p.waitForTimeout(400);
+  ok(await p.evaluate(() => window.__flash === false), 'signed out, the sign-in card never shows for a moment before Who is using Ingenium (watched frame by frame)', await p.evaluate(() => window.__flash));
   const d1 = await p.evaluate(() => { const d = document.getElementById('profDoor'), c = document.querySelector('#ingLockDoor .ild-card'), o = document.querySelector('#profDoor .r344-door-out');
     return { door: !!(d && !d.hidden), text: d ? d.textContent.replace(/\s+/g, ' ').slice(0, 300) : '', lock: !!document.querySelector('#ingLockDoor:not([hidden]) #ildPw'), cardHidden: !!(c && getComputedStyle(c).visibility === 'hidden'), ink: o ? getComputedStyle(o).color : '' }; });
   ok(d1.cardHidden && d1.ink && !/106, 63, 181/.test(d1.ink), 'while the profiles stand over it, the sign-in card waits out of sight; the Signed out line is in ink, not violet (it is not pressed)', d1);
@@ -97,6 +102,7 @@ const NAME = 'Ada Example', PW = 'tide-clock-harbour-41';
   // by night, as she would come to it: Night chosen, then Sign out (the page's look is sealed; only the sign-in door knows it is night)
   await p.evaluate(() => { state.theme = 'night'; applyTheme(); saveState(); }); await p.waitForTimeout(1200);
   await p.evaluate(() => { window.__pvOld = 1; try { openPresenceMenu(); } catch (e) {} document.getElementById('r344Out').click(); }); await fresh();
+  await p.waitForSelector('#profDoor:not([hidden]) .r331-door .r344-door-out', { timeout: 120000 }).catch(() => {}); await p.waitForTimeout(400);
   const n1 = await p.evaluate(() => { const l = document.getElementById('ingLockDoor'), box = document.querySelector('#profDoor .r331-door'), o = document.querySelector('#profDoor .r344-door-out');
     return { lockNight: !!(l && l.classList.contains('ild-night')), card: box ? getComputedStyle(box).backgroundColor : '', ink: o ? getComputedStyle(o).color : '' }; });
   ok(n1.lockNight && n1.card === 'rgb(32, 26, 43)' && n1.ink === 'rgb(211, 201, 227)', 'by night (Night chosen, then Sign out): Who is using Ingenium is in the night colours on the night door, never a day card', n1);
@@ -111,8 +117,8 @@ const NAME = 'Ada Example', PW = 'tide-clock-harbour-41';
   ok(await p.evaluate(() => document.body.getAttribute('data-theme') === 'night' && state.theme === 'night'), 'signed in again: her desk by night, as she left it');
   await p.evaluate(() => { state.theme = 'day'; applyTheme(); saveState(); }); await p.waitForTimeout(800);
   await p.evaluate(() => document.getElementById('r344Out') || openPresenceMenu()); await p.evaluate(() => { window.__pvOld = 1; try { openPresenceMenu(); } catch (e) {} document.getElementById('r344Out').click(); });
-  await fresh();
-  const d2 = await p.evaluate(() => [...document.querySelectorAll('#profDoor button[data-door]')].map((x) => x.getAttribute('data-door')));
+  await fresh(); await p.waitForSelector('#profDoor:not([hidden]) .r331-door .r344-door-out', { timeout: 120000 }).catch(() => {}); await p.waitForTimeout(400);
+  const d2 =await p.evaluate(() => [...document.querySelectorAll('#profDoor button[data-door]')].map((x) => x.getAttribute('data-door')));
   ok(d2.indexOf('owner') >= 0 && d2.indexOf('ptide') >= 0, 'the door lists each profile', d2);
   await p.evaluate(() => document.querySelector('#profDoor button[data-door="ptide"]').click()); await p.waitForTimeout(1500); await ready();
   const g = await p.evaluate(() => ({ prof: window.__ingProfile, out: !!(JSON.parse(localStorage.getItem('ingenium_profiles') || '{}') || {}).out }));

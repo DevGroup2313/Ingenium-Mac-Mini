@@ -19,6 +19,8 @@
   background:#f5f3f7;color:#221a2e;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --ild-face-a:#ffffff;--ild-face-b:#f7f5fa;--ild-wall:#d3cbe0;--ild-ink:#221a2e;--ild-soft:rgba(70,58,92,.78);--ild-line:rgba(91,70,144,.30);--ild-fam:40,22,68;--ild-field:#ffffff;--ild-acc:#5b4690}
 #ingLockDoor[hidden]{display:none}
+/* 7.54: after Sign out (r344), the page starts again at Who is using Ingenium; until that door is up, the sign-in's card waits out of sight */
+#ingLockDoor.ild-wait .ild-card{visibility:hidden}
 #ingLockDoor.ild-night{background:#16131c;color:#efe9f6;--ild-face-a:#342a4c;--ild-face-b:#2c2341;--ild-wall:#140e1c;--ild-ink:#ece6f6;--ild-soft:rgba(236,230,246,.74);--ild-line:rgba(190,170,230,.34);--ild-fam:0,0,0;--ild-field:#1d1728;--ild-acc:#c9b8ee}
 #ingLockDoor.ild-over{background:rgba(22,18,30,.58)}
 #ingLockDoor .ild-card{width:min(470px,94vw);max-height:92vh;overflow:auto;box-sizing:border-box;padding:28px 28px 22px;border-radius:22px;color:var(--ild-ink);
@@ -450,6 +452,11 @@ function night(){try{var h=W_.__ingLockedRaw?deskHead(W_.__ingLockedRaw):null,t=
 function door(over){if(!DOOR){DOOR=D.createElement("div");DOOR.id="ingLockDoor";DOOR.setAttribute("role","dialog");DOOR.setAttribute("aria-modal","true");DOOR.setAttribute("aria-label","Ingenium's sign-in");
     CARD=D.createElement("div");CARD.className="ild-card";DOOR.appendChild(CARD);(D.body||D.documentElement).appendChild(DOOR);}
   DOOR.classList.toggle("ild-night",night());DOOR.classList.toggle("ild-over",!!over);
+  /* 7.54: signed out (r344 marks the profiles' list), the page starts again at Who is using Ingenium, which r344 puts up only once its
+     part of the page has loaded, seconds later on a slow device. Until then the sign-in's card waits out of sight, so it never shows
+     for a moment first; r344 takes it from there. Should nothing take over within 12 s, the card shows. */
+  if(!over&&!DOOR.__r344w){DOOR.__r344w=1;try{var rg=W_.__ingProfiles&&W_.__ingProfiles.reg?W_.__ingProfiles.reg():null;
+    if(rg&&rg.out){DOOR.classList.add("ild-wait");setTimeout(function(){DOOR.classList.remove("ild-wait");},12000);}}catch(e){}}
   /* 6.9.9: asked at the welcome door, the sign-in takes the door's own place, as wide as its card, on the door's own ground */
   var ic=over?introCard():null,dd=$("introDoor");DOOR.classList.toggle("ild-indoor",!!ic);if(dd)dd.classList.toggle("ild-card-away",!!ic);
   if(ic){if(!CARD.style.width){var w=ic.getBoundingClientRect().width;if(w>0)CARD.style.width=Math.round(Math.max(440,Math.min(w,640)))+"px";}}else CARD.style.width="";

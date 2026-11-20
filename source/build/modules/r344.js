@@ -121,7 +121,7 @@ function door(){if(!signedOut()||!W.IngProfiles||typeof IngProfiles.door!=="func
   if(!d.__r344){d.__r344=1;d.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("button[data-door]");if(!b)return;
     var me=(W.__ingProfile&&W.__ingProfile.owner===false)?W.__ingProfile.id:"owner";setOut(false);
     if(b.getAttribute("data-door")===me){e.stopPropagation();e.preventDefault();d.hidden=true;}under(false);},true);}}
-function under(on){var l=D.getElementById("ingLockDoor");if(l)l.classList.toggle("r344-under",!!on);}
+function under(on){var l=D.getElementById("ingLockDoor");if(l){l.classList.toggle("r344-under",!!on);l.classList.remove("ild-wait");}}   /* r197's wait ends here */
 /* the profiles door takes the sign-in door's night look while that door stands (after Sign out, or from "Someone else? Choose a profile") */
 function dark(){var l=D.getElementById("ingLockDoor"),d=D.getElementById("profDoor");
   if(l&&!l.__r344w){l.__r344w=1;try{new MutationObserver(dark).observe(l,{attributes:true,attributeFilter:["class","hidden"]});}catch(e){}}   /* the door may learn it is night after */
