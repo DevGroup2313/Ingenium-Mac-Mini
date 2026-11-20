@@ -9,8 +9,10 @@ os.makedirs(OUT, exist_ok=True)
 F = lambda n, b=False: ImageFont.truetype("/usr/share/fonts/opentype/inter/Inter-%s.otf" % ("SemiBold" if b else "Medium"), n)
 STEPS = [("2-its-files", "The record, in Ingenium's folder",
           "Ingenia, Ingenium's folder, Its files and instructions: the eleven files of the record, which go with every conversation in this folder."),
-         ("3-panel-foot", "The same panel, scrolled to its foot",
-          "It scrolls by the wheel or the touchpad, with no scroll bar in view, to its own Cancel, which closes it, and Save.")]
+         ("3-close-key", "Its close key, at the top",
+          "A raised key at the panel's top-right corner closes it, as its Cancel does, without scrolling down."),
+         ("4-panel-foot", "The same panel, scrolled to its foot",
+          "It scrolls by the wheel or the touchpad, with no scroll bar in view, to its own Cancel and Save; the close key stays at the top.")]
 bg, ink, ink2, violet, edge = (244, 241, 248), (34, 26, 46), (90, 82, 104), (106, 63, 181), (220, 214, 230)
 M = 64
 

@@ -414,12 +414,15 @@ Ingenium 7.55 (20 November 2026): the record of Ingenium's security, profiles an
   back only when the record changes. No new part is drawn. `build/build_page.py` writes the files in (`/*R345_RECORD*/`), and stops the build
   if a file lacks its title or the record has fewer than eleven files; `rig/inject_modules.js` writes them into a test page the same way.
 - What is new (r222): one line, for the master edition.
-- The Project panel (the base page's own, which lists a folder's files) is not changed. Her words on its picture: "I don't see any way to
+- The Project panel (the base page's own, which lists a folder's files): her words on its picture: "I don't see any way to
   close the Project panel", then "Leave the Project panel's Close and Save buttons below and add the scrolling function and scroll bar to
   the panel but hide the scroll bar from view", then "I did not see the Close and Save buttons since I only saw a picture and not a live
-  interactive preview". The panel already scrolls (`#modalBox`, overflow-y auto) with its scroll bar hidden, to its own Cancel and Save;
-  a close key drawn in its corner (r346) was taken out again before any release. `rig/t_755_project_panel.js` checks it as it is.
-- Tests: `rig/t_755_record.js` 10/10 and `rig/t_755_project_panel.js` 6/6 on a test build (7.54's release page with r345 put in);
+  interactive preview", and "On second thought, please still add the "x" button at the top of the panel so I don't always have to scroll
+  all the way down in order to close the Project panel." The panel already scrolls (`#modalBox`, overflow-y auto) with its scroll bar
+  hidden, to its own Cancel and Save, which stay at its foot. `build/modules/r346.js` (new) adds a close key at its top-right corner,
+  sticky while the panel scrolls: raised and round in the app's own key look (`--pop`, `--pop-hi`), lifting 2 pixels under the pointer,
+  never tinted, with the key sound; it does what Cancel does. Only the Project panel takes it (found by its name field `#pjName`).
+- Tests: `rig/t_755_record.js` 10/10 and `rig/t_755_project_panel.js` 10/10 on a test build (7.54's release page with r345 and r346 put in);
   `rig/t_745_owner_free.js` refuses the record and r345 in the other editions. Pictures of the folder: `previews/record` (the scripts;
   the pictures stay out of the repository).
 
