@@ -114,7 +114,8 @@ const HERS = /Carpe Diem|The Forge|\bthe Forge\b|Inkwell|Lakay|Offline Project/;
       try { go('home'); } catch (e) {} await new Promise((s) => setTimeout(s, 1200));
       r.tiles = [...document.querySelectorAll('.hx-app[data-app]')].map((b) => b.getAttribute('data-app')).filter((x) => DESK.indexOf(x) >= 0);
       r.head = (document.getElementById('hxAppsH') || {}).textContent || null;
-      r.routes = DESK.filter((x) => { try { go(x); const a = document.querySelector('section.section.active'); return !!(a && a.id === 'page-' + x); } catch (e) { return false; } });
+      // where each of the five apps' routes leads: Home, where the Desk is not (r231); the apps open in frames of their own where it is
+      r.routes = DESK.filter((x) => { try { go(x); const a = document.querySelector('section.section.active'); return !(a && a.id === 'page-home'); } catch (e) { return false; } });
       for (const pg of ['home', 'chat', 'folders', 'blend', 'build', 'lector', 'career', 'fabrica', 'focus', 'settings', 'guide']) { try { go(pg); } catch (e) { continue; } await new Promise((s) => setTimeout(s, 1400));
         const sec = document.querySelector('section.section.active'); if (sec && sec.id === 'page-' + pg) r.said[pg] = visible(sec); }
       r.sendKeys = [...document.querySelectorAll('button')].filter((b) => b.offsetParent && /^(?:📝\s*)?(?:Send to Tabula|To Tabula|My Tabula page|Open in Tabula)$/.test(b.textContent.trim())).map((b) => b.textContent.trim());
@@ -122,11 +123,11 @@ const HERS = /Carpe Diem|The Forge|\bthe Forge\b|Inkwell|Lakay|Offline Project/;
       try { go('home'); } catch (e) {}
       return r; });
     if (OWNER) {
-      ok(d.keys.indexOf('tabula') >= 0 && d.keys.indexOf('abacus') >= 0 && d.tiles.length === 5 && d.routes.length >= 2, 'control: in her own profile the Desk is all there: Tabula and Abacus in the side bar, the five apps on Home, their pages open', d);
+      ok(d.keys.indexOf('tabula') >= 0 && d.keys.indexOf('abacus') >= 0 && d.tiles.length === 5 && d.head === 'Your apps' && d.tip, 'control: in her own profile the Desk is all there: its keys in the side bar, the five apps on Home under Your apps, the Guide\'s tip on them', { keys: d.keys, tiles: d.tiles, head: d.head, tip: d.tip });
     } else {
       ok(d.keys.length === 0 && d.group.length === 0, '4. the Desk (7.52): no key to any of its five apps in the side bar, and no Apps group', { keys: d.keys, group: d.group });
       ok(d.tiles.length === 0 && d.head === 'Your instruments', '   Home shows the instruments alone, under Your instruments', { tiles: d.tiles, head: d.head });
-      ok(d.routes.length === 0, '   no route opens one of the five apps\' pages', d.routes);
+      ok(d.routes.length === 0, '   each of the five apps\' routes leads Home', d.routes);
       const named = Object.entries(d.said).filter(([k, v]) => v.length);
       ok(named.length === 0 && !d.tip, '   no page, nor the Guide\'s tip, names Tabula, Abacus, Imago, or Scriba and Fontes as apps', { named, tip: d.tip });
       ok(d.sendKeys.length === 0, '   no key sends anything to one of them (Send to Tabula, To Tabula, My Tabula page, Open in Tabula)', d.sendKeys);

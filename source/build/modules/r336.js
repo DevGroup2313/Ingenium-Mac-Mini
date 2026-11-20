@@ -66,13 +66,14 @@ function own(e){try{return !!(e&&e.closest&&e.closest(MINE));}catch(x){return tr
 function text(n){var v=n.nodeValue;if(!v||!ANY.test(v))return;var p=n.parentElement;if(!p||own(p))return;var t=say(v);if(t!==v)n.nodeValue=t;}
 function attrs(e){if(own(e))return;for(var i=0;i<ATTRS.length;i++){var v=e.getAttribute(ATTRS[i]);if(v&&ANY.test(v)){var t=say(v);if(t!==v)e.setAttribute(ATTRS[i],t);}}}
 /* 7.52: the keys that send something to the Desk's apps (a note's menu, Schedae, the Inbox, Blend, the workbench) and the Guide's tip on
-   the five apps; never in what the person writes or reads of their own */
+   the five apps (its mark "T" stands right before the word, so the tip's text reads "TTabula is..."); never in what the person writes
+   or reads of their own */
 var DESKKEY=/^(?:📝\s*)?(?:Send to Tabula|To Tabula|My Tabula page|Tabula)$/;
 function deskless(){try{return typeof ING_HAS==="function"&&!ING_HAS("desk");}catch(e){return false;}}
 function drop(root){if(!root||root.nodeType!==1||!deskless())return;var q=[],gone=[];
   try{if(root.matches&&root.matches("button,.tip"))q.push(root);[].push.apply(q,root.querySelectorAll("button,.tip"));}catch(e){return;}
   q.forEach(function(e){if(own(e))return;var t=(e.textContent||"").replace(/\s+/g," ").trim();
-    if(e.classList.contains("tip")){if(/\bTabula is the writing tablet\b/.test(t))gone.push(e);}else if(DESKKEY.test(t))gone.push(e);});
+    if(e.classList.contains("tip")){if(/Tabula is the writing tablet/.test(t))gone.push(e);}else if(DESKKEY.test(t))gone.push(e);});
   gone.forEach(function(e){try{e.remove();}catch(x){}});}
 function sweep(root){if(!root)return;
   if(root.nodeType===3){text(root);return;}
