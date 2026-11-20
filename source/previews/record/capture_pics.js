@@ -26,10 +26,10 @@ const [URL_, OUT] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true }
   const box = await p.evaluate(() => { const all = [...document.querySelectorAll('body *')].filter((x) => x.offsetParent && /Ingenium record 00 · Read me first/.test(x.textContent) && x.children.length > 3); const el = all.length ? all[all.length - 1] : null; if (!el) return null; el.id = el.id || 'pvList'; return el.id; });
   console.log('list', box); if (box) await ring('#' + box, 10); await shot('2-its-files');
   // 3. its close key, at its top-right corner (modules/r346.js)
-  await p.evaluate(() => { document.getElementById('modalBox').scrollTop = 0; }); await p.waitForTimeout(500);
+  await p.evaluate(() => { (document.querySelector('#modalBox .r346-body') || document.getElementById('modalBox')).scrollTop = 0; }); await p.waitForTimeout(500);
   await ring('#modalBox .r346-x', 8); await shot('3-close-key');
   // 4. the panel scrolled to its foot: its own Cancel and Save, no scroll bar in view, the close key still at its corner
-  await p.evaluate(() => { const bx = document.getElementById('modalBox'); bx.scrollTop = bx.scrollHeight; }); await p.waitForTimeout(700);
+  await p.evaluate(() => { const bx = document.querySelector('#modalBox .r346-body') || document.getElementById('modalBox'); bx.scrollTop = bx.scrollHeight; }); await p.waitForTimeout(700);
   await p.evaluate(() => { const c = document.getElementById('pjCancel'); if (c && c.parentElement) c.parentElement.id = c.parentElement.id || 'pvFoot'; });
   await ring('#pvFoot', 10); await shot('4-panel-foot');
   await b.close();

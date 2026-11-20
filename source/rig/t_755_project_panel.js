@@ -24,16 +24,16 @@ function ok(c, m, d) { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === und
   const isOpen = () => p.evaluate(() => document.getElementById('modalRoot').classList.contains('open'));
   // 1
   await openIt(); await p.waitForTimeout(900);
-  const m = await p.evaluate(() => { const bx = document.getElementById('modalBox'), cs = getComputedStyle(bx), sb = document.createElement('div');
+  const m = await p.evaluate(() => { const bx = (document.querySelector('#modalBox .r346-body') || document.getElementById('modalBox')), cs = getComputedStyle(bx);
     const bl = parseFloat(cs.borderLeftWidth) || 0, br = parseFloat(cs.borderRightWidth) || 0;
     return { files: document.querySelectorAll('#pjFiles .proj-row').length, taller: bx.scrollHeight > bx.clientHeight + 20, overflow: cs.overflowY, bar: Math.round(bx.offsetWidth - bx.clientWidth - bl - br), x: !!document.querySelector('#modalBox .r346-x') }; });
-  const r0 = await p.evaluate(() => document.getElementById('modalBox').getBoundingClientRect());
+  const r0 = await p.evaluate(() => (document.querySelector('#modalBox .r346-body') || document.getElementById('modalBox')).getBoundingClientRect());
   await p.mouse.move(r0.x + r0.width / 2, r0.y + r0.height / 2); await p.mouse.wheel(0, 900); await p.waitForTimeout(700);
-  const top = await p.evaluate(() => document.getElementById('modalBox').scrollTop);
+  const top = await p.evaluate(() => (document.querySelector('#modalBox .r346-body') || document.getElementById('modalBox')).scrollTop);
   ok(m.files >= 11 && m.taller && /auto|scroll/.test(m.overflow) && top > 0 && m.bar === 0, 'with the eleven files the panel scrolls, by the wheel as by a person, and no scroll bar takes any room', Object.assign(m, { scrolledTo: top }));
   // 2
   await p.mouse.wheel(0, 6000); await p.waitForTimeout(800);
-  const foot = await p.evaluate(() => { const bx = document.getElementById('modalBox'), files = document.getElementById('pjFiles'), c = document.getElementById('pjCancel'), s = document.getElementById('pjSave'); const b = bx.getBoundingClientRect();
+  const foot = await p.evaluate(() => { const bx = (document.querySelector('#modalBox .r346-body') || document.getElementById('modalBox')), files = document.getElementById('pjFiles'), c = document.getElementById('pjCancel'), s = document.getElementById('pjSave'); const b = bx.getBoundingClientRect();
     const seen = (e) => { const r = e.getBoundingClientRect(); return r.top >= b.top - 1 && r.bottom <= b.bottom + 1; };
     return { after: !!(files.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING) && !!(files.compareDocumentPosition(s) & Node.DOCUMENT_POSITION_FOLLOWING), cancel: c.textContent, save: s.textContent, seen: seen(c) && seen(s) }; });
   ok(foot.after && foot.seen, 'Cancel and Save stay at its foot, after the files, and come into view when it is scrolled down', foot);
@@ -50,10 +50,13 @@ function ok(c, m, d) { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === und
   await openIt(); await p.waitForTimeout(900);
   let k = await look();
   ok(k && k.name === 'Close the project panel' && k.inBox && k.corner && k.w >= 30, 'a close key at the panel\'s top-right corner, named for screen readers, in view', k);
-  await p.evaluate(() => { const bx = document.getElementById('modalBox'); bx.scrollTop = bx.scrollHeight; }); await p.waitForTimeout(500);
-  const k2 = await look();
-  ok(k2 && k2.inBox && k2.corner, 'scrolled to its foot, the key is still at its top-right corner', k2);
-  await p.evaluate(() => { document.getElementById('modalBox').scrollTop = 0; }); await p.waitForTimeout(300);
+  const where = () => p.evaluate(() => { const k = document.querySelector('#modalBox .r346-x').getBoundingClientRect(), h = document.querySelector('#modalBox .r346-head h3'), bd = document.querySelector('#modalBox .r346-body');
+    return { kx: Math.round(k.left), ky: Math.round(k.top), kb: Math.round(k.bottom), title: h ? h.textContent : '', ty: h ? Math.round(h.getBoundingClientRect().top) : null, bodyTop: bd ? Math.round(bd.getBoundingClientRect().top) : null }; });
+  const w1 = await where();
+  await p.evaluate(() => { const bx = (document.querySelector('#modalBox .r346-body') || document.getElementById('modalBox')); bx.scrollTop = bx.scrollHeight; }); await p.waitForTimeout(500);
+  const k2 = await look(), w2 = await where();
+  ok(k2 && k2.inBox && k2.corner && w1.kx === w2.kx && w1.ky === w2.ky && w2.kb <= w2.bodyTop && w2.title === 'Project' && w1.ty === w2.ty, 'scrolled to its foot, the key and the title Project stay where they were, at the top, above the part that scrolls, never over it', { w1, w2 });
+  await p.evaluate(() => { (document.querySelector('#modalBox .r346-body') || document.getElementById('modalBox')).scrollTop = 0; }); await p.waitForTimeout(300);
   k = await look(); const kc = await p.evaluate(() => { const r = document.querySelector('#modalBox .r346-x').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
   await p.mouse.move(kc.x, kc.y); await p.waitForTimeout(500); const hov = await look(); await p.mouse.move(5, 5);
   ok(k.shadow && k.shadow !== 'none' && /matrix\(1, 0, 0, 1, 0, -2\)/.test(hov.tf) && hov.bg === k.bg, 'the key is raised, lifts 2 pixels under the pointer, and is never tinted', { rest: k.shadow.slice(0, 60), hover: hov.tf });
@@ -63,8 +66,8 @@ function ok(c, m, d) { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === und
   await p.fill('#pjName', 'CHANGED-NAME not to be kept'); await p.click('#modalBox .r346-x'); await p.waitForTimeout(600);
   const shut = await p.evaluate((id) => ({ open: document.getElementById('modalRoot').classList.contains('open'), name: (IngFolders.folders().filter((x) => x.id === id)[0] || {}).name, page: (document.querySelector('main.main > .section.active') || {}).id || '' }), fid);
   await p.evaluate(() => { try { openSkills(); } catch (e) {} }); await p.waitForTimeout(600);
-  const sk = await p.evaluate(() => ({ open: document.getElementById('modalRoot').classList.contains('open'), x: !!document.querySelector('#modalBox .r346-x') }));
-  ok(!shut.open && shut.name === 'Ingenium' && shut.page === 'page-folders' && sk.open && !sk.x, 'pressed, the key closes the panel, nothing saved, Ingenia with the folder there again; another panel (Skills) gets no such key', { shut, sk });
+  const sk = await p.evaluate(() => ({ open: document.getElementById('modalRoot').classList.contains('open'), x: !!document.querySelector('#modalBox .r346-x'), dressed: document.getElementById('modalBox').classList.contains('r346-on') || !!document.querySelector('#modalBox .r346-body') }));
+  ok(!shut.open && shut.name === 'Ingenium' && shut.page === 'page-folders' && sk.open && !sk.x && !sk.dressed, 'pressed, the key closes the panel, nothing saved, Ingenia with the folder there again; another panel (Skills) gets no such key, and its box as it always was', { shut, sk });
   ok(!errs.length, 'no error on the page', errs);
   console.log('\n' + P + ' passed, ' + F + ' failed'); await b.close(); process.exit(F ? 1 : 0);
 })();

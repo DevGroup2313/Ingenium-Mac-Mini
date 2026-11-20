@@ -419,9 +419,13 @@ Ingenium 7.55 (20 November 2026): the record of Ingenium's security, profiles an
   the panel but hide the scroll bar from view", then "I did not see the Close and Save buttons since I only saw a picture and not a live
   interactive preview", and "On second thought, please still add the "x" button at the top of the panel so I don't always have to scroll
   all the way down in order to close the Project panel." The panel already scrolls (`#modalBox`, overflow-y auto) with its scroll bar
-  hidden, to its own Cancel and Save, which stay at its foot. `build/modules/r346.js` (new) adds a close key at its top-right corner,
-  sticky while the panel scrolls: raised and round in the app's own key look (`--pop`, `--pop-hi`), lifting 2 pixels under the pointer,
-  never tinted, with the key sound; it does what Cancel does. Only the Project panel takes it (found by its name field `#pjName`).
+  hidden, to its own Cancel and Save, which stay at its foot. `build/modules/r346.js` (new) adds a close key at its top-right corner. Her
+  word on its first picture, where the key floated over the panel's fields once scrolled: "It looks like the x button scrolls down on the
+  panel and is not placed properly, please fix that and have it placed properly at the top of the page." So the panel's title and the
+  key share a top that never scrolls (`.r346-head`), and the rest of the panel scrolls beneath it (`.r346-body`, its scroll bar hidden).
+  The key is raised and round in the app's own key look (`--pop`, `--pop-hi`), lifting 2 pixels under the pointer, never tinted, with
+  the key sound; it does what Cancel does. Only the Project panel is dressed so (found by its name field `#pjName`); any other panel
+  drawn in the same box takes it as it always was.
 - Tests: `rig/t_755_record.js` 10/10 and `rig/t_755_project_panel.js` 10/10 on a test build (7.54's release page with r345 and r346 put in);
   `rig/t_745_owner_free.js` refuses the record and r345 in the other editions. Pictures of the folder: `previews/record` (the scripts;
   the pictures stay out of the repository).
