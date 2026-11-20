@@ -516,7 +516,9 @@ function newest(){var raw=W_.__ingLockedRaw||null,p=Promise.resolve(null);
   return p.then(function(rec){try{if(rec&&rec.lsOk===false&&typeof rec.raw==="string"&&isDeskEnv(rec.raw)){var a=deskHead(rec.raw),b=raw?deskHead(raw):null;if(a&&(!b||(a.__deskAt||0)>(b.__deskAt||0)))raw=rec.raw;}}catch(e){}return raw;});}
 function takeDesk(){return newest().then(function(raw){if(!raw)return;
   if(!isDeskEnv(raw)){try{adoptPlain(raw);}catch(e){warn(e);dropKeys();throw new Error("desk");}return;}
-  return openDesk(raw).then(function(plain){adoptPlain(plain);},function(e){warn(e);dropKeys();throw new Error("desk");});});}
+  return openDesk(raw).then(function(plain){adoptPlain(plain);},function(e){warn(e);dropKeys();throw new Error("desk");});})
+    /* 7.54 (r344): what was sealed when Ingenium locked or she signed out is opened again before the door opens, so no part reads it sealed */
+    .then(function(){return typeof W_.__ingAfterOpen==="function"?Promise.resolve(W_.__ingAfterOpen()).catch(warn):null;});}
 /* adopted as R132 and deskAdopt adopt: the desk's keys replaced in place, then the whole desk painted again */
 function adoptPlain(plain){var incoming=JSON.parse(plain),migrated=W_.migrateFrom(incoming),st=W_.state;
   Object.keys(st).forEach(function(k){delete st[k];});Object.keys(migrated).forEach(function(k){st[k]=migrated[k];});
@@ -626,12 +628,14 @@ function busyWhat(){try{if(D.querySelector("#page-chat .msg-live")||W_.liveBot)r
 function lockNow(why){if(GOING||!on())return Promise.resolve(false);var busy=busyWhat();
   if(busy&&why==="idle"){ACT=Date.now();return Promise.resolve(false);}
   var ask=busy&&typeof W_.ingAsk==="function"?W_.ingAsk({title:"Lock Ingenium now?",text:busy+" Locking stops it, and the part not yet finished may be lost. Everything already saved stays.",yes:"Lock now",no:"Keep waiting"}):Promise.resolve(true);
-  return Promise.resolve(ask).then(function(ok){if(!ok)return false;GOING=true;
+  return Promise.resolve(ask).then(function(ok){if(!ok)return false;
+    /* 7.54 (r344, Sign out): what other parts must seal before the keys go, awaited (the carried apps' documents, Scriba's recordings) */
+    return Promise.resolve(typeof W_.__ingBeforeLock==="function"?W_.__ingBeforeLock(why):null).catch(warn).then(function(){return true;});}).then(function(ok){if(!ok)return false;GOING=true;
     try{W_.dispatchEvent(new CustomEvent("ing-keys",{detail:{held:false,locking:true}}));}catch(e){}   /* 7.49: the computer app drops its disk key before the page goes to its door */
     /* what was typed in the chat's box and not yet sent is kept with the sealed desk, and put back after the sign-in */
     try{var ci=$("chatInput");if(ci&&ci.value&&ci.value.trim()&&W_.state)W_.state.__lockDraft=ci.value;}catch(e){}
     try{W_.saveState();}catch(e){}try{flushSync();}catch(e){}
-    try{if(W_.__ingBoot){W_.__ingBoot.look(D.body.getAttribute("data-theme")==="night");W_.__ingBoot.again(why==="idle"?"Locked after time away. Sign in to open your desk again.":"Locked. Sign in to open your desk again.");}}catch(e){}
+    try{if(W_.__ingBoot){W_.__ingBoot.look(D.body.getAttribute("data-theme")==="night");W_.__ingBoot.again(why==="idle"?"Locked after time away. Sign in to open your desk again.":why==="signout"?"Signed out. Everything of yours is sealed until you sign in again.":"Locked. Sign in to open your desk again.");}}catch(e){}
     setTimeout(function(){try{location.reload();}catch(e){location.href=location.href;}},350);return true;});}
 function idleMs(){if(IDLE_MS!=null)return IDLE_MS;var m=REC&&typeof REC.idle==="number"?REC.idle:15;return m>0?m*60000:0;}
 function startIdle(){if(!ACT_ON){ACT_ON=true;["pointerdown","keydown","wheel","touchstart","mousemove"].forEach(function(ev){try{W_.addEventListener(ev,function(){ACT=Date.now();},{passive:true,capture:true});}catch(e){}});}

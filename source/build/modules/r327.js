@@ -80,7 +80,12 @@ if(window.IngWays)return;
 var W=window,D=document;
 var HERS=[["Software that looks and feels alive",""],["The animated, popped-out 3D look and effect",""],["Refined, elegant and understated design",""],
   ["A mechanical, analogue feel and sounds",""],["Lighter, weighted and defined pages, cards and tabs",""],["Soft pastel colours by day; dark academia, Oxbridge colours by night",""],
-  ["AuDHD accessibility at the root of everything",""],["Offline and in-house first",""],["App logos truly 3D and clickable, like the engine logo","From Fabrica, 18 November 2026"]];
+  ["AuDHD accessibility at the root of everything",""],["Offline and in-house first",""],["App logos truly 3D and clickable, like the engine logo","From Fabrica, 18 November 2026"],
+  ["Purple words that can be pressed are underlined","Added 20 November 2026"]];
+/* 7.54: her rules added after her list was first seeded go into it once, in her master copy and her own profile only (never another
+   person's profile, never another edition): her words (20 November 2026): "I want you to add the purple pressable words underlined to my
+   rules in my way of working in the Ingenia page." */
+var LATER=[["u753","Purple words that can be pressed are underlined","Added 20 November 2026"]];
 function master(){try{return W.IngTerms?IngTerms.mine():(typeof ING_EDITION!=="string"||ING_EDITION==="master");}catch(e){return true;}}
 function uid(){return "w"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function S(){if(!W.state)return null;var w=state.ways;
@@ -88,6 +93,10 @@ function S(){if(!W.state)return null;var w=state.ways;
   if(!Array.isArray(w.list))w.list=[];["models","work","settings"].forEach(function(k){if(typeof w[k]!=="boolean")w[k]=true;});
   /* her rules, once, in her master copy only; every other copy starts empty */
   if(!w.seeded&&master()){w.seeded=true;if(!w.list.length)w.list=HERS.map(function(x){return {id:uid(),t:x[0],from:x[1],at:Date.now()};});try{saveState();}catch(e){}}
+  if(w.seeded&&master()&&!W.__ingGuest){var ch=false;if(!w.added||typeof w.added!=="object")w.added={};
+    LATER.forEach(function(x){if(w.added[x[0]])return;w.added[x[0]]=Date.now();ch=true;
+      if(!w.list.some(function(r){return r&&String(r.t||"").trim().toLowerCase()===x[1].toLowerCase();}))w.list.push({id:uid(),t:x[1],from:x[2],at:Date.now()});});
+    if(ch)try{saveState();}catch(e){}}
   return w;}
 function save(){try{saveState();}catch(e){}paintAll();}
 function mk(t,c,x){var e=D.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}

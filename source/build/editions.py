@@ -784,6 +784,8 @@ def apply(out, ed):
 # Fabrica's machines, the Cloud, the lending and Ship. Each edition but the master carries none of them: her ways list is empty there
 # (each person writes their own), and her devices are said as any person's computers, tablets and phones.
 _HER_WAYS = re.compile(r"var HERS=\[\[.*?\]\];", re.S)
+# 7.54: her rules added to her list later, once (r327's var LATER), are hers too: left out the same way
+_HER_LATER = re.compile(r"var LATER=\[\[.*?\]\];", re.S)
 _HER_DEVICES = (
     ("one app for Apple silicon (your Mac mini) and Intel (your MacBook), macOS 12 or newer", "one app for Apple silicon and Intel Macs, macOS 12 or newer"),
     ("choose this on your Mac mini at home, or on the computer you take with you", "choose this on the computer that stays at home, or on the one you take with you"),
@@ -802,6 +804,10 @@ def _no_owner_material(out, ed):
     if n != 1:
         sys.exit("edition %s: her ways of working (var HERS in modules/r327.js) found %d times, not once" % (ed, n))
     out = _HER_WAYS.sub("var HERS=[];", out)
+    n = len(_HER_LATER.findall(out))
+    if n != 1:
+        sys.exit("edition %s: her rules added later (var LATER in modules/r327.js) found %d times, not once" % (ed, n))
+    out = _HER_LATER.sub("var LATER=[];", out)
     for old, new in _HER_DEVICES:
         if old not in out:
             if ed == "full":  # every one of these parts is in the full edition; the gift and demo editions leave several out
