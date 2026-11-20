@@ -1,5 +1,7 @@
 <style id="r342-css">
-/* ============ R342 · FABRICA, STAGE 3, PART TWO: CHERRY-PICK AND CHANGES PUT ASIDE (Ingenium 7.53, held for her preview) ============
+/* ============ R342 · FABRICA, STAGE 3, PART TWO: CHERRY-PICK AND CHANGES PUT ASIDE (Ingenium 7.53, 20 November 2026) ============
+   Her word on its ten pictures (20 November 2026, source/previews/fabrica_stage3b): "I approve of your previews and recommendations,
+   please commit and push them everywhere and continue working on the rest of my requests." 
    Her plan (Fabrica's audit, 19 November 2026, approved in full: "I want them all implemented into Ingenium in the proposed order"):
    "11. Cherry-pick, stash and submodules. On repositories kept in Ingenium and on your drives." This part: cherry-pick and stash, as git
    2.43 does them (checked in the session: git cherry-pick -x, git stash), on repositories kept in Ingenium (modules/r110.js: cherryPick,

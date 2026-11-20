@@ -395,6 +395,28 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.53 (20 November 2026): Fabrica's plan, stage 3, part two (cherry-pick, changes put aside); purple words that can be pressed,
+underlined.
+- Fabrica's plan, stage 3, part two (the audit's recommendation 11), built in the other session (Mini 41e10ea: modules/r342.js; the engine
+  in r110.js: cherryPick, stashPush, stashList, stashApply, stashDrop; Rules before main in r285.js holding a picked version), shown to her
+  as ten pictures one by one at full size (previews/fabrica_stage3b), and her word (20 November 2026): "I approve of your previews and
+  recommendations, please commit and push them everywhere and continue working on the rest of my requests." Out of build/held.json now
+  ("released_753"). On repositories kept in Ingenium; a repository on a drive and submodules come next.
+- Purple words that can be pressed, underlined. Her words (20 November 2026): "On thing that annoys me is the purple clickable word
+  buttons on Ingenium that do not have an underline, they look naked without being underlined when they are in purple and are clearly
+  supposed to be clickable especially from your last preview and the rest of the app." `build/modules/r343.js` (new, a stylesheet only):
+  a thin underline in the word's own colour, three pixels below it, on Lector's quiet keys, its compare toggle and Why this model;
+  Fabrica's quiet keys, crumbs, the "more" under Needs you and its GitHub "more"; Home's quiet keys (See all); Vocatio's quiet keys;
+  Folders' crumb key; the composer's lines under a chat; Show the whole message; the folder search's citations; Adamas's Hide and Show;
+  the disclosures Thinking and the preview's own; the Security question's quiet key. Found by a scan of every page and each of its rooms,
+  by day and by night, on 7.52's release page (pressable elements drawn as purple words with no fill, border or shadow, and no
+  underline), by walking the guided tour, and by the rules that paint such keys violet over no fill. Left as they were, on purpose:
+  keys with a fill, a border or a shadow; a strip's choices (Lector's "A job", Fabrica's "Ship"); the left menu's active row; the
+  tour's chapter rows (only their number is violet). After it the scan finds only those. Nothing else of any part changes.
+- What is new (r222): two lines (the underline everywhere; stage 3, part two where Fabrica is).
+- Tests on a test build (7.52's release page with r110, r285, r222, r342 and r343 put in): rig/t_753_pick_aside.js 23/23, t_691_rules
+  37/37, t_746_repo_work 18/18 (alone; one hover check missed under three tests at once), t_749_reviews 32/32, t_626_guide 27/27.
+
 Ingenium 7.52 (20 November 2026): the Desk's five apps, the master's alone.
 Her words (19 November 2026): "I do not want any of my apps built-in any editions outside of the master edition. Ingenium itself is not
 exempt from that, I want it removed plus any other functions inside of it that give ownership accesss and capabilities for any of my apps
