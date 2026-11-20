@@ -6,7 +6,7 @@ Part of the record of Ingenium's security system, written from Ingenium 7.54's s
 
 | Name | What it holds | Per profile or shared | Sealed with the sign-in on |
 |---|---|---|---|
-| `ingenium_v4` | the desk: the whole state (chats, notes, settings, projects and folders, Lector, Vocatio, Focus, Blend) | per profile | yes, as the sealed desk with its clear header (record 02, section 4) |
+| `ingenium_v4` | the desk: the whole state (chats, notes, settings, projects and folders, Lector, Vocatio, Vesta, Concordia) | per profile | yes, as the sealed desk with its clear header (record 02, section 4) |
 | `ingenium_v4.snap0`, `.snap1`, `.snap2` | the recovery shelf: three earlier copies of the desk, taken at most every 45 seconds, for desks under 1 MB (`SNAPRING`, `ingNoteSnapshot`) | per profile | yes |
 | `ingenium_lock` | the lock record (record 02, section 2.3); opens nothing without the password or a way back in | per profile (each profile's sign-in is its own) | not needed: it holds only wrapped keys |
 | `ingenium_profiles` | the list of profiles, which one is in use, and the signed out mark (record 04) | shared | no; it names profiles, it holds none of their data |
@@ -23,7 +23,7 @@ sessionStorage holds marks for the length of a session, renamed per profile as l
 
 | Database | The Storage page's words | Per profile or shared | Sealed with the sign-in on |
 |---|---|---|---|
-| `ingenium_big` (store `t`) | "Long texts: Files and pages your chats, Lector, Code and Build hold" | per profile | yes, each text `"big:<id>"` |
+| `ingenium_big` (store `t`) | "Long texts: Files and pages your chats, Lector, Code and Adamas hold" | per profile | yes, each text `"big:<id>"` |
 | `ingenium_desk` | "The desk's larger copy: Your desk, when the small store is too full for it" | per profile | yes, it holds the sealed desk |
 | `ingenium_claude` | conversations brought in from Claude, Claude Code and Ollama | per profile | yes, records |
 | `ingenium_keys` | "Signing keys: The keys your Android apps are signed with" | per profile | yes, records |
