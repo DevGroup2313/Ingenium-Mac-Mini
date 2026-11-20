@@ -395,7 +395,8 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.57 (20 November 2026): repositories on a drive work again; Fabrica's plan, stage 3, part two, on a drive.
+Ingenium 7.57 (20 November 2026): repositories on a drive work again; Fabrica's plan, stage 3, part two, on a drive; submodules kept
+in every version Fabrica makes, and shown in Files.
 - Repositories on a drive, broken since 7.49, work again (`build/desktop/app_disk_fix_757.py`, applied after app_disk_750.py). 7.49's seal
   on the computer's disk (app_disk_749.py, then app_disk_750.py) took three names the drive's repositories had used since 6.86 and 6.87,
   each set later when the app starts, so the seal's won: `_DISK` (its table {key, kid, at} in place of the drive's {lock, open, work,
@@ -421,8 +422,25 @@ Ingenium 7.57 (20 November 2026): repositories on a drive work again; Fabrica's 
   - r342 offers both on a drive repository with a folder of files (a bare one has no Changes); after a pick that stopped on lines
     changed both ways, the words box holds the version's words with git's line, as git offers them (here and in Ingenium's own
     repositories). Fabrica sends a chosen idea's branch to GitHub, never refs/stash.
-- What is new (r222): two lines, where there is a Fabrica.
-- rig: `t_757_drive_pick.py` (58 checks: the computer app, patched copies of the Mac and Windows apps, against git) and
+- Submodules, stage 3, part two's last piece (the audit's recommendation 11, "Cherry-pick, stash and submodules", approved in full on 19
+  November 2026). `build/modules/r110.js`: a repository's submodules (git's tree entries of mode 160000) were never files of the work, and
+  every new version was written from the work alone, so a version kept in Ingenium on a repository with submodules dropped them (shown by
+  rig/t_757_submodules.js on the first 7.57 page: after Fabrica's merge, kept version, branch of its own and rebase, git found lib gone from
+  each). Now flatten() gathers them when asked, linksOf() reads a version's ({path: the version it stands at}, the last 64 trees kept),
+  writeTrees() puts each back where no file or folder of files stands, and every version made keeps them: Keep this version (the
+  parent's, or the merge's), a version kept on a branch of its own (the branch's), Put aside (the version out's, as git's W holds the
+  index's); a merge, a squash, a version brought in, an undo and a rebase choose three ways (mergeLinks: the other side's where it changed
+  one, else this side's), so a pick or an undo that changes only a submodule is a change. IngRepo.links(id, ref) reads them. A repository
+  on a drive keeps its own through git's index, as before. `build/modules/r347.js` (new): in Files, each submodule in the folder shown is a
+  row of the tree's own kind (.f-node): its name, then "another repository" and the short name of its version; pressed, the line under the
+  tree says what it is, its address in .gitmodules and that every version Fabrica makes keeps it at that version. Shown to her as four
+  pictures one by one at full size (`previews/submodules`: the scripts; the pictures stay out of the repository), and her word: "I approve
+  of your preview, please continue working on my requests."
+- What is new (r222): four lines where there is a Fabrica, and one where there is none (the disk seal's own names): t_626_guide with the
+  gift edition found the first 7.57 page's newest line there was 7.56's, every line of 7.57 being Fabrica's.
+- rig: `t_757_submodules.js` (a repository with a submodule made by git; brought in from git's bundle; kept, merged, undone, picked, kept on
+  a branch of its own, put aside and rebased with Fabrica's engine; sent out as a bundle, cloned and read by git: every version keeps lib,
+  at the version each step should leave it at; git fsck content), `t_757_drive_pick.py` (58 checks: the computer app, patched copies of the Mac and Windows apps, against git) and
   `t_757_drive_page.js` (the page bridged to the computer app by rig/run_app.py, each result read back with git).
 
 Ingenium 7.56 (20 November 2026): purple words that can be pressed, the rest of them underlined.

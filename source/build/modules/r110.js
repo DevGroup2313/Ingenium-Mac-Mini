@@ -231,20 +231,37 @@ function okRefName(n){n=String(n||"");return n.length>0&&n.length<=200&&!/(^|\/)
 function execByName(p){var b=p.split("/").pop();return b==="gradlew"||/\.(sh|command|bash|zsh)$/i.test(b);}
 
 /* ---------- reading a commit's whole tree as a flat list of paths ---------- */
-function flatten(store,treeOid,prefix,out){out=out||{};prefix=prefix||"";
+function flatten(store,treeOid,prefix,out,links){out=out||{};prefix=prefix||"";
   return store.need(treeOid,"tree").then(function(t){var ents=parseTree(t.body),chain=Promise.resolve();
-    ents.forEach(function(e){var p=prefix+e.name;if(e.mode==="40000"||e.mode==="040000")chain=chain.then(function(){return flatten(store,e.oid,p+"/",out);});
-      else if(e.mode!=="160000")out[p]=[e.mode==="100664"?"100644":e.mode,e.oid];});
+    ents.forEach(function(e){var p=prefix+e.name;if(e.mode==="40000"||e.mode==="040000")chain=chain.then(function(){return flatten(store,e.oid,p+"/",out,links);});
+      else if(e.mode==="160000"){if(links)links[p]=e.oid;}   /* 7.57: a submodule, never a file of the work; gathered when asked (linksOf) */
+      else out[p]=[e.mode==="100664"?"100644":e.mode,e.oid];});
     return chain.then(function(){return out;});});}
 /* paths -> trees, each kept; returns the root tree's name */
-function writeTrees(store,files){var root={d:{},f:[]};
-  Object.keys(files).forEach(function(p){var parts=p.split("/"),d=root;
+function writeTrees(store,files,links){var root={d:{},f:[]},fk=Object.keys(files);
+  fk.forEach(function(p){var parts=p.split("/"),d=root;
     for(var i=0;i<parts.length-1;i++){d=d.d[parts[i]]||(d.d[parts[i]]={d:{},f:[]});}
     d.f.push({mode:files[p][0],name:parts[parts.length-1],oid:files[p][1]});});
+  /* 7.57: the submodules of the version it is made from, each where no file or folder of files now stands (git's mode 160000) */
+  Object.keys(links||{}).forEach(function(p){if(files[p]||!/^[0-9a-f]{40}$/.test(links[p]))return;var pre=p+"/";
+    if(fk.some(function(q){return q.indexOf(pre)===0||p.indexOf(q+"/")===0;}))return;
+    var parts=p.split("/"),d=root;for(var i=0;i<parts.length-1;i++){d=d.d[parts[i]]||(d.d[parts[i]]={d:{},f:[]});}
+    d.f.push({mode:"160000",name:parts[parts.length-1],oid:links[p]});});
   function walk(d){var names=Object.keys(d.d);return Promise.all(names.map(function(n){return walk(d.d[n]);})).then(function(oids){
       var ents=d.f.slice();names.forEach(function(n,i){ents.push({mode:"40000",name:n,oid:oids[i]});});
       return store.put("tree",treeBody(ents));});}
   return walk(root);}
+
+/* 7.57: the other repositories inside one (git's submodules): {path: the version it stands at}, read from a version (kept for the last
+   few trees read), and chosen three ways when two sides meet: the other side's where it changed one, else this side's (git's own rule) */
+var LINKS=new Map();
+function linksOf(commitOid){if(!commitOid)return Promise.resolve({});return commitOf(commitOid).then(function(c){var hit=LINKS.get(c.tree);
+  if(hit)return JSON.parse(JSON.stringify(hit));var links={};return flatten(store(),c.tree,"",{},links).then(function(){LINKS.set(c.tree,links);
+    if(LINKS.size>64)LINKS.delete(LINKS.keys().next().value);return JSON.parse(JSON.stringify(links));});});}
+function mergeLinks(base,ours,theirs){var out={},seen={};base=base||{};ours=ours||{};theirs=theirs||{};
+  Object.keys(base).concat(Object.keys(ours),Object.keys(theirs)).forEach(function(p){if(seen[p])return;seen[p]=1;var v=theirs[p]!==base[p]?theirs[p]:ours[p];if(v)out[p]=v;});return out;}
+function linksFor(base,ours,theirs){return Promise.all([linksOf(base),linksOf(ours),linksOf(theirs)]).then(function(x){return mergeLinks(x[0],x[1],x[2]);});}
+function sameLinks(a,b){a=a||{};b=b||{};var ka=Object.keys(a).sort(),kb=Object.keys(b).sort();return ka.join("\n")===kb.join("\n")&&ka.every(function(k){return a[k]===b[k];});}
 
 /* ---------- lines: the differences between two texts, as git shows them ---------- */
 function splitLines(s){if(!s)return [];var a=s.split("\n");if(a[a.length-1]==="")a.pop();return a;}
@@ -493,7 +510,7 @@ function commit(id,msg,opt){opt=opt||{};return locked(id,function(){return load(
     if(r.merging&&r.merging.conflicts.length){return Promise.all(r.merging.conflicts.map(function(p){return r.work[p]?store().need(r.work[p][1]).then(function(o){return /^(<<<<<<<|=======|>>>>>>>)( |$)/m.test(dec(o.body))?p:null;}):null;})).then(function(left){left=left.filter(Boolean);
       if(left.length)throw new Error("these still hold both versions: "+left.join(", "));r.merging.conflicts=[];return go();});}
     return go();
-    function go(){var parent=headOid(r);return writeTrees(store(),r.work).then(function(tree){
+    function go(){var parent=headOid(r);return Promise.resolve(opt.links||(r.merging&&r.merging.links)||linksOf(parent)).then(function(lk){return writeTrees(store(),r.work,lk);}).then(function(tree){
       var chk=parent?commitOf(parent).then(function(pc){return pc.tree===tree&&!r.merging&&!opt.allowEmpty;}):Promise.resolve(false);
       return chk.then(function(empty){if(empty)throw new Error("nothing has changed since the last commit");
         var d=opt.date||new Date(),when=Math.floor(d.getTime()/1000),a=ident(opt.author||who,when,tzOf(d)),parents=parent?[parent]:[];if(r.merging&&r.merging.theirs)parents.push(r.merging.theirs);
@@ -517,7 +534,7 @@ function commitTo(id,name,changes,msg,opt){opt=opt||{};return locked(id,function
         if(!/^(100644|100755|120000)$/.test(m))throw new Error("not a mode a file can have");
         Object.keys(next).forEach(function(x){if(x!==q&&(x.indexOf(q+"/")===0||q.indexOf(x+"/")===0))throw new Error("“"+x+"” is in the way of “"+q+"”");});
         return store().put("blob",b,was?was[1]:null).then(function(oid){next[q]=[m,oid];r.sizes[oid]=b.length;});});});
-      return chain.then(function(){return writeTrees(store(),next);}).then(function(tree){return commitOf(tip).then(function(pc){
+      return chain.then(function(){return linksOf(tip);}).then(function(lk){return writeTrees(store(),next,lk);}).then(function(tree){return commitOf(tip).then(function(pc){
         if(pc.tree===tree&&!opt.allowEmpty)throw new Error("nothing has changed since the last commit");
         var d=opt.date||new Date(),when=Math.floor(d.getTime()/1000),a=ident(opt.author||who,when,tzOf(d));
         return store().put("commit",commitBody({tree:tree,parents:[tip],author:a,msg:msg+"\n"})).then(function(oid){r.refs[k]=oid;
@@ -597,11 +614,11 @@ function merge(id,other,opt){opt=opt||{};return locked(id,function(){return load
     var ours=headOid(r),theirs=x[1];if(!ours)throw new Error("make a first commit first");if(ours===theirs)return {kind:"same"};
     return mergeBase(ours,theirs).then(function(base){
       if(base===theirs)return {kind:"same"};
-      if(base===ours){if(opt.squash)return treeFiles(theirs).then(function(f){r.work=f;r.merging={theirs:null,label:other,conflicts:[]};return save(r).then(function(){return null;});});
+      if(base===ours){if(opt.squash)return Promise.all([treeFiles(theirs),linksOf(theirs)]).then(function(f){r.work=f[0];r.merging={theirs:null,label:other,conflicts:[],links:f[1]};return save(r).then(function(){return null;});});
         return treeFiles(theirs).then(function(f){r.work=f;moveHead(r,theirs,"merge "+other+" (moved forward)");return save(r).then(function(){return {kind:"forward",commit:theirs};});});}
-      return Promise.all([treeFiles(base),Promise.resolve(x[0]),treeFiles(theirs)]).then(function(t){return mergeTrees(t[0],t[1],t[2],{ours:summary(r).branch||ours.slice(0,7),theirs:other});}).then(function(m){
+      return Promise.all([treeFiles(base),Promise.resolve(x[0]),treeFiles(theirs),linksFor(base,ours,theirs)]).then(function(t){return Promise.resolve(mergeTrees(t[0],t[1],t[2],{ours:summary(r).branch||ours.slice(0,7),theirs:other})).then(function(m){m.links=t[3];return m;});}).then(function(m){
         /* 6.86: squashed, the version has one parent (main's), as GitHub's Squash and merge */
-        r.work=m.files;r.merging={theirs:opt.squash?null:theirs,label:other,conflicts:m.conflicts};
+        r.work=m.files;r.merging={theirs:opt.squash?null:theirs,label:other,conflicts:m.conflicts,links:m.links};
         if(m.conflicts.length)return save(r).then(function(){return {kind:"conflicts",conflicts:m.conflicts};});
         return save(r).then(function(){return null;});});});});});}).then(function(res){
   if(res)return res;return commit(id,opt.msg||("Merge "+other)).then(function(oid){return {kind:"merged",commit:oid};});});}
@@ -614,14 +631,14 @@ function rebase(id,other,opt){opt=opt||{};return locked(id,function(){return loa
     return mergeBase(ours,theirs).then(function(base){if(base===theirs)return {kind:"same"};var chain=[],seen=0;
       function back(oid){if(!oid||oid===base)return Promise.resolve();if(++seen>20000)throw new Error("too many versions to make again one by one: bring it in by merge");
         return commitOf(oid).then(function(c){if(c.parents.length>1)throw new Error("“"+c.msg.split("\n")[0]+"” is itself a merge: bring the idea in by merge instead");chain.unshift(c);return back(c.parents[0]||null);});}
-      return back(theirs).then(function(){var work=x[0],plan=[],i=0;
+      return Promise.all([back(theirs),linksOf(ours)]).then(function(bl){var work=x[0],plan=[],i=0,links=bl[1];
         function step(){if(i>=chain.length)return Promise.resolve();var c=chain[i++];
-          return Promise.all([treeFiles(c.parents[0]||null),treeFiles(c.oid)]).then(function(t){return mergeTrees(t[0],work,t[1],{ours:"now",theirs:c.oid.slice(0,7)});}).then(function(m){
+          return Promise.all([treeFiles(c.parents[0]||null),treeFiles(c.oid),linksOf(c.parents[0]||null),linksOf(c.oid)]).then(function(t){links=mergeLinks(t[2],links,t[3]);return mergeTrees(t[0],work,t[1],{ours:"now",theirs:c.oid.slice(0,7)});}).then(function(m){
             if(m.conflicts.length)throw new Error("“"+c.msg.split("\n")[0]+"” meets a change on the same lines in "+m.conflicts.slice(0,3).join(", ")+": bring the idea in by merge instead");
-            work=m.files;plan.push({c:c,files:m.files});return step();});}
+            work=m.files;plan.push({c:c,files:m.files,links:links});return step();});}
         return step().then(function(){var head=ours,j=0;
           function write(){if(j>=plan.length)return Promise.resolve();var it=plan[j++],a=it.c.author||{};
-            return writeTrees(store(),it.files).then(function(tree){var who2={name:a.name||who.name,email:a.email||""},when=a.when||Math.floor(Date.now()/1000),tz=a.tz||tzOf(new Date());
+            return writeTrees(store(),it.files,it.links).then(function(tree){var who2={name:a.name||who.name,email:a.email||""},when=a.when||Math.floor(Date.now()/1000),tz=a.tz||tzOf(new Date());
               return store().put("commit",commitBody({tree:tree,parents:[head],author:ident(who2,when,tz),msg:it.c.msg.replace(/\n*$/,"\n")}));}).then(function(oid){head=oid;return write();});}
           return write().then(function(){r.work=work;moveHead(r,head,"rebase "+other);return save(r).then(function(){return {kind:"rebased",commit:head,count:plan.length};});});});});});});});});}
 function stopMerge(id){return locked(id,function(){return load(id).then(function(r){if(!r.merging)return summary(r);return treeFiles(headOid(r)).then(function(h){r.work=h;r.merging=null;return save(r).then(summary);});});});}
@@ -629,10 +646,10 @@ function stopMerge(id){return locked(id,function(){return load(id).then(function
 function revert(id,target){return locked(id,function(){return load(id).then(function(r){if(r.merging)throw new Error("finish or stop the merge first");
   return Promise.all([treeFiles(headOid(r)),resolve(r,target)]).then(function(x){if(changesBetween(x[0],r.work).length)throw new Error("commit your changes before undoing an older one");
     return commitOf(x[1]).then(function(c){if(c.parents.length>1)throw new Error("a merge cannot be undone in one step");
-      return Promise.all([treeFiles(c.oid),treeFiles(c.parents[0]||null)]).then(function(t){return mergeTrees(t[0],x[0],t[1],{ours:"now",theirs:"before "+c.oid.slice(0,7)});}).then(function(m){
+      return Promise.all([treeFiles(c.oid),treeFiles(c.parents[0]||null),linksFor(c.oid,headOid(r),c.parents[0]||null)]).then(function(t){return Promise.resolve(mergeTrees(t[0],x[0],t[1],{ours:"now",theirs:"before "+c.oid.slice(0,7)})).then(function(m){m.links=t[2];return m;});}).then(function(m){
         r.work=m.files;var msg="Undo “"+c.msg.split("\n")[0]+"”\n\nThis undoes commit "+c.oid+".";
-        if(m.conflicts.length){r.merging={theirs:null,label:"undo "+c.oid.slice(0,7),conflicts:m.conflicts,msg:msg};return save(r).then(function(){return {kind:"conflicts",conflicts:m.conflicts};});}
-        return save(r).then(function(){return {msg:msg};});});});});});}).then(function(res){if(res.kind)return res;return commit(id,res.msg).then(function(oid){return {kind:"undone",commit:oid};});});}
+        if(m.conflicts.length){r.merging={theirs:null,label:"undo "+c.oid.slice(0,7),conflicts:m.conflicts,msg:msg,links:m.links};return save(r).then(function(){return {kind:"conflicts",conflicts:m.conflicts};});}
+        return save(r).then(function(){return {msg:msg,links:m.links};});});});});});}).then(function(res){if(res.kind)return res;return commit(id,res.msg,{links:res.links}).then(function(oid){return {kind:"undone",commit:oid};});});}
 
 /* ---------- 7.53: Fabrica's plan, stage 3, part two (the audit's recommendation 11), used by modules/r342.js, held for her preview ---------- */
 /* one version brought onto the idea that is out, as git cherry-pick -x (checked with git 2.43): its own change, from its first parent to
@@ -644,13 +661,13 @@ function cherryPick(id,target){return locked(id,function(){return load(id).then(
     if(changesBetween(x[0],r.work).length)throw new Error("keep or put aside the changes under Changes before bringing a version in");
     if(x[1]===headOid(r))throw new Error("that is the version this idea is on");
     return commitOf(x[1]).then(function(c){if(c.parents.length>1)throw new Error("a version that joined two ideas cannot be brought in by itself");
-      return Promise.all([treeFiles(c.parents[0]||null),treeFiles(c.oid)]).then(function(t){return mergeTrees(t[0],x[0],t[1],{ours:"now",theirs:c.oid.slice(0,7)});}).then(function(m){
-        if(!m.conflicts.length&&!changesBetween(x[0],m.files).length)throw new Error("this idea already holds that version's change");
+      return Promise.all([treeFiles(c.parents[0]||null),treeFiles(c.oid),linksFor(c.parents[0]||null,headOid(r),c.oid),linksOf(headOid(r))]).then(function(t){return Promise.resolve(mergeTrees(t[0],x[0],t[1],{ours:"now",theirs:c.oid.slice(0,7)})).then(function(m){m.links=t[2];m.headLinks=t[3];return m;});}).then(function(m){
+        if(!m.conflicts.length&&!changesBetween(x[0],m.files).length&&sameLinks(m.links,m.headLinks))throw new Error("this idea already holds that version's change");
         var msg=String(c.msg||"").replace(/\s+$/,"")+"\n\n(cherry picked from commit "+c.oid+")";r.work=m.files;
-        if(m.conflicts.length){r.merging={theirs:null,label:String(c.msg||"").split("\n")[0].slice(0,80)+" ("+c.oid.slice(0,7)+")",conflicts:m.conflicts,msg:msg,author:c.author||null};
+        if(m.conflicts.length){r.merging={theirs:null,label:String(c.msg||"").split("\n")[0].slice(0,80)+" ("+c.oid.slice(0,7)+")",conflicts:m.conflicts,msg:msg,author:c.author||null,links:m.links};
           return save(r).then(function(){return {kind:"conflicts",conflicts:m.conflicts,msg:msg};});}
-        return save(r).then(function(){return {msg:msg,author:c.author};});});});});});}).then(function(res){if(res.kind)return res;
-    return commit(id,res.msg,{authorIdent:res.author}).then(function(oid){return {kind:"picked",commit:oid};});});}
+        return save(r).then(function(){return {msg:msg,author:c.author,links:m.links};});});});});});}).then(function(res){if(res.kind)return res;
+    return commit(id,res.msg,{authorIdent:res.author,links:res.links}).then(function(oid){return {kind:"picked",commit:oid};});});}
 /* changes put aside, as git stash (checked with git 2.43): the files as they are now kept as a version of their own, W (its parents: the
    version out, then I, the staged files, which here are the version out's own, nothing being staged in Fabrica), in git's own words
    ("WIP on <idea>: <short id> <title>", or "On <idea>: <words>"); the list, newest first, kept beside the repository (git keeps it as
@@ -658,7 +675,7 @@ function cherryPick(id,target){return locked(id,function(){return load(id).then(
 function stashPush(id,words){return locked(id,function(){return load(id).then(function(r){if(r.merging)throw new Error("finish or stop the merge first");
   var head=headOid(r);if(!head)throw new Error("keep a first version before putting changes aside");
   return treeFiles(head).then(function(hf){var ch=changesBetween(hf,r.work);if(!ch.length)throw new Error("nothing waits to be kept, so there is nothing to put aside");
-    return Promise.all([commitOf(head),writeTrees(store(),r.work)]).then(function(x){var hc=x[0],d=new Date(),me=ident(who,Math.floor(d.getTime()/1000),tzOf(d));
+    return Promise.all([commitOf(head),linksOf(head).then(function(lk){return writeTrees(store(),r.work,lk);})]).then(function(x){var hc=x[0],d=new Date(),me=ident(who,Math.floor(d.getTime()/1000),tzOf(d));
       var br=r.head&&r.head.ref?r.head.ref.replace(/^refs\/heads\//,""):"(no branch)",title=String(hc.msg||"").split("\n")[0],sh=head.slice(0,7);
       var w=String(words||"").replace(/\s+/g," ").trim().slice(0,200),wmsg=w?"On "+br+": "+w:"WIP on "+br+": "+sh+" "+title;
       return store().put("commit",commitBody({tree:hc.tree,parents:[head],author:me,msg:"index on "+br+": "+sh+" "+title+"\n"})).then(function(io){
@@ -843,6 +860,8 @@ return {create:create,list:list,info:info,rename:rename,remove:remove,
   put:putFile,putMany:putFiles,del:delFile,move:moveFile,read:readFile,readText:readText,files:files,
   status:status,commit:commit,commitTo:commitTo,cherryPick:cherryPick,stashPush:stashPush,stashList:stashList,stashApply:stashApply,stashDrop:stashDrop,log:log,diff:diff,branch:branch,delBranch:delBranch,tag:tag,delTag:delTag,switchTo:switchTo,discard:discard,restore:restore,
   merge:merge,rebase:rebase,stopMerge:stopMerge,revert:revert,isDisk:isDisk,
+  /* 7.57: the submodules of a version (the one out when no ref is named): {path: the version it stands at} */
+  links:function(id,ref){return load(id).then(function(r){return Promise.resolve(ref?resolve(r,ref):headOid(r)).then(function(oid){return linksOf(oid);});});},
   setNote:setNote,notes:notes,head:headOf,resolve:function(id,ref){return load(id).then(function(r){return resolve(r,ref);});},setRef:setRef,
   bundle:bundle,gitFolder:gitFolder,sourceZip:sourceZip,importAny:importAny,fromZip:fromZip,fromBundle:fromBundle,fromFiles:fromFiles,
   /* 6.83: a repository's git folder read piece by piece (Fabrica opens a repository brought from GitHub, modules/r276.js) */
