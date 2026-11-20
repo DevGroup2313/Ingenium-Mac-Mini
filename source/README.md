@@ -410,13 +410,16 @@ Ingenium 7.54 (20 November 2026): Sign out; her rule on underlined purple words 
   Fixed: the card waits out of sight while the profiles stand over it, and the line is in ink. The eighth picture, taken again as she
   would come to it (signed in, Night chosen, signed out), showed a day card on the night door: the page's own look is sealed with the
   desk, and only the sign-in door knows it is night. The profiles door over it, and its "Someone else? Choose a profile" key, now take
-  r331's night colours (the same values) while that door stands by night. Out of build/held.json ("released_754").
+  r331's night colours (the same values) while that door stands by night. Found on the release page under load: the sign-in door is
+  painted as r197 loads, Who is using Ingenium only once r344's part of the page has loaded, seconds later on a slow device, so the
+  sign-in's card showed for a moment first. r197 now holds the card out of sight while the profiles' list says signed out (r344 takes
+  over; should nothing take over within 12 s, the card shows). Out of build/held.json ("released_754").
 - Her ways of working on the Ingenia page take a tenth rule (`build/modules/r327.js`): "Purple words that can be pressed are underlined",
   at her words (20 November 2026): "I want you to add the purple pressable words underlined to my rules in my way of working in the
   Ingenia page." Added once, at the end of her list, in her master copy and her own profile; not added twice, not added back if she
   removes it. `build/editions.py` leaves it out of every other edition (`var LATER=[];`).
 - What is new (r222): Sign out for every edition; the Desk's documents sealed, and the rule, for the master edition.
-- Tests on a test build (7.53's release page with r197, r327 and r344 put in): rig/t_754_sign_out.js 24/24 (with four checks by night),
+- Tests on a test build (7.53's release page with r197, r327 and r344 put in): rig/t_754_sign_out.js 25/25 (with four checks by night, and one watching each frame for a flash of the sign-in card),
   rig/t_754_ways_rule.js 7/7, t_700_lock 58/58, t_744_profiles 17/17.
 
 Ingenium 7.53 (20 November 2026): Fabrica's plan, stage 3, part two (cherry-pick, changes put aside); purple words that can be pressed,
