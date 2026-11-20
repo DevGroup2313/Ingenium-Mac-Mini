@@ -234,7 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
-  ["7.53", "Purple words that can be pressed are underlined now, across Ingenium: a thin line in the word's own colour, a little below it, by day and by night (See all on Home, the quiet keys of Lector, Fabrica and Vocatio, the crumbs, Why this model, Hide in Adamas and the rest)."],
+  ["7.53", "Purple words that can be pressed are underlined now, across Ingenium: a thin line in the word's own colour, a little below it, by day and by night; nothing else of them changes."],
   ["7.53", "Fabrica picks a version from another idea and brings it onto yours (Ideas, Pick its versions, then Bring it here: git's own line says where it came from, the author is kept and the other idea is not changed), and puts unfinished changes aside (Changes, Put aside, then Bring back or Drop), as git does them, on the apps kept in Ingenium.", "fabrica"],
   ["7.52", "The Desk's five apps, Tabula, Abacus, Imago, Scriba and Fontes, are your master copy's alone, as your other apps are: the full edition carries none of them now, as the gift and demo editions did not, and another person's profile here shows none of them (no key, no tile on Home, no Open in Tabula in Lector or Vocatio). Your own profile keeps all five.", "master"],
   ["7.51", "Ask before each export: in Settings, Security, More protection, a switch makes every plain copy that leaves Ingenium (a backup without its seal, an app or a document saved as a file) ask for your password first; a backup sealed whole leaves without the question. It needs your sign-in, and turning it off asks for your password too."],
