@@ -426,7 +426,12 @@ Ingenium 7.55 (20 November 2026): the record of Ingenium's security, profiles an
   The key is raised and round in the app's own key look (`--pop`, `--pop-hi`), lifting 2 pixels under the pointer, never tinted, with
   the key sound; it does what Cancel does. Only the Project panel is dressed so (found by its name field `#pjName`); any other panel
   drawn in the same box takes it as it always was.
-- Tests: `rig/t_755_record.js` 10/10 and `rig/t_755_project_panel.js` 10/10 on a test build (7.54's release page with r345 and r346 put in);
+- Tests on the release page (3646272cf3ac08a0, served on its own port and checked by its SHA-256): t_755_record 10/10, t_755_project_panel
+  10/10, t_626_guide 27/27, t_736_security 14/14 (alone); on the same page before What is new's last line (only r222 differs): t_754_sign_out
+  25/25, t_744_profiles 17/17, t_746_no_apps 4/4 and 22/22, t_754_ways_rule 7/7, and t_700_lock 58/58 (it now leaves the record's texts out
+  of its own counts); the editions: t_627_editions 26/26, t_745_owner_free 21/21, t_745_to_full 15/15, t_746_no_apps 22/22, 19/19, 19/19,
+  t_750_disk_page 12/12 and t_626_guide 27/27 with the gift edition. Earlier, on a test build (7.54's release page with r345 and r346 put in):
+  `rig/t_755_record.js` 10/10 and `rig/t_755_project_panel.js` 10/10;
   `rig/t_745_owner_free.js` refuses the record and r345 in the other editions. Pictures of the folder: `previews/record` (the scripts;
   the pictures stay out of the repository).
 
