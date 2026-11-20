@@ -1,5 +1,5 @@
 // Fabrica, stage 3, part one, as pictures: the running app (a test build that keeps the held modules/r339.js), with invented people and an
-// invented app (Ada, Theo, Tide Clock; owners @rain-gauge, @tide-team/keepers, docs@example.invalid); the new part ringed in gold.
+// invented app (Ada, Theo, Tide Clock; owners @rain-gauge, @tide-team/keepers, docs@example.invalid); the new part ringed in violet.
 //   node source/previews/fabrica_stage3/capture_pics.js <page url> <out folder>
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path');
 const [URL_, OUT] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true });
@@ -9,7 +9,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const b = await pw.chromium.launch(); const ctx = await b.newContext({ viewport: { width: VW, height: VH }, deviceScaleFactor: 2 }); const p = await ctx.newPage();
   const errs = []; p.on('pageerror', (e) => errs.push(e.message.slice(0, 200)));
   const ring = (sel) => p.evaluate((sel) => { document.querySelectorAll('.pv-ring').forEach((x) => x.classList.remove('pv-ring'));
-    if (!document.getElementById('pvRingCss')) { const st = document.createElement('style'); st.id = 'pvRingCss'; st.textContent = '.pv-ring{outline:3px solid #d4a23a!important;outline-offset:4px!important;border-radius:12px}'; document.body.appendChild(st); }
+    if (!document.getElementById('pvRingCss')) { const st = document.createElement('style'); st.id = 'pvRingCss'; st.textContent = '.pv-ring{outline:3px solid #6a3fb5!important;outline-offset:4px!important;border-radius:12px}'; document.body.appendChild(st); }
     const els = sel.split('|').map((q) => document.querySelector(q)).filter(Boolean); els.forEach((e) => e.classList.add('pv-ring')); return els.length; }, sel);
   // the part brought into view below Fabrica's sticky heading (which would cover it), and no passing notice over it
   const bring = (sel) => p.evaluate((sel) => { document.querySelectorAll('#fb .f-toast').forEach((x) => x.remove()); const e = document.querySelector(sel.split('|')[0]); if (!e) return -1; for (let f = e; f && f !== document.body; f = f.parentElement) if (getComputedStyle(f).position === 'fixed') return 0;

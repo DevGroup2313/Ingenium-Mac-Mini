@@ -1,4 +1,4 @@
-"""Fabrica stage 3, part one, as pictures: one per step, the new part ringed in gold, one plain sentence each. Every picture is the running app."""
+"""Fabrica stage 3, part one, as pictures: one per step, the new part ringed in violet, one plain sentence each. Every picture is the running app."""
 import os, sys
 from PIL import Image, ImageDraw, ImageFont
 
@@ -36,7 +36,7 @@ STEPS = [
      "The same thread in Fabrica's night colours."),
 ]
 W, M = 1240, 44
-bg, ink, ink2, gold = (244, 241, 248), (34, 26, 46), (90, 82, 104), (212, 162, 58)
+bg, ink, ink2, violet = (244, 241, 248), (34, 26, 46), (90, 82, 104), (106, 63, 181)
 
 
 def wrap(dr, text, font, width):
@@ -55,7 +55,7 @@ def wrap(dr, text, font, width):
 tmp = Image.new("RGB", (10, 10)); dr0 = ImageDraw.Draw(tmp)
 blocks, y = [], M
 head = ["Fabrica, stage 3, part one: reviewers, code owners and suggested changes (a preview, held until your yes)",
-        "Recommendations 9 and 10 of the audit, checked against GitHub's own documentation. Each picture is the real app with an invented app (Tide Clock) and invented people; the gold ring marks what is new."]
+        "Recommendations 9 and 10 of the audit, checked against GitHub's own documentation. Each picture is the real app with an invented app (Tide Clock) and invented people; the violet ring marks what is new."]
 y += 50 + 30 * len(wrap(dr0, head[0], F(28, True), W - 2 * M)) - 30 + 30 * len(wrap(dr0, head[1], F(19), W - 2 * M)) + 26
 for key, title, text in STEPS:
     f = os.path.join(D, key + ".png")
@@ -72,7 +72,7 @@ for i, l in enumerate(hl):
 for i, l in enumerate(wrap(dr, head[1], F(19), W - 2 * M)):
     dr.text((M, M + 34 * len(hl) + 16 + 30 * i), l, font=F(19), fill=ink2)
 for n, (yy, key, title, lines, im) in enumerate(blocks):
-    dr.ellipse((M, yy + 2, M + 28, yy + 30), fill=gold); dr.text((M + 9 if n < 9 else M + 4, yy + 4), str(n + 1), font=F(18, True), fill=(255, 255, 255))
+    dr.ellipse((M, yy + 2, M + 28, yy + 30), fill=violet); dr.text((M + 9 if n < 9 else M + 4, yy + 4), str(n + 1), font=F(18, True), fill=(255, 255, 255))
     dr.text((M + 40, yy + 2), title, font=F(21, True), fill=ink)
     for i, l in enumerate(lines):
         dr.text((M, yy + 40 + 27 * i), l, font=F(18), fill=ink2)
