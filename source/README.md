@@ -395,7 +395,24 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.49 (20 November 2026): sealed on the computer's disk, first stage.
+Ingenium 7.49 (20 November 2026): Fabrica's plan, stage 3, part one (reviewers, code owners, suggested changes); sealed on the computer's
+disk, first stage.
+Fabrica's plan, stage 3, part one: the audit's recommendations 9 and 10 (approved in full, 19 November 2026: "I want them all implemented
+into Ingenium in the proposed order"), built in the other session as `build/modules/r339.js` and held for her preview; shown to her as
+pictures of the running app (14 steps, source/previews/fabrica_stage3; their rings drawn in Ingenium's violet, not gold, at her rule), and
+her word (20 November 2026): "I approve of everything, please commit and push it everywhere and continue working on my requests."
+- Reviewers: a third chip beside People and Milestone asks a person known in the repository, someone else, or her own model for a review;
+  each one asked has a pill with what they did since (waiting, approved, asked for changes, commented), which asks again or no longer.
+  Her model's review is written by it and kept as a comment: a model never approves.
+- Code owners: the CODEOWNERS file of the pull request's base is read as GitHub reads it (GitHub's own documentation read at its source,
+  github/docs at 16d03dd): .github/CODEOWNERS, then CODEOWNERS, then docs/CODEOWNERS; the last matching line names the owners. The owners
+  of the files a pull request changes are asked for a review, each with the line that named them; the merge box says who owns what and
+  whether one has approved. Nothing is held back by it, as on GitHub without its own rule.
+- Suggested changes: a comment on a line offers Suggest a change; Commit suggestion, or Add suggestion to batch and Commit suggestions as
+  one version naming who suggested each; a suggestion whose line has changed since is out of date and never applied. A suggestion made on
+  GitHub's site arrives as an ordinary comment (GitHub's exact text for one was not in the pages read).
+- What is new (r222): three lines, where Fabrica is. held.json: released_749.
+- rig: `t_749_reviews.js` (32 checks).
 Her security request (18 November 2026, in source/README.md, 7.36) and her answer for the computer's disk: "All of them" sealed; the
 approved live preview (https://claude.ai/artifact/H4ieskf4TqQR7DXc6YSeAQ, source/previews/security): "While you are signed in, the computer
 app holds the key in its memory only, and drops it when Ingenium locks. A run still runs on plain files while it runs; its files are sealed

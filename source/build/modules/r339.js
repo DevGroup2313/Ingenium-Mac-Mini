@@ -1,5 +1,6 @@
 <style id="r339-css">
-/* ============ R339 · FABRICA, STAGE 3, PART ONE: REVIEWERS, CODE OWNERS AND SUGGESTED CHANGES (Ingenium 7.49, held for her preview) ============
+/* ============ R339 · FABRICA, STAGE 3, PART ONE: REVIEWERS, CODE OWNERS AND SUGGESTED CHANGES (Ingenium 7.49, 20 November 2026) ============
+   Her word on its pictures (20 November 2026): "I approve of everything, please commit and push it everywhere and continue working on my requests."
    Her plan (Fabrica's audit, 19 November 2026, approved in full: "I want them all implemented into Ingenium in the proposed order"):
    "9. Requested reviewers and code owners. A pull request can ask a person, or your own model, for a review; a CODEOWNERS file is read as
    GitHub reads it." "10. Suggested changes in a review. A comment can propose new lines, and one press applies them as a version."

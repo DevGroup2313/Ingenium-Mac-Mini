@@ -1,5 +1,5 @@
 // node rig/t_749_reviews.js <Ingenium page url (master or full)> <out folder>
-// Ingenium 7.49 (held for her preview): Fabrica's plan, stage 3, part one (modules/r339.js). The audit's recommendations 9 and 10, approved in
+// Ingenium 7.49 (20 November 2026, approved on its pictures): Fabrica's plan, stage 3, part one (modules/r339.js). The audit's recommendations 9 and 10, approved in
 // full on 19 November 2026 ("I want them all implemented into Ingenium in the proposed order"):
 //   9. requested reviewers and code owners: a pull request asks a person, or your own model, for a review; CODEOWNERS is read as GitHub reads it
 //  10. suggested changes in a review: a comment proposes new lines, and one press applies them as a version

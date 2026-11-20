@@ -43,7 +43,8 @@ const doorUp = (p) => p.evaluate(() => { const d = document.querySelector('#ingL
   const r1 = await room(); const st = Object.fromEntries(r1.items);
   ok(r1.tabs.join('|').includes('Your data|Security|Ownership') && r1.shown, 'Settings has a room Security, between Your data and Ownership', r1.tabs);
   // 7.37 (r319): Sealed between your devices is built: in a browser that can seal and has paired with no computer yet, it says On
-  ok(st['Sealed on this device'] === 'Off' && st['Sealed between your devices'] === 'On' && ['Sealed on the computer\'s disk', 'Your apps signed when shipped', 'Your apps\' code scrambled', 'Ingenium itself, signed and checked'].every(k => st[k] === 'Not yet') && /^\d+ of \d+ protections on$/.test(r1.big), 'its card: each protection with its true state (the sign-in off on a fresh copy; Sealed between your devices On; the four to come say Not yet)', { big: r1.big, st });
+  // 7.49 (r340): Sealed on the computer's disk is built: with the sign-in off (and, in a browser, no computer app) it says Off
+  ok(st['Sealed on this device'] === 'Off' && st['Sealed between your devices'] === 'On' && st['Sealed on the computer\'s disk'] === 'Off' && ['Your apps signed when shipped', 'Your apps\' code scrambled', 'Ingenium itself, signed and checked'].every(k => st[k] === 'Not yet') && /^\d+ of \d+ protections on$/.test(r1.big), 'its card: each protection with its true state (the sign-in off on a fresh copy; Sealed between your devices On; the computer\'s disk Off; the three to come say Not yet)', { big: r1.big, st });
   await p.screenshot({ path: OUT + '/room.png' });
   /* 2. the first start's ask */
   const a1 = await p.evaluate(() => { const shown = IngSecurity.ask(); const w = document.getElementById('secAsk'); return { shown, h: w && w.querySelector('h2').textContent, keys: w ? [...w.querySelectorAll('button')].map(x => x.textContent) : [] }; });
