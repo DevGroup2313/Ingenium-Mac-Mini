@@ -497,7 +497,9 @@ function commit(id,msg,opt){opt=opt||{};return locked(id,function(){return load(
       var chk=parent?commitOf(parent).then(function(pc){return pc.tree===tree&&!r.merging&&!opt.allowEmpty;}):Promise.resolve(false);
       return chk.then(function(empty){if(empty)throw new Error("nothing has changed since the last commit");
         var d=opt.date||new Date(),when=Math.floor(d.getTime()/1000),a=ident(opt.author||who,when,tzOf(d)),parents=parent?[parent]:[];if(r.merging&&r.merging.theirs)parents.push(r.merging.theirs);
-        return store().put("commit",commitBody({tree:tree,parents:parents,author:a,msg:msg+"\n"})).then(function(oid){moveHead(r,oid,r.merging?"merge "+r.merging.label:"commit");r.merging=null;return save(r).then(function(){return oid;});});});});}});});}
+        /* 7.53: a version brought in (cherryPick) keeps its own author, name, address and time; the one keeping it is its committer */
+        var ai=opt.authorIdent||(r.merging&&r.merging.author)||null,cm=null;if(ai&&ai.when){cm=a;a=ident(ai,ai.when,ai.tz||"+0000");}
+        return store().put("commit",commitBody({tree:tree,parents:parents,author:a,committer:cm,msg:msg+"\n"})).then(function(oid){moveHead(r,oid,r.merging?"merge "+r.merging.label:"commit");r.merging=null;return save(r).then(function(){return oid;});});});});}});});}
 /* 7.46 (modules/r333.js): a version kept on a branch that is not the one out, as a Code or Chat session keeps its work on a branch of its
    own (ingenium/...), so the working copy Fabrica shows is never touched. changes: [{path, data}] ({path, data:null} takes a file away);
    the branch is made from opt.from (a branch, a tag or a version; the one out when none is named) the first time. */
@@ -632,6 +634,53 @@ function revert(id,target){return locked(id,function(){return load(id).then(func
         if(m.conflicts.length){r.merging={theirs:null,label:"undo "+c.oid.slice(0,7),conflicts:m.conflicts,msg:msg};return save(r).then(function(){return {kind:"conflicts",conflicts:m.conflicts};});}
         return save(r).then(function(){return {msg:msg};});});});});});}).then(function(res){if(res.kind)return res;return commit(id,res.msg).then(function(oid){return {kind:"undone",commit:oid};});});}
 
+/* ---------- 7.53: Fabrica's plan, stage 3, part two (the audit's recommendation 11), used by modules/r342.js, held for her preview ---------- */
+/* one version brought onto the idea that is out, as git cherry-pick -x (checked with git 2.43): its own change, from its first parent to
+   it, merged three ways onto what the idea holds now; its words kept, with git's own line "(cherry picked from commit <id>)"; its author
+   kept (commit, above). A file changed both ways holds both versions between git's marks, as a merge's does, until the version is kept;
+   a change the idea already holds is said so, and nothing is made */
+function cherryPick(id,target){return locked(id,function(){return load(id).then(function(r){if(r.merging)throw new Error("finish or stop the merge first");
+  return Promise.all([treeFiles(headOid(r)),resolve(r,target)]).then(function(x){if(!x[1])throw new Error("that version is not here");
+    if(changesBetween(x[0],r.work).length)throw new Error("keep or put aside the changes under Changes before bringing a version in");
+    if(x[1]===headOid(r))throw new Error("that is the version this idea is on");
+    return commitOf(x[1]).then(function(c){if(c.parents.length>1)throw new Error("a version that joined two ideas cannot be brought in by itself");
+      return Promise.all([treeFiles(c.parents[0]||null),treeFiles(c.oid)]).then(function(t){return mergeTrees(t[0],x[0],t[1],{ours:"now",theirs:c.oid.slice(0,7)});}).then(function(m){
+        if(!m.conflicts.length&&!changesBetween(x[0],m.files).length)throw new Error("this idea already holds that version's change");
+        var msg=String(c.msg||"").replace(/\s+$/,"")+"\n\n(cherry picked from commit "+c.oid+")";r.work=m.files;
+        if(m.conflicts.length){r.merging={theirs:null,label:String(c.msg||"").split("\n")[0].slice(0,80)+" ("+c.oid.slice(0,7)+")",conflicts:m.conflicts,msg:msg,author:c.author||null};
+          return save(r).then(function(){return {kind:"conflicts",conflicts:m.conflicts,msg:msg};});}
+        return save(r).then(function(){return {msg:msg,author:c.author};});});});});});}).then(function(res){if(res.kind)return res;
+    return commit(id,res.msg,{authorIdent:res.author}).then(function(oid){return {kind:"picked",commit:oid};});});}
+/* changes put aside, as git stash (checked with git 2.43): the files as they are now kept as a version of their own, W (its parents: the
+   version out, then I, the staged files, which here are the version out's own, nothing being staged in Fabrica), in git's own words
+   ("WIP on <idea>: <short id> <title>", or "On <idea>: <words>"); the list, newest first, kept beside the repository (git keeps it as
+   refs/stash's log; here no ref is made, so nothing put aside travels with a push) and kept by gc; the files go back to the version out */
+function stashPush(id,words){return locked(id,function(){return load(id).then(function(r){if(r.merging)throw new Error("finish or stop the merge first");
+  var head=headOid(r);if(!head)throw new Error("keep a first version before putting changes aside");
+  return treeFiles(head).then(function(hf){var ch=changesBetween(hf,r.work);if(!ch.length)throw new Error("nothing waits to be kept, so there is nothing to put aside");
+    return Promise.all([commitOf(head),writeTrees(store(),r.work)]).then(function(x){var hc=x[0],d=new Date(),me=ident(who,Math.floor(d.getTime()/1000),tzOf(d));
+      var br=r.head&&r.head.ref?r.head.ref.replace(/^refs\/heads\//,""):"(no branch)",title=String(hc.msg||"").split("\n")[0],sh=head.slice(0,7);
+      var w=String(words||"").replace(/\s+/g," ").trim().slice(0,200),wmsg=w?"On "+br+": "+w:"WIP on "+br+": "+sh+" "+title;
+      return store().put("commit",commitBody({tree:hc.tree,parents:[head],author:me,msg:"index on "+br+": "+sh+" "+title+"\n"})).then(function(io){
+        return store().put("commit",commitBody({tree:x[1],parents:[head,io],author:me,msg:wmsg}));}).then(function(wo){
+        r.stashes=[{oid:wo,msg:wmsg,branch:br,at:Date.now(),files:ch.map(function(c){return c.path;}).slice(0,200)}].concat(r.stashes||[]);r.work=hf;
+        r.log=(r.log||[]).concat([{at:Date.now(),from:null,to:wo,why:"put aside: "+wmsg}]).slice(-200);
+        return save(r).then(function(){return {oid:wo,msg:wmsg,files:ch.length};});});});});});});}
+function stashList(id){return load(id).then(function(r){return (r.stashes||[]).map(function(s,i){return {n:i,oid:s.oid,msg:s.msg,branch:s.branch,at:s.at,files:(s.files||[]).slice()};});});}
+/* changes put aside, back onto the files, as git stash apply (and pop, opt.drop, which drops them once back): their own change, from the
+   version they were put aside on to them, merged three ways onto files with nothing waiting; a file changed both ways holds both versions
+   between git's marks, and then they stay in the list, as git keeps a stash whose return found both */
+function stashApply(id,n,opt){opt=opt||{};n=n|0;return locked(id,function(){return load(id).then(function(r){if(r.merging)throw new Error("finish or stop the merge first");
+  var s=(r.stashes||[])[n];if(!s)throw new Error("nothing is put aside under that number");
+  return Promise.all([treeFiles(headOid(r)),commitOf(s.oid)]).then(function(x){
+    if(changesBetween(x[0],r.work).length)throw new Error("keep or put aside the changes under Changes first: changes come back onto files with nothing waiting");
+    return Promise.all([treeFiles(x[1].parents[0]||null),flatten(store(),x[1].tree)]).then(function(t){return mergeTrees(t[0],x[0],t[1],{ours:"now",theirs:"put aside"});}).then(function(m){
+      r.work=m.files;var gone=!!opt.drop&&!m.conflicts.length;if(gone)r.stashes.splice(n,1);
+      return save(r).then(function(){return {kind:m.conflicts.length?"conflicts":"back",conflicts:m.conflicts,dropped:gone,msg:s.msg};});});});});});}
+function stashDrop(id,n){n=n|0;return locked(id,function(){return load(id).then(function(r){var a=r.stashes||[];if(!a[n])throw new Error("nothing is put aside under that number");
+  var s=a.splice(n,1)[0];r.stashes=a;r.log=(r.log||[]).concat([{at:Date.now(),from:s.oid,to:null,why:"dropped: "+s.msg}]).slice(-200);
+  return save(r).then(function(){return {dropped:s.msg};});});});}
+
 /* ---------- out: a bundle, a folder for git (zipped), a zip of the files ---------- */
 /* every object the named commits need, oldest first, each blob kept against the version before it at its path
    (names only; the bodies are read while the pack is written) */
@@ -721,7 +770,7 @@ function importAny(u8,opt){u8=u8of(u8);opt=opt||{};var head=dec(u8.subarray(0,16
   return Promise.reject(new Error("Ingenium reads a zip or a git bundle here"));}
 
 /* what is no longer named by any repository is let go */
-function gc(){var live={},s=store();return backend().allRepos().then(function(rs){rs=rs.filter(function(r){return !isDisk(r.id);});var tips=[];rs.forEach(function(r){Object.keys(r.refs).forEach(function(k){tips.push(r.refs[k]);});(r.log||[]).forEach(function(l){if(l.from)tips.push(l.from);if(l.to)tips.push(l.to);});
+function gc(){var live={},s=store();return backend().allRepos().then(function(rs){rs=rs.filter(function(r){return !isDisk(r.id);});var tips=[];rs.forEach(function(r){Object.keys(r.refs).forEach(function(k){tips.push(r.refs[k]);});(r.log||[]).forEach(function(l){if(l.from)tips.push(l.from);if(l.to)tips.push(l.to);});(r.stashes||[]).forEach(function(x){tips.push(x.oid);});
       if(r.merging&&r.merging.theirs)tips.push(r.merging.theirs);Object.keys(r.work||{}).forEach(function(p){live[r.work[p][1]]=1;});});
     function mark(oid){if(live[oid]===2)return Promise.resolve();live[oid]=2;return s.get(oid).then(function(o){if(!o)return;var ch=Promise.resolve();
       if(o.type==="commit"){var c=parseCommit(o.body);ch=ch.then(function(){return mark(c.tree);});c.parents.forEach(function(p){ch=ch.then(function(){return mark(p);});});}
@@ -792,7 +841,7 @@ function headOf(id){return load(id).then(function(r){return headOid(r);});}
 function _use(be){BE=be;ST=new Store(be);ST.onPut=function(oid){if(mshell())MIR.fresh.add(oid);};locks={};recovered=null;}
 return {create:create,list:list,info:info,rename:rename,remove:remove,
   put:putFile,putMany:putFiles,del:delFile,move:moveFile,read:readFile,readText:readText,files:files,
-  status:status,commit:commit,commitTo:commitTo,log:log,diff:diff,branch:branch,delBranch:delBranch,tag:tag,delTag:delTag,switchTo:switchTo,discard:discard,restore:restore,
+  status:status,commit:commit,commitTo:commitTo,cherryPick:cherryPick,stashPush:stashPush,stashList:stashList,stashApply:stashApply,stashDrop:stashDrop,log:log,diff:diff,branch:branch,delBranch:delBranch,tag:tag,delTag:delTag,switchTo:switchTo,discard:discard,restore:restore,
   merge:merge,rebase:rebase,stopMerge:stopMerge,revert:revert,isDisk:isDisk,
   setNote:setNote,notes:notes,head:headOf,resolve:function(id,ref){return load(id).then(function(r){return resolve(r,ref);});},setRef:setRef,
   bundle:bundle,gitFolder:gitFolder,sourceZip:sourceZip,importAny:importAny,fromZip:fromZip,fromBundle:fromBundle,fromFiles:fromFiles,

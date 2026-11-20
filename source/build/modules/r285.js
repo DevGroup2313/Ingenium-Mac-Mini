@@ -91,6 +91,8 @@ function guard(kind,id,args){return rulesOf(id).then(function(x){var rs=x.rules;
   return IR.info(id).then(function(s){var main=mainOf(s,x.rec),onMain=!s.detached&&s.branch===main,pr=W.__ingPrMerge===id;
     if(kind==="commit"&&rs.pr&&onMain&&!s.merging)return refuse(main+" takes new versions only through a pull request (Rules before main): keep this on an idea of its own, then open a pull request.");
     if(kind==="revert"&&rs.pr&&onMain)return refuse(main+" takes new versions only through a pull request (Rules before main): undo it on an idea of its own, then open a pull request.");
+    /* 7.53: a version brought in from another idea (cherryPick, modules/r110.js) is a new version too */
+    if(kind==="cherryPick"&&rs.pr&&onMain)return refuse(main+" takes new versions only through a pull request (Rules before main): bring the version into an idea of its own, then open a pull request.");
     if((kind==="merge"||kind==="rebase")&&rs.pr&&onMain&&!pr)return refuse(main+" takes versions only through a pull request (Rules before main): open a pull request for this idea, and merge it there.");
     if(kind==="delBranch"&&rs.keep&&String(args[1]||"")===main)return refuse(main+" stays, with every version it holds (Rules before main: kept versions stay as they are).");
     if(kind==="setRef"&&rs.keep){var nm=String(args[1]||""),k=/^refs\//.test(nm)?nm:"refs/heads/"+nm,to=String(args[2]||"");if(k!=="refs/heads/"+main||!/^[0-9a-f]{40}$/.test(to))return null;
@@ -100,7 +102,7 @@ function guard(kind,id,args){return rulesOf(id).then(function(x){var rs=x.rules;
 /* Fabrica's own writes: held to the rules (each a refusal in plain words), and followed, so that what she does here is never news to her */
 var REFS={delBranch:"h",setRef:"r",branch:"h",tag:"t",delTag:"t"};
 function named(k,args){var t=REFS[k],nm=String(args[1]||"");if(!t||!nm)return [];return [t==="h"?"refs/heads/"+nm:t==="t"?"refs/tags/"+nm:(/^refs\//.test(nm)?nm:"refs/heads/"+nm)];}
-["commit","merge","rebase","revert","delBranch","setRef","branch","tag","delTag"].forEach(function(k){var f=IR[k];if(typeof f!=="function")return;var held=k!=="branch"&&k!=="tag"&&k!=="delTag";
+["commit","merge","rebase","revert","cherryPick","delBranch","setRef","branch","tag","delTag"].forEach(function(k){var f=IR[k];if(typeof f!=="function")return;var held=k!=="branch"&&k!=="tag"&&k!=="delTag";
   IR[k]=function(id){var args=arguments,names=named(k,args);begin(id);
     /* a version kept, merged, rebased or undone goes on the idea she is on as she does it: named now, not when it is followed */
     var here=names.length?Promise.resolve():IR.info(id).then(function(s){if(!s.detached&&s.branch)names=["refs/heads/"+s.branch];},function(){});
