@@ -205,8 +205,16 @@ function active(){return !!REC;}
 function on(){return !!K.key&&!OFF;}
 function canOpen(){return !!K.key;}
 function ready(){if(K.key||!REC)return Promise.resolve();return new Promise(function(res){READY.push(res);});}
-function holdKeys(r){K.raw=r.dekRaw;K.key=r.dek;K.js=jsGcm(r.dekRaw);var w=READY;READY=[];w.forEach(function(f){try{f();}catch(e){}});}
-function dropKeys(){K.raw=null;K.key=null;K.js=null;K.via=null;}
+function holdKeys(r){K.raw=r.dekRaw;K.key=r.dek;K.js=jsGcm(r.dekRaw);var w=READY;READY=[];w.forEach(function(f){try{f();}catch(e){}});
+  try{W_.dispatchEvent(new CustomEvent("ing-keys",{detail:{held:true}}));}catch(e){}}   /* 7.49: the computer app takes its disk key (modules/r340.js) */
+function dropKeys(){var had=!!K.raw;K.raw=null;K.key=null;K.js=null;K.via=null;
+  if(had)try{W_.dispatchEvent(new CustomEvent("ing-keys",{detail:{held:false}}));}catch(e){}}   /* 7.49: and drops it */
+/* 7.49: the computer's disk is sealed with a key of its own, derived from the data key (HKDF-SHA-256, info "ingenium-disk 1"): the
+   computer app holds it in memory while she is signed in (modules/r340.js, desktop/app_disk_749.py); its id is the first 8 bytes of
+   its SHA-256, so a file sealed under another sign-in is known as such */
+function diskKey(){var s=S();if(!s||!K.raw)return Promise.reject(new Error("locked"));
+  return s.importKey("raw",K.raw,"HKDF",false,["deriveBits"]).then(function(k){return s.deriveBits({name:"HKDF",hash:"SHA-256",salt:new Uint8Array(32),info:TE.encode("ingenium-disk 1")},k,256);})
+    .then(function(b){var u=new Uint8Array(b);return s.digest("SHA-256",u).then(function(h){var x=new Uint8Array(h),hex="";for(var i=0;i<8;i++)hex+=("0"+x[i].toString(16)).slice(-2);return {b64:b64e(u),kid:hex};});});}
 function makeRecord(user,password,phrase){var dekRaw=rnd(32),salt=rnd(16),rsalt=rnd(16);
   return calibrate().then(function(iter){return Promise.all([kdf(password,salt,iter),kdf(normPhrase(phrase),rsalt,iter)]).then(function(ks){var iv1=rnd(12),iv2=rnd(12);
     return Promise.all([enc(ks[0],iv1,"ingenium-lock dek",dekRaw),enc(ks[1],iv2,"ingenium-lock recovery",dekRaw),importDek(dekRaw)]).then(function(r){var dek=r[2],iv3=rnd(12),iv4=rnd(12);
@@ -611,6 +619,7 @@ function lockNow(why){if(GOING||!on())return Promise.resolve(false);var busy=bus
   if(busy&&why==="idle"){ACT=Date.now();return Promise.resolve(false);}
   var ask=busy&&typeof W_.ingAsk==="function"?W_.ingAsk({title:"Lock Ingenium now?",text:busy+" Locking stops it, and the part not yet finished may be lost. Everything already saved stays.",yes:"Lock now",no:"Keep waiting"}):Promise.resolve(true);
   return Promise.resolve(ask).then(function(ok){if(!ok)return false;GOING=true;
+    try{W_.dispatchEvent(new CustomEvent("ing-keys",{detail:{held:false,locking:true}}));}catch(e){}   /* 7.49: the computer app drops its disk key before the page goes to its door */
     /* what was typed in the chat's box and not yet sent is kept with the sealed desk, and put back after the sign-in */
     try{var ci=$("chatInput");if(ci&&ci.value&&ci.value.trim()&&W_.state)W_.state.__lockDraft=ci.value;}catch(e){}
     try{W_.saveState();}catch(e){}try{flushSync();}catch(e){}
@@ -872,7 +881,7 @@ W_.addEventListener("storage",function(e){if(!e||e.key!==LSK)return;
 try{var og=W_.go;if(typeof og==="function"){W_.go=function(p){var r=og.apply(this,arguments);try{if(p==="settings")ensureCard();}catch(e){}return r;};}}catch(e){}
 setTimeout(function(){try{ensureCard();}catch(e){}},600);
 try{doorKey();}catch(e){warn(e);}
-W_.IngLock={active:active,on:on,locked:function(){return active()&&!canOpen();},ready:ready,sealed:sealed,sealText:sealText,openText:openText,sealTextSync:sealTextSync,isRecEnv:isRecEnv,binStores:BSTORES.map(function(x){return x.slice();}),
+W_.IngLock={active:active,on:on,diskKey:diskKey,locked:function(){return active()&&!canOpen();},ready:ready,sealed:sealed,sealText:sealText,openText:openText,sealTextSync:sealTextSync,isRecEnv:isRecEnv,binStores:BSTORES.map(function(x){return x.slice();}),
   /* 6.32: what a part writes to a sealed store waits for the keys while the page is locked, so nothing is written there in clear */
   sealFor:function(db,sn,k,v){return active()?ready().then(function(){return sealRec(db,sn,k,v);}):Promise.resolve(v);},
   deskWrite:deskWrite,isDeskEnvelope:isDeskEnv,openDesk:openDesk,adoptRaw:adoptRaw,lockedNow:adoptRaw,openRecs:openRecs,sealRecs:sealRecs,sealRec:sealRec,openRec:openRec,openValues:openValues,lockNow:lockNow,

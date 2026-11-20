@@ -395,6 +395,33 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.49 (20 November 2026): sealed on the computer's disk, first stage.
+Her security request (18 November 2026, in source/README.md, 7.36) and her answer for the computer's disk: "All of them" sealed; the
+approved live preview (https://claude.ai/artifact/H4ieskf4TqQR7DXc6YSeAQ, source/previews/security): "While you are signed in, the computer
+app holds the key in its memory only, and drops it when Ingenium locks. A run still runs on plain files while it runs; its files are sealed
+when it ends." Kept readable on purpose: an app served for the Home Screen and the model files. The Security room still said "Planned for
+7.40: the computer apps need an encryption library they do not carry yet"; they have carried it (cryptography) since 7.37.
+- `build/desktop/app_disk_749.py` (new, in release.py's list for the Mac and Windows apps): the key held in memory only (disk_key_hold,
+  disk_key_drop); a sealed file is "INGSEAL1", the key's id, a nonce prefix, then the plain bytes in chunks of 1 MiB, each sealed with
+  AES-256-GCM (its number and whether it is the last bound in, so a file cut short, reordered or changed by a byte is refused), so a part
+  is read without opening the rest. Sealed: the apps waiting for her devices (as they are written; a device asking while the computer is
+  locked is told so, 423), Fabrica's runs (each job's log and every file a run kept, when the run ends; its record, its name, state and
+  times, stays readable so the list shows) and the copies of runs made on her other computers (a copy still arriving waits a quarter of an
+  hour, unless she asks). disk_status, disk_seal_now (Seal them now), disk_unseal_all (her sign-in turned off).
+- `build/modules/r197.js`: IngLock.diskKey (HKDF-SHA-256 from the data key, info "ingenium-disk 1"; never the password or the data key
+  itself), with the key's id; an "ing-keys" event when the keys are held and dropped, and before Lock now sends the page to its door.
+- `build/modules/r340.js` (new, IngDiskSeal): hands the key to the computer app while she is signed in and drops it when Ingenium locks
+  (a page opened locked drops any key left behind); when she turns her sign-in off, everything sealed is opened again first.
+- `build/modules/r318.js`: Security, The computer's disk shows its true state (On, Off, or a copy without a computer app), what is sealed,
+  how many files, Seal them now, and what is not sealed yet: Fabrica apps kept on a drive, the folder search's index and texts for
+  training (the next stage). Its overview no longer names a release that has passed.
+- What is new (r222): one line, where Fabrica is.
+- rig: `t_749_disk_app.py` (new, 19 checks, a copy of the real computer app: a waiting app sealed and opened for a device, a run sealed
+  when it ends and read in parts across chunks, locked, a changed byte and another key refused, a copy added to after sealing, everything
+  opened again); `t_749_disk_page.js` (new, 13 checks, a stand-in computer app recording each call: no key without a sign-in, the key
+  handed over when protected and not the password, dropped on Lock now before the page goes to its door, the same key back after signing
+  in, dropped by a page opened locked, Seal them now, and everything opened again before the key is dropped when protection is turned off).
+
 Ingenium 7.48 (20 November 2026): Fabrica's plan, stage 2, one ecosystem; the profile key inside the Status panel.
 
 Her word on its pictures (19 November 2026): "I approve of the preview, please commit and push it everywhere" (the audit's recommendations
