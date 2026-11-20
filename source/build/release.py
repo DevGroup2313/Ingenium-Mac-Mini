@@ -140,7 +140,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_disk_749", "_disk_key_hold", ("mini", "intel", "win")),  # 7.49: sealed on the computer's disk (Security; her answer "All of them")
            ("app_disk_750", "_disk_more_750", ("mini", "intel", "win")),  # 7.50: their records too, and texts for training
            ("app_disk_fix_757", "_disk_seal_status", ("mini", "intel", "win")),  # 7.57: the seal's names its own; drive repositories work again
-           ("app_pick_757", "_disk_pick_757", ("mini", "intel", "win"))]  # 7.57: Fabrica's stage 3, part two, on a drive
+           ("app_pick_757", "_disk_pick_757", ("mini", "intel", "win")),  # 7.57: Fabrica's stage 3, part two, on a drive
+           ("app_self_758", "_self_758", ("mini", "intel", "win"))]  # 7.58: Ingenium itself, signed and checked (Security)
 
 
 def desktop():
@@ -150,6 +151,28 @@ def desktop():
             if mark in open(p, encoding="utf-8").read():
                 continue
             subprocess.run([sys.executable, os.path.join(H, "desktop", name + ".py"), p], check=True)
+    self_stamp()
+
+
+def self_stamp():
+    """7.58 (desktop/app_self_758.py): each computer app carries its own release (version.json) and the owner's public keys
+    (security/owner_keys.json, checked as the page's are: public halves only, each its own fingerprint), written in at every release."""
+    sys.path.insert(0, os.path.normpath(os.path.join(H, "..", "security")))
+    import permits
+    v = json.load(open(os.path.join(H, "version.json")))["v"]
+    keys = json.dumps([{"kid": k["kid"], "x": k["jwk"]["x"], "y": k["jwk"]["y"]} for k in permits.keys()])
+    for k in ("mini", "intel", "win"):
+        p = os.path.join(R[k], "ingenium_app.py")
+        s = open(p, encoding="utf-8").read()
+        if "_self_758" not in s:
+            continue
+        t, n1 = re.subn(r'^_SELF_RELEASE = "[0-9.]*"  # ING-SELF-RELEASE$', lambda m: '_SELF_RELEASE = "%s"  # ING-SELF-RELEASE' % v, s, flags=re.M)
+        t, n2 = re.subn(r'^_SELF_KEYS = \[.*\]  # ING-SELF-KEYS$', lambda m: "_SELF_KEYS = %s  # ING-SELF-KEYS" % keys, t, flags=re.M)
+        if n1 != 1 or n2 != 1:
+            sys.exit("%s: its release or its keys were not found once (%d, %d)" % (p, n1, n2))
+        if t != s:
+            open(p, "w", encoding="utf-8").write(t)
+            print("the computer app's release and keys written in:", k, v)
 
 
 DEMO_PAGE = os.path.join(H, "ingenium_demo.html")  # 6.77: the demo edition of this release, built by page() before the master page

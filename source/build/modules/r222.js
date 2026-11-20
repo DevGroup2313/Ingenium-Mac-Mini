@@ -234,6 +234,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.58", "Settings, Security, Ingenium itself: the Mac and Windows apps check this copy against its signature at every start. A signed copy changed by anyone else does not open, and its window says which file changed."],
+  ["7.58", "Sign this release, in Settings, Security, Ingenium itself: your owner key signs the copy you installed, on this device, and the key never leaves it. Save the signature, and bring it in on your other computers that run the same release.", "master"],
   ["7.57", "A repository with other repositories inside it (git's submodules) keeps them in every version Fabrica makes in Ingenium; until now a version kept here left them out. A merge, a version brought in, an undo and a rebase take the other side's change to one, as git does.", "fabrica"],
   ["7.57", "In Fabrica's Files, each submodule is a row of the tree: its name, another repository, and the version it stands at. Pressed, it says where it comes from, and that every version Fabrica makes keeps it at that version.", "fabrica"],
   ["7.57", "In the Mac and Windows apps, the part that seals your work on the computer's disk keeps names of its own now, apart from the computer app's other parts that had taken the same names. It seals as before.", "nofabrica"],

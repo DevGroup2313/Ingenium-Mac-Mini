@@ -24,7 +24,10 @@
      scrambled code, the owner key on her apps, Ingenium itself signed and checked, asking before each export.
    - 7.51 (20 November 2026): Ask before each export is a switch of More protection, as the preview draws it (off until she turns it on;
      it needs her sign-in): with it on, every file saved out of Ingenium unsealed asks for her password first (modules/r341.js), and
-     turning it off asks for the password too. */
+     turning it off asks for the password too.
+   - 7.58: Ingenium itself, signed and checked, part one (modules/r348.js, desktop/app_self_758.py): in the Mac and Windows apps, a
+     release she signs with her owner key on her device (Sign this release, in her master copy) is checked at every start, and a copy
+     changed since refuses to open and says which file changed. The section asks IngSelfSign for its state and its words. */
 #secCard{--sc-lav-t:rgba(106,63,181,.14);--sc-lav-c:#6a3fb5;--sc-sky-t:rgba(74,160,240,.16);--sc-sky-c:#2f6fd0;--sc-amb-t:rgba(232,144,42,.16);--sc-amb-c:#b4600f;--sc-emr-t:rgba(31,157,99,.14);--sc-emr-c:#1a7f50;--sc-rub-t:rgba(200,20,60,.1);--sc-rub-c:#b8433f;
   --sc-ck:inset 0 1.5px 0 rgba(255,255,255,.95),inset 0 -3px 5px rgba(60,30,90,.16),0 1px 1px rgba(40,20,70,.3),0 3px 4px rgba(40,20,70,.24),0 6px 9px rgba(40,20,70,.18),0 12px 20px rgba(40,20,70,.12);
   --sc-ckhi:inset 0 1.5px 0 #fff,inset 0 -3px 5px rgba(60,30,90,.14),0 3px 4px rgba(40,20,70,.24),0 9px 16px rgba(40,20,70,.2),0 16px 26px rgba(40,20,70,.14);
@@ -206,7 +209,7 @@ function items(){var c=cfg(),on=lockOn();
   return [{k:"device",t:"Sealed on this device",s:on?"on":"off"},{k:"device",t:"Backups sealed whole",s:on?"on":"off"},
     {k:"disk",t:"Sealed on the computer's disk",s:W.IngDiskSeal?IngDiskSeal.state():"soon"},{k:"wifi",t:"Sealed between your devices",s:W.IngSealing?IngSealing.state():"soon"},
     ].concat(hasPg("fabrica")?[{k:"code",t:"Your apps' sources sealed in Fabrica",s:on?"on":"off"}]:[],[{k:"code",t:"Your apps signed when shipped",s:"soon"},{k:"code",t:"Your apps' code scrambled",s:"soon"},
-    {k:"self",t:"Ingenium itself, signed and checked",s:"soon"},
+    {k:"self",t:"Ingenium itself, signed and checked",s:W.IngSelfSign?IngSelfSign.state():"soon"},
     {k:"more",t:"Offline only",s:c.offline?"on":"off"},{k:"more",t:"Lock when the computer sleeps",s:c.sleep&&on?"on":"off"},{k:"more",t:"Slow down wrong passwords",s:c.slow&&lockActive()?"on":"off"},
     {k:"more",t:"Clear a copied secret",s:c.clip?"on":"off"},{k:"more",t:"A record of every opening",s:c.log?"on":"off"},
     {k:"more",t:"Ask before each export",s:c.export&&lockActive()?"on":"off"}]);}
@@ -242,8 +245,8 @@ function paint(){var c=card();if(!c)return;var b=c.querySelector(".sc-body");if(
     +'<div class="sc-well"><div class="sc-wh"><b>Signed with your key</b>'+chip("soon")+'</div><p>'+(FB?'Already: your Android and Fire packages are signed with your Android key (Fabrica, Ship), as Android requires, and an iPhone or iPad app with your Apple ID, through Sideloadly. ':"")+'Not yet: your owner key\'s signature on every package, the computer ones too, so a changed file is caught and the app refuses to open and says so.</p></div>'
     +'<div class="sc-well"><div class="sc-wh"><b>Scrambled code</b>'+chip("soon")+'</div><p>The shipped code shrunk and its names scrambled: much slower to read or copy, never impossible. Your sources stay as you wrote them.</p></div>'
     +'<div class="sc-well"><div class="sc-wh"><b>Opens only with your owner key</b>'+chip("soon")+'</div><p>For an app meant for you alone: it opens only on a device that holds your owner key.</p></div>'));
-  sections.push(P("self","self","Ingenium itself, signed and checked",mine()?"The copy you run is the one you built":"The copy you run is the one its maker released",chip("soon"),
-    '<p>'+(mine()?'Already: Ingenium\'s Fire app is signed with your Android key, so the tablet refuses an update signed with any other. Not yet: each release signed with your owner key,':'Already: Ingenium\'s Fire app is signed by its maker, so the tablet refuses an update signed with any other key. Not yet: each release signed with its maker\'s key,')+' and checked by the computer apps and the iPhone, iPad and Fire apps before Ingenium opens: a copy changed by anyone else refuses to open, and says which file changed. Planned after the sealing above.</p>'));
+  sections.push(P("self","self","Ingenium itself, signed and checked",mine()?"The copy you run is the one you built":"The copy you run is the one its maker released",chip(W.IngSelfSign?IngSelfSign.state():"soon"),
+    W.IngSelfSign?IngSelfSign.describe(mine()):('<p>'+(mine()?'Already: Ingenium\'s Fire app is signed with your Android key, so the tablet refuses an update signed with any other. Not yet: each release signed with your owner key,':'Already: Ingenium\'s Fire app is signed by its maker, so the tablet refuses an update signed with any other key. Not yet: each release signed with its maker\'s key,')+' and checked by the computer apps and the iPhone, iPad and Fire apps before Ingenium opens: a copy changed by anyone else refuses to open, and says which file changed. Planned after the sealing above.</p>')));
   var lg=(W.state&&Array.isArray(state.secLog))?state.secLog.slice(-8).reverse():[];
   sections.push(P("more","more","More protection","For a workspace that is truly your own",'<span class="sc-chip ok">'+it.filter(function(x){return x.k==="more"&&x.s==="on";}).length+' on</span>',
     sw("offline","Offline only","Nothing leaves this page but what goes to this device and your home network. Anything else waits, with Allow for an hour and Allow once. The computer apps' own downloads (models you choose to get) follow it from a later release.",cv("offline"))

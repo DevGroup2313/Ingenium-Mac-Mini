@@ -395,6 +395,39 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.58 (20 November 2026): Ingenium itself, signed and checked, part one, in the Mac and Windows apps.
+The Security room's promise (modules/r318.js, approved on the live preview of 18 November 2026): "each release signed with your owner
+key, and checked by the computer apps ... before Ingenium opens: a copy changed by anyone else refuses to open, and says which file
+changed." Where her owner key signs, her choice (20 November 2026): on her device, a "Sign this release" key in her master copy, so the
+key never leaves it. Shown to her as six pictures one by one at full size (`previews/self_sign`: the script; the pictures stay out of
+the repository), and her word: "I approve of your preview, please commit and push it everywhere and continue working on my requests."
+- `build/desktop/app_self_758.py` (the Mac and Windows apps): at every start, before the window is made, the built page is read once:
+  its SHA-256 and size, and the version and edition it names. The build number a device build stamps into its first
+  `<meta name="ingenium-build">` (tools/stamp_build.py) is left out, as the release's own page has it empty, so the fingerprint is the one
+  BUILD_INFO.txt lists and one signature serves every device build of the release; anything else in that tag is read as it is. The same
+  reading gives the page's mark. Her signatures (`<the app's folder>/signatures/*.ingsig`) are checked with the owner's public keys the
+  app carries (`_SELF_KEYS`) and its release (`_SELF_RELEASE`), both written in by release.py at every release: ECDSA P-256 with SHA-256
+  over PermitCore's fixed order, the page's raw signature turned into DER for Python's cryptography. Signed: the page opens. Changed (a
+  signature of hers names this app's release, and the page is not the one signed: a file differs, or it names another version or
+  edition): the window opens on the app's own page, which says which file changed, what was signed and what is there now, with Show the
+  file and Quit; nothing of the changed page runs, and the app's own address gives none of it (a reload, its parts, the window's page).
+  Not signed: it opens, and Security says so. Her own page (6.19) is never refused. A fault in the check never keeps Ingenium closed. A
+  refusal is kept (the last ten) for the room. Bridge: self_check, self_signature_put (kept only when it is hers and names this very
+  copy), self_signature_get, self_reveal, self_quit.
+- `build/modules/r348.js` (new) and `r318.js`: Settings, Security, Ingenium itself shows this copy (its version and edition, its build,
+  its page's size and fingerprint) and its state; Sign this release (the master edition, with the owner's key on this device: her owner
+  key's password asked in a card of the room's own kind; the release's fields signed with PermitCore's signWith and handed to the computer
+  app, which checks and keeps them); Save the signature; Bring a signature in; Check it now; a refusal at an earlier start. Without a
+  computer app (a browser, the iPhone, iPad and Fire apps) the room says Not yet. Its limits, said in the room: someone who can change the
+  computer app itself, or take its signatures away, can stop the check (it then says Not signed yet); the iPhone, iPad and Fire apps
+  check from a later release, and so does each release carrying her signature to the copies she gives.
+- `build/release.py`: app_self_758 among the desktop patches; `self_stamp()` writes each computer app's release and keys at every release.
+- What is new (r222): one line for every edition, one for the master's Sign this release.
+- rig: `t_758_self_check.py` (the app's side with a test key: signed, changed, a stamped build, another version or edition, other keys
+  and changed signatures refused, her own page never refused, the app's own address, the bridge, and each release app's own release and
+  keys), `t_758_self_page.js` with `t_758_run_self.py` (the page signs in the browser with a key PermitCore made, the app checks it in
+  Python, Node checks it again apart from both; saved, brought in, and a changed page refused by the app's own address).
+
 Ingenium 7.57 (20 November 2026): repositories on a drive work again; Fabrica's plan, stage 3, part two, on a drive; submodules kept
 in every version Fabrica makes, and shown in Files.
 - Repositories on a drive, broken since 7.49, work again (`build/desktop/app_disk_fix_757.py`, applied after app_disk_750.py). 7.49's seal
