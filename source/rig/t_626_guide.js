@@ -13,6 +13,10 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 300)));
   await p.goto(URL_); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 }); await p.waitForTimeout(1200);
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); });
+  // 7.51: the editions other than the master show their terms first (r326, since 7.41); a person agrees before anything else, so the test does
+  const agree = (pg) => pg.evaluate(() => { const tick = [...document.querySelectorAll('.tg-veil input[type=checkbox], #tgTick')].find((c) => !c.checked);
+    if (tick) tick.click(); const g = [...document.querySelectorAll('button')].find((b) => /^I agree$/.test(b.textContent.trim()) && b.offsetParent); if (g) g.click(); });
+  await p.waitForTimeout(400); await agree(p); await p.waitForTimeout(600);
   await p.waitForTimeout(500); await p.evaluate(() => go('guide')); await p.waitForTimeout(1200);
   const master = ED === 'master', career = ED === 'master' || ED === 'full';
 
@@ -134,7 +138,8 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   /* 10. on a phone: nothing past the edge; the card rises from the foot, above the side keys */
   const q = await (await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })).newPage(); q.on('pageerror', e => errs.push('phone: ' + e.message.slice(0, 200)));
   await q.goto(URL_); await q.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 }); await q.waitForTimeout(1200);
-  await q.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); go('guide'); }); await q.waitForTimeout(900);
+  await q.evaluate(() => { const k = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); }); await q.waitForTimeout(400); await agree(q); await q.waitForTimeout(600);
+  await q.evaluate(() => go('guide')); await q.waitForTimeout(900);
   await q.evaluate(() => document.getElementById('gdNewKey').click()); await q.waitForTimeout(700);
   const ph = await q.evaluate(() => { const pop = document.getElementById('gdNewPop'), r = pop.getBoundingClientRect(); const pts = [[r.right - 18, r.top + r.height * 0.5], [r.right - 18, r.top + r.height * 0.75], [r.left + 30, r.top + 40]];
     return { over: document.scrollingElement.scrollWidth - innerWidth, inView: r.left >= 0 && r.right <= innerWidth + 1 && r.bottom <= innerHeight + 1 && r.top >= 0, onTop: pts.every(([x, y]) => pop.contains(document.elementFromPoint(x, y))) }; });

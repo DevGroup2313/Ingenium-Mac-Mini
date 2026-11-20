@@ -395,6 +395,26 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.51 (20 November 2026): Ask before each export.
+Her security request (18 November 2026, 7.36) and the approved live preview (https://claude.ai/artifact/H4ieskf4TqQR7DXc6YSeAQ,
+source/previews/security), More protection: "Ask before each export. A plain copy (a backup without its seal, a plain export of an app)
+asks for your password first." (a switch, off in the preview). Her word (20 November 2026): "I approve of everything, please commit and
+push it everywhere and continue working on my requests."
+- `build/modules/r341.js` (new, window.IngExportAsk): every file Ingenium saves out of itself goes through window.saveFileNative (the
+  base's own, queued by r137); this part stands in front of it. With the switch on and her sign-in on, a file that would leave unsealed
+  waits for her password: the right one lets it go; a wrong one is refused; Cancel, Escape, or the page locking meanwhile keeps it,
+  and the save answers that nothing was saved. A backup sealed whole (it begins "INGENIUM SEALED BACKUP 1", r143) and the recovery key
+  file (r197 saves it only after asking her password) leave without the question. Files asked for while the question is open share
+  its one answer; the next export asks again.
+- `build/modules/r197.js`: IngLock.confirm(title, text, key), the lock's own password question over the open page, for a part that
+  guards an action with it; true once the password is right, false when cancelled or when the question goes away.
+- `build/modules/r318.js`: Settings, Security, More protection: Ask before each export is a switch, off until she turns it on; it needs
+  her sign-in; turning it off asks for the password too, or anyone at the open page could undo it. It counts among the protections.
+- What is new (r222): one line, in every edition.
+- rig: `t_751_export_ask.js` (new, 19 checks: no sign-in, switch off and on, a wrong password, Cancel, Escape, the right password, two
+  files at once, a sealed backup and the recovery key file, turning it off). `t_626_guide.js` ticks the terms gate's own box and agrees,
+  as a person does, in the editions other than the master (it had stopped at the gate there since 7.41; 27/27 on the gift edition now).
+
 Ingenium 7.50 (20 November 2026): sealed on the computer's disk, the second stage's first part: the records too, and texts for training.
 Her answer for the computer's disk (18 November 2026): "All of them" sealed; her word (20 November 2026): "I approve of everything, please
 commit and push it everywhere and continue working on my requests."

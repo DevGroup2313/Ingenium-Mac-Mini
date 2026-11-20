@@ -586,6 +586,14 @@ function askPassword(title,text,okText,danger,onOk){var c=view('<h2>'+title+'</h
   c.querySelector("#ildCancel").onclick=closeDoor;
   c.querySelector("#ildAsk").onsubmit=function(e){e.preventDefault();var pw=c.querySelector("#ildPw").value;if(!pw){err(c,"Type your password.");return;}busyKeys(c,true);err(c,"");
     openWith(REC,pw,"dek").then(function(r){onOk(pw,r,c);},function(){busyKeys(c,false);err(c,"That is not the password. Nothing was changed.");var i=c.querySelector("#ildPw");if(i){i.value="";try{i.focus();}catch(_){}}});};}
+/* 7.51 (r341, Ask before each export): a question over the open page that only the password answers. Resolves true once the password
+   is right, false when it is cancelled (Cancel, Escape) or when the question goes away (the page locks meanwhile); without a sign-in, true. */
+function confirmAsk(title,text,okText){return new Promise(function(res){var done=false;function fin(v){if(done)return;done=true;res(v);}
+  if(!active()){fin(true);return;}
+  try{askPassword(esc(title),esc(text),okText||"Go on",false,function(){closeDoor();fin(true);});}catch(e){warn(e);fin(false);return;}
+  var form=CARD&&CARD.querySelector("#ildAsk"),cx=CARD&&CARD.querySelector("#ildCancel");
+  if(cx)cx.onclick=function(){closeDoor();fin(false);};
+  (function watch(){if(done)return;if(!form||!form.isConnected||!doorOpen()){fin(false);return;}setTimeout(watch,400);})();});}
 function changePassword(){if(K.via==="device"&&K.raw){newPwView();return;}askPassword("Change the password","Your present password first.","Next",false,newPwView);}
 function newPwView(){
   var c=view('<h2>Choose the new password</h2><p>Only the lock changes: nothing is sealed again, and the recovery phrase stays as it is.</p><form id="ildCp" autocomplete="off">'+pwFields("A new password (at least eight characters)","The same password again")
@@ -881,7 +889,7 @@ W_.addEventListener("storage",function(e){if(!e||e.key!==LSK)return;
 try{var og=W_.go;if(typeof og==="function"){W_.go=function(p){var r=og.apply(this,arguments);try{if(p==="settings")ensureCard();}catch(e){}return r;};}}catch(e){}
 setTimeout(function(){try{ensureCard();}catch(e){}},600);
 try{doorKey();}catch(e){warn(e);}
-W_.IngLock={active:active,on:on,diskKey:diskKey,locked:function(){return active()&&!canOpen();},ready:ready,sealed:sealed,sealText:sealText,openText:openText,sealTextSync:sealTextSync,isRecEnv:isRecEnv,binStores:BSTORES.map(function(x){return x.slice();}),
+W_.IngLock={active:active,on:on,diskKey:diskKey,confirm:confirmAsk,locked:function(){return active()&&!canOpen();},ready:ready,sealed:sealed,sealText:sealText,openText:openText,sealTextSync:sealTextSync,isRecEnv:isRecEnv,binStores:BSTORES.map(function(x){return x.slice();}),
   /* 6.32: what a part writes to a sealed store waits for the keys while the page is locked, so nothing is written there in clear */
   sealFor:function(db,sn,k,v){return active()?ready().then(function(){return sealRec(db,sn,k,v);}):Promise.resolve(v);},
   deskWrite:deskWrite,isDeskEnvelope:isDeskEnv,openDesk:openDesk,adoptRaw:adoptRaw,lockedNow:adoptRaw,openRecs:openRecs,sealRecs:sealRecs,sealRec:sealRec,openRec:openRec,openValues:openValues,lockNow:lockNow,

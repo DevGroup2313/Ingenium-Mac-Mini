@@ -21,7 +21,10 @@
      minute, where the browser lets a page do so); A record of every opening (when and on which device Ingenium opened, and every wrong
      password, kept in the desk, so sealed with it).
    - Not yet, and said so with the release planned: sealing on the computer's disk, sealing between her devices, signed packages,
-     scrambled code, the owner key on her apps, Ingenium itself signed and checked, asking before each export. */
+     scrambled code, the owner key on her apps, Ingenium itself signed and checked, asking before each export.
+   - 7.51 (20 November 2026): Ask before each export is a switch of More protection, as the preview draws it (off until she turns it on;
+     it needs her sign-in): with it on, every file saved out of Ingenium unsealed asks for her password first (modules/r341.js), and
+     turning it off asks for the password too. */
 #secCard{--sc-lav-t:rgba(106,63,181,.14);--sc-lav-c:#6a3fb5;--sc-sky-t:rgba(74,160,240,.16);--sc-sky-c:#2f6fd0;--sc-amb-t:rgba(232,144,42,.16);--sc-amb-c:#b4600f;--sc-emr-t:rgba(31,157,99,.14);--sc-emr-c:#1a7f50;--sc-rub-t:rgba(200,20,60,.1);--sc-rub-c:#b8433f;
   --sc-ck:inset 0 1.5px 0 rgba(255,255,255,.95),inset 0 -3px 5px rgba(60,30,90,.16),0 1px 1px rgba(40,20,70,.3),0 3px 4px rgba(40,20,70,.24),0 6px 9px rgba(40,20,70,.18),0 12px 20px rgba(40,20,70,.12);
   --sc-ckhi:inset 0 1.5px 0 #fff,inset 0 -3px 5px rgba(60,30,90,.14),0 3px 4px rgba(40,20,70,.24),0 9px 16px rgba(40,20,70,.2),0 16px 26px rgba(40,20,70,.14);
@@ -122,7 +125,7 @@ function lsGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.pars
 function lsPut(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function toast(m){try{if(typeof W.ingToast==="function")W.ingToast(m);else if(typeof W.toast==="function")W.toast(m);}catch(e){}}
 /* her choices: on this device, beside the lock's own record (they must be read before the desk opens) */
-var DEF={offline:false,sleep:true,slow:true,clip:true,log:true};
+var DEF={offline:false,sleep:true,slow:true,clip:true,log:true,export:false};   /* 7.51: Ask before each export, off until she turns it on (as the preview shows it) */
 function cfg(){var c=lsGet(LS,{});var o={};for(var k in DEF)o[k]=(k in c)?!!c[k]:DEF[k];o.allow=c.allow&&typeof c.allow==="object"?c.allow:{};return o;}
 function setCfg(k,v){var c=lsGet(LS,{});c[k]=v;lsPut(LS,c);}
 function L(){return W.IngLock||null;}
@@ -205,7 +208,8 @@ function items(){var c=cfg(),on=lockOn();
     ].concat(hasPg("fabrica")?[{k:"code",t:"Your apps' sources sealed in Fabrica",s:on?"on":"off"}]:[],[{k:"code",t:"Your apps signed when shipped",s:"soon"},{k:"code",t:"Your apps' code scrambled",s:"soon"},
     {k:"self",t:"Ingenium itself, signed and checked",s:"soon"},
     {k:"more",t:"Offline only",s:c.offline?"on":"off"},{k:"more",t:"Lock when the computer sleeps",s:c.sleep&&on?"on":"off"},{k:"more",t:"Slow down wrong passwords",s:c.slow&&lockActive()?"on":"off"},
-    {k:"more",t:"Clear a copied secret",s:c.clip?"on":"off"},{k:"more",t:"A record of every opening",s:c.log?"on":"off"}]);}
+    {k:"more",t:"Clear a copied secret",s:c.clip?"on":"off"},{k:"more",t:"A record of every opening",s:c.log?"on":"off"},
+    {k:"more",t:"Ask before each export",s:c.export&&lockActive()?"on":"off"}]);}
 function chip(s){return s==="on"?'<span class="sc-chip ok">On</span>':s==="off"?'<span class="sc-chip off">Off</span>':'<span class="sc-chip soon">Not yet</span>';}
 var VIEW="all";
 function card(){var c=$("secCard");if(c)return c;var host=$("ingLockCard");var page=$("page-settings");if(!page)return null;
@@ -248,7 +252,7 @@ function paint(){var c=card();if(!c)return;var b=c.querySelector(".sc-body");if(
     +sw("clip","Clear a copied secret","A password, a recovery word or a pairing code copied from Ingenium is cleared from the clipboard after a minute, where the browser lets a page do it.",cv("clip"))
     +sw("log","A record of every opening","When and on which device Ingenium opened, and every wrong password, kept with your desk (so sealed with it).",cv("log"))
     +'<div class="sc-well"><div class="sc-wh"><b>Openings lately</b><span class="sc-chip">'+lg.length+'</span></div><div class="sc-log">'+(lg.length?lg.map(function(x){return '<span>'+esc(new Date(x.at).toLocaleString())+' · '+esc(x.kind)+' · '+esc(x.device||"")+'</span>';}).join(""):'<span>None kept yet.</span>')+'</div></div>'
-    +'<div class="sc-well"><div class="sc-wh"><b>Ask before each export</b>'+chip("soon")+'</div><p>A plain copy (a backup without its seal, a plain export of an app) asking for your password first.</p></div>'));
+    +sw("export","Ask before each export","A plain copy (a backup without its seal, a plain export of an app, any file saved out of Ingenium unsealed) asks for your password first. Needs your sign-in.",cv("export")&&lockActive(),!lockActive())));
   function cv(k){return cfg()[k];}
   function sw(k,t,s,on,dis){return '<button type="button" class="sw2" role="switch" data-sw="'+k+'" aria-checked="'+(!!on)+'"'+(dis?" disabled":"")+'><span class="t"><b>'+esc(t)+'</b><small>'+esc(s)+'</small></span><span class="tr"></span></button>';}
   var show=VIEW==="all"?sections:sections.filter(function(x){return x.indexOf('data-k="'+VIEW+'"')>=0;});
@@ -258,7 +262,10 @@ function paint(){var c=card();if(!c)return;var b=c.querySelector(".sc-body");if(
 function wire(b){[].forEach.call(b.querySelectorAll(".sc-sub"),function(t){t.onclick=function(){VIEW=t.getAttribute("data-v");paint();};});
   [].forEach.call(b.querySelectorAll(".sc-it"),function(t){t.onclick=function(){VIEW=t.getAttribute("data-go");paint();};});
   [].forEach.call(b.querySelectorAll(".sc-p:not(.sc-limits)"),function(p){var h=p.querySelector(".sc-ph"),bd=p.querySelector(".sc-pb");if(h&&bd)h.onclick=function(){var on=p.getAttribute("aria-expanded")!=="true";p.setAttribute("aria-expanded",String(on));bd.hidden=!on;};});
-  [].forEach.call(b.querySelectorAll(".sw2"),function(s){s.onclick=function(){if(s.disabled)return;var k=s.getAttribute("data-sw"),v=s.getAttribute("aria-checked")!=="true";setCfg(k,v);
+  [].forEach.call(b.querySelectorAll(".sw2"),function(s){s.onclick=function(){if(s.disabled)return;var k=s.getAttribute("data-sw"),v=s.getAttribute("aria-checked")!=="true";
+    /* 7.51: turning Ask before each export off is itself asked with the password, or anyone at the open page could undo it */
+    if(k==="export"&&!v&&lockActive()&&L()&&typeof L().confirm==="function"){L().confirm("Stop asking before each export","Your password first: without the question, anyone at this open page could save your work out of Ingenium unsealed.","Stop asking").then(function(ok){if(ok){setCfg(k,false);toast("Ingenium no longer asks before an export.");}paint();});return;}
+    setCfg(k,v);if(k==="export"&&v)toast("Each plain export now asks for your password first.");
     if(k==="offline")toast(v?"Offline only is on: this page reaches only this device and your home network.":"Offline only is off.");paint();};});
   [].forEach.call(b.querySelectorAll("[data-a]"),function(k){k.onclick=function(){act(k.getAttribute("data-a"));};});}
 function openLock(){try{W.go("settings");}catch(e){}try{if(W.IngRooms)IngRooms.open("settings","data",true);}catch(e){}try{if(W.IngSettingsParts)IngSettingsParts.show("data","lock");}catch(e){}
