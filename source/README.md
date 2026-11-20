@@ -413,7 +413,7 @@ Ingenium 7.55 (20 November 2026): the record of Ingenium's security, profiles an
   replaced when the record changes, unless she changed her copy (hers stays; the new text goes beside it, dated); a file she removed comes
   back only when the record changes. No new part is drawn. `build/build_page.py` writes the files in (`/*R345_RECORD*/`), and stops the build
   if a file lacks its title or the record has fewer than eleven files; `rig/inject_modules.js` writes them into a test page the same way.
-- What is new (r222): one line, for the master edition.
+- What is new (r222): the record, for the master edition; the Project panel's close key, for every edition.
 - The Project panel (the base page's own, which lists a folder's files): her words on its picture: "I don't see any way to
   close the Project panel", then "Leave the Project panel's Close and Save buttons below and add the scrolling function and scroll bar to
   the panel but hide the scroll bar from view", then "I did not see the Close and Save buttons since I only saw a picture and not a live
