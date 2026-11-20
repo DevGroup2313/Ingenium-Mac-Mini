@@ -1,5 +1,8 @@
 <style id="r344-css">
-/* ============ R344 · SIGN OUT (Ingenium 7.54, 20 November 2026, held for her preview) ============
+/* ============ R344 · SIGN OUT (Ingenium 7.54, 20 November 2026) ============
+   Approved on its eight pictures (source/previews/sign_out), the same day: "I do approve of the other screenshots of the previews, please
+   commit and push it everywhere and continue working on my requests", the fourth fixed first at her word ("There is something wrong with
+   this screenshot, please fix it"): the sign-in's card no longer shows behind Who is using Ingenium, and the Signed out line is in ink.
    Her words (20 November 2026): "I want to be able to log out of Ingenium and not only be able to login. I want to be able to sign out of
    my profile and out of the app and have my data and chats and evrything else sealed until I login again into Igenium. Please make the
    fix and continue working on my requests."
@@ -18,7 +21,20 @@
      ing_carried_sealed:<its name>, never lost, and the app starts without it.
    window.IngSignOut: go(), signedOut(), _seal(), _open() */
 #secCard .sc-key.r344-out,#ingLockCard .r344-out{margin-left:8px}
-.r344-door-out{margin:0 0 4px;font:600 13px/1.4 inherit;letter-spacing:.02em;color:var(--p3-acc,#6a3fb5);text-align:center}
+.r344-door-out{margin:0 0 4px;font:600 13px/1.4 inherit;letter-spacing:.02em;color:var(--p3-ink2,#4a4358);text-align:center}   /* words, not a key: in ink, never violet */
+/* while Who is using Ingenium stands over it, the sign-in's own card waits out of sight (it shows again when her own profile is chosen) */
+#ingLockDoor.r344-under .ild-card{visibility:hidden}
+/* by night: while Ingenium is sealed, the page's own look is sealed with it, and only the sign-in door knows it is night (modules/r197.js
+   reads it from the desk's plain header). Who is using Ingenium over that door, and its "Someone else? Choose a profile" key on the
+   sign-in's card, take the night colours the profiles part (r331) gives the page by night, the same values, so a night door never holds
+   a day card. Found on the preview's eighth picture, taken as she would come to it: signed in, Night chosen, signed out. */
+#ingLockDoor.ild-night,#profDoor.r344-night{--p3-card:#201a2b;--p3-ink1:#f6f1fd;--p3-ink2:#d3c9e3;--p3-ink3:#a99cc1;--p3-acc:#b79ce6;--p3-line:rgba(205,184,240,.11);--p3-well:#1c1626;--p3-rail:#171221;
+  --p3-slot:rgba(0,0,0,.28);--p3-slot-sh:inset 0 2px 3px rgba(0,0,0,.55),inset 0 0 0 1px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.05);
+  --p3-card-sh:0 1px 0 rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.34);--p3-card-hi:0 2px 0 rgba(0,0,0,.45),0 10px 20px rgba(0,0,0,.42),0 20px 40px rgba(0,0,0,.4);
+  --p3-key-bg:linear-gradient(#2a2239,#251e33);--p3-key-sh:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5);
+  --p3-key-hi:inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 0 rgba(0,0,0,.4),0 3px 0 rgba(0,0,0,.7),0 7px 10px rgba(0,0,0,.5);
+  --p3-pri-bg:linear-gradient(#7a56c8,#5b3aa1);--p3-pri-line:#2c1956;--p3-pri-sh:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45);
+  --p3-lav-t:rgba(183,156,230,.15);--p3-lav-c:#b79ce6;--p3-emr-t:rgba(64,192,128,.15);--p3-emr-c:#6fd8a2;--p3-red-c:#f0939c;--p3-dim:.8}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p344"]="started";}catch(_){}
 (function r344(){"use strict";
@@ -100,11 +116,17 @@ try{new MutationObserver(function(){if(KT)return;KT=setTimeout(function(){KT=0;t
 
 /* after Sign out: the page starts at Who is using Ingenium, headed Signed out */
 function door(){if(!signedOut()||!W.IngProfiles||typeof IngProfiles.door!=="function")return;
-  IngProfiles.door();var d=D.getElementById("profDoor");if(!d)return;var box=d.querySelector(".r331-door");
+  IngProfiles.door();var d=D.getElementById("profDoor");if(!d)return;var box=d.querySelector(".r331-door");under(true);dark();
   if(box&&!box.querySelector(".r344-door-out")){var p=D.createElement("p");p.className="r344-door-out";p.textContent="Signed out. Everything is sealed until its profile signs in again.";box.insertBefore(p,box.firstChild);}
   if(!d.__r344){d.__r344=1;d.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("button[data-door]");if(!b)return;
     var me=(W.__ingProfile&&W.__ingProfile.owner===false)?W.__ingProfile.id:"owner";setOut(false);
-    if(b.getAttribute("data-door")===me){e.stopPropagation();e.preventDefault();d.hidden=true;}},true);}}
+    if(b.getAttribute("data-door")===me){e.stopPropagation();e.preventDefault();d.hidden=true;}under(false);},true);}}
+function under(on){var l=D.getElementById("ingLockDoor");if(l)l.classList.toggle("r344-under",!!on);}
+/* the profiles door takes the sign-in door's night look while that door stands (after Sign out, or from "Someone else? Choose a profile") */
+function dark(){var l=D.getElementById("ingLockDoor"),d=D.getElementById("profDoor");
+  if(l&&!l.__r344w){l.__r344w=1;try{new MutationObserver(dark).observe(l,{attributes:true,attributeFilter:["class","hidden"]});}catch(e){}}   /* the door may learn it is night after */
+  if(d)d.classList.toggle("r344-night",!!(l&&!l.hidden&&l.classList.contains("ild-night")));}
+D.addEventListener("click",function(){try{dark();}catch(e){}});
 W.addEventListener("ing-keys",function(e){if(e&&e.detail&&e.detail.held&&signedOut())setOut(false);});
 (function wait(){var n=0;(function t(){if(W.IngProfiles&&D.body){setTimeout(door,300);return;}if(++n<200)setTimeout(t,100);})();})();
 W.IngSignOut={go:go,signedOut:signedOut,_seal:function(){return W.__ingBeforeLock();},_open:function(){return W.__ingAfterOpen();}};

@@ -234,6 +234,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.54", "Sign out: in the Status panel after Lock Ingenium, and beside Lock now in Settings. It seals everything of yours and closes the desk as Lock now does, and Ingenium starts again at Who is using Ingenium until a profile signs in. Without a sign-in it says that nothing can be sealed yet, and offers to turn the sign-in on."],
+  ["7.54", "The documents of the apps on your Desk (Tabula, Abacus, Imago, Scriba and Fontes) and Scriba's recordings are sealed too when Ingenium locks or you sign out, and opened again when you sign in.", "master"],
   ["7.54", "Your ways of working, on the Ingenia page, have a rule more: purple words that can be pressed are underlined. It is added once to the list you keep; remove it there if you ever wish.", "master"],
   ["7.53", "Purple words that can be pressed are underlined now, across Ingenium: a thin line in the word's own colour, a little below it, by day and by night; nothing else of them changes."],
   ["7.53", "Fabrica picks a version from another idea and brings it onto yours (Ideas, Pick its versions, then Bring it here: git's own line says where it came from, the author is kept and the other idea is not changed), and puts unfinished changes aside (Changes, Put aside, then Bring back or Drop), as git does them, on the apps kept in Ingenium.", "fabrica"],

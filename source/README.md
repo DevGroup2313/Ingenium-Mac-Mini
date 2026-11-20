@@ -395,6 +395,30 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.54 (20 November 2026): Sign out; her rule on underlined purple words added to her ways of working.
+- Sign out. Her words (20 November 2026): "I want to be able to log out of Ingenium and not only be able to login. I want to be able to
+  sign out of my profile and out of the app and have my data and chats and evrything else sealed until I login again into Igenium."
+  `build/modules/r344.js` (new): Sign out in the Status panel after Lock Ingenium, and beside Lock now in Settings (Security, and the
+  sign-in's own card). It saves, seals and drops the keys as Lock now does (r197's two hooks, `__ingBeforeLock` and `__ingAfterOpen`,
+  inert without it), and Ingenium starts again at Who is using Ingenium (r331's door), headed Signed out, until a profile signs in. Without
+  a sign-in it says that nothing can be sealed yet and offers to turn the sign-in on. The documents of the apps carried on the Desk (their
+  keys in this page's store) and Scriba's recordings (scriba_db) are now sealed with the desk's key when Ingenium locks or she signs out,
+  and opened again at her sign-in before the door opens; the documents also when the page closes; in her own profile only. Shown to her as
+  eight pictures one by one at full size (previews/sign_out), and her words: "There is something wrong with this screenshot, please fix
+  it" (the fourth: the sign-in's card showed behind the profiles, and the Signed out line was violet though it cannot be pressed), then
+  "I do approve of the other screenshots of the previews, please commit and push it everywhere and continue working on my requests."
+  Fixed: the card waits out of sight while the profiles stand over it, and the line is in ink. The eighth picture, taken again as she
+  would come to it (signed in, Night chosen, signed out), showed a day card on the night door: the page's own look is sealed with the
+  desk, and only the sign-in door knows it is night. The profiles door over it, and its "Someone else? Choose a profile" key, now take
+  r331's night colours (the same values) while that door stands by night. Out of build/held.json ("released_754").
+- Her ways of working on the Ingenia page take a tenth rule (`build/modules/r327.js`): "Purple words that can be pressed are underlined",
+  at her words (20 November 2026): "I want you to add the purple pressable words underlined to my rules in my way of working in the
+  Ingenia page." Added once, at the end of her list, in her master copy and her own profile; not added twice, not added back if she
+  removes it. `build/editions.py` leaves it out of every other edition (`var LATER=[];`).
+- What is new (r222): Sign out for every edition; the Desk's documents sealed, and the rule, for the master edition.
+- Tests on a test build (7.53's release page with r197, r327 and r344 put in): rig/t_754_sign_out.js 24/24 (with four checks by night),
+  rig/t_754_ways_rule.js 7/7, t_700_lock 58/58, t_744_profiles 17/17.
+
 Ingenium 7.53 (20 November 2026): Fabrica's plan, stage 3, part two (cherry-pick, changes put aside); purple words that can be pressed,
 underlined.
 - Fabrica's plan, stage 3, part two (the audit's recommendation 11), built in the other session (Mini 41e10ea: modules/r342.js; the engine

@@ -18,6 +18,8 @@ const NAME = 'Ada Example', PW = 'tide-clock-harbour-41';
   const b = await pw.chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1280, height: 860 } }); const p = await ctx.newPage();
   const errs = []; p.on('pageerror', (e) => errs.push(String(e).slice(0, 200)));
   const ready = async () => { await p.waitForFunction(() => window.__ingReady === true || !!document.querySelector('#ingLockDoor:not([hidden]) #ildPw') || !!document.querySelector('#profDoor:not([hidden])'), null, { timeout: 600000, polling: 500 }); await p.waitForTimeout(2200); };
+  // Sign out seals, then the page starts again (r197 reloads it): wait for the new page, never the old one still standing
+  const fresh = async () => { for (let i = 0; i < 480; i++) { try { if (await p.evaluate(() => !window.__pvOld)) break; } catch (e) {} await p.waitForTimeout(250); } await ready(); };
   const enter = () => p.evaluate(() => { const k = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); try { tourEnd(); } catch (e) {} });
   const panel = () => p.evaluate(() => { try { openPresenceMenu(); } catch (e) {} const m = document.querySelector('.pres-menu'); const rows = m ? [...m.querySelectorAll('button')].map((x) => (x.id ? '#' + x.id + ' ' : '') + x.textContent.trim()) : []; return rows; });
   const raw = () => p.evaluate(async () => { const out = { ls: {}, rec: null };
@@ -61,8 +63,10 @@ const NAME = 'Ada Example', PW = 'tide-clock-harbour-41';
   // 3. sign out
   rows = await panel();
   ok(rows.some((x) => /#r344Out Sign out/.test(x)), 'signed in, the Status panel offers Sign out', rows);
-  await p.evaluate(() => document.getElementById('r344Out').click()); await p.waitForTimeout(1500); await ready();
-  const d1 = await p.evaluate(() => { const d = document.getElementById('profDoor'); return { door: !!(d && !d.hidden), text: d ? d.textContent.replace(/\s+/g, ' ').slice(0, 300) : '', lock: !!document.querySelector('#ingLockDoor:not([hidden]) #ildPw') }; });
+  await p.evaluate(() => { window.__pvOld = 1; document.getElementById('r344Out').click(); }); await fresh();
+  const d1 = await p.evaluate(() => { const d = document.getElementById('profDoor'), c = document.querySelector('#ingLockDoor .ild-card'), o = document.querySelector('#profDoor .r344-door-out');
+    return { door: !!(d && !d.hidden), text: d ? d.textContent.replace(/\s+/g, ' ').slice(0, 300) : '', lock: !!document.querySelector('#ingLockDoor:not([hidden]) #ildPw'), cardHidden: !!(c && getComputedStyle(c).visibility === 'hidden'), ink: o ? getComputedStyle(o).color : '' }; });
+  ok(d1.cardHidden && d1.ink && !/106, 63, 181/.test(d1.ink), 'while the profiles stand over it, the sign-in card waits out of sight; the Signed out line is in ink, not violet (it is not pressed)', d1);
   ok(d1.door && /Signed out\. Everything is sealed/.test(d1.text) && /Who is using Ingenium/.test(d1.text) && d1.lock, 'signed out: the page starts at Who is using Ingenium, headed Signed out, with the sign-in waiting under it', d1);
   let r = await raw();
   ok(/^ING1\./.test(r.ls.tabula_docs || '') && /^ING1\./.test(r.ls.cd_signatures_v1 || '') && !JSON.stringify(r.ls).includes('TABMARK-1') && !JSON.stringify(r.ls).includes('SIGMARK-2'), "the carried apps' documents are sealed in the store, their words nowhere in clear", r.ls);
@@ -70,14 +74,14 @@ const NAME = 'Ada Example', PW = 'tide-clock-harbour-41';
   ok(r.reg && r.reg.out, 'the profiles\' list remembers that Ingenium was signed out');
   // 4. her own profile, her sign-in
   await p.evaluate(() => { const c = document.querySelector('#profDoor button[data-door="owner"]'); if (c) c.click(); }); await p.waitForTimeout(800);
-  ok(await p.evaluate(() => document.getElementById('profDoor').hidden && !!document.querySelector('#ingLockDoor:not([hidden]) #ildPw')), 'her own profile chosen: her sign-in, and nothing reloaded');
+  ok(await p.evaluate(() => document.getElementById('profDoor').hidden && !!document.querySelector('#ingLockDoor:not([hidden]) #ildPw') && getComputedStyle(document.querySelector('#ingLockDoor .ild-card')).visibility === 'visible'), 'her own profile chosen: her sign-in shows, and nothing reloaded');
   await p.fill('#ingLockDoor #ildPw', PW); await p.click('#ingLockDoor #ildGo'); await p.waitForFunction(() => window.__ingReady === true && !document.querySelector('#ingLockDoor:not([hidden]) #ildPw'), null, { timeout: 120000, polling: 500 }); await p.waitForTimeout(2000);
   r = await raw();
   ok(r.ls.tabula_docs && JSON.parse(r.ls.tabula_docs)[0].title === 'TABMARK-1 harbour notes' && r.ls.cd_signatures_v1 === 'SIGMARK-2', "signed in: the carried apps' documents are as they were", r.ls);
   ok(r.rec && r.rec.v && r.rec.v.name === 'RECNAME-3 harbour' && r.rec.bytes === 'RECBYTES-4 sound' && !r.rec.v.__ing, "Scriba's recording is as it was, its sound byte for byte", r.rec);
   ok(r.reg && !r.reg.out, 'and Ingenium is no longer signed out');
   // 5. Lock now seals them too
-  await p.evaluate(() => IngLock.lockNow('press')); await p.waitForTimeout(1500); await ready();
+  await p.evaluate(() => { window.__pvOld = 1; IngLock.lockNow('press'); }); await fresh();
   r = await raw();
   ok(/^ING1\./.test(r.ls.tabula_docs || '') && r.rec && r.rec.v && r.rec.v.__ing === 'sealed' && !await p.evaluate(() => !!(document.getElementById('profDoor') && !document.getElementById('profDoor').hidden)), 'Lock now seals them too, and stays in her profile (no door of profiles)', { tab: (r.ls.tabula_docs || '').slice(0, 12) });
   await p.fill('#ingLockDoor #ildPw', PW); await p.click('#ingLockDoor #ildGo'); await p.waitForFunction(() => window.__ingReady === true && !document.querySelector('#ingLockDoor:not([hidden]) #ildPw'), null, { timeout: 120000, polling: 500 }); await p.waitForTimeout(2000);
@@ -90,8 +94,24 @@ const NAME = 'Ada Example', PW = 'tide-clock-harbour-41';
   ok(r.ls.tabula_docs && JSON.parse(r.ls.tabula_docs)[0].title === 'TABMARK-1 harbour notes', 'and opened again at the sign-in');
   // another profile, chosen from the door
   await p.evaluate(() => { const x = window.__ingProfiles, g = x.reg() || { v: 1, cur: 'owner', list: [] }; if (!g.list.some((q) => q.id === 'ptide')) g.list.push({ id: 'ptide', name: 'Theo', t: 2, pw: 'none', kind: 'guest' }); x.save(g); });
-  await p.evaluate(() => document.getElementById('r344Out') || openPresenceMenu()); await p.evaluate(() => { try { openPresenceMenu(); } catch (e) {} document.getElementById('r344Out').click(); });
-  await p.waitForTimeout(1500); await ready();
+  // by night, as she would come to it: Night chosen, then Sign out (the page's look is sealed; only the sign-in door knows it is night)
+  await p.evaluate(() => { state.theme = 'night'; applyTheme(); saveState(); }); await p.waitForTimeout(1200);
+  await p.evaluate(() => { window.__pvOld = 1; try { openPresenceMenu(); } catch (e) {} document.getElementById('r344Out').click(); }); await fresh();
+  const n1 = await p.evaluate(() => { const l = document.getElementById('ingLockDoor'), box = document.querySelector('#profDoor .r331-door'), o = document.querySelector('#profDoor .r344-door-out');
+    return { lockNight: !!(l && l.classList.contains('ild-night')), card: box ? getComputedStyle(box).backgroundColor : '', ink: o ? getComputedStyle(o).color : '' }; });
+  ok(n1.lockNight && n1.card === 'rgb(32, 26, 43)' && n1.ink === 'rgb(211, 201, 227)', 'by night (Night chosen, then Sign out): Who is using Ingenium is in the night colours on the night door, never a day card', n1);
+  await p.evaluate(() => { const c = document.querySelector('#profDoor button[data-door="owner"]'); if (c) c.click(); }); await p.waitForTimeout(800);
+  const n2 = await p.evaluate(() => { const k = document.querySelector('#ingLockDoor .r331-else'); return k ? getComputedStyle(k).backgroundImage + ' | ' + getComputedStyle(k).color : 'no key'; });
+  ok(/rgb\(42, 34, 57\)/.test(n2) && /rgb\(246, 241, 253\)/.test(n2), 'by night, her sign-in\'s "Someone else? Choose a profile" key is in the night colours too', n2);
+  await p.evaluate(() => document.querySelector('#ingLockDoor .r331-else').click()); await p.waitForTimeout(600);
+  const n3 = await p.evaluate(() => { const box = document.querySelector('#profDoor:not([hidden]) .r331-door'); return box ? getComputedStyle(box).backgroundColor : 'no door'; });
+  ok(n3 === 'rgb(32, 26, 43)', 'and the profiles that key opens are in the night colours', n3);
+  await p.evaluate(() => { const c = document.querySelector('#profDoor button[data-door="owner"]'); if (c) c.click(); }); await p.waitForTimeout(800);
+  await p.fill('#ingLockDoor #ildPw', PW); await p.click('#ingLockDoor #ildGo'); await p.waitForFunction(() => window.__ingReady === true && !document.querySelector('#ingLockDoor:not([hidden]) #ildPw'), null, { timeout: 120000, polling: 500 }); await p.waitForTimeout(2000);
+  ok(await p.evaluate(() => document.body.getAttribute('data-theme') === 'night' && state.theme === 'night'), 'signed in again: her desk by night, as she left it');
+  await p.evaluate(() => { state.theme = 'day'; applyTheme(); saveState(); }); await p.waitForTimeout(800);
+  await p.evaluate(() => document.getElementById('r344Out') || openPresenceMenu()); await p.evaluate(() => { window.__pvOld = 1; try { openPresenceMenu(); } catch (e) {} document.getElementById('r344Out').click(); });
+  await fresh();
   const d2 = await p.evaluate(() => [...document.querySelectorAll('#profDoor button[data-door]')].map((x) => x.getAttribute('data-door')));
   ok(d2.indexOf('owner') >= 0 && d2.indexOf('ptide') >= 0, 'the door lists each profile', d2);
   await p.evaluate(() => document.querySelector('#profDoor button[data-door="ptide"]').click()); await p.waitForTimeout(1500); await ready();
