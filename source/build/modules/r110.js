@@ -849,7 +849,7 @@ return {create:create,list:list,info:info,rename:rename,remove:remove,
   fromGitDir:fromGitDir,gc:gc,setAuthor:setAuthor,author:function(){return who;},
   core:{sha1:sha1,sha1JS:sha1JS,inflateRaw:inflateRaw,inflateZ:inflateZ,deflateZ:deflateZ,storedZ:storedZ,makeDelta:makeDelta,applyDelta:applyDelta,writePack:writePack,readPack:readPack,
     zip:zip,unzip:unzip,unzipData:unzipData,lineDiff:lineDiff,hunks:hunks,merge3:merge3,unified:unified,splitLines:splitLines,parseTree:parseTree,parseCommit:parseCommit,treeBody:treeBody,
-    okRefName:okRefName,cleanPath:cleanPath,crc32:crc32,MemBackend:MemBackend,use:_use,store:store,be:function(){return backend();},mirrorNow:mirrorNow,recover:recover,remirror:remirror}};
+    okRefName:okRefName,cleanPath:cleanPath,crc32:crc32,MemBackend:MemBackend,use:_use,store:store,mergeTrees:mergeTrees,treeFiles:treeFiles,commitOf:commitOf,changesBetween:changesBetween,headOid:headOid,be:function(){return backend();},mirrorNow:mirrorNow,recover:recover,remirror:remirror}};
 })();
 window.IngRepo=IngRepo;
 ;try{window.__ingParts["p42"]="running";}catch(_){}

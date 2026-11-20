@@ -65,7 +65,7 @@ r = ia._apps_send("tide-clock", "Tide Clock", "1.0", base64.b64encode(PAGE).deco
 aid = r.get("id")
 f_out = os.path.join(ia._apps_dir("outbox"), aid + ".html")
 ok(r.get("ok") and not sealed(f_out), "without the key an app waiting for a device is written as before (plain)", r)
-st = ia._disk_status()
+st = (ia._disk_seal_status() if hasattr(ia, '_disk_seal_status') else ia._disk_status())
 ok(st.get("held") is False and st.get("lib") is True, "the status: no key held; the encryption library is there", st)
 
 # 2. the key held

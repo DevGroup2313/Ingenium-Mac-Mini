@@ -260,6 +260,47 @@ var ROUTE={
   stopMerge:function(id){return ready(id).then(function(){return call("disk_merge_stop",[id]);}).then(function(x){stale(id);
     if(x.saved)toast("The merge is stopped. What its files held is kept in "+x.aside+", inside its folder.");return IR.info(id);});}
 };
+/* 7.57 (20 November 2026): Fabrica's plan, stage 3, part two, on a drive (desktop/app_pick_757.py). A version brought in from another
+   idea: the page makes its three-way merge as r110 makes it for a repository kept in Ingenium (from the version's parent to the version,
+   onto the files as they are), and the computer app writes it into the folder as git cherry-pick -x does: at once when no line changed
+   both ways (its author and the author's time kept), else left as git leaves a pick (CHERRY_PICK_HEAD, MERGE_MSG, git's marks), which
+   Keep this version ends and Stop the merge stops. Changes put aside: the computer app writes them as git stash push --include-untracked
+   (W, I, U; refs/stash and its log), lists them from refs/stash's log, drops them by number; bringing them back, the page merges W's files
+   and U's (from W's first parent) three ways onto the version out, and the computer app writes the result as git stash apply does. */
+function changedFiles(before,after){var be=IR.core.be(),st=IR.core.store(),files={},seen={},jobs=[],big=[];
+  Object.keys(before||{}).concat(Object.keys(after||{})).forEach(function(p){if(seen[p])return;seen[p]=1;var o=(before||{})[p],n=(after||{})[p];
+    if(o&&n&&o[0]===n[0]&&o[1]===n[1])return;if(!n){files[p]=null;return;}var f=files[p]={oid:n[1],mode:n[0]};
+    /* a file made in the page (the merge's own) travels whole; one the drive already holds, by its git name */
+    jobs.push(Promise.resolve(be.ownRec(n[1])).then(function(own){if(!own)return null;return st.get(n[1]).then(function(x){if(!x)return;
+      if(/Fabrica keeps a file this large whole on the drive/.test(new TextDecoder().decode(x.body.subarray(0,400))))big.push(p);f.b64=b64(x.body);});}));});
+  return Promise.all(jobs).then(function(){if(big.length)throw new Error("Both sides changed "+big.join(", ")+", too large for Fabrica to bring into the page: do this one with git, in its folder. Nothing was changed.");return files;});}
+function nothingWaits(rec,what){if(rec.merging)throw new Error("finish or stop the merge first");
+  if(rec.changes&&rec.changes.length)throw new Error("keep or put aside the changes under Changes "+what);}
+ROUTE.cherryPick=function(id,target){var C=IR.core;return ready(id).then(function(rec){nothingWaits(rec,"before bringing a version in");
+    var head=headOid(rec);if(!head)throw new Error("keep a first version before bringing one in");
+    var oid=String(target||"");if(!/^[0-9a-f]{40}$/.test(oid)){var refs=rec.refs||{};oid=refs["refs/heads/"+target]||refs["refs/tags/"+target]||refs[target]||"";}
+    if(!oid)throw new Error("that version is not here");if(oid===head)throw new Error("that is the version this idea is on");
+    return C.commitOf(oid).then(function(c){if(c.parents.length>1)throw new Error("a version that joined two ideas cannot be brought in by itself");
+      return Promise.all([C.treeFiles(c.parents[0]||null),C.treeFiles(head),C.treeFiles(c.oid)]).then(function(t){
+        return Promise.resolve(C.mergeTrees(t[0],t[1],t[2],{ours:"now",theirs:c.oid.slice(0,7)})).then(function(m){
+          if(!m.conflicts.length&&!C.changesBetween(t[1],m.files).length)throw new Error("this idea already holds that version's change");
+          var msg=String(c.msg||"").replace(/\s+$/,"")+"\n\n(cherry picked from commit "+c.oid+")";
+          return changedFiles(t[1],m.files).then(function(files){var w=author();
+            return call("disk_pick",[id,{ours:head,pick:c.oid,msg:msg,files:files,conflicts:m.conflicts.slice()},w.name||null,w.email||null]);})
+            .then(function(x){stale(id);return x.commit?{kind:"picked",commit:x.commit}:{kind:"conflicts",conflicts:(x.conflicts||[]).slice(),msg:msg};});});});});});};
+ROUTE.stashPush=function(id,words){return ready(id).then(function(rec){if(rec.merging)throw new Error("finish or stop the merge first");var w=author();
+    return call("disk_stash_push",[id,String(words||"")||null,w.name||null,w.email||null]);}).then(function(x){stale(id);return {oid:x.oid,msg:x.msg,files:x.files};});};
+ROUTE.stashList=function(id){if(!wt(id))return Promise.resolve([]);return call("disk_stash_list",[id]).then(function(x){
+    return (x.list||[]).map(function(e){return {n:e.n,oid:e.oid,msg:e.msg,branch:e.branch,at:e.at,files:(e.files||[]).slice()};});});};
+ROUTE.stashDrop=function(id,n){return ready(id).then(function(){return call("disk_stash_drop",[id,n|0]);}).then(function(x){stale(id);return {dropped:x.dropped};});};
+ROUTE.stashApply=function(id,n,opt){opt=opt||{};n=n|0;var C=IR.core;return ready(id).then(function(rec){nothingWaits(rec,"first: changes come back onto files with nothing waiting");
+    var head=headOid(rec);return call("disk_stash_list",[id]).then(function(x){var e=(x.list||[])[n];if(!e)throw new Error("nothing is put aside under that number");
+      return C.commitOf(e.oid).then(function(wc){
+        return Promise.all([C.treeFiles(wc.parents[0]||null),C.treeFiles(head),C.treeFiles(e.oid),wc.parents[2]?C.treeFiles(wc.parents[2]):Promise.resolve({})]).then(function(t){
+          var theirs={};Object.keys(t[2]).forEach(function(p){theirs[p]=t[2][p];});Object.keys(t[3]).forEach(function(p){theirs[p]=t[3][p];});
+          return Promise.resolve(C.mergeTrees(t[0],t[1],theirs,{ours:"now",theirs:"put aside"})).then(function(m){
+            return changedFiles(t[1],m.files).then(function(files){return call("disk_stash_apply",[id,n,{w:e.oid,ours:head,files:files,conflicts:m.conflicts.slice()},!!opt.drop]);})
+              .then(function(r){stale(id);var cs=(r.conflicts||[]).slice();return {kind:cs.length?"conflicts":"back",conflicts:cs,dropped:!!r.dropped,msg:r.msg||e.msg};});});});});});});};
 Object.keys(ROUTE).forEach(function(k){var f=IR[k];if(typeof f!=="function")return;IR[k]=function(id){return isDisk(id)?ROUTE[k].apply(null,arguments):f.apply(IR,arguments);};});
 ["branch","delBranch","tag","delTag","merge","rebase","revert","setRef","stopMerge","switchTo"].forEach(function(k){var f=IR[k];if(typeof f!=="function")return;
   IR[k]=function(id){if(!isDisk(id))return f.apply(IR,arguments);var args=arguments;WRITING[id]=(WRITING[id]||0)+1;

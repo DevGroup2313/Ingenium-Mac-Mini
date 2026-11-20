@@ -138,7 +138,9 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_profiles_744", "_profile_use", ("mini", "intel", "win")),
            ("app_session_746", "_disk_commit_to", ("mini", "intel", "win")),  # Fabrica's stage 1 (modules/r333.js), approved 19 November 2026
            ("app_disk_749", "_disk_key_hold", ("mini", "intel", "win")),  # 7.49: sealed on the computer's disk (Security; her answer "All of them")
-           ("app_disk_750", "_disk_more_750", ("mini", "intel", "win"))]  # 7.50: their records too, and texts for training
+           ("app_disk_750", "_disk_more_750", ("mini", "intel", "win")),  # 7.50: their records too, and texts for training
+           ("app_disk_fix_757", "_disk_seal_status", ("mini", "intel", "win")),  # 7.57: the seal's names its own; drive repositories work again
+           ("app_pick_757", "_disk_pick_757", ("mini", "intel", "win"))]  # 7.57: Fabrica's stage 3, part two, on a drive
 
 
 def desktop():

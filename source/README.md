@@ -395,6 +395,36 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.57 (20 November 2026): repositories on a drive work again; Fabrica's plan, stage 3, part two, on a drive.
+- Repositories on a drive, broken since 7.49, work again (`build/desktop/app_disk_fix_757.py`, applied after app_disk_750.py). 7.49's seal
+  on the computer's disk (app_disk_749.py, then app_disk_750.py) took three names the drive's repositories had used since 6.86 and 6.87,
+  each set later when the app starts, so the seal's won: `_DISK` (its table {key, kid, at} in place of the drive's {lock, open, work,
+  size, sz, last}: every call on a drive repository failed with KeyError: 'lock'), `_disk_status()` (in place of the drive's
+  `_disk_status(rid, repo)`) and `_disk_write(path, data, seal)` (in place of the drive's `_disk_write(rid, payload)`, which the bridge's
+  disk_write calls). The seal's are named `_DISK_SEAL`, `_disk_seal_status()` and `_disk_seal_write()`, with every use; the drive's are
+  as they were; app_disk_749.py and app_disk_750.py write the new names themselves. Found by the first drive test run on a 7.49 or later
+  app; a scan of every function the app defines twice found no other pair whose arguments differ.
+- Fabrica's plan, stage 3, part two, on a drive (`build/desktop/app_pick_757.py`; `modules/r280.js`, `r110.js`, `r342.js`). As git 2.43
+  makes them, checked in the session against git itself:
+  - a version brought in from another idea (git cherry-pick -x): the page makes the three-way merge (r110's, now shared through
+    `IngRepo.core`: mergeTrees, treeFiles, commitOf, changesBetween, headOid) and r280 sends it (disk_pick); with no line changed both
+    ways the computer app makes the version at once, the picked version's author and the author's time kept, git's own last line
+    "(cherry picked from commit <id>)", one parent; with lines changed both ways it leaves the pick as git does (CHERRY_PICK_HEAD,
+    MERGE_MSG with "# Conflicts:", git's marks, the index marked; no ORIG_HEAD, as git 2.43), which Keep this version ends as git
+    cherry-pick --continue (one parent, the picked author and time) and Stop the merge stops as git cherry-pick --abort; a pick git itself
+    left is read from MERGE_MSG;
+  - changes put aside (git stash push --include-untracked): W, I and U in git's own words, refs/stash and its log as git writes them, the
+    files and the index back to the version out, the new files git did not know taken away (in U); the list from refs/stash's log; back
+    (apply and pop) merged in the page from W's and U's files onto the version out, written as git stash apply leaves it (not staged; a
+    file changed both ways marked, the entry kept); drop by number (refs/stash and its log go with the last). dulwich 0.22.8's own
+    stash_push is not git's ("A stash on <id>", its log line "commit:", the files left as they were), so it is not used.
+  - r342 offers both on a drive repository with a folder of files (a bare one has no Changes); after a pick that stopped on lines
+    changed both ways, the words box holds the version's words with git's line, as git offers them (here and in Ingenium's own
+    repositories). Fabrica sends a chosen idea's branch to GitHub, never refs/stash.
+- What is new (r222): two lines, where there is a Fabrica.
+- rig: `t_757_drive_pick.py` (58 checks: the computer app, patched copies of the Mac and Windows apps, against git) and
+  `t_757_drive_page.js` (the page bridged to the computer app by rig/run_app.py, each result read back with git).
+
 Ingenium 7.56 (20 November 2026): purple words that can be pressed, the rest of them underlined.
 Her rule (20 November 2026, kept in her ways of working since 7.54): "Purple words that can be pressed are underlined." 7.53's list in
 `build/modules/r343.js` names the keys found then; a scan of 7.55's release page, every page by day and by night (elements one can press,

@@ -74,7 +74,7 @@ def _apps_read(aid):
 
 
 def _apps_write_rec(rec):
-    _disk_write(os.path.join(_apps_dir("outbox"), rec["id"] + ".json"), json.dumps(rec).encode("utf-8"), True)
+    _disk_seal_write(os.path.join(_apps_dir("outbox"), rec["id"] + ".json"), json.dumps(rec).encode("utf-8"), True)
 
 
 def _apps_outbox():
@@ -120,7 +120,7 @@ def _apps_send(slug, name, version, b64, to=None):
                     except Exception:
                         pass
         aid = _apps_new_id()
-        _disk_write(os.path.join(base, aid + ".html"), raw)
+        _disk_seal_write(os.path.join(base, aid + ".html"), raw)
         rec = {"id": aid, "slug": slug, "name": str(name or slug)[:80], "version": str(version or "")[:40], "bytes": len(raw),
                "to": [str(x)[:64] for x in (to or []) if isinstance(x, str)][:20], "at": int(time.time()), "got": {},
                "computer": _share_computer_name()}
@@ -468,7 +468,7 @@ def _disk_sweep(force=False):
     return n
 
 
-def _disk_status():
+def _disk_seal_status():
     fs = _disk_targets(True)
     sealed = sum(1 for f in fs if _disk_is_sealed(f))
     return {"ok": True, "held": bool(_DISK["key"]), "kid": _DISK["kid"] or "", "lib": bool(_seal_lib()), "files": len(fs), "sealed": sealed,

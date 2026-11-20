@@ -234,6 +234,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.57", "Repositories on your drives work again in the Mac and Windows apps: since 7.49, a part of the disk seal had taken three names the drives use, so adding one, or changing its files, versions or merges, failed. The seal keeps its own names now, and seals as before.", "fabrica"],
+  ["7.57", "Pick its versions and Put aside work on a repository on your drive too, with a folder of files, written as git writes them, so git and any other program see the same: a version brought in keeps its author and the author's time and ends with git's own line; Put aside is git's stash, which git stash list and git stash pop read. After a version that stopped on lines changed both ways, the words box holds that version's words with git's line, as git offers them.", "fabrica"],
   ["7.56", "Every purple word that can be pressed now has its line, also those the first pass missed, such as Take the guided tour and the model names, and any such word drawn later. Only the line is added: nothing else about them changes."],
   ["7.55", "A folder's Project panel has a close key at its top, beside its title, which stays there while the rest of the panel scrolls; its Cancel and Save stay at its foot."],
   ["7.55", "The record of Ingenium's sign-in, Sign out, profiles, its whole security system, where each piece of data lives, and your ways of working and its design is in Ingenium's folder on the Ingenia page: eleven files, for you and for every model you work with there, to build the same again in your other apps.", "master"],

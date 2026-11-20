@@ -38,7 +38,7 @@ if "_apps_send" not in s or "_runs_keep_file" not in s or "_seal_lib" not in s:
     sys.exit("%s: app_apps_735.py, app_runs_728.py and app_seal_737.py must be applied first" % p)
 
 FN = r'''# ---- 7.49: sealed on the computer's disk (app_disk_749.py) ----
-_DISK = {"key": None, "kid": None, "at": 0}
+_DISK_SEAL = {"key": None, "kid": None, "at": 0}  # 7.57: its own name; _DISK is the drive's (app_disk_fix_757.py)
 _DISK_MAGIC = b"INGSEAL1"
 _DISK_HEAD = 24                 # magic 8, key id 8, nonce prefix 8
 _DISK_CH = 1 << 20              # plain bytes in a chunk
@@ -54,21 +54,21 @@ def _disk_key_hold(b64key, kid):
         k = base64.b64decode(str(b64key or ""))
         if len(k) != 32 or not _seal_lib():
             return {"ok": False, "error": "no key"}
-        _DISK["key"], _DISK["kid"], _DISK["at"] = k, str(kid or "")[:16], time.time()
+        _DISK_SEAL["key"], _DISK_SEAL["kid"], _DISK_SEAL["at"] = k, str(kid or "")[:16], time.time()
         threading.Thread(target=_disk_sweep, daemon=True).start()     # what ended while she was away is sealed now
-        return _disk_status()
+        return _disk_seal_status()
     except Exception as e:
         return {"ok": False, "error": str(e)}
 
 
 def _disk_key_drop():
-    _DISK["key"] = None
-    _DISK["kid"] = None
-    return _disk_status()
+    _DISK_SEAL["key"] = None
+    _DISK_SEAL["kid"] = None
+    return _disk_seal_status()
 
 
 def _disk_kid_bytes():
-    return bytes.fromhex(_DISK["kid"]) if _DISK["kid"] and len(_DISK["kid"]) == 16 else hashlib.sha256(_DISK["key"]).digest()[:8]
+    return bytes.fromhex(_DISK_SEAL["kid"]) if _DISK_SEAL["kid"] and len(_DISK_SEAL["kid"]) == 16 else hashlib.sha256(_DISK_SEAL["key"]).digest()[:8]
 
 
 def _disk_is_sealed(path):
@@ -81,9 +81,9 @@ def _disk_is_sealed(path):
 
 def _disk_aead():
     from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-    if not _DISK["key"]:
+    if not _DISK_SEAL["key"]:
         raise _DiskLocked(_DISK_LOCKED)
-    return AESGCM(_DISK["key"])
+    return AESGCM(_DISK_SEAL["key"])
 
 
 def _disk_ad(i, last):
@@ -136,11 +136,11 @@ def _disk_read(path, offset=0, size=None):
     return b[offset - first:end - first]
 
 
-def _disk_write(path, data, seal=True):
+def _disk_seal_write(path, data, seal=True):
     """write a file whole: sealed while the key is held (and seal is asked), plain otherwise"""
     tmp = path + ".ingtmp"
     with open(tmp, "wb") as fh:
-        fh.write(_disk_seal_bytes(data) if (seal and _DISK["key"]) else data)
+        fh.write(_disk_seal_bytes(data) if (seal and _DISK_SEAL["key"]) else data)
     os.replace(tmp, path)
 
 
@@ -148,11 +148,11 @@ def _disk_seal_file(path):
     """seal a plain file in place; True when it is sealed after"""
     if _disk_is_sealed(path):
         return True
-    if not _DISK["key"] or not os.path.isfile(path):
+    if not _DISK_SEAL["key"] or not os.path.isfile(path):
         return False
     with open(path, "rb") as fh:
         data = fh.read()
-    _disk_write(path, data, True)
+    _disk_seal_write(path, data, True)
     return True
 
 
@@ -160,14 +160,14 @@ def _disk_open_file(path):
     if not _disk_is_sealed(path):
         return True
     data = _disk_read(path)
-    _disk_write(path, data, False)
+    _disk_seal_write(path, data, False)
     return True
 
 
 def _disk_append(path, data):
     """append to a file that may be sealed: read it whole, add, write it back sealed"""
     if os.path.isfile(path) and _disk_is_sealed(path):
-        _disk_write(path, _disk_read(path) + data, True)
+        _disk_seal_write(path, _disk_read(path) + data, True)
     else:
         with open(path, "ab") as fh:
             fh.write(data)
@@ -214,24 +214,24 @@ def _disk_sweep(force=False):
     return n
 
 
-def _disk_status():
+def _disk_seal_status():
     fs = _disk_targets(True)
     sealed = sum(1 for f in fs if _disk_is_sealed(f))
-    return {"ok": True, "held": bool(_DISK["key"]), "kid": _DISK["kid"] or "", "lib": bool(_seal_lib()), "files": len(fs), "sealed": sealed,
+    return {"ok": True, "held": bool(_DISK_SEAL["key"]), "kid": _DISK_SEAL["kid"] or "", "lib": bool(_seal_lib()), "files": len(fs), "sealed": sealed,
             "kinds": ["outbox", "runs"]}
 
 
 def _disk_seal_now():
-    if not _DISK["key"]:
+    if not _DISK_SEAL["key"]:
         return {"ok": False, "error": _DISK_LOCKED}
     n = _disk_sweep(True)
-    r = _disk_status()
+    r = _disk_seal_status()
     r["now"] = n
     return r
 
 
 def _disk_unseal_all():
-    if not _DISK["key"]:
+    if not _DISK_SEAL["key"]:
         return {"ok": False, "error": _DISK_LOCKED}
     n = 0
     for f in _disk_targets(True):
@@ -240,7 +240,7 @@ def _disk_unseal_all():
                 n += 1
         except Exception:
             pass
-    r = _disk_status()
+    r = _disk_seal_status()
     r["opened"] = n
     return r
 
@@ -250,7 +250,7 @@ rep("\ndef _apps_send(slug, name, version, b64, to=None):", "\n" + FN + "def _ap
 
 # the outbox: each page sealed as it is written
 rep('''        with open(os.path.join(base, aid + ".html"), "wb") as fh:
-            fh.write(raw)''', '''        _disk_write(os.path.join(base, aid + ".html"), raw)   # 7.49: sealed while the key is held''')
+            fh.write(raw)''', '''        _disk_seal_write(os.path.join(base, aid + ".html"), raw)   # 7.49: sealed while the key is held''')
 
 # a device asking for an app waiting for it: opened while the key is held; locked, the device is told so
 rep('''        with open(os.path.join(_apps_dir("outbox"), aid + ".html"), "rb") as fh:
@@ -298,7 +298,7 @@ def _runs_keep_log(rid, job, text, append=False):
         if append:
             _disk_append(f, data)
         else:
-            _disk_write(f, data, False)
+            _disk_seal_write(f, data, False)
         return {"ok": True}
     except Exception as e:
         return {"ok": False, "error": str(e)}
@@ -314,7 +314,7 @@ def _runs_keep_file(rid, art, path, b64, append=False):
         if append:
             _disk_append(to, data)
         else:
-            _disk_write(to, data, False)
+            _disk_seal_write(to, data, False)
         return {"ok": True}
     except Exception as e:
         return {"ok": False, "error": str(e)}
@@ -328,7 +328,7 @@ def _runs_worker(rid):
     try:
         _runs_worker_plain(rid)
     finally:
-        if _DISK["key"]:
+        if _DISK_SEAL["key"]:
             try:
                 d = os.path.join(_runs_dir(), _runs_safe(rid))
                 for sub in ("logs", "files"):
@@ -351,7 +351,7 @@ rep('''    def share_renew_code(self):''', '''    def disk_key_hold(self, b64key
         return _disk_key_drop()
 
     def disk_status(self):
-        return _disk_status()
+        return _disk_seal_status()
 
     def disk_seal_now(self):
         return _disk_seal_now()

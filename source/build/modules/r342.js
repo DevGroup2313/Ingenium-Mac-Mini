@@ -51,7 +51,13 @@ function cur(){var x=X();try{return x&&x.cur?x.cur():null;}catch(e){return null;
 function view(){var x=X();return x&&x.S?x.S.view:null;}
 function when(t){var x=X();return x&&x.when?x.when(t):new Date(t).toLocaleString("en-GB");}
 function plural(n,w){return n+" "+w+(n===1?"":"s");}
-function disk(r){try{return !!(W.IngDisk&&IngDisk.isDisk&&IngDisk.isDisk(r.id));}catch(e){return false;}}
+/* 7.57: a repository on a drive takes both too (desktop/app_pick_757.py, routed by r280), unless it is known to be bare (it has no folder of
+   files, so no Changes; the hub's first, lighter record may not say yet, and the computer app refuses a bare one in plain words) */
+function disk(r){try{if(!(W.IngDisk&&IngDisk.isDisk&&IngDisk.isDisk(r.id)))return false;var d=r.disk||{};return d.bare===true||d.worktree===false;}catch(e){return false;}}
+/* 7.57: after a pick that stopped on lines changed both ways, the words box holds the version's words with git's own last line, as git
+   cherry-pick --continue offers them (her own words, if she wrote any, stay) */
+function prefill(msg){if(!msg)return;[300,900,1800].forEach(function(t){setTimeout(function(){var mm=D.getElementById("fbMsg");
+  if(mm&&!String(mm.value||"").trim()){mm.value=msg;try{mm.dispatchEvent(new Event("input",{bubbles:true}));}catch(e){}}},t);});}
 function again(){var x=X();if(!x||!x.refresh)return Promise.resolve();try{x.C.diff={};x.C.files={};x.C.log={};}catch(e){}return x.refresh().then(function(){x.paint();});}
 function askYes(title,text,yes){try{if(typeof W.ingAsk==="function")return Promise.resolve(W.ingAsk({title:title,text:text,yes:yes,no:"Keep them"}));}catch(e){}return Promise.resolve(false);}
 function here(r){return r.detached?null:(r.branch||null);}
@@ -76,7 +82,7 @@ function pick(r,n){var to=here(r),sh=sheet("Pick versions of “"+n+"”","Each 
       if(c.parents.length>1){keys.appendChild(el("span","r342-tag","Joined two ideas: not on its own"));}
       else{var go=el("button","f-btn sm pri","Bring it here");go.type="button";go.setAttribute("data-r342","bring");
         go.onclick=function(){go.disabled=true;IR.cherryPick(r.id,c.oid).then(function(m){
-          if(m.kind==="conflicts"){sh.close();toast("Both versions are in "+plural(m.conflicts.length,"file")+": choose under Changes, keep one of each, then keep the version.");try{X().S.view="changes";}catch(e){}return again();}
+          if(m.kind==="conflicts"){sh.close();prefill(m.msg);toast("Both versions are in "+plural(m.conflicts.length,"file")+": choose under Changes, keep one of each, then keep the version.");try{X().S.view="changes";}catch(e){}return again();}
           try{if(W.fbHub&&typeof fbHub.kept==="function")fbHub.kept(r.id,m.commit);}catch(e){}
           row.classList.add("r342-done");keys.innerHTML="";keys.appendChild(el("span","r342-tag",esc("Brought in as "+String(m.commit).slice(0,7))));toast("Brought into “"+to+"” as version "+String(m.commit).slice(0,7)+".");
           return again();},function(e){go.disabled=false;fail(e);});};

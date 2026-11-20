@@ -254,7 +254,7 @@ ok(lst.get("ok") and len(lst.get("apps") or []) == len(recs) - 1, "a record chan
 os.remove(victim)
 
 # 6. open everything again
-stt = ia._disk_status()
+stt = (ia._disk_seal_status() if hasattr(ia, '_disk_seal_status') else ia._disk_status())
 ok(stt.get("files") and stt.get("sealed") == stt.get("files") and "records" in stt.get("kinds", []) and "training" in stt.get("kinds", []),
    "the status counts every record and text, all sealed", {k: stt.get(k) for k in ("files", "sealed", "kinds")})
 un = ia._disk_unseal_all()
