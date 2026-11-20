@@ -18,7 +18,19 @@ const STUB = () => { const calls = []; window.__diskCalls = calls; let held = fa
     disk_seal_now() { calls.push(['seal']); return Promise.resolve(Object.assign(st(), { now: 1 })); },
     disk_unseal_all() { calls.push(['unseal', held]); return Promise.resolve(Object.assign(st(), { opened: 2 })); } } }; };
 (async () => {
-  const b = await pw.chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1280, height: 800 } }); await ctx.addInitScript(STUB);
+  const b = await pw.chromium.launch();
+  // 0. with no computer app at all (a browser, the Fire tablet, the iPhone): the page starts, and the room says so. A test build of the
+  //    first draft froze here: the room asked for its words, the words asked the (absent) app, and the answer painted the room again.
+  { const c0 = await b.newContext({ viewport: { width: 1280, height: 800 } }); const p0 = await c0.newPage(); const t0 = Date.now(); let ready = false;
+    try { await p0.goto(URL, { timeout: 90000 }); await p0.waitForFunction(() => window.__ingReady === true, null, { timeout: 90000, polling: 500 }); ready = true; } catch (e) {}
+    const secs = (Date.now() - t0) / 1000;
+    const r0 = ready ? await p0.evaluate(async () => { const k = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); try { tourEnd(); } catch (e) {}
+      try { go('settings'); IngRooms.open('settings', 'security'); } catch (e) {} if (window.IngSecurity) IngSecurity.paint(); const sv = [...document.querySelectorAll('#secCard .sc-sub')].find((x) => x.getAttribute('data-v') === 'disk'); if (sv) sv.click();
+      await new Promise((r) => setTimeout(r, 6000)); const c = document.getElementById('secCard'); return { text: c ? c.textContent.replace(/\s+/g, ' ') : '', alive: true }; }) : null;
+    ok(ready && secs < 60, 'with no computer app the page starts as before (' + secs.toFixed(1) + ' s)', secs);
+    ok(r0 && /runs without a computer app/.test(r0.text), 'and Security, The computer\'s disk says this copy keeps nothing in files on a computer\'s disk, the page still answering six seconds later', r0 && r0.text.slice(r0.text.indexOf('computer\'s disk'), 300));
+    await c0.close(); }
+  const ctx = await b.newContext({ viewport: { width: 1280, height: 800 } }); await ctx.addInitScript(STUB);
   const ALL = []; await ctx.exposeBinding('diskRec', (_s, n) => { ALL.push(n); }); const p = await ctx.newPage(); const errs = []; p.on('pageerror', (e) => errs.push(String(e).slice(0, 200)));
   await p.goto(URL, { timeout: 600000 }); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 600000, polling: 1000 }); await p.waitForTimeout(2500);
   const calls = () => p.evaluate(() => window.__diskCalls.map((c) => c.slice()));

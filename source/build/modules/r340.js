@@ -19,8 +19,11 @@ function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return
 function warn(e){try{console.warn("r340",e);}catch(_){}}
 var ST={held:false,files:0,sealed:0,lib:true,asked:0},BUSY=false;
 function repaint(){try{if(W.IngSecurity&&IngSecurity.paint)IngSecurity.paint();}catch(e){}}
-function status(){var a=api();if(!a)return Promise.resolve(ST);
-  return Promise.resolve(a.disk_status()).then(function(s){if(s&&s.ok){ST=s;ST.asked=Date.now();}return ST;},function(){return ST;});}
+/* the computer app's own count, asked at most every four seconds and only where there is a computer app; the room is painted again only
+   when the answer changed (the room asks for its words as it paints, so asking and painting must never feed each other) */
+function sig(x){return [x.held,x.files,x.sealed,x.lib].join("/");}
+function status(){var a=api();if(!a)return Promise.resolve(ST);ST.asked=Date.now();
+  return Promise.resolve(a.disk_status()).then(function(s){if(s&&s.ok){var was=sig(ST);s.asked=ST.asked;ST=s;ST.changed=was!==sig(ST);}return ST;},function(){return ST;});}
 function hold(){var a=api(),l=L();if(!a||!l||!l.diskKey||!l.active||!l.active())return Promise.resolve(false);
   if(l.locked&&l.locked())return drop();
   return l.diskKey().then(function(k){return Promise.resolve(a.disk_key_hold(k.b64,k.kid));}).then(function(s){if(s&&s.ok)ST=s;repaint();return true;},function(e){warn(e);return false;});}
@@ -37,7 +40,7 @@ function sealNow(btn){var a=api();if(!a||BUSY)return;BUSY=true;if(btn)btn.disabl
   Promise.resolve(a.disk_seal_now()).then(function(s){BUSY=false;if(s&&s.ok){ST=s;try{W.ingToast&&ingToast(s.now?(s.now===1?"One file sealed just now.":s.now+" files sealed just now."):"Everything was sealed already.");}catch(e){}}
     else{try{W.ingToast&&ingToast((s&&s.error)||"It could not be sealed now.");}catch(e){}}repaint();},function(e){BUSY=false;warn(e);repaint();});}
 function describe(fab){var a=api(),l=L(),on=!!(l&&l.active&&l.active());
-  if(Date.now()-ST.asked>4000)status().then(function(){repaint();});
+  if(a&&Date.now()-ST.asked>4000)status().then(function(x){if(x&&x.changed){x.changed=false;repaint();}});
   var what=fab?"Fabrica's runs and their logs, and the apps waiting for your devices":"The apps waiting for your devices";
   var later=fab?"Fabrica apps kept on a drive, the folder search's index and texts for training":"the folder search's index and texts for training";
   var h="";
@@ -51,7 +54,7 @@ function describe(fab){var a=api(),l=L(),on=!!(l&&l.active&&l.active());
   return h;}
 D.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest('#secCard [data-a="disk-seal"]');if(b){e.preventDefault();sealNow(b);}});
 /* at start: signed in, the key is handed over; opened locked, any key the app still held is dropped */
-function boot(){var l=L();if(!api()||!l)return;if(l.active&&l.active()&&!(l.locked&&l.locked()))hold();else drop();status().then(repaint);}
+function boot(){var l=L();if(!api()||!l)return;if(l.active&&l.active()&&!(l.locked&&l.locked()))hold();else drop();status().then(function(x){if(x&&x.changed){x.changed=false;repaint();}});}
 (function wait(){var n=0;(function t(){if(W.__ingReady===true&&W.IngLock){setTimeout(boot,400);return;}if(++n<400)setTimeout(t,500);})();})();
 W.IngDiskSeal={state:state,describe:describe,status:status,sealNow:function(){sealNow(null);},_hold:hold,_drop:drop};
 })();
