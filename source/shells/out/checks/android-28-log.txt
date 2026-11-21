@@ -1,11 +1,2 @@
---------- beginning of main
 --------- beginning of system
-11-21 15:00:23.826  3342  3342 I IngeniumShell: ERROR Error while parsing the 'sandbox' attribute: 'allow-downloads' is an invalid sandbox flag. (6646)
-11-21 15:00:24.001  3342  3342 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (33413)
-11-21 15:00:24.012  3342  3342 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (33414)
-11-21 15:00:24.033  3342  3342 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (33414)
-11-21 15:00:27.529  3342  3342 I IngeniumShell: WARNING the code editor could not start: Object.fromEntries is not a function (67185)
-11-21 15:00:27.533  3342  3342 I IngeniumShell: WARNING the shared code editor is missing (67377)
-11-21 15:00:40.184  3472  3472 W IngeniumShell: not opened, not as its maker signed it: signed_test.html is signed with a key this app does not know
-11-21 15:00:40.438  3472  3472 I IngeniumShell: ERROR Refused to load the image 'https://appassets.androidplatform.net/favicon.ico' because it violates the following Content Security Policy directive: "img-src data:".
-11-21 15:00:40.438  3472  3472 I IngeniumShell:  (0)
+--------- beginning of main
