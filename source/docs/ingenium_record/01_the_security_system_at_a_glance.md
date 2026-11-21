@@ -1,6 +1,6 @@
 # Ingenium record 01 · The security system at a glance
 
-Part of the record, written from Ingenium 7.54's sources and brought up to 7.61 (21 November 2026).
+Part of the record, written from Ingenium 7.54's sources and brought up to 7.63 (21 November 2026).
 
 ## 1. What is protected, and from whom
 
@@ -10,6 +10,7 @@ Part of the record, written from Ingenium 7.54's sources and brought up to 7.61 
 * **Plain copies leaving the device**: Ask before each export (record 06, section 2); backups sealed whole while the sign-in is on.
 * **Ingenium itself, on her computers**: from 7.58 each release can be signed with her owner key on her own device, and the Mac and Windows apps check the page against her signature at every start, before anything of it runs: a changed copy does not open and says which file changed (record 06, section 9).
 * **Her ownership of her apps**: the licence, her owner keys and her permissions (record 06, section 6); the editions carry nothing of hers (record 06, section 8).
+* **An app meant for her alone** (7.63): turned on in its Package details, every package of it opens only where she opened it once with her owner key, or for someone she gave a permission to use it (record 06, section 12).
 * **Ingenium itself, from being changed by anyone else**: the Mac and Windows apps check the page against her signature at every start, and a changed copy does not open (record 06, section 9).
 * **What the device shares, from anyone who opens the practice studio**: it opens without a password, so it reads the device's models, protection and pairing but can change none of them (record 04, section 9).
 
@@ -22,6 +23,7 @@ Part of the record, written from Ingenium 7.54's sources and brought up to 7.61 
 * Model files, the engine, the training lab's models and Fabrica's finds by meaning, which are not sealed; a run's working files while the run is still running.
 * Anyone who can change the computer app itself, or take its signatures away, can stop the check of Ingenium itself (it then says Not signed yet); the iPhone, iPad and Fire apps and the copies she gives do not check yet.
 * Not yet built: her apps' code scrambled, the check of Ingenium itself on the iPhone, iPad and Fire apps, the check at start of an app built from its build kit, and apps kept on a drive sealed (record 06, section 7). The folder search's index is sealed from 7.59 (record 06, section 10); her apps are signed when shipped from 7.60 (the packages Fabrica makes carry her owner key's signature), and from 7.62 each app Fabrica makes checks it at every start, and an app is checked as it comes into her library (record 06, section 11).
+* An app made to open only with her owner key (record 06, section 12) opened straight from its file in a browser, which does not check it, or taken apart on a device where it is open. A permission she withdraws closes only the copies made after it, which carry her newer list.
 * Anyone who opens the browser's own tools at an unlocked device: profiles and the practice studio are kept apart by the app, not by the browser, so every store can be read raw there. What keeps her work closed is the seal, which only her password or a way back in opens.
 
 There is no maker's key and no back door. A copy opens only with what its owner keeps, so a forgotten password with no way back in cannot be undone by anyone.
@@ -57,6 +59,7 @@ Each profile has its own record and its own data key. The Cloud has its own key,
 | Sealed between devices | `build/modules/r319.js`, `build/desktop/app_seal_737.py` | 06 |
 | Ingenium Cloud | `build/modules/r255.js`, `build/desktop/app_cloud_657.py` | 06 |
 | Ownership, licence, permissions | `build/modules/r162.js`, `build/thoughts/permit_core.html`, `security/permits.py`, `security/owner_keys.json` | 06 |
+| Opens only with your owner key (the door at the head of each package's page) | `build/modules/r354.js` | 06 |
 | Ingenium itself, signed and checked | `build/modules/r348.js`, `build/desktop/app_self_758.py`, `tools/stamp_build.py`, `build/release.py` (`self_stamp`) | 06 |
 | The practice studio | `build/modules/r350.js`, its part in `build/boot/profiles_boot.js` | 04 |
 | Purple words that can be pressed, underlined | `build/modules/r343.js` | 07 |

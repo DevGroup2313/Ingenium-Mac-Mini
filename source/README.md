@@ -395,6 +395,43 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.63 (21 November 2026): opens only with your owner key.
+The Security room's promise (modules/r318.js, approved on the live preview of 18 November 2026): "For an app meant for you alone: it
+opens fully only on a device that holds your owner key, as the master edition does." Shown to her as nine pictures one by one at full
+size (`previews/owner_key`: the scripts; the pictures stay out of the repository), and her word: "I approve of the previews, please
+commit and push it everywhere and continue working on my requests."
+- `build/modules/r354.js` (new): Package details (Fabrica, Ship) gains Opens only with your owner key, under Signed with your owner key,
+  off for every app until she turns it on; turned on, it keeps the signature on, since the signature carries the door. Every package made
+  from such an app's page then carries a door, the page's first script, written in before r349 signs the page. Where the app was opened
+  by its owner (the owner key's file and its password, once per device) or with a permission the owner signed (PermitCore's own: it
+  allows use, it is in its dates, not withdrawn, and for this app), the app starts as it is; anywhere else the door stops the page before
+  anything of the app is read, and draws itself in its place. The opening is kept in the app's own storage, signed by the owner key, and
+  checked again at every start; the key is used once and not kept; nothing leaves the device. On a device without her owner key nothing
+  is made for such an app, and a page whose own security policy runs only its own scripts cannot carry the door: nothing is made, and
+  Fabrica says why.
+- The Security room (r318) says how many apps are hers alone, and what the door keeps out and what it cannot: a page opened straight from
+  its file in a browser is not checked, and someone who takes the app apart on a device where it is open can always read it. A permission
+  she withdraws closes only the copies made after it, which carry her newer list (record 06, section 12).
+- The permission form (Settings, Licence and permissions; r162 and thoughts/permit_core.html) lists the apps she keeps for herself alone
+  beside her four, and a permission names such an app as its door reads it (its name in small letters, or PermitCore's short name).
+- The other editions: no switch and nothing made for its owner alone; the room says that the owner's own copy of Ingenium makes such an app.
+- The shells: what the door needs from each device's app (Web Crypto in a secure context, and a page that stops where its first script
+  stops it) is checked on GitHub's machines (shells/test/door_check.html, in build-shells.yml, run 44931986250). On Apple silicon and
+  Intel Macs (carpe-app://desk, a secure context), on Windows (https://desk.app.test) and on the Android 9 and 11 emulators, Web Crypto was
+  there and nothing after the stop ran. Android 14's emulator stopped answering at The Forge's 13 MB page before it reached the check, as
+  it has done since 6.1. Two faults in the check itself, found on its first run and fixed: the Mac and iPhone shells report a page when it
+  finishes loading, and a stopped page never finishes, so the check page reports itself through their log; and the Windows case named its
+  files through $T, which holds a time at that point of the script.
+- What is new (r222): two lines for the master, one where there is a Fabrica, one where there is none.
+- The record in Ingenium's folder: record 06 section 12 (new), records 00, 01, 09 and 10.
+- rig: `t_763_owner_door.js` (24 checks on the test page: the switch and its signature; the room; the permission form's list; the package,
+  its door the page's first script and the page signed; a page that runs only its own scripts, and a device without her key, making
+  nothing; the door: a wrong password, the owner key, the next start, an opening changed by one field, an opening from another device;
+  permissions valid, ended, withdrawn, another app's, not for use, and not the owner's; a kept permission that has since ended; and, in
+  another edition, no switch).
+
+    node rig/t_763_owner_door.js <page url> [master|gift]
+
 Ingenium 7.62 (21 November 2026): your apps signed when shipped, part two: every app Fabrica makes checks its signature at each start,
 and an app is checked as it comes into her library.
 The Security room's promise (modules/r318.js, approved on the live preview of 18 November 2026): "a changed file is caught, and the app
