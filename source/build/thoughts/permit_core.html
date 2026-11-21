@@ -261,7 +261,7 @@ function create(o){
       rs.forEach(function(r){var p=r.permit||{},it=el("div","pc-item"),t=el("div");t.appendChild(el("b",null,(p.holder||"A permission")+(p.n?" · "+p.n:"")));
         var cls=r.state==="valid"?"ok":r.state==="ended"||r.state==="notyet"?"old":"bad",w={valid:"valid",ended:"ended",notyet:"not yet begun",withdrawn:"withdrawn",foreign:"not the owner's",otherapp:"for another app",unreadable:"unreadable"}[r.state]||r.state;
         t.appendChild(D.createTextNode(" "));t.appendChild(el("span","pc-state "+cls,w));it.appendChild(t);
-        if(p.allows)it.appendChild(el("div",C.note,"Allows: "+p.allows.map(function(a){var x=ALLOWS.filter(function(y){return y[0]===a;})[0];return x?x[1]:a;}).join("; ")+(p.apps?". For "+p.apps.map(function(a){return APPS[a]||a;}).join(", "):"")+"."));
+        if(p.allows)it.appendChild(el("div",C.note,"Allows: "+p.allows.map(function(a){var x=ALLOWS.filter(function(y){return y[0]===a;})[0];return x?x[1]:a;}).join("; ")+(p.apps?". For "+p.apps.map(function(a){if(APPS[a])return APPS[a];try{var m=typeof o.moreApps==="function"?(o.moreApps()||[]).filter(function(x){return x&&x.id===a;})[0]:null;if(m)return m.name||a;}catch(e){}return a;}).join(", "):"")+"."));
         it.appendChild(el("div",C.note,r.why));lst.appendChild(it);});});
     if(o.owner)ownerPart(c);
     return c;}
@@ -279,7 +279,10 @@ function create(o){
       box.appendChild(el("h3","pc-sub","Give a permission"));var f=el("form","pc-form");f.noValidate=true;
       function field(lbl,name,type,val){var l=el("label",null,lbl),i=el("input");i.type=type;i.name=name;if(val)i.value=val;l.appendChild(i);f.appendChild(l);return i;}
       field("The person it is for","holder","text");field("How to reach them (optional)","contact","text");
-      var ap=el("div","pc-checks");ap.setAttribute("role","group");ap.setAttribute("aria-label","The apps it covers");Object.keys(APPS).forEach(function(k){var l=el("label"),i=el("input");i.type="checkbox";i.name="app";i.value=k;if(k===o.app)i.checked=true;l.appendChild(i);l.appendChild(D.createTextNode(APPS[k]));ap.appendChild(l);});
+      var ap=el("div","pc-checks");ap.setAttribute("role","group");ap.setAttribute("aria-label","The apps it covers");
+      /* Ingenium 7.63: beside the four, the apps the owner keeps for herself alone (o.moreApps, Ingenium's r354), by the names their door reads */
+      var appList=Object.keys(APPS).map(function(k){return [k,APPS[k]];});try{if(typeof o.moreApps==="function")(o.moreApps()||[]).forEach(function(a){if(a&&a.id&&!APPS[a.id]&&!appList.some(function(x){return x[0]===a.id;}))appList.push([a.id,a.name||a.id]);});}catch(e){}
+      appList.forEach(function(x){var k=x[0],l=el("label"),i=el("input");i.type="checkbox";i.name="app";i.value=k;if(k===o.app)i.checked=true;l.appendChild(i);l.appendChild(D.createTextNode(x[1]));ap.appendChild(l);});
       f.appendChild(el("div",C.note,"The apps it covers"));f.appendChild(ap);
       var al=el("div","pc-checks");al.setAttribute("role","group");al.setAttribute("aria-label","What it allows");/* an app may offer only the kinds it acts on (o.offer; Ingenium since 6.45) */(o.offer?ALLOWS.filter(function(a){return o.offer.indexOf(a[0])>=0;}):ALLOWS).forEach(function(a){var l=el("label"),i=el("input");i.type="checkbox";i.name="allow";i.value=a[0];if(a[0]==="use"||a[0]==="install")i.checked=true;l.appendChild(i);l.appendChild(D.createTextNode(a[1]));al.appendChild(l);});
       f.appendChild(el("div",C.note,"What it allows"));f.appendChild(al);

@@ -15,7 +15,9 @@
      the app apart on a device where it is open can always read it.
    - A page whose own security policy runs only its own scripts cannot carry the door: Fabrica says so, and makes nothing rather than
      a package that would open for anyone.
-   window.IngOwnerOnly: wanted(id), door(html, ctx), blocked(html), packageRow(box, r, pref, signRow), well(chip) */
+   - The permission form (Settings, Licence and permissions) lists the apps she keeps for herself alone beside her four, so a permission
+     to use one can be given; a permission names the app as the door does (its name in small letters, or PermitCore's short name).
+   window.IngOwnerOnly: wanted(id), door(html, ctx), blocked(html), packageRow(box, r, pref, signRow), well(chip), apps(), namesOf(id, slug) */
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p354"]="started";}catch(_){}
 /* R354 · opens only with your owner key: see the note at the top of its styles */
@@ -36,8 +38,16 @@ function blocked(html){var head=String(html).slice(0,1<<20),m=/<meta[^>]+http-eq
   return !!(sc&&!/'unsafe-inline'/i.test(sc[1]));}
 /* the door: the page's first script, with what it checks against written in */
 function doorSrc(){var e=D.getElementById("r354-door");return e?e.textContent:"";}   /* read when a package is made: the module runs before the page reaches it */
+/* the names a permission may give the app: its own name in small letters (the address form, Tide-Clock as tide-clock), and for one of
+   her four apps the short name PermitCore gives it (cd, forge, inkwell, ingenium) */
+function repoOf(id){try{return (W.fbHubHost&&fbHubHost.C&&fbHubHost.C.repos||[]).filter(function(r){return r.id===id;})[0]||null;}catch(e){return null;}}
+function namesOf(id,slug){var r=repoOf(id),out=[];var s=String(slug||(r&&(r.slug||r.name))||"app").toLowerCase();out.push(s);
+  if(r&&r.app&&W.PermitCore&&PermitCore.APPS&&PermitCore.APPS[r.app]&&out.indexOf(r.app)<0)out.push(r.app);return out;}
+/* the apps she keeps for herself alone, for the permission form in Settings (r162 asks): those PermitCore does not already list */
+function apps(){var out=[];try{var s=ship();(W.fbHubHost&&fbHubHost.C&&fbHubHost.C.repos||[]).forEach(function(r){if(!s[r.id]||!s[r.id].ownerOnly)return;
+    if(r.app&&W.PermitCore&&PermitCore.APPS&&PermitCore.APPS[r.app])return;out.push({id:String(r.slug||r.name).toLowerCase(),name:r.name});});}catch(e){}return out;}
 function door(html,ctx){var DOOR=doorSrc();if(!DOOR)throw new Error("this build of Ingenium carries no door");if(blocked(html))throw new Error((ctx.name||"This app")+"'s page runs only its own scripts (its security policy), so it cannot carry the door: nothing was made. Turn off Opens only with your owner key for it, in Package details.");
-  var cfg={app:String(ctx.app||"app").toLowerCase(),name:String(ctx.name||"This app"),keys:keys(),withdrawn:withdrawn()};   /* as permissions name apps: in small letters */
+  var names=namesOf(ctx.id,ctx.app),cfg={app:names[0],apps:names,name:String(ctx.name||"This app"),keys:keys(),withdrawn:withdrawn()};   /* as permissions name apps: in small letters */
   var tag='<script>window.__ingDoorCfg='+JSON.stringify(cfg).replace(/</g,"\\u003c")+';\n'+DOOR.replace(/<\/script/gi,"<\\/script")+'<\/script>';
   if(/<head(\s[^>]*)?>/i.test(html))return html.replace(/<head(\s[^>]*)?>/i,function(m){return m+"\n"+tag;});
   if(/<html(\s[^>]*)?>/i.test(html))return html.replace(/<html(\s[^>]*)?>/i,function(m){return m+"\n<head>"+tag+"</head>";});
@@ -55,7 +65,7 @@ function well(chip){var n=0;try{var s=ship();Object.keys(s).forEach(function(k){
   return '<div class="sc-well"><div class="sc-wh"><b>Opens only with your owner key</b>'+chip(n?"on":"off")+'</div><p>'+esc(n?"On for "+n+(n===1?" app":" apps")+": every package of "+(n===1?"it":"each")+" opens only where you open it once with your owner key, or for someone you give a permission to use it."
       :"For an app meant for you alone: turned on in its Package details, every package opens only where you open it once with your owner key, or for someone you give a permission to use it.")
     +'</p><p class="sc-fine">It keeps out a person without your key or your permission. The apps refuse a copy whose door was taken out, since the page is signed; a page opened straight from its file in a browser is not checked, and someone who takes the app apart on a device where it is open can always read it.</p></div>';}
-W.IngOwnerOnly={wanted:wanted,door:door,blocked:blocked,packageRow:packageRow,well:well};
+W.IngOwnerOnly={wanted:wanted,door:door,blocked:blocked,packageRow:packageRow,well:well,apps:apps,namesOf:namesOf};
 })();
 ;try{window.__ingParts["p354"]="running";}catch(_){}
 </script>
@@ -95,7 +105,7 @@ function permitState(file){var p=file&&file.permit;
     if((CFG.withdrawn||[]).indexOf(p.n)>=0)return {state:"withdrawn",p:p,why:"Its owner has withdrawn it."};
     if(p.from&&t<p.from)return {state:"notyet",p:p,why:"It begins on "+said(p.from)+"."};
     if(p.until&&t>p.until)return {state:"ended",p:p,why:"It ended on "+said(p.until)+". Ask its owner for a new one."};
-    if(!Array.isArray(p.apps)||p.apps.indexOf(CFG.app)<0)return {state:"otherapp",p:p,why:"It is for another app, not for "+CFG.name+"."};
+    var mine=CFG.apps||[CFG.app];if(!Array.isArray(p.apps)||!p.apps.some(function(a){return mine.indexOf(a)>=0;}))return {state:"otherapp",p:p,why:"It is for another app, not for "+CFG.name+"."};
     if(!Array.isArray(p.allows)||p.allows.indexOf("use")<0)return {state:"nouse",p:p,why:"It does not allow its holder to use "+CFG.name+"."};
     return {state:"valid",p:p,why:esc(p.holder||"Its holder")+" may use "+esc(CFG.name)+(p.until?" until "+said(p.until):"")+"."};});}
 /* what this device keeps: the owner's opening of the app here, or a permission */

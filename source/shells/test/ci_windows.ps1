@@ -251,8 +251,8 @@ $r = ''; if (Test-Path $log) { $r = Get-Content $log -Encoding utf8 | Where-Obje
 if ($r -and $r -like '*is signed with a key this app does not know*' -and $r -like '*ING-SHELL-CHECK-1*') { say "PASS a page signed with a key the shell does not carry: refused before it ran, the shell's own page in its place: $($r.Substring(23))" }
 else { say "FAIL a page signed with a key the shell does not carry: $(if ($r) { $r } else { '(no report)' })"; $script:fail = 1 }
 # 7.63: what the door of an app for its owner alone needs (modules/r354.js): Web Crypto here, and a page that stops where its first
-# script stops it (the title says what was found; the script after the stop never runs)
-node "$T/make_win.mjs" $M $Shell "$T/door_check.html" $I "$W\Door Check Setup.exe" com.yannieforest.doorcheck.win "Door Check" CarpeNative "Ada Quill" | Out-Null
+# script stops it (the title says what was found; the script after the stop never runs). As above, not $T: it holds a time here
+node "source/shells/test/make_win.mjs" $M $Shell "source/shells/test/door_check.html" $I "$W\Door Check Setup.exe" com.yannieforest.doorcheck.win "Door Check" CarpeNative "Ada Quill" | Out-Null
 $D = Join-Path $W 'x-door'; New-Item -ItemType Directory -Force $D | Out-Null; Copy-Item "$W\Door Check Setup.exe" $D -Force
 $log = Join-Path $W 'door.log'; Remove-Item $log -ErrorAction SilentlyContinue
 $p = Start-App (Join-Path $D 'Door Check Setup.exe') $log ''

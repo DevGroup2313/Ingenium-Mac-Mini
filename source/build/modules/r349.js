@@ -183,7 +183,7 @@ IngShip.onePage=function(id,opt){opt=opt||{};return o1.apply(IngShip,arguments).
     /* 7.63 (modules/r354.js): an app for its owner alone carries its door, written in before the page is signed, and is never made unsigned */
     var own=W.IngOwnerOnly&&IngOwnerOnly.wanted(id);
     return session(name).then(function(s){if(!s){if(own)throw new Error("Nothing was made: "+name+" opens only with your owner key, and it can only be made signed, with your owner key on this device.");return x;}
-      var page=own?IngOwnerOnly.door(x.html,{app:info.slug||"",name:name}):x.html;
+      var page=own?IngOwnerOnly.door(x.html,{id:id,app:info.slug||"",name:name}):x.html;
       return signPage(page,{s:s,app:info.slug||"",name:name,version:ver}).then(function(sp){
       x.html=sp.html;x.bytes=TE.encode(sp.html);x.signed=sp.file;return mark(id,x.commit,opt.target,sp.file).then(function(){return x;});});});});});};
 /* the web app, however it was made (r111's own, r178's from the app's templates or Ingenium's family of designs, with r330's additions):

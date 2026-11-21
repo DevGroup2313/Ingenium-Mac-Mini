@@ -10,6 +10,13 @@
   var ok = !!(window.isSecureContext && window.crypto && window.crypto.subtle && window.crypto.subtle.importKey);
   try { window.stop(); } catch (e) {}
   document.documentElement.innerHTML = '<head><meta charset="utf-8"><title>Door check: ' + (ok ? 'crypto' : 'no crypto') + '</title></head><body><p>The door stood here.</p></body>';
+  /* the Mac and iPhone shells send their test report when a page finishes loading, and a stopped page never finishes: here the page
+     reports itself through their log, four seconds on, so the title it gives shows whether anything after the stop ran */
+  var hs = window.webkit && window.webkit.messageHandlers;
+  if (hs && hs.shellLog) setTimeout(function () {
+    try { hs.shellLog.postMessage('SHELL_PAGETEST PAGE ' + JSON.stringify({ title: document.title, secure: !!window.isSecureContext, subtle: ok, href: location.href }));
+      hs.shellLog.postMessage('SHELL_PAGETEST DONE'); } catch (e) {}
+  }, 4000);
 })();
 </script>
 <title>Door check: not reached</title>

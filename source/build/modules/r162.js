@@ -22,7 +22,9 @@ var LICENCE=/*PERMIT_LICENCE*/"",KEYS=/*PERMIT_KEYS*/[],WITHDRAWN=/*PERMIT_WITHD
 var ED=typeof ING_EDITION==="string"?ING_EDITION:"master";
 function build(){try{return typeof ingBuild==="function"?ingBuild():"";}catch(e){return "";}}
 var P=PermitCore.create({app:"ingenium",appName:"Ingenium",ownerName:OWNER,version:typeof ING_VERSION==="string"?ING_VERSION:"",edition:ED,stamp:build(),
-  licence:LICENCE,keys:KEYS,withdrawn:WITHDRAWN,given:GIVEN,owner:ED==="master",id:"ingPermitCard",offer:["use","install","share","sell"],onChange:function(){try{gate();}catch(e){}},
+  licence:LICENCE,keys:KEYS,withdrawn:WITHDRAWN,given:GIVEN,owner:ED==="master",id:"ingPermitCard",offer:["use","install","share","sell"],
+  /* 7.63: the apps she keeps for herself alone (modules/r354.js), offered beside the four when she gives a permission */
+  moreApps:function(){try{return W.IngOwnerOnly&&IngOwnerOnly.apps?IngOwnerOnly.apps():[];}catch(e){return [];}},onChange:function(){try{gate();}catch(e){}},
   load:function(){return state.permits;},save:function(s){state.permits=s;try{saveState();}catch(e){}},
   toast:function(t){try{(W.ingToast||W.toast)(t);}catch(e){}},
   saveFile:function(n,m,t){return typeof saveFileNative==="function"?Promise.resolve(saveFileNative(n,m,t)):null;},
