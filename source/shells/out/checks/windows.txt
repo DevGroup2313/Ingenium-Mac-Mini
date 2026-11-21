@@ -1,7 +1,7 @@
 
 Windows: Microsoft Windows Server 2025 Datacenter 10.0.26100.0, WebView2 runtime 157.0.4341.46
-{"out":"D:\\a\\_temp\\wintest\\Shell Test Setup.exe","kind":"setup","size":1004647,"sha256":"ed439b7ade91f9563f1309badcf40bffd46439e05663668c891cc637b4016bc7","exe":"Shell Test Setup.exe","exeSize":1004647,"exeSha256":"ed439b7ade91f9563f1309badcf40bffd46439e05663668c891cc637b4016bc7","id":"com.yannieforest.shelltest.win","icons":6,"ms":457}
-{"out":"D:\\a\\_temp\\wintest\\The Forge Setup.exe","kind":"setup","size":15348710,"sha256":"961586e7ec1de306183229a1eaa516595e62f9bb9f185f2857283a40054728f0","exe":"The Forge Setup.exe","exeSize":15348710,"exeSha256":"961586e7ec1de306183229a1eaa516595e62f9bb9f185f2857283a40054728f0","id":"com.yannieforest.theforge.wintest","icons":6,"ms":117}
+{"out":"D:\\a\\_temp\\wintest\\Shell Test Setup.exe","kind":"setup","size":1004647,"sha256":"df0f9131cb75912a733cebe81d3dec07016622bb44fa8557c060fd82615d723a","exe":"Shell Test Setup.exe","exeSize":1004647,"exeSha256":"df0f9131cb75912a733cebe81d3dec07016622bb44fa8557c060fd82615d723a","id":"com.yannieforest.shelltest.win","icons":6,"ms":335}
+{"out":"D:\\a\\_temp\\wintest\\The Forge Setup.exe","kind":"setup","size":15348710,"sha256":"dcfd28d679848608ad5b4a56f7dfb1fb2b9b2a1f6e480d4027788afa90deff29","exe":"The Forge Setup.exe","exeSize":15348710,"exeSha256":"dcfd28d679848608ad5b4a56f7dfb1fb2b9b2a1f6e480d4027788afa90deff29","id":"com.yannieforest.theforge.wintest","icons":6,"ms":98}
 PASS a test page in the Windows app Fabrica made: Windows reads its own name (Shell Test, version 6.5, company Ada Quill), not its file name
      Shell Test Setup.exe: 1 MB, one file: the app and its installer
 PASS a test page in the Windows app Fabrica made: Windows shows the app's own icon for the file (rgb 13,106,88)
@@ -9,7 +9,7 @@ PASS a test page in the Windows app Fabrica made: a second start brings the open
 PASS a test page in the Windows app Fabrica made, first start: its page, its storage and IndexedDB, the file saver: {"title":"Shell Test run 1","text":47,"errors":0,"first":[],"bridge":true,"storage":true,"kept":null,"idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/test_page.html"}
 PASS a test page in the Windows app Fabrica made: the clipboard, written and read back
 PASS a test page in the Windows app Fabrica made: the page saved a file, and it holds what the page gave
-PASS a test page in the Windows app Fabrica made, second start: what the first start kept is there: {"title":"Shell Test run 2","text":48,"errors":0,"first":[],"bridge":true,"storage":true,"kept":"1795283329494","idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/test_page.html"}
+PASS a test page in the Windows app Fabrica made, second start: what the first start kept is there: {"title":"Shell Test run 2","text":48,"errors":0,"first":[],"bridge":true,"storage":true,"kept":"1795288550811","idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/test_page.html"}
 PASS The Forge (13 MB page) in the Windows app Fabrica made: Windows reads its own name (The Forge, version 6.5, company Ada Quill), not its file name
      The Forge Setup.exe: 14.6 MB, one file: the app and its installer
 PASS The Forge (13 MB page) in the Windows app Fabrica made: Windows shows the app's own icon for the file (rgb 13,106,88)
@@ -22,7 +22,7 @@ the installer: this account is an administrator: True
      me, screen after: {"screen":"installed","eye":"Installed","title":"Shell Test is ready","sub":"Find it in the Start menu and on your desktop, and in Settings, Apps to uninstall it.","err":"","scope":null,"desk":null,"removeData":null,"open":true,"tryit":false,"bar":"Shell Test Setup","w":540,"h":464,"sh":464,"wide":0,"scrollbars":0,"font":"\"Setup Serif\", \"Iowan Old Style\", \"Palatino Linotype\", Palatino, Georgia, serif","errors":0,"first":[]}
 PASS the installer opens on For everyone on this PC, the desktop shortcut ticked, Open without installing offered, no scroll bar, no page error
 PASS Just for me, pressed through the page: installed, and the page says so
-PASS the installer's window is drawn: its violet keys and ring are on the screen (406 samples)
+PASS the installer's window is drawn: its violet keys and ring are on the screen (455 samples)
 PASS just for me: the program and installed.txt in C:\Users\runneradmin\AppData\Local\Programs\Shell Test
 PASS just for me: the Start menu shortcut, named Shell Test, opens C:\Users\runneradmin\AppData\Local\Programs\Shell Test\Shell Test.exe
 PASS just for me: the desktop shortcut, named Shell Test
@@ -60,6 +60,6 @@ PASS uninstalled for everyone: its folder is gone (C:\Program Files\Shell Test)
 PASS uninstalled for everyone: its shortcuts are gone
 PASS uninstalled for everyone: its entry in Settings, Apps is gone
 PASS uninstalled for everyone: the saved work is removed, as ticked
-{"out":"D:\\a\\_temp\\wintest\\Tide Check Setup.exe","kind":"setup","size":1004745,"sha256":"8dd1ecf44d18b42a511154241ffaa770dfbe09e56397aab696121f4b1614166f","exe":"Tide Check Setup.exe","exeSize":1004745,"exeSha256":"8dd1ecf44d18b42a511154241ffaa770dfbe09e56397aab696121f4b1614166f","id":"com.yannieforest.tidecheck.win","icons":6,"ms":45}
+{"out":"D:\\a\\_temp\\wintest\\Tide Check Setup.exe","kind":"setup","size":1004745,"sha256":"1cb3375c9b2a4cdcb61d0817a6e4c0e65bae3983eb0433ac4b627ee07381ccaa","exe":"Tide Check Setup.exe","exeSize":1004745,"exeSha256":"1cb3375c9b2a4cdcb61d0817a6e4c0e65bae3983eb0433ac4b627ee07381ccaa","id":"com.yannieforest.tidecheck.win","icons":6,"ms":31}
 PASS a page signed with a key the shell does not carry: refused before it ran, the shell's own page in its place: {"file":"signed_test.html","why":"is signed with a key this app does not know","check":"ING-SHELL-CHECK-1 CdbXeLQDHJ63NSC4cT0xnK,iej1hHjzk8YQm5BBv-52cR"}
 PASS the door's needs: Web Crypto in a secure context, and the page stops where its first script stops it: {"title":"Door check: crypto","text":20,"errors":0,"first":[],"bridge":true,"storage":true,"kept":null,"idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/door_check.html"}
