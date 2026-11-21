@@ -1,6 +1,6 @@
 # Ingenium record 06 · The other protections
 
-Part of the record of Ingenium's security system, written from Ingenium 7.54's sources (20 November 2026). Each section names its module in `source/build/modules/` and, for the computer apps, its patch in `source/build/desktop/`.
+Part of the record of Ingenium's security system, written from Ingenium 7.54's sources and brought up to 7.61 (21 November 2026). Each section names its module in `source/build/modules/` and, for the computer apps, its patch in `source/build/desktop/`.
 
 Her security request that most of these answer (18 November 2026): "I want you to upgrade and enhance Ingenium's security system and embedded software protection. I really want everything to be encrypted and protected ... my data is protected and also my code is protected and anything that I build inside of Ingenium with my local models and all of my current apps." Her answers then: the lock asked at first start; everything on the computer's disk sealed with the same password; messages between her devices encrypted end to end; her code signed and tamper-evident, scrambled, under an owner key and sealed in Fabrica, "and any additional features that will further protect me and encrypt Ingenium and all of its content". Her word on the live preview (source/previews/security): "I approve of the preview, please commit and push it everywhere".
 
@@ -17,7 +17,8 @@ A room in Settings that says how many protections are on, then each, with its tr
   * Clear a copied secret (on): a password, a recovery word or a pairing code copied from Ingenium is cleared from the clipboard after a minute, where the browser lets a page do so.
   * A record of every opening (on): when and on which device Ingenium opened, and every wrong password, kept in the desk, so sealed with it.
   * Ask before each export (off until turned on; needs the sign-in; turning it off asks for the password too): section 2.
-* **Not yet**, said so with the release planned: signed packages, scrambled code, the owner key on her apps. Ingenium itself, signed and checked, is built for the Mac and Windows apps from 7.58 (section 9).
+* **Not yet**, said so with the release planned: her apps' code scrambled. Ingenium itself, signed and checked, is built for the Mac and Windows apps from 7.58 (section 9); her apps signed when shipped is part one from 7.60 (the packages Fabrica makes carry her owner key's signature; their shells' check at every start comes later).
+* **In the practice studio** (record 04, section 9): a line before the room says this device's protection can be read but not changed there, and that there is no sign-in; the switches' names are not written from it.
 * `window.IngSecurity` gives the others `cfg()` (the switches), `set(key, value)`, `view()` (which part of the room is shown), `paint()`, `log()` (the record of every opening, kept in the desk as `state.secLog`) and the Offline only helpers (`net`, `allowed(url)`, `allow`).
 
 ## 2. Ask before each export (`r341.js`, 7.51)
@@ -33,6 +34,7 @@ A room in Settings that says how many protections are on, then each, with its tr
 * While the owner is signed in, the computer app is handed the disk key (`IngLock.diskKey()`: derived from the data key with HKDF-SHA-256, info `"ingenium-disk 1"`; never the password and never the data key itself) and keeps it in memory only (`disk_key_hold`). When Ingenium locks it is dropped (`disk_key_drop`); a page opened locked drops it too, so a refresh never leaves it behind.
 * Sealed with it: the apps waiting for her devices and Fabrica's runs, their logs and files, in 1 MiB AES-256-GCM chunks (7.49); the records of waiting apps under names that say nothing, a run's record once it ends, and texts for training (7.50). A run still runs on plain files while it runs; its files are sealed when it ends.
 * When the sign-in is turned off, everything sealed on the disk is opened again first (`disk_unseal_all`).
+* The seal's own names in the computer app (7.57, `desktop/app_disk_fix_757.py`): `_DISK_SEAL`, `_disk_seal_status()`, `_disk_seal_write()`. 7.49 had taken three names that the drive's repositories use (`_DISK`, `_disk_status`, `_disk_write`), which stopped repositories on a drive from working until 7.57. A lesson for any app: a patch that adds a part must check that none of its names is taken already.
 * Settings, Security, The computer's disk says what is sealed and what is not yet, with Seal them now; it repeats only what the computer app itself reports it seals (`disk_status`), so an older app is never said to seal more than it does.
 * `window.IngDiskSeal`: `state()`, `describe(hasFabrica)`, `status()`, `sealNow()`.
 
@@ -61,15 +63,15 @@ Her words: "The app is my sole original work and only I am able to do distribute
 * Terms and privacy (`r320.js`, 7.37): a card beside the licence: In short, the Privacy notice, the Terms of use, and in the master edition Your contact; a first draft, marked Draft in the master edition, for a lawyer in the US and the UK to read before it is final.
 * The Android signing keys: no page carries one; the builds take them from each repository's secrets (`security/KEYS.md`).
 
-## 7. Approved and not yet built (as of 7.59)
+## 7. Approved and not yet built (as of 7.61)
 
 * The folder search's index: built in 7.59 (section 10).
 * Fabrica's apps kept on a drive, sealed (approved): only the repositories Ingenium writes itself; any other folder only at the owner's choice, one at a time; with Export a plain copy.
-* From the Security preview: Your apps signed when shipped, and Your apps' code scrambled. Ingenium itself, signed and checked: part one is built (section 9); the iPhone, iPad and Fire apps, and the copies she gives carrying her signature, come later.
+* From the Security preview: Your apps' code scrambled; Your apps signed when shipped, part one built in 7.60, its later parts (each app's shell checking at every start, an app brought into the library checked as it comes in) to come. Ingenium itself, signed and checked: part one is built (section 9); the iPhone, iPad and Fire apps, and the copies she gives carrying her signature, come later.
 
 ## 8. The editions carry nothing of hers
 
-The full, gift and demo editions are built from the same sources by `build/editions.py`. Every edition but the master leaves out her own modules (`skip_modules`: Lector's recipe, the Workshop, the Author Studio, Troubleshoot, the Offline Project, her demonstrations, her build library, Ingenium's own rules in its folder, her plans in Vocatio, this record (`r345.js`), the Desk's five apps outside the master), takes out her ways of working (`var HERS=[];`) and her later rules (`var LATER=[];`), and must find each exactly once or the build stops. `rig/t_745_owner_free.js` reads the whole text of each edition for anything of hers.
+The full, gift and demo editions are built from the same sources by `build/editions.py`. Every edition but the master leaves out her own modules (`skip_modules`: Lector's recipe, the Workshop, the Author Studio, Troubleshoot, the Offline Project, her demonstrations, her build library, Ingenium's own rules in its folder, her plans in Vocatio, this record (`r345.js`), the Desk's five apps outside the master), takes out her ways of working (`var HERS=[];`) and her later rules (`var LATER=[];`), and must find each exactly once or the build stops. `rig/t_745_owner_free.js` reads the whole text of each edition for anything of hers. The practice studio (r350) is in every edition: its sample work is invented and names no one, and on her master copy it runs as the full edition, as another person's profile does. This record (r345) and its news lines stay the master's.
 
 ## 9. Ingenium itself, signed and checked (`r348.js` and `desktop/app_self_758.py`, 7.58)
 
@@ -79,7 +81,7 @@ The Security room's promise: "each release signed with your owner key, and check
 * **The three outcomes**: Signed: the page opens. Changed (a signature of hers names this release and the page is not the one signed): the window opens on the app's own page, which says which file changed, what was signed and what is there now, with Show the file and Quit; nothing of the changed page runs, and the app's own address serves none of it. Not signed: it opens, and Security says so. Her own page (6.19) is never refused, and a fault in the check never keeps Ingenium closed. A refusal is kept (the last ten) and told once Ingenium opens again.
 * **Signing** (Settings, Security, Ingenium itself, master edition, with the owner's key on the device): her owner key's password is asked in a card of the room's own kind; the release's fields are signed with PermitCore's `signWith` and handed to the computer app (`self_signature_put`), which checks it with the public keys it carries and keeps it only when it is hers and names this very copy. The key and its password never leave the page; the signature is no secret. Also: Save the signature (for her other computers on the same release), Bring a signature in, Check it now.
 * **Its limits, said in the room**: someone who can change the computer app itself, or take its signatures away, can stop the check; without a computer app (a browser, the iPhone, iPad and Fire apps) the room says Not yet.
-* Interface: `window.IngSelfSign` (`state()`, `describe(mine)`, `check(again)`, `sign()`, `bring()`, `save()`, `put(text)`); the computer app's bridge `self_check`, `self_signature_put`, `self_signature_get`, `self_reveal`, `self_quit`.
+* Interface: `window.IngSelfSign` (`state()`, `describe(mine)`, `check(again)`, `sign()`, `bring()`, `save()`, `put(text)`); the computer app's bridge `self_check`, `self_signature_put`, `self_signature_get`, `self_reveal`, `self_quit`. In the practice studio the calls that change something (`self_signature_put`, `self_reveal`, `self_quit`) are refused (record 04, section 9).
 
 ## 10. The folder search's index, sealed, one per profile (`rag/seal.js`, `rag/store.worker.js`, `rag/main.js`, `r197.js`, `r340.js`; 7.59)
 

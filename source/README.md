@@ -395,6 +395,37 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.61 (21 November 2026): the practice studio; see the password as it is typed; the record brought up to this release.
+- The practice studio (`build/modules/r350.js`, with its part in `build/boot/profiles_boot.js`). Her words (20 November 2026): "I want a
+  practice page built into Ingenium or a Guest page built into the app that users are able to view when they are signed out of their
+  account and want to show the app. Basically, I want the similar option as the Lakay app's "Practice Store" or some variation of that."
+  Approved on twelve pictures (`previews/practice`: the scripts; the pictures stay out of the repository): "I approve of the previews,
+  please commit and push it everywhere and continue working on my requests." Only where no one is signed in: Open the practice studio on
+  the sign-in's card (after its note) and on Who is using Ingenium. Entered, the page starts again as a profile of its own kind (id
+  `practice`, stores `@practice`, never in the list, no password, another person's profile so the full edition on her master copy and
+  none of her parts), with invented sample work (three conversations, each reply marked a sample; Tide Clock's folder on Ingenia), the
+  welcome door with its mark in place of the little lock, a strip on Home, a Practice studio key in the top bar, Start again and Leave in
+  the Status panel. It ends when it is left or its window closes (sessionStorage `ing.practice.session`): its stores are taken away at
+  the next start before anything opens them, and the computer app drops its files (`profile_drop("practice")`). Three guards, in the
+  practice studio only, since it opens without a password: the device's shared names are never written (`SHARED_LS`), its shared
+  databases are read-only and never deleted (`SHARED_DB`: a `readwrite` transaction opens `readonly`), and the computer app's calls that
+  would change the device are refused before they reach it (`NOPR`: drives, models and engine, sharing and pairing, runs, training, the
+  folder search's folders, the app's page, its sign-in key, signatures, the Cloud, the clipboard). Said plainly in the record: it is kept
+  apart by the app, not by the browser; what keeps the owner's work closed is the seal, which it never opens.
+- See the password as it is typed (`build/modules/r351.js`). Her words (20 November 2026): "I also want to be able to see the text of my
+  password when I am typing it on the sign-in page the same way it is done on the Lakay app, please make the fix." As Lakay's "See the
+  password": every password field carries a key at its right edge that shows and hides what is typed; the field keeps the focus and the
+  caret stays at the end. In Ingenium's look: an eye in the field's quiet ink, no purple shading, never moving on the sign-in's door.
+  While shown: marked secret (r318's Clear a copied secret still applies), never spell-checked, a password field again the moment its
+  form is sent.
+- The record of Ingenium's security, profiles and design (`docs/ingenium_record`, r345, the master's alone) brought up to 7.61: 7.56's
+  underline rule, 7.57's disk seal names, 7.58's Ingenium itself signed and checked, the practice studio and its guards, the password
+  key, what Carpe Diem (its own sign-in since its build 1086), Lakay (its own sign-in and practice store), Inkwell and The Forge (none)
+  already have, a section on pages and sections, and each test's count.
+- What is new (r222): three lines for every edition, one for the master's record.
+- rig: `t_759_practice.js` (27 checks, with a stand-in computer app that records each call), `t_759_practice_app.py` (6 checks: the
+  computer app's own side, its practice folder made, used and dropped, the owner's desk untouched), `t_759_peek.js` (15 checks).
+
 Ingenium 7.60 (21 November 2026): your apps signed when shipped, part one.
 The Security room's promise (modules/r318.js): "your owner key's signature on every package, the computer ones too, so a changed file is
 caught and the app refuses to open and says so." Shown to her as eight pictures one by one at full size (`previews/app_sign`: the

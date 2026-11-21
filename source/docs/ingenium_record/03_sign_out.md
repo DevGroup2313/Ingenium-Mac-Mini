@@ -1,6 +1,6 @@
 # Ingenium record 03 · Sign out
 
-Part of the record of Ingenium's security system, written from Ingenium 7.54's sources (20 November 2026). The module is `build/modules/r344.js`; the two hooks it uses are in `build/modules/r197.js` (record 02).
+Part of the record of Ingenium's security system, written from Ingenium 7.54's sources and brought up to 7.61 (21 November 2026). The module is `build/modules/r344.js`; the two hooks it uses are in `build/modules/r197.js` (record 02).
 
 ## 1. What she asked for
 
@@ -37,6 +37,7 @@ At the sign-in (`window.__ingAfterOpen`, called by r197 after the desk is opened
 * r197 paints the sign-in door as soon as its part of the page loads. If the profiles' list says signed out, the sign-in's card waits out of sight (`#ingLockDoor.ild-wait .ild-card{visibility:hidden}`), so it never shows for a moment before the profiles. Should nothing take over within 12 seconds, it shows. (Measured on a loaded machine before this was added: the sign-in card showed for about 2.5 seconds before the profiles covered it.)
 * r344, once its part has loaded, shows Who is using Ingenium (r331's door, `IngProfiles.door()`), headed by a line in plain ink, not violet, since it is not pressed: "Signed out. Everything is sealed until its profile signs in again." (`.r344-door-out`, colour `var(--p3-ink2)`). The sign-in's card stays out of sight beneath (`#ingLockDoor.r344-under .ild-card{visibility:hidden}`).
 * Choosing her own profile hides the profiles and shows her sign-in, without starting the page again. Choosing another profile opens that one as it opens (r331's `switchTo`).
+* From 7.61, under the coins: a line in ink and the door's own key, Open the practice studio (record 04, section 9). The signed out mark is kept aside while the practice studio is open (`backOut`) and put back when it is left, so the page returns to this door, still headed Signed out.
 * By night: the page's own look is sealed with the desk, so only the sign-in door knows it is night (r197's `night()` reads the desk's clear header). While that door stands by night, the profiles door (`#profDoor.r344-night`) and the "Someone else? Choose a profile" key on the sign-in's card (inside `#ingLockDoor.ild-night`) take the night colours that r331 gives the page by night: the same values, set on those two elements, so a night door never holds a day card.
 
 ## 6. Hooks and interface

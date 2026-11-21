@@ -1,6 +1,6 @@
 # Ingenium record 01 · The security system at a glance
 
-Part of the record, written from Ingenium 7.54's sources (20 November 2026).
+Part of the record, written from Ingenium 7.54's sources and brought up to 7.61 (21 November 2026).
 
 ## 1. What is protected, and from whom
 
@@ -10,6 +10,8 @@ Part of the record, written from Ingenium 7.54's sources (20 November 2026).
 * **Plain copies leaving the device**: Ask before each export (record 06, section 2); backups sealed whole while the sign-in is on.
 * **Ingenium itself, on her computers**: from 7.58 each release can be signed with her owner key on her own device, and the Mac and Windows apps check the page against her signature at every start, before anything of it runs: a changed copy does not open and says which file changed (record 06, section 9).
 * **Her ownership of her apps**: the licence, her owner keys and her permissions (record 06, section 6); the editions carry nothing of hers (record 06, section 8).
+* **Ingenium itself, from being changed by anyone else**: the Mac and Windows apps check the page against her signature at every start, and a changed copy does not open (record 06, section 9).
+* **What the device shares, from anyone who opens the practice studio**: it opens without a password, so it reads the device's models, protection and pairing but can change none of them (record 04, section 9).
 
 ## 2. What it does not protect against (said plainly)
 
@@ -19,7 +21,8 @@ Part of the record, written from Ingenium 7.54's sources (20 November 2026).
 * Malicious software already on the device, or a browser extension that reads pages.
 * Model files, the engine, the training lab's models and Fabrica's finds by meaning, which are not sealed; a run's working files while the run is still running.
 * Anyone who can change the computer app itself, or take its signatures away, can stop the check of Ingenium itself (it then says Not signed yet); the iPhone, iPad and Fire apps and the copies she gives do not check yet.
-* Not yet built: signed packages, scrambled code, the check of Ingenium itself on the iPhone, iPad and Fire apps, and apps kept on a drive sealed (record 06, section 7). The folder search's index is sealed from 7.59 (record 06, section 10).
+* Not yet built: her apps' code scrambled, the check of Ingenium itself on the iPhone, iPad and Fire apps, the check of her apps' signatures at every start by their own shells, and apps kept on a drive sealed (record 06, section 7). The folder search's index is sealed from 7.59 (record 06, section 10); her apps are signed when shipped from 7.60 (part one: the packages Fabrica makes carry her owner key's signature).
+* Anyone who opens the browser's own tools at an unlocked device: profiles and the practice studio are kept apart by the app, not by the browser, so every store can be read raw there. What keeps her work closed is the seal, which only her password or a way back in opens.
 
 There is no maker's key and no back door. A copy opens only with what its owner keeps, so a forgotten password with no way back in cannot be undone by anyone.
 
@@ -50,11 +53,14 @@ Each profile has its own record and its own data key. The Cloud has its own key,
 | Sign out | `build/modules/r344.js` | 03 |
 | Settings, Security; More protection | `build/modules/r318.js` | 06 |
 | Ask before each export | `build/modules/r341.js` | 06 |
-| Sealed on the computer's disk | `build/modules/r340.js`, `build/desktop/app_disk_749.py`, `app_disk_750.py` | 06 |
+| Sealed on the computer's disk | `build/modules/r340.js`, `build/desktop/app_disk_749.py`, `app_disk_750.py`, `app_disk_fix_757.py` | 06 |
 | Sealed between devices | `build/modules/r319.js`, `build/desktop/app_seal_737.py` | 06 |
 | Ingenium Cloud | `build/modules/r255.js`, `build/desktop/app_cloud_657.py` | 06 |
 | Ownership, licence, permissions | `build/modules/r162.js`, `build/thoughts/permit_core.html`, `security/permits.py`, `security/owner_keys.json` | 06 |
-| Ingenium itself, signed and checked | `build/modules/r348.js`, `build/desktop/app_self_758.py` | 06 |
+| Ingenium itself, signed and checked | `build/modules/r348.js`, `build/desktop/app_self_758.py`, `tools/stamp_build.py`, `build/release.py` (`self_stamp`) | 06 |
+| The practice studio | `build/modules/r350.js`, its part in `build/boot/profiles_boot.js` | 04 |
+| Purple words that can be pressed, underlined | `build/modules/r343.js` | 07 |
+| See the password as it is typed (every password field) | `build/modules/r351.js` | 02 |
 | The editions | `build/editions.py` | 06 |
 | The Storage page (what each store is) | `build/modules/r142.js` | 05 |
 | Her ways of working | `build/modules/r327.js` | 07 |
@@ -66,3 +72,4 @@ Each profile has its own record and its own data key. The Cloud has its own key,
 3. The right password unwraps the data key; the desk is opened and adopted; the carried documents and recordings are opened; the computer app is handed the disk key; the door goes.
 4. Every save seals the desk (one sealing at a time; the last one sealed at once if the window closes).
 5. Lock now, Sign out, time away or the computer's sleep: save, seal, drop the keys, tell the computer app to drop its disk key, start the page again with nothing of the session in memory.
+6. While no one is signed in, a visitor may open the practice studio from the door: the page starts again in its own stores, with sample work, and leaving it (or closing the window) takes everything of it away (record 04, section 9).

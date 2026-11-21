@@ -1,6 +1,6 @@
 # Ingenium record 02 · The sign-in and the sealed desk
 
-Part of the record of Ingenium's security system, written from Ingenium 7.54's sources (20 November 2026). Every name below (a function, a store, a constant, a string) is quoted from the code; where a line says what the code does, the module that does it is named, so that it can be checked against the source in `source/build/modules/`.
+Part of the record of Ingenium's security system, written from Ingenium 7.54's sources and brought up to 7.61 (21 November 2026). Every name below (a function, a store, a constant, a string) is quoted from the code; where a line says what the code does, the module that does it is named, so that it can be checked against the source in `source/build/modules/`.
 
 ## 1. What it is, in one paragraph
 
@@ -154,6 +154,8 @@ There is no maker's key and no back door: "a copy opens only with what its owner
 * The main key (`.ild-key`) is violet (`linear-gradient(180deg,#7348be,#5d37a1)`) with a darker wall below it. The door's own rule: "a key never moves under the pointer (it would flicker when the pointer rests on its lower edge): it brightens, and sinks into its shadow when pressed". A quieter key is `.ild-ghost`; a key that destroys is `.ild-danger`; a link-like key is `.ild-link`, underlined.
 * Over the welcome door, the sign-in takes the welcome card's own place (`.ild-indoor`), as wide, with nothing dimmed behind it (her words, 3 November 2026: "Ingenium's sign in page looks slightly awkward floating over the app's introduction door ... I want the app to keep its elegant and refined look").
 * The offer to turn the sign-in on, on the welcome door, is a small key in the card's top-left corner, the twin of the theme switch in the top-right (her words, 1 November 2026: "The new sign in prompt section looks a bit cluttered on the introduction door").
+* From 7.61 every password field on the door (the sign-in, its set-up, the ways back in, Change the password) carries a key at its right edge that shows what is typed and hides it again, as Lakay's does (`build/modules/r351.js`; her words, 20 November 2026: "I also want to be able to see the text of my password when I am typing it on the sign-in page the same way it is done on the Lakay app, please make the fix."). An eye drawn in the door's quiet ink (`--ild-soft`), an eye with a line across while the text shows; its label says Show the password or Hide the password (`aria-pressed` follows); the field keeps the focus and the caret stays at the end. Like the door's other keys it never moves under the pointer: it brightens and stands a little, and sinks when pressed; no purple shading. While shown, the field is marked secret (`data-secret`, so Clear a copied secret still applies) and never spell-checked, and it is a password field again the moment its form is sent. Every other password field in Ingenium has the same key.
+* From 7.61 the sign-in's note ends with a key, Open the practice studio (`#ildPractice`, the door's own `.ild-link`, underlined), put there by r350 (record 04, section 9). Inside the practice studio the welcome door's top-left corner holds the practice studio's mark instead of the little lock, and `IngLock.setup` says that no sign-in is offered there.
 
 ## 8. The interface other parts use (`window.IngLock`)
 
@@ -163,4 +165,4 @@ Hooks a part may set on `window`: `__ingBeforeLock(why)` (called and waited for 
 
 ## 9. Tests
 
-`rig/t_700_lock.js` (58 checks on 7.54's release page): turning protection on, the phrase and the words asked back, the sealed stores read raw, a wrong password, the right one, Lock now, the lock after time away, the ways back in, and turning protection off. See record 10.
+`rig/t_700_lock.js` (58 checks, on 7.54's release page and again on 7.61's): turning protection on, the phrase and the words asked back, the sealed stores read raw, a wrong password, the right one, Lock now, the lock after time away, the ways back in, and turning protection off. See record 10.

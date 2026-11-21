@@ -1,6 +1,6 @@
 # Ingenium record 10 · Words and functions
 
-Part of the record, written from Ingenium 7.54's sources (20 November 2026). The words Ingenium uses, and every function, hook, event and name another part (or another app) relies on.
+Part of the record, written from Ingenium 7.54's sources and brought up to 7.61 (21 November 2026). The words Ingenium uses, and every function, hook, event and name another part (or another app) relies on.
 
 ## 1. Words
 
@@ -17,6 +17,8 @@ Part of the record, written from Ingenium 7.54's sources (20 November 2026). The
 * **The ways back in**: the ten words, the recovery key file, the computer's own sign-in, the hint.
 * **The carried apps**: the Desk's five apps in the master copy (Tabula, Abacus, Imago, Scriba, Fontes).
 * **The master copy, the editions**: the owner's own Ingenium; the full, gift and demo editions built without anything of hers.
+* **The practice studio**: Ingenium with sample work, opened from a door while no one is signed in; its own stores (`@practice`), nothing of anyone's, nothing the device shares changed, and nothing kept once it is left or its window closes.
+* **Ingenium itself, signed and checked**: her owner key's signature on a release she installed, checked by the Mac and Windows apps at every start.
 
 ## 2. `window.IngLock` (r197)
 
@@ -56,6 +58,7 @@ Hooks on `window`: `__ingBeforeLock(why)` (waited for before the keys go), `__in
 * `window.__ingProfile`: `{id:"owner", owner:true}`, or `{id, name, t, pw, owner:false}`; `window.__ingGuest`: true in another person's profile.
 * `window.IngProfiles` (r331): `me()`, `list()`, `owner()` (true in the owner's profile), `switchTo(id)`, `door()`, `open()` and `close()` (the menu), `paint()` (Settings' card), and `_reg`, `_models` for tests.
 * The computer apps' bridge: `profile_current()`, `profile_use(id)`, `profile_drop(id)`.
+* The practice studio (r350, with its part in profiles_boot.js): `window.IngPractice`: `on()`, `enter()`, `leave()`, `again()`, `sample(night)`. `window.__ingProfiles.practice`: `on`, `put(name, value)`, `clear()`, `enter()`, `leave()`, `fresh()`, `appDue()`, `appDone()`; `window.__ingProfiles.practiceRefuses(name)`; `window.__ingPractice` (true in it). Its elements: `#ildPractice`, `#r350Open`, `.r350-door`, `#r350Pill`, `.r350-strip` (`#r350Again`, `#r350Leave`), `#r350RowAgain`, `#r350RowLeave`, `.r350-corner`, `.r350-sec`.
 
 ## 5. The other parts
 
@@ -63,7 +66,8 @@ Hooks on `window`: `__ingBeforeLock(why)` (waited for before the keys go), `__in
 * `window.IngExportAsk` (r341): `on()`, `sealed(data)`.
 * `window.IngRag` (rag/main.js), its sealing (7.59): `sealState()` (`{open, on, keyed, files: {sealed, plain, empty}}`), `dropProfile(id)`; the store worker's `seal.key`, `seal.openAll`, `seal.state`, `profile.drop`.
 * `window.IngDiskSeal` (r340): `state()`, `describe(hasFabrica)`, `status()`, `sealNow()`; the computer app's `disk_key_hold`, `disk_key_drop`, `disk_unseal_all`, `disk_status`.
-* `window.IngSelfSign` (r348, 7.58): `state()`, `describe(mine)`, `check(again)`, `sign()`, `bring()`, `save()`, `put(text)`; the computer app's `self_check`, `self_signature_put`, `self_signature_get`, `self_reveal`, `self_quit`.
+* `window.IngSelfSign` (r348, 7.58): `state()`, `describe(mine)`, `check(again)`, `sign()`, `bring()`, `save()`, `put(text)`; the computer app's `self_check(again)`, `self_signature_put(text)`, `self_signature_get()`, `self_reveal()`, `self_quit()`. A signature file: `{kind:"ingenium-release-signature", v:1, release:{kind:"ingenium-release", v:1, app:"ingenium", version, edition, files, made}, kid, sig}`, the release's fields signed with PermitCore's `signWith` (ECDSA P-256, SHA-256, its fixed order).
+* `window.IngPeek` (r351): `scan()` (every password field not yet given its key), `show(input, on)`; each field wrapped in `.ing-peek-wrap`, its key `.ing-peek` (`aria-label` Show the password or Hide the password, `aria-pressed`), the field marked `data-peek` and `data-secret`.
 * `window.saveFileNative(name, type, bytes)`: every file Ingenium saves goes through it.
 * `window.ingAsk({title, text, yes, no})`, `window.ingToast(text)`: Ingenium's own question and note.
 

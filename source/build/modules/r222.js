@@ -234,6 +234,10 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.61", "The practice studio: while no one is signed in, the sign-in and Who is using Ingenium offer Open the practice studio. It is Ingenium with sample work, to show it or to try it. Nothing of anyone's is in it, it changes nothing this device shares, and everything tried there is taken away when it is left or Ingenium closes."],
+  ["7.61", "In the practice studio, Home says what it is, the top bar keeps a Practice studio key, and the Status panel offers Start again and Leave the practice studio."],
+  ["7.61", "Every password field, the sign-in's first, has a key at its right edge that shows what you typed and hides it again. The field keeps the focus, and the password is never spell-checked or kept by the browser."],
+  ["7.61", "The record of Ingenium's security, profiles and design, in Ingenium's folder on Ingenia, is brought up to this release: Ingenium itself signed and checked, the practice studio, the guards behind it, and each part's tests.", "master"],
   ["7.60", "Your apps signed when shipped: every package Fabrica makes carries your owner key's signature inside its page, after one ask for your owner key's password each time you make them. Package details can turn it off for an app.", "master"],
   ["7.60", "A web app you make in Fabrica, signed, checks its own files when it is installed: one changed on the server that hosts it, and it does not open, and says which file.", "master"],
   ["7.60", "Check a package, in Fabrica's Ship card: a page or a web app's zip is read here, and says whether it is as it was signed, and if not, which file changed.", "fabrica"],

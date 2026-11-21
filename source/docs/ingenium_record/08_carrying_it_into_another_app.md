@@ -1,6 +1,6 @@
 # Ingenium record 08 · Carrying the sign-in, Sign out and profiles into another app
 
-Written so that the owner, or a model working for her, can give another of her apps (Carpe Diem, Lakay, Inkwell, The Forge, or one made later) the same sign-in, Sign out, profiles and sealing as Ingenium 7.54, without starting from nothing. Read records 02 to 07 first; this one says what to copy, in what order, what the app must provide, and what went wrong in Ingenium so that it does not go wrong again.
+Written so that the owner, or a model working for her, can give another of her apps (Carpe Diem, Lakay, Inkwell, The Forge, or one made later) the same sign-in, Sign out, profiles, practice studio and sealing as Ingenium 7.61, without starting from nothing. Read records 02 to 07 first; this one says what to copy, in what order, what the app must provide, and what went wrong in Ingenium so that it does not go wrong again.
 
 ## 1. Before anything: what the app must be
 
@@ -19,6 +19,8 @@ Written so that the owner, or a model working for her, can give another of her a
 | 5 | `build/modules/r338.js` | the profiles inside the app's Status panel (or its own menu) | after r331 |
 | 6 | `build/modules/r344.js` | Sign out (record 03) | after r197, r331 and r338 |
 | 7 | `build/modules/r341.js`, `r318.js` | Ask before each export; Settings, Security | after r197 |
+| 8 | `build/modules/r350.js`, with its part in `profiles_boot.js` | the practice studio: the app shown while no one is signed in, with sample work, and its guards (record 04, section 9) | after r331, r338 and r344 |
+| 9 | `build/modules/r351.js` | see the password as it is typed: a key in every password field (record 02, section 7) | anywhere after the fields' own parts; it finds every field, then and later |
 
 In Ingenium each module is a `<style>` block and a `<script>` block, marked as started and running (`window.__ingParts["p344"]`), so a test can see that a part loaded. Keep that habit.
 
@@ -56,7 +58,8 @@ Keep exactly as they are, since they are the security: PBKDF2-SHA-256 with at le
 4. Copy r331, then its place in the app's menu (r338's rows, or the app's own), then r344. Test with `rig/t_754_sign_out.js` (25 checks), changed to the app's names.
 5. Then r318's room and r341, if the app saves files out of itself.
 6. Make every part in the app's own look (record 07): the door, the keys, the rows, by day and by night, still with reduced motion.
-7. Show the owner pictures of the running app, one by one at full size, before it is released.
+7. If the app is to be shown while no one is signed in: the practice studio. Copy its part of `profiles_boot.js` (the practice id, the window's session mark, the three guards, `__ingProfiles.practice`), then r350 with the app's own sample work, invented and naming no one, and its own words. Test it with `rig/t_759_practice.js` (27 checks), changed to the app's names.
+8. Show the owner pictures of the running app, one by one at full size, before it is released.
 
 ## 6. What went wrong in Ingenium, so that it does not again
 
@@ -71,8 +74,21 @@ Keep exactly as they are, since they are the security: PBKDF2-SHA-256 with at le
 * **Two parts of the computer app took the same names** (7.49 to 7.57): the disk seal defined `_DISK`, `_disk_status` and `_disk_write`, names the drive's repositories already used, and being set later it won, so every drive repository failed until 7.57 renamed the seal's. Give each part's names its own prefix, and scan for any function defined twice.
 * **A build that renames words also renames them in quoted text**: Ingenium's build changes a page's old names to their new ones (Adamas's old name, for one) wherever they stand, and it changed one quoted label inside this record (7.55). Quote what the screen shows, and test the shipped page, not only the sources.
 * **Comments in a shipped page**: Ingenium's release build takes comments out; never put meaning in a comment that the code needs.
+* **A door anyone can open** (the practice studio, 7.61): whatever it can reach, anyone can. Before it shipped, three guards were put in the first script: what the device shares is read and never written, its shared databases are read-only, and the computer app refuses every call that would change the device. Decide such guards at the storage and bridge level, where every part passes, not part by part.
+* **A session's end is the window's** (7.61): a mode that must not outlive its visit is tied to sessionStorage, which a new window does not have; the next start ends it and takes it away. A second window still open in that mode notices (the `storage` event, and a check every three seconds) and leaves too.
+* **A name taken twice** (7.57): a patch added a part whose names were already used by another part of the computer app, and the later one won. Search for every name a patch adds before adding it.
 
-## 7. Notes for each of her apps
+## 7. What each of her apps already has (checked in the builds Ingenium carries, 20 November 2026)
+
+Read from the copies Ingenium carries in `source/build/apps/builtin/` (`cd.html.gz`, `lakay.html.gz`, `inkwell.html.gz`, `forge.html.gz`). Each app's own repository is the authority: check its newest sources before changing anything, since a later build may differ.
+
+* **Carpe Diem** (the carried build is 1091): it already has a sign-in of its own since its build 1086, "the sign-in, as Ingenium has it, in Carpe Diem's own look" (`cd-lock-1086-core` and `cd-lock-1086-door`). Its lock record is localStorage `cd_lock_v1`; its check string `carpe-diem-lock-check v1`; every value it keeps in the browser's store is sealed with AES-256-GCM under a data key that is itself sealed twice, under a key from the password and one from the recovery phrase (PBKDF2 with SHA-256); the phrase has ten words (`N_WORDS = 10`); a plain JavaScript AES-GCM (`cdGcm`) seals at once; its rooms share the window's keys through sessionStorage `cd_lock_s`; it has Lock now. Not found in it: Sign out as Ingenium has it, profiles, the recovery key file, the hint, the practice studio. So for Carpe Diem the work is to add what it lacks around its own lock, keeping `cd_lock_v1` and its data key as they are, never to put Ingenium's r197 beside it. Ingenium's Sign out seals the `carpe_` and `cd_` names when Carpe Diem is carried on the Desk (record 03), so its lock record is sealed there too and opened again at the sign-in.
+* **Lakay** (the carried build is 17): it already has its own sign-in for the store's books (IndexedDB `emporium`), a Master Key of 13 groups made when the store is set up, people with roles (the owner and staff with presets), Sign out, and its practice store, which Ingenium's practice studio follows: a second database (`emporium-practice`) with sample goods and sample sales that opens with no sign-in, its store key sealed by a key kept on that device only, offered on the door ("Open the practice store"), with Start the practice store again and Leave the practice store. So for Lakay the work is to bring its look and words into her family's rules (record 07), not to replace its books or its keys.
+* **Inkwell**: no sign-in and no sealing were found in its carried build (it keeps its work in localStorage and IndexedDB). It is the app that would take Ingenium's parts most directly: profiles_boot.js first, then r197, r331, r344 and r350, in the order of section 2, with Inkwell's own names (section 4).
+* **The Forge**: no sign-in was found in its carried build; the cryptography in it is PermitCore's (the owner key, wrapped with PBKDF2 and AES-256-GCM), shared with Ingenium (record 06, section 6). Its work would follow Inkwell's path.
+* For any app: the practice studio needs the app's stores renamed per profile first (profiles_boot.js), since its whole safety rests on its own `@practice` names and the three guards there.
+
+### What the earlier notes said, kept for reference
 
 These say only what is known from the sources in this repository; check each app's own sources before relying on them.
 

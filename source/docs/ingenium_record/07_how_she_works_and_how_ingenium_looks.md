@@ -1,6 +1,6 @@
 # Ingenium record 07 · How the owner likes to work, and how Ingenium looks
 
-Part of the record, written from Ingenium 7.54's sources (20 November 2026). The rules here are the owner's, for Ingenium and for every app she makes. Her own words are quoted where the code keeps them; each rule names the module that carries or measures it, so that it can be checked.
+Part of the record, written from Ingenium 7.54's sources and brought up to 7.61 (21 November 2026). The rules here are the owner's, for Ingenium and for every app she makes. Her own words are quoted where the code keeps them; each rule names the module that carries or measures it, so that it can be checked.
 
 ## 1. Her ways of working (`r327.js`, "Your ways of working", 7.41)
 
@@ -31,11 +31,12 @@ Each of these was given by the owner, often more than once. A new part keeps the
 4. **No long wide buttons.** A key is as wide as its words and its padding; it never stretches across a card.
 5. **No purple shading over a key under the pointer** (`r314.js`, her words: "I don't want any purple shading over the button when I hover over it"). A key under the pointer lifts and brightens; it is not tinted.
 6. **No film behind a panel or a popup** (`r334.js`, her words 19 November 2026: "Please remove the weird film that covers the background when a panel or popup is opened, I don't like how it looks."). The layer that catches a press outside a sheet stays, transparent; the sheet keeps its own look. The sign-in door and the welcome door's frosted glass are doors, not films.
-7. **Purple words that can be pressed are underlined** (`r343.js`, 7.53): a thin line in the word's own colour, three pixels below it (`text-decoration-thickness:1px; text-underline-offset:3px`), by day and by night. A word in violet that cannot be pressed is not violet at all: it is in ink (the Signed out line, record 03).
+7. **Purple words that can be pressed are underlined** (`r343.js`, 7.53): a thin line in the word's own colour, three pixels below it (`text-decoration-thickness:1px; text-underline-offset:3px`), by day and by night. From 7.56, every key drawn as bare purple words that the list does not name is given the class `.ing-ul` as it is drawn (the same line), and looked at again when the theme changes, so a key added later has its line too; keys with a face, the strips' choices and tabs, menus, chips and the left menu keep their own look. A word in violet that cannot be pressed is not violet at all: it is in ink (the Signed out line, record 03; the practice studio's line on the door).
 8. **Pages may grow.** No page is squeezed into one page and its tabs; a page may have pages of its own, more tabs and sections, wherever the work needs the room, "as long as it does not ruin the design and template of the app and can be done tastefully" (`r297.js`, "Pages may grow").
 9. **A night look is drawn for everything**, and a ring shows the keyboard's focus.
-10. **No gold.** The colours stay Ingenium's; a preview's rings are drawn in Ingenium's violet (`#6a3fb5`), never gold.
+10. **No gold.** The colours stay Ingenium's; a preview's rings are drawn in Ingenium's violet (`#6a3fb5`), never gold. A part that needs its own mark takes a colour of her family: the practice studio's is lilac (`--r350-dot`, `#a78bdb` by day, `#c4b0ee` by night), where Lakay's practice store used amber.
 11. **Offline and in-house.** Nothing is fetched from outside unless she allows it; Fabrica's Checks name every address outside an app that its pages would load or call (`r330.js`).
+12. **A password can always be seen as it is typed** (`r351.js`, 7.61, as in Lakay, part of AuDHD support): every password field carries a key at its right edge that shows and hides what is typed, without taking the focus away.
 
 `r330.js` measures, in Fabrica, the rules that can be measured, from an app's own styles: keys and cards that answer the pointer, no scroll bar in view, no long wide buttons, no purple shade under the pointer, a night look drawn, still when motion is reduced, a ring for the keyboard. The others (refined, understated) stay for her eye.
 
@@ -95,6 +96,8 @@ The newer parts (profiles, Sign out, the ways of working) use the same recipe th
 * **Tiles and coins** (a profile's): soft pastel by day, deeper by night, raised, turning a little under the pointer (`rotate(-6deg) scale(1.06)`), with a small spring when pressed.
 * **Motion**: springs, never linear (`--spring:cubic-bezier(.34,1.3,.64,1)`, `--p3-spring:cubic-bezier(.2,.9,.25,1.2)`, `--p3-bounce:cubic-bezier(.34,1.35,.64,1)`); a part rising in takes about a third to half a second. `body[data-motion="minimal"]` and `@media (prefers-reduced-motion:reduce)` take every animation and transition away.
 * **Sounds**: Ingenium's own analogue sounds play on its keys (`r176.js`, `IngSound.play(name)`, for example "confirm"); they follow the sound settings.
+* **A strip at the head of a page** (the practice studio's on Home, `.r350-strip`): a raised card, never a banner across the window: its face the card's (`--p3-card`), an edge of colour on its left drawn as a shadow (`inset 4px 0 0`), the card's shadows, a round tile, a title in the serif, one sentence, and its keys at the right; it rises 2 pixels under the pointer.
+* **A key in the top bar**: of the bar's own kind (`.cl-key`), a dot and a word, beside the keys already there (the practice studio's `#r350Pill` stands before the status key).
 
 ## 7. Words
 
@@ -110,3 +113,16 @@ The newer parts (profiles, Sign out, the ways of working) use the same recipe th
 * Predictable places: a part is reached where it belongs (Sign out beside Lock now, and after Lock Ingenium in the Status panel), and the same row does the same thing wherever it appears.
 * Nothing moves unless asked: Minimal motion and reduced motion make everything still; nothing flashes (record 03, section 5: the sign-in card never shows for a moment before the profiles).
 * Every key has a name for screen readers (`aria-label`, `title`), dialogs are marked (`role="dialog"`, `aria-modal`), and the keyboard's focus always shows.
+
+## 9. Pages and sections (how a new one is put together)
+
+What every page of Ingenium shares, as the code draws it; a new page or section starts from these, in her family's colours, by day and by night.
+
+* **The top bar**: the seal and the name at the left; at the right a row of keys of one kind (`.cl-key`): the status, the engine, the model, the clock, Display, About, Help. A mark that must stay in view (the practice studio's) joins that row as a key of the same kind, never as a banner.
+* **The left menu**: the pages in groups under small capitals (Studio, Make, Learn); the page in use marked by a violet rule at its left. No profile key and no film over it.
+* **A page's head**: a raised card (the hero) with the day's date in Latin above a serif title, one or two sentences below, and the page's own instrument (Home's orrery, Ingenia's drawer, the turret on Models); keys under the title, the main one violet. The head never moves the page under the pointer.
+* **Sections**: raised cards with a serif heading; long pages fold into rooms, drawers and divider tabs that open one at a time, so no page asks for long scrolling (her rule, 7.10).
+* **Panels and menus**: one card that opens from its key, rows of the panel's own kind (`.pres-row`: a dot or a tile, a name, a quiet line under it), a head in small capitals (`.pres-head`), a rule between groups (`.pres-rule`). A row added later copies its neighbours' class.
+* **Settings**: one console of rooms; each room a card whose keys are the room's own (`.sc-key`, its shadows in `--sc-ck` and `--sc-ckhi`), with chips that say the true state (On, Off, Not yet).
+* **Doors**: one raised card centred on the window (the welcome door's `.intro-card`, the sign-in's `.ild-card`, Who is using Ingenium's `.r331-door`); small pills in its top corners (the theme at the right; the little lock, or the practice studio's mark, at the left); its keys never move under the pointer on the sign-in door, and lift elsewhere.
+* **Questions**: Ingenium's own (`ingAsk`), a card with a serif title, one or two sentences, and two keys: what it will do, and a way out.

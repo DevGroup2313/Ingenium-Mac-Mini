@@ -1,6 +1,6 @@
 # Ingenium record 05 · Where every piece of data lives
 
-Part of the record of Ingenium's security system, written from Ingenium 7.54's sources (20 November 2026). The labels in quotation marks are the ones the Storage page shows (`build/modules/r142.js`, `LABELS`). "Per profile" means the store is renamed with `@<profile id>` in every profile but the owner's (record 04, section 3); "shared" means the device keeps one copy for every profile. "Sealed" means sealed under the data key while the sign-in is on (record 02).
+Part of the record of Ingenium's security system, written from Ingenium 7.54's sources and brought up to 7.61 (21 November 2026). The labels in quotation marks are the ones the Storage page shows (`build/modules/r142.js`, `LABELS`). "Per profile" means the store is renamed with `@<profile id>` in every profile but the owner's (record 04, section 3); "shared" means the device keeps one copy for every profile. "Sealed" means sealed under the data key while the sign-in is on (record 02).
 
 ## 1. The browser's small store (localStorage)
 
@@ -9,7 +9,8 @@ Part of the record of Ingenium's security system, written from Ingenium 7.54's s
 | `ingenium_v4` | the desk: the whole state (chats, notes, settings, projects and folders, Lector, Vocatio, Vesta, Concordia) | per profile | yes, as the sealed desk with its clear header (record 02, section 4) |
 | `ingenium_v4.snap0`, `.snap1`, `.snap2` | the recovery shelf: three earlier copies of the desk, taken at most every 45 seconds, for desks under 1 MB (`SNAPRING`, `ingNoteSnapshot`) | per profile | yes |
 | `ingenium_lock` | the lock record (record 02, section 2.3); opens nothing without the password or a way back in | per profile (each profile's sign-in is its own) | not needed: it holds only wrapped keys |
-| `ingenium_profiles` | the list of profiles, which one is in use, and the signed out mark (record 04) | shared | no; it names profiles, it holds none of their data |
+| `ingenium_profiles` | the list of profiles, which one is in use, and the signed out mark (record 04); while the practice studio is open, the door it was entered from (`back`, `backOut`) and its housekeeping (`practiceFresh`, `practiceDrop`, `practiceDropApp`) | shared | no; it names profiles, it holds none of their data |
+| `<name>@practice` | the practice studio's own copy of every store it uses (record 04, section 9) | its own | no: it holds only sample work and what a visitor tries, and all of it is taken away when it is left or its window closes |
 | `ingenium_models_shared` | the models' record, so every profile lists the same models | shared | no |
 | `ing.security.v1`, `ing.security.fails.v1`, `ing.security.asked.v1` | the device's security settings (More protection's switches), the count of wrong passwords, whether the first-start question was asked | shared | no |
 | `ing.gpu.diamond`, `ing.diamond.trying` | the graphics measure | shared | no |
@@ -17,7 +18,7 @@ Part of the record of Ingenium's security system, written from Ingenium 7.54's s
 | `ing_carried_sealed:<key>` | a carried document that could not be opened at a sign-in, kept aside, never lost | per profile | stays as it was |
 | `ingenium_lock.sealed-<time>`, `ingenium_v4.sealed-<time>` | a sealed desk and its record set aside by "Start with an empty desk" (never destroyed) | per profile | already sealed |
 
-sessionStorage holds marks for the length of a session, renamed per profile as localStorage is (for example `ing.profile.entered`, set when a profile is switched).
+sessionStorage holds marks for the length of a session, renamed per profile as localStorage is (for example `ing.profile.entered`, set when a profile is switched; `ing.practice.session`, kept as `ing.practice.session@practice`, the mark that the practice studio belongs to this window's session).
 
 ## 2. The browser's larger store (IndexedDB)
 
@@ -51,6 +52,8 @@ The folder search keeps its index in the browser's private file system (OPFS, th
 * Sealed with the disk key while the owner is signed in (record 06, section 3): the apps waiting for her devices and Fabrica's runs, their logs and files (7.49); the records of waiting apps under names that say nothing, a run's record once it ends, and texts for training (7.50).
 * From 7.58: her signatures of Ingenium's releases (`<the app's folder>/signatures/*.ingsig`, no secret: a signature proves, it opens nothing), and the last ten refusals of a changed copy, for Settings, Security.
 * Not sealed: models on the disk, the engine, and a run's working files while the run is still running (sealed when it ends).
+* The practice studio's files: a profile folder of its own (`practice`, through `profile_use`), dropped when it is left (`profile_drop`).
+* Her signatures of Ingenium's releases (7.58): `<the app's folder>/signatures/*.ingsig`, beside its storage; nothing secret is in them (record 06, section 9).
 
 ## 4. What leaves the device
 
