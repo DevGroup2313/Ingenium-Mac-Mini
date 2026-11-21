@@ -1,9 +1,9 @@
 {
- "made": "2026-11-21T15:01Z",
- "from": "cc3b371",
+ "made": "2026-11-21T17:50Z",
+ "from": "b2e922f",
  "file": "win-shell.exe",
  "bytes": 952320,
- "sha256": "b2a50b7447e90578a642d988e7a200ef7d7e47ccd6b8bd5035f4dd9a75430238",
+ "sha256": "97b7894bfdb48a220374880652d2b7ec965529dcddd1d3022c7c734a11653fe2",
  "arch": "x64",
  "min_windows": "10",
  "webview2_sdk": "Microsoft.Web.WebView2 1.0.2210.55 (NuGet), sha256 c0945ddfe38272f10f24673a1cb07b54b018f614eec85d3e830628369039ad3d",
