@@ -417,8 +417,10 @@ commit and push it everywhere and continue working on my requests."
 - The other editions: no switch and nothing made for its owner alone; the room says that the owner's own copy of Ingenium makes such an app.
 - The shells: what the door needs from each device's app (Web Crypto in a secure context, and a page that stops where its first script
   stops it) is checked on GitHub's machines (shells/test/door_check.html, in build-shells.yml, run 44931986250). On Apple silicon and
-  Intel Macs (carpe-app://desk, a secure context), on Windows (https://desk.app.test) and on the Android 9 and 11 emulators, Web Crypto was
-  there and nothing after the stop ran. Android 14's emulator stopped answering at The Forge's 13 MB page before it reached the check, as
+  Intel Macs and the iPhone simulator (carpe-app://desk, a secure context), on Windows (https://desk.app.test) and on the Android 9 and 11
+  emulators, Web Crypto was there and nothing after the stop ran. On the iPhone simulator the first app opened after it starts took
+  about three and a half minutes, longer than its check's first case waited (three minutes): that case now waits up to six, as the step
+  before it does (shells/test/ci_ios.sh). Android 14's emulator stopped answering at The Forge's 13 MB page before it reached the check, as
   it has done since 6.1. Two faults in the check itself, found on its first run and fixed: the Mac and iPhone shells report a page when it
   finishes loading, and a stopped page never finishes, so the check page reports itself through their log; and the Windows case named its
   files through $T, which holds a time at that point of the script.

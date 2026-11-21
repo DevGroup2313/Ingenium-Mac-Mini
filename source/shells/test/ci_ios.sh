@@ -21,7 +21,9 @@ one() {   # $1 ipa, $2 bundle id, $3 what, $4 title wanted (a pattern), $5 pictu
   APP=$(ls -d "$W"/x/Payload/*.app | head -1)
   if ! xcrun simctl install "$UDID" "$APP"; then say "FAIL $3: it did not install"; fail=1; return; fi
   LOG="$W/$2.log"; xcrun simctl launch --console-pty "$UDID" "$2" -shell_pagetest > "$LOG" 2>&1 & LP=$!
-  for i in $(seq 1 60); do grep -q "SHELL_PAGETEST PAGE" "$LOG" 2>/dev/null && break; sleep 3; done
+  # 7.63: up to six minutes, as the step before allows: the first app opened after the simulator starts took about three and a half
+  # minutes on GitHub's Mac (21 November 2026), and three minutes was not enough twice running
+  for i in $(seq 1 120); do grep -q "SHELL_PAGETEST PAGE" "$LOG" 2>/dev/null && break; sleep 3; done
   kill "$LP" > /dev/null 2>&1
   L=$(grep "SHELL_PAGETEST PAGE" "$LOG" | tail -1); R="${L#*SHELL_PAGETEST PAGE }"
   xcrun simctl io "$UDID" screenshot "$OUT/$5" > /dev/null 2>&1
