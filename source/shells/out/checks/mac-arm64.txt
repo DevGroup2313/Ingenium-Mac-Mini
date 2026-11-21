@@ -1,16 +1,18 @@
 Mac (arm64): macOS 15.8.2, arm64
-{"out":"/Users/runner/work/_temp/mactest-arm64/test.zip","size":219597,"sha256":"484e612239e5ac4bb12171e5b4c460b4739907a2ed8a5ecb8446f400ac932cea","id":"com.yannieforest.shelltest.mac","folder":"Shell Test.app","exe":"ShellTest","signatures":2,"ms":73}
-{"out":"/Users/runner/work/_temp/mactest-arm64/forge.zip","size":5342915,"sha256":"67b5aa7d5728b2f55a04c50a4eccc7a8036d7633561c1316daaad39cdcb56c46","id":"com.yannieforest.theforge.mactest","folder":"The Forge.app","exe":"TheForge","signatures":2,"ms":614}
+{"out":"/Users/runner/work/_temp/mactest-arm64/test.zip","size":287120,"sha256":"e3e9e2c813a0e03a32cd6d59255edba0756d135bf9b3d83e90652ad48b4e2440","id":"com.yannieforest.shelltest.mac","folder":"Shell Test.app","exe":"ShellTest","signatures":2,"ms":97}
+{"out":"/Users/runner/work/_temp/mactest-arm64/forge.zip","size":5410442,"sha256":"2d9fa9153067afa348b145aad6ef9f3b8f94d60dfa216db2d5a686ac053feb26","id":"com.yannieforest.theforge.mactest","folder":"The Forge.app","exe":"TheForge","signatures":2,"ms":592}
      Shell Test.app: com.yannieforest.shelltest.mac, program ShellTest (x86_64 arm64), how to open: 1 file
 PASS a test page in the Mac app Fabrica made: codesign --verify --deep --strict accepts the seal Fabrica wrote (/Users/runner/work/_temp/mactest-arm64/x-mac-arm64-test.png/Shell Test.app: satisfies its Designated Requirement)
      Gatekeeper's own word (an app from outside the App Store, opened once with Open): /Users/runner/work/_temp/mactest-arm64/x-mac-arm64-test.png/Shell Test.app: rejected 
 PASS a test page in the Mac app Fabrica made, first start: its page, its storage and IndexedDB, the file saver: {"title":"Shell Test run 1","text":47,"errors":0,"first":[],"bridge":true,"clipHandler":true,"storage":true,"kept":null,"idb":true,"origin":"carpe-app://desk","href":"carpe-app://desk/test_page.html"}
 PASS a test page in the Mac app Fabrica made: the clipboard, written and read back
 PASS a test page in the Mac app Fabrica made: the page saved a file, and it holds what the page gave
-PASS a test page in the Mac app Fabrica made, second start (opened as the Finder opens it): what the first start kept is there: {"title":"Shell Test run 2","text":48,"errors":0,"first":[],"bridge":true,"clipHandler":true,"storage":true,"kept":"1794396890554","idb":true,"origin":"carpe-app://desk","href":"carpe-app://desk/test_page.html"}
+PASS a test page in the Mac app Fabrica made, second start (opened as the Finder opens it): what the first start kept is there: {"title":"Shell Test run 2","text":48,"errors":0,"first":[],"bridge":true,"clipHandler":true,"storage":true,"kept":"1795272526079","idb":true,"origin":"carpe-app://desk","href":"carpe-app://desk/test_page.html"}
      The Forge.app: com.yannieforest.theforge.mactest, program TheForge (x86_64 arm64), how to open: 1 file
 PASS The Forge (13 MB page) in the Mac app Fabrica made: codesign --verify --deep --strict accepts the seal Fabrica wrote (/Users/runner/work/_temp/mactest-arm64/x-mac-arm64-forge.png/The Forge.app: satisfies its Designated Requirement)
      Gatekeeper's own word (an app from outside the App Store, opened once with Open): /Users/runner/work/_temp/mactest-arm64/x-mac-arm64-forge.png/The Forge.app: rejected 
 PASS The Forge (13 MB page) in the Mac app Fabrica made, first start: its page, its storage and IndexedDB, the file saver: {"title":"The Forge","text":6191,"errors":0,"first":[],"bridge":true,"clipHandler":true,"storage":true,"kept":null,"idb":true,"origin":"carpe-app://desk","href":"carpe-app://desk/the_forge.html"}
 PASS The Forge (13 MB page) in the Mac app Fabrica made: the clipboard, written and read back
 PASS The Forge (13 MB page) in the Mac app Fabrica made: the page saved a file, and it holds what the page gave
+{"out":"/Users/runner/work/_temp/mactest-arm64/refused.zip","size":287237,"sha256":"cf6c55afe4eef6b828416ecb133f48f909f9354ca103acf2f16c7522752e3714","id":"com.yannieforest.tidecheck.mac","folder":"Tide Check.app","exe":"TideCheck","signatures":2,"ms":150}
+PASS a page signed with a key the shell does not carry: refused before it ran, the shell's own page in its place: {"file":"signed_test.html","why":"is signed with a key this app does not know","check":"ING-SHELL-CHECK-1 CdbXeLQDHJ63NSC4cT0xnK,iej1hHjzk8YQm5BBv-52cR"}
