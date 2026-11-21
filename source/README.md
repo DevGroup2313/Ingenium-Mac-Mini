@@ -418,6 +418,12 @@ Ingenium 7.61 (21 November 2026): the practice studio; see the password as it is
   caret stays at the end. In Ingenium's look: an eye in the field's quiet ink, no purple shading, never moving on the sign-in's door.
   While shown: marked secret (r318's Clear a copied secret still applies), never spell-checked, a password field again the moment its
   form is sent.
+- Found by the practice studio's test on the gift edition, both older than this release: Sign out did nothing on a copy whose list of
+  profiles had never been written (a full or gift copy with one profile; the master writes it at once with the owner's name): r344's
+  reg() now starts one as r331 does, so the mark is kept and the copy is sealed and signed out. And in the full, gift and demo editions,
+  after Lock now or Sign out, the Terms sheet (r326) waited behind the sign-in door and asked again once the desk opened: need() asks
+  nothing while the desk is sealed. In those editions the databases' names carry the edition's prefix ("ing-gift:"), which the practice
+  studio's read-only guard now sets aside to know the shared ones.
 - The record of Ingenium's security, profiles and design (`docs/ingenium_record`, r345, the master's alone) brought up to 7.61: 7.56's
   underline rule, 7.57's disk seal names, 7.58's Ingenium itself signed and checked, the practice studio and its guards, the password
   key, what Carpe Diem (its own sign-in since its build 1086), Lakay (its own sign-in and practice store), Inkwell and The Forge (none)

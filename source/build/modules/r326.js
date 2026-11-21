@@ -73,7 +73,9 @@ function T(){return W.IngTerms||null;}
 function mine(){try{return !!(T()&&T().mine());}catch(e){return true;}}
 function rec(){try{var t=W.state&&state.terms;return t&&t.agreed||null;}catch(e){return null;}}
 function agreed(){var r=rec(),t=T();return !!(r&&t&&r.v===t.version);}
-function need(){return !!(W.state&&T()&&!mine()&&!agreed());}
+/* 7.61: nothing is asked while the desk is sealed (its record of the agreement is sealed with it): before, the sheet waited behind the
+   sign-in door and asked again once the desk had opened, agreed or not */
+function need(){return !!(W.state&&T()&&!mine()&&!W.__ingLocked&&!agreed());}
 function door(){var d=D.getElementById("introDoor");return !!(d&&!d.hidden&&d.offsetParent!==null);}
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function mk(t,c,x){var e=D.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}

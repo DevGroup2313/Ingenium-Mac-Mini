@@ -49,6 +49,8 @@ const STUB = () => { let cur = '';
     await new Promise((res) => { const rq = indexedDB.open('ingenium_files'); rq.onsuccess = () => { const db = rq.result; if (!db.objectStoreNames.contains('files')) { db.close(); res(); return; } const t = db.transaction('files', 'readwrite'); t.objectStore('files').put('PVFILEBYTES', 'pvmark'); t.oncomplete = () => { db.close(); res(); }; }; }); });
   // her sign-in, as she would turn it on, and a conversation of hers
   await p.evaluate(() => { localStorage.removeItem('ingenium_intro_seen'); }); await p.reload(); await ready();
+  // the full, gift and demo editions ask a new copy's owner to agree to the Terms first (r326): agreed, as she would
+  if (await p.evaluate(() => !!document.querySelector('.tg-veil'))) { await terms(); await p.waitForTimeout(600); }
   await p.click('#introProtect'); await p.waitForSelector('#ingLockDoor #ildUser', { timeout: 10000 });
   await p.fill('#ildUser', NAME); await p.fill('#ildP1', PW); await p.fill('#ildP2', PW); await p.click('#ingLockDoor form button[type=submit]');
   await p.waitForSelector('#ingLockDoor .ild-words', { timeout: 15000 });
@@ -65,6 +67,7 @@ const STUB = () => { let cur = '';
   await p.waitForSelector('#profDoor:not([hidden]) .r350-door #r350Open', { timeout: 120000 }).catch(() => {}); await p.waitForTimeout(600);
   const d1 = await p.evaluate(() => { const w = document.querySelector('#profDoor .r350-door'), l = w && w.querySelector('p'), k = document.getElementById('r350Open');
     return { has: !!(w && k), line: l ? l.textContent : '', ink: l ? getComputedStyle(l).color : '', key: k ? k.className : '', text: k ? k.textContent.trim() : '', out: !!document.querySelector('#profDoor .r344-door-out') }; });
+  ok(await p.evaluate(() => !document.querySelector('.tg-veil')), 'signed out, no Terms sheet waits behind the door (the agreement is sealed with the desk)');
   ok(d1.has && d1.out && /Showing Ingenium to someone\?/.test(d1.line) && !/106, 63, 181/.test(d1.ink) && /\br331-k\b/.test(d1.key) && d1.text === 'Open the practice studio', 'signed out, Who is using Ingenium offers it: a line in ink and the door\'s own key', d1);
   // the sign-in's card, her own profile chosen
   await p.evaluate(() => { const c = document.querySelector('#profDoor [data-door="owner"]'); if (c) c.click(); }); await p.waitForTimeout(1500);

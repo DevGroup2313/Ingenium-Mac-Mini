@@ -58,10 +58,11 @@ var F=IDB&&Object.getPrototypeOf(IDB),oP=F&&F.open,dP=F&&F.deleteDatabase,bP=F&&
 if(F&&oP){
   F.open=function(n,v){return arguments.length>1&&v!==undefined?oP.call(this,mapD(n),v):oP.call(this,mapD(n));};
   F.deleteDatabase=function(n){return dP.call(this,PR&&SHARED_DB.test(String(n))?String(n)+SUF:mapD(n));};   /* R350: never the device's own */
-  /* R350: in the practice studio the device's shared databases are read and never written: the models' files and the engine, the
+  /* R350: in the practice studio the device's shared databases are read and never written (by their names as the page gives them; the
+     full, gift and demo editions keep theirs under their own prefix, "ing-gift:", which is set aside to know them): the models' files and the engine, the
      device's pairing, the training lab's models (a write there fails as a read-only store refuses it, and its part says so) */
   var DBP=W.IDBDatabase&&W.IDBDatabase.prototype,oT=DBP&&DBP.transaction;
-  if(PR&&oT)DBP.transaction=function(st,mode){if(mode&&mode!=="readonly"&&SHARED_DB.test(String(this.name||""))){var a=[].slice.call(arguments);a[1]="readonly";return oT.apply(this,a);}return oT.apply(this,arguments);};
+  if(PR&&oT)DBP.transaction=function(st,mode){if(mode&&mode!=="readonly"&&SHARED_DB.test(String(this.name||"").replace(/^ing-[a-z]+:/,""))){var a=[].slice.call(arguments);a[1]="readonly";return oT.apply(this,a);}return oT.apply(this,arguments);};
   if(typeof bP==="function")F.databases=function(){return bP.call(this).then(function(L){return (L||[]).filter(function(d){var n=String(d.name||"");
       return SUF?(n.slice(-SUF.length)===SUF||SHARED_DB.test(n)):!OTHER.test(n);}).map(function(d){var n=String(d.name||"");
       return {name:SUF&&n.slice(-SUF.length)===SUF?n.slice(0,-SUF.length):n,version:d.version};});});};}

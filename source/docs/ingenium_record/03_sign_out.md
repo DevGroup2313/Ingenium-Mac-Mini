@@ -18,7 +18,7 @@ Approved on eight pictures of the running app, one by one at full size (`source/
 ## 3. What it does (`go()`)
 
 1. Without a sign-in nothing can be sealed, so it says so, and never pretends: a question (Ingenium's own `ingAsk`) titled "Sign out needs your sign-in": "Signing out seals everything of yours with your password, so that nothing can be read until you sign in again. Your sign-in is off, so nothing can be sealed yet. Turn it on first: a name and a password, and ten recovery words." Keys: Turn on my sign-in (opens `IngLock.setup`), Not now (nothing changes).
-2. With a sign-in: the profiles' list (localStorage `ingenium_profiles`, shared by the device) is marked signed out (`out` set to the time). If the browser's store refuses, nothing happens and a note says so.
+2. With a sign-in: the profiles' list (localStorage `ingenium_profiles`, shared by the device) is marked signed out (`out` set to the time). If the browser's store refuses, nothing happens and a note says so. From 7.61, a copy whose list was never written (a full or gift copy with one profile; the master writes it at once, with the owner's name) starts one here, as r331 does: before, Sign out did nothing on such a copy and said the store had refused.
 3. `IngLock.lockNow("signout")`: the lock saves, calls `window.__ingBeforeLock`, drops the keys, shows "Signed out. Everything of yours is sealed until you sign in again." and starts the page again (record 02, section 6.4). If the lock does not go on, the mark is taken off again.
 
 ## 4. What is sealed, newly, by Sign out and by every lock
@@ -46,6 +46,10 @@ At the sign-in (`window.__ingAfterOpen`, called by r197 after the desk is opened
 * `window.__ingAfterOpen()`: opens them again, then clears the signed out mark.
 * `window.IngSignOut`: `go()`, `signedOut()`, `_seal()`, `_open()` (the last two for tests).
 * The window event `ing-keys` with `held` true clears the signed out mark.
+
+## 6b. The Terms while sealed (7.61)
+
+In the full, gift and demo editions a new copy is asked to agree to the Terms (r326). Its agreement is kept in the desk, so it is sealed with it: while the desk is sealed (`__ingLocked`), nothing is asked. Before 7.61 the sheet opened behind the sign-in door after Lock now or Sign out, and asked again once the desk had opened.
 
 ## 7. Two lessons from its preview, kept for every later one
 

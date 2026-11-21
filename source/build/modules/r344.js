@@ -46,7 +46,9 @@ function active(){try{return !!(L()&&L().active());}catch(e){return false;}}
 function held(){try{return !!(L()&&L().active()&&!L().locked());}catch(e){return false;}}
 function mine(){return !W.__ingGuest;}
 function X(){return W.__ingProfiles||null;}
-function reg(){try{var r=X()&&X().reg();return r&&typeof r==="object"?r:null;}catch(e){return null;}}
+/* 7.61: a copy whose list of profiles was never written (a full or gift copy with one profile: the master writes it at once, with the
+   owner's name) starts one here, as r331 does, so Sign out can mark it; before, Sign out did nothing there and said the store refused */
+function reg(){try{var x=X();if(!x)return null;var r=x.reg();return r&&typeof r==="object"?r:{v:1,cur:"owner",list:[]};}catch(e){return null;}}
 function setOut(v){var x=X(),r=reg();if(!x||!r)return false;if(v)r.out=Date.now();else delete r.out;return x.save(r);}
 function signedOut(){var r=reg();return !!(r&&r.out);}
 
