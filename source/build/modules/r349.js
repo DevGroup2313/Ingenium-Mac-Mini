@@ -173,14 +173,18 @@ function signPage(html,ctx){var head=html.slice(0,1<<20);
     .then(function(file){var c=b64u(TE.encode(JSON.stringify(file)));return {html:html.replace(SIGTAG,function(){return '<meta name="ingenium-signature" content="'+c+'">';}),file:file};});}
 /* her choice for an app (Package details): on unless she turned it off */
 function prefsOf(id){try{var f=W.fbHubHost&&fbHubHost.FBS?fbHubHost.FBS():null;return f&&f.ship&&f.ship[id]?f.ship[id]:{};}catch(e){return {};}}
-function wanted(id){return master()&&prefsOf(id).sign!==false;}
+function wanted(id){var p=prefsOf(id);return master()&&(p.sign!==false||p.ownerOnly===true);}
 function mark(id,commit,target,file){if(!target||!W.IngRepo||typeof IngRepo.setNote!=="function")return Promise.resolve();
   return IngRepo.setNote(id,commit,"ownerSigned_"+target,{at:Date.now(),kid:file.kid,made:file.release.made}).catch(function(){});}
 /* the page every package carries */
 var o1=IngShip.onePage;
 IngShip.onePage=function(id,opt){opt=opt||{};return o1.apply(IngShip,arguments).then(function(x){if(!wanted(id)||opt.unsigned)return x;
   return IngRepo.info(id).then(function(info){var name=(x.recipe&&x.recipe.name)||info.name||"this app",ver=String(IngShip._.numberOf(x.html,x.recipe||{})||(x.commit||"").slice(0,7)||"1.0");
-    return session(name).then(function(s){if(!s)return x;return signPage(x.html,{s:s,app:info.slug||"",name:name,version:ver}).then(function(sp){
+    /* 7.63 (modules/r354.js): an app for its owner alone carries its door, written in before the page is signed, and is never made unsigned */
+    var own=W.IngOwnerOnly&&IngOwnerOnly.wanted(id);
+    return session(name).then(function(s){if(!s){if(own)throw new Error("Nothing was made: "+name+" opens only with your owner key, and it can only be made signed, with your owner key on this device.");return x;}
+      var page=own?IngOwnerOnly.door(x.html,{app:info.slug||"",name:name}):x.html;
+      return signPage(page,{s:s,app:info.slug||"",name:name,version:ver}).then(function(sp){
       x.html=sp.html;x.bytes=TE.encode(sp.html);x.signed=sp.file;return mark(id,x.commit,opt.target,sp.file).then(function(){return x;});});});});});};
 /* the web app, however it was made (r111's own, r178's from the app's templates or Ingenium's family of designs, with r330's additions):
    the finished zip is read, every file in it listed and signed together (signature.ingsig, beside them), and a check put at the head of

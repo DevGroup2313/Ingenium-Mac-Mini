@@ -1304,9 +1304,10 @@ function sheetPackage(r){var P=pkgOf(r),pref=shipPrefs(r),sh=sheet("Package deta
       return IngApk.keys.save(id,pw).then(function(u8){return saveBytes((id==="device"?"ingenium-device":"ingenium-"+id)+"-signing.p12","application/x-pkcs12",u8);}).then(function(){toast("Saved. keytool and the online builds open it with the password you chose.");});},"");}));
   sh.box.appendChild(kr);
   var signRow=window.IngAppSign&&IngAppSign.packageRow?IngAppSign.packageRow(sh.box,r,pref):null;  /* 7.60 (modules/r349.js) */
+  var ownRow=window.IngOwnerOnly&&IngOwnerOnly.packageRow?IngOwnerOnly.packageRow(sh.box,r,pref,signRow):null;  /* 7.63 (modules/r354.js) */
   var end=h("div","end");
   end.appendChild(btn("pri","Keep these",function(){var id=fI.value.trim();if(!IngApk.cleanId(id)){fI.focus();toast("“"+id+"” cannot be an id: letters, digits and dots, such as com.yannieforest.myapp.");return;}
-    pref.title=fT.value.trim()||r.name;pref.id=id;pref.version=fV.value.trim();pref.alias=fA.value.trim();pref.keyId=ks.value||"device";if(signRow)pref.sign=signRow.on();saveSoon();sh.close();paintShip();toast("Kept. The next APK and IPA carry them.");}));
+    pref.title=fT.value.trim()||r.name;pref.id=id;pref.version=fV.value.trim();pref.alias=fA.value.trim();pref.keyId=ks.value||"device";if(signRow)pref.sign=signRow.on();if(ownRow){pref.ownerOnly=ownRow.on();if(pref.ownerOnly)pref.sign=true;}saveSoon();sh.close();paintShip();toast("Kept. The next APK and IPA carry them.");}));
   sh.box.appendChild(end);}
 /* the app's files, written here: any text file, saved as a change to keep (The Forge's file editor, in Ingenium) */
 var BIN=/\.(png|jpe?g|gif|webp|ico|woff2?|ttf|otf|pdf|zip|gz|wasm|mp3|mp4|m4a|ogg|wav|webm|avif|jks|keystore|p12|apk|ipa)$/i;
