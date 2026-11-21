@@ -422,6 +422,7 @@ folder search; her choice between the ways (21 November 2026): "One index per pr
 - rig: `t_759_rag_seal.js` (the store: the move, each profile's own, the seal read raw, no key, another key, a changed byte, opened and
   sealed again in place, a sealed shared index left alone, a removed profile's index) and `t_759_rag_page.js` (the page, with the folder
   bridge standing in: plain, sealed when the sign-in is turned on, after Lock now, opened again when it is turned off, and the room).
+  `t_750_disk_page.js` brought up to the room's 7.59 words: the index is no longer named among what is still to come.
 
 Ingenium 7.58 (20 November 2026): Ingenium itself, signed and checked, part one, in the Mac and Windows apps.
 The Security room's promise (modules/r318.js, approved on the live preview of 18 November 2026): "each release signed with your owner
