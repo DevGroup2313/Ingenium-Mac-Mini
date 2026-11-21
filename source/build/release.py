@@ -270,9 +270,10 @@ RAG_FILES = ("main.js", "folders.js", "indexer.js", "parse.worker.js", "chunker.
              "store.js", "store.worker.js", "retriever.js", "ftsquery.js", "prompt.js", "scheduler.js", "scheduler.worker.js",
              "reranker.js", "reranker.worker.js", "vendor.json",
              "seal.js")   # 7.59: the index sealed with each profile's key
-# 6.63: the zip the workflow rag-vendor.yml made from 6.62's vendor.json (8 November 2026, 17:48 UTC): the same 22 files as before
-# (ecd2f34b...) and the reranker's six, each identical to its pinned SHA-256 (compared file by file); only VENDOR.txt differs
-RAG_VENDOR_SHA256 = "57db28f7820b1109cf5d75232f61a21fdbf9e5b7b17539148db71e3d2edaa351"   # rag-vendor.zip, release rag-vendor
+# 7.59: the zip the workflow rag-vendor.yml made from 7.59's vendor.json (21 November 2026, 03:28 UTC, run 44861236709): the same
+# 28 files as 6.63's (57db28f7...), compared file by file, and @noble/ciphers 2.4.0's five in noble/ (each identical to the files
+# fetch_vendor.py took from the registry's tarball after its sha512 check); only VENDOR.txt differs otherwise
+RAG_VENDOR_SHA256 = "2210500fdf5f60f47f6e0bceba1e4acda1a8e7c2d08a44d2ce70d0c9a01c0055"   # rag-vendor.zip, release rag-vendor
 
 
 def ship_rag():
