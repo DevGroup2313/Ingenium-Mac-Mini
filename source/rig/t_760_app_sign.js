@@ -49,7 +49,8 @@ const serve = (dir, port) => new Promise((res) => { const s = http.createServer(
     await p.evaluate(() => IngSecurity.view('code')); await sleep(900);
     const room = await p.evaluate(() => { const w = [...document.querySelectorAll('#secCard .sc-well')].find((x) => /Signed with your key/.test(x.textContent)); const it = IngSecurity.items().filter((x) => x.t === 'Your apps signed when shipped')[0];
       return { t: w ? w.innerText.replace(/\s+/g, ' ') : '', s: it && it.s }; });
-    ok(room.s === 'on' && /On: every package Fabrica makes carries your owner key's signature/.test(room.t) && /Not yet: the Mac, Windows, Android and iPhone apps check/.test(room.t), 'the Security room: Your apps signed when shipped, on, with what is not yet', room);
+    // 7.62 (part two, r352 and the shells) made the room's "Not yet" true: every app Fabrica makes now checks its signature at each start
+    ok(room.s === 'on' && /On: every package Fabrica makes carries your owner key's signature/.test(room.t) && /every app it makes checks that signature each time it starts/.test(room.t) && !/Not yet: the Mac, Windows, Android and iPhone apps check/.test(room.t), 'the Security room: Your apps signed when shipped, on, and (since 7.62) every app checks it at each start', room);
     await p.evaluate(() => go('fabrica')); await sleep(1200);
     const b64 = fs.readFileSync(path.join(OUT, 'tide.bundle')).toString('base64');
     const id = await p.evaluate(async (b64) => { const bin = atob(b64), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
