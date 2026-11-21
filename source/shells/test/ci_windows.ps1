@@ -237,10 +237,11 @@ if ($admin) {
   Check ($c -eq 0) "uninstalled for everyone from the quiet command (exit 0)" "uninstalling for everyone: exit $c"
   Gone 'uninstalled for everyone' $allDir $cprogs $pdesk $keyAll $false
 } else { say "     (this account has no administrator's rights here, so For everyone is not tried: Windows would ask a person)" }
+# 7.62: $T is not used here: PowerShell's names ignore case, and the uninstall check above set $t to a time at this level
 # 7.62: a page signed with a key the shell does not carry (a test key, shells/common/test): the shell refuses it before anything
 # of it runs, and shows its own page in its place (modules/r352.js)
 node source/shells/common/test/page_from_case.mjs source/shells/common/test/vectors.json "signed, as Fabrica made it" "$W\signed_test.html" | Out-Null
-node "$T/make_win.mjs" $M $Shell "$W\signed_test.html" $I "$W\Tide Check Setup.exe" com.yannieforest.tidecheck.win "Tide Check" CarpeNative "Ada Quill" | Select-Object -Last 1 | ForEach-Object { say $_ }
+node "source/shells/test/make_win.mjs" $M $Shell "$W\signed_test.html" $I "$W\Tide Check Setup.exe" com.yannieforest.tidecheck.win "Tide Check" CarpeNative "Ada Quill" | Select-Object -Last 1 | ForEach-Object { say $_ }
 $D = Join-Path $W 'x-refused'; New-Item -ItemType Directory -Force $D | Out-Null; Copy-Item "$W\Tide Check Setup.exe" $D -Force
 $log = Join-Path $W 'refused.log'; Remove-Item $log -ErrorAction SilentlyContinue
 $p = Start-App (Join-Path $D 'Tide Check Setup.exe') $log ''

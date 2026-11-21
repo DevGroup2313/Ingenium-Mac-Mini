@@ -3,6 +3,9 @@
 // and, from 6.5, the Mac and Windows app maker (modules/r170.js), which uses the first one's zip and signing parts.
 import fs from 'node:fs'; import path from 'node:path'; import vm from 'node:vm';
 export function loadMaker(modulesDir) {
+  // as in a page, where window is the global object itself (r136 asks window.__ingGuest since 7.44, which stopped the Android
+  // check from making its key in Node until 7.62)
+  if (typeof globalThis.window === 'undefined') globalThis.window = globalThis;
   for (const f of ['r136.js', 'r170.js']) {
     const p = path.join(modulesDir, f); if (!fs.existsSync(p)) continue;
     const src = fs.readFileSync(p, 'utf8').replace(/^<script>/, '').replace(/<\/script>\s*$/, '');
