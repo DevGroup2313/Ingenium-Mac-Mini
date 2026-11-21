@@ -104,6 +104,12 @@ shutil.copy(REFUSED, os.path.join(V, "self_refused.html"))
 if REAL:
     app_page(REAL, os.path.join(V, "real"), "7.64.20261121.300")
     json.dump(ia._self2_fields(open(REAL, "rb").read())[2], open(os.path.join(V, "real_fields.json"), "w"))
+# 7.64: KEEP_VECTORS=<folder> keeps these cases (without real/), as tools/selftest/vectors in the Fire and iPhone repository, where each build
+# on GitHub holds the Fire app's SelfCore.java and the iPhone app's SelfCore.swift to them (the test key is a throwaway, never the owner's)
+if os.environ.get("KEEP_VECTORS"):
+    dst = os.environ["KEEP_VECTORS"]
+    shutil.rmtree(dst, ignore_errors=True)
+    shutil.copytree(V, dst, ignore=shutil.ignore_patterns("real", "real_fields.json"))
 OUT = os.path.join(TMP, "classes")
 os.makedirs(OUT)
 subprocess.run(["javac", "-nowarn", "-d", OUT, CORE, os.path.join(HERE, "selfcore", "SelfCoreTest.java")], check=True)
