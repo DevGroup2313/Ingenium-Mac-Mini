@@ -418,7 +418,9 @@ first made by session 01E1RQBJcMzrWTBAb5ip2Gr8, taken again by session 01QVxDzBf
   the stamped build number left out of the page; a signature of hers is checked with the owner's public keys in `self.json`, written in by
   `release.py` (`self_stamp`) at each release, as the computer apps' are. Only a device with a signature kept checks at start; one with
   none opens at once and says Not signed yet. Both cores are built from the shells' own check of 7.62, and both are run at each build on
-  GitHub against the same cases (`tools/selftest`: `make_vectors.py`, `SelfCoreTest.java`, `main.swift`).
+  GitHub against the same cases (`tools/selftest`: the cases, made by `rig/t_764_self_core.py` with `KEEP_VECTORS` and a throwaway test key; `SelfCoreTest.java` at each
+  Fire build, `main.swift` at each iPhone build). The other session's native files did not reach GitHub before it ended; session
+  01E1RQBJcMzrWTBAb5ip2Gr8 wrote them again from this description and from `rig/selfcore/SelfCoreTest.java`, which did.
 - What is new (r222): one line for every edition, two for the master's.
 - The record in Ingenium's folder: record 06 section 13 (new), section 7 and section 9's limits, records 00, 01, 09 and 10.
 - rig: `t_764_self2.py` (24 checks: the copy made here is app_page.py's own, on a test page and on the 7.63 release page; one with a build
