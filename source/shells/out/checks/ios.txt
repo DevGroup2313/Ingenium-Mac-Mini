@@ -1,3 +1,4 @@
 PASS a test page in the shell Fabrica filled: {"title":"Shell Test run 1","text":47,"errors":0,"first":[],"bridge":true,"clipHandler":true,"storage":true}
 PASS The Forge (13 MB page) in the shell Fabrica filled: {"title":"The Forge","text":6177,"errors":0,"first":[],"bridge":true,"clipHandler":true,"storage":true}
-PASS a page signed with a key the shell does not carry: refused before it ran, the shell's own page in its place: {"file":"signed_test.html","check":"ING-SHELL-CHECK-1 CdbXeLQDHJ63NSC4cT0xnK,iej1hHjzk8YQm5BBv-52cR","why":"is signed with a key this app does not know"}
+PASS a page signed with a key the shell does not carry: refused before it ran, the shell's own page in its place: {"file":"signed_test.html","why":"is signed with a key this app does not know","check":"ING-SHELL-CHECK-1 CdbXeLQDHJ63NSC4cT0xnK,iej1hHjzk8YQm5BBv-52cR"}
+PASS the door's needs: Web Crypto in a secure context, and the page stops where its first script stops it: {"title":"Door check: crypto","secure":true,"subtle":true,"href":"carpe-app://desk/door_check.html"}
