@@ -1,15 +1,15 @@
 
-Windows: Microsoft Windows Server 2025 Datacenter 10.0.26100.0, WebView2 runtime 156.0.4314.58
-{"out":"D:\\a\\_temp\\wintest\\Shell Test Setup.exe","kind":"setup","size":953977,"sha256":"39ad2f7a77990075e6fbf69fbc849e7f1d2361f878b2ef0fc965164325d486a2","exe":"Shell Test Setup.exe","exeSize":953977,"exeSha256":"39ad2f7a77990075e6fbf69fbc849e7f1d2361f878b2ef0fc965164325d486a2","id":"com.yannieforest.shelltest.win","icons":6,"ms":377}
-{"out":"D:\\a\\_temp\\wintest\\The Forge Setup.exe","kind":"setup","size":15298040,"sha256":"927f6a702e8c36eab503c8f1fb0ea4e9e34c8ea9bd6fc2c76ebe9bb21101deb9","exe":"The Forge Setup.exe","exeSize":15298040,"exeSha256":"927f6a702e8c36eab503c8f1fb0ea4e9e34c8ea9bd6fc2c76ebe9bb21101deb9","id":"com.yannieforest.theforge.wintest","icons":6,"ms":71}
+Windows: Microsoft Windows Server 2025 Datacenter 10.0.26100.0, WebView2 runtime 157.0.4341.46
+{"out":"D:\\a\\_temp\\wintest\\Shell Test Setup.exe","kind":"setup","size":1004647,"sha256":"a67a3a24a33dee8915232d777c30c1e2c1359c89e8df0f286ebf5e25dd284c88","exe":"Shell Test Setup.exe","exeSize":1004647,"exeSha256":"a67a3a24a33dee8915232d777c30c1e2c1359c89e8df0f286ebf5e25dd284c88","id":"com.yannieforest.shelltest.win","icons":6,"ms":475}
+{"out":"D:\\a\\_temp\\wintest\\The Forge Setup.exe","kind":"setup","size":15348710,"sha256":"00fa5eafbc564bf4ebfe23554d4977bc39e6473ef9f1c5e4887e20112071adb4","exe":"The Forge Setup.exe","exeSize":15348710,"exeSha256":"00fa5eafbc564bf4ebfe23554d4977bc39e6473ef9f1c5e4887e20112071adb4","id":"com.yannieforest.theforge.wintest","icons":6,"ms":125}
 PASS a test page in the Windows app Fabrica made: Windows reads its own name (Shell Test, version 6.5, company Ada Quill), not its file name
-     Shell Test Setup.exe: 0.9 MB, one file: the app and its installer
+     Shell Test Setup.exe: 1 MB, one file: the app and its installer
 PASS a test page in the Windows app Fabrica made: Windows shows the app's own icon for the file (rgb 13,106,88)
 PASS a test page in the Windows app Fabrica made: a second start brings the open window forward and ends (one copy running)
 PASS a test page in the Windows app Fabrica made, first start: its page, its storage and IndexedDB, the file saver: {"title":"Shell Test run 1","text":47,"errors":0,"first":[],"bridge":true,"storage":true,"kept":null,"idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/test_page.html"}
 PASS a test page in the Windows app Fabrica made: the clipboard, written and read back
 PASS a test page in the Windows app Fabrica made: the page saved a file, and it holds what the page gave
-PASS a test page in the Windows app Fabrica made, second start: what the first start kept is there: {"title":"Shell Test run 2","text":48,"errors":0,"first":[],"bridge":true,"storage":true,"kept":"1794857291011","idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/test_page.html"}
+PASS a test page in the Windows app Fabrica made, second start: what the first start kept is there: {"title":"Shell Test run 2","text":48,"errors":0,"first":[],"bridge":true,"storage":true,"kept":"1795273180674","idb":true,"origin":"https://desk.app.test","href":"https://desk.app.test/test_page.html"}
 PASS The Forge (13 MB page) in the Windows app Fabrica made: Windows reads its own name (The Forge, version 6.5, company Ada Quill), not its file name
      The Forge Setup.exe: 14.6 MB, one file: the app and its installer
 PASS The Forge (13 MB page) in the Windows app Fabrica made: Windows shows the app's own icon for the file (rgb 13,106,88)
@@ -22,12 +22,12 @@ the installer: this account is an administrator: True
      me, screen after: {"screen":"installed","eye":"Installed","title":"Shell Test is ready","sub":"Find it in the Start menu and on your desktop, and in Settings, Apps to uninstall it.","err":"","scope":null,"desk":null,"removeData":null,"open":true,"tryit":false,"bar":"Shell Test Setup","w":540,"h":464,"sh":464,"wide":0,"scrollbars":0,"font":"\"Setup Serif\", \"Iowan Old Style\", \"Palatino Linotype\", Palatino, Georgia, serif","errors":0,"first":[]}
 PASS the installer opens on For everyone on this PC, the desktop shortcut ticked, Open without installing offered, no scroll bar, no page error
 PASS Just for me, pressed through the page: installed, and the page says so
-PASS the installer's window is drawn: its violet keys and ring are on the screen (455 samples)
+PASS the installer's window is drawn: its violet keys and ring are on the screen (406 samples)
 PASS just for me: the program and installed.txt in C:\Users\runneradmin\AppData\Local\Programs\Shell Test
 PASS just for me: the Start menu shortcut, named Shell Test, opens C:\Users\runneradmin\AppData\Local\Programs\Shell Test\Shell Test.exe
 PASS just for me: the desktop shortcut, named Shell Test
 PASS just for me: the shortcut carries the app's taskbar identity (com.yannieforest.shelltest.win)
-PASS just for me: Settings, Apps lists it (Shell Test 6.5, Ada Quill, 0.9 MB, 20261116)
+PASS just for me: Settings, Apps lists it (Shell Test 6.5, Ada Quill, 1 MB, 20261121)
 PASS the installed program opens as the app (Shell Test)
 PASS the Setup file opens the installer (Shell Test Setup), the app being installed
 PASS an update over it, from the command line (exit 0)
@@ -35,7 +35,7 @@ PASS the update: the program and installed.txt in C:\Users\runneradmin\AppData\L
 PASS the update: the Start menu shortcut, named Shell Test, opens C:\Users\runneradmin\AppData\Local\Programs\Shell Test\Shell Test.exe
 PASS the update: no desktop shortcut, as chosen
 PASS the update: the shortcut carries the app's taskbar identity (com.yannieforest.shelltest.win)
-PASS the update: Settings, Apps lists it (Shell Test 6.5, Ada Quill, 0.9 MB, 20261116)
+PASS the update: Settings, Apps lists it (Shell Test 6.5, Ada Quill, 1 MB, 20261121)
 PASS the update leaves one program and installed.txt
 PASS the app's saved work is there before uninstalling (C:\Users\runneradmin\AppData\Local\com.yannieforest.shelltest.win)
      uninstall-me, screen uninstall: {"screen":"uninstall","eye":"Uninstall","title":"Remove Shell Test?","sub":"Its program, its shortcuts and its entry in Settings go.","err":"","scope":null,"desk":null,"removeData":false,"open":null,"tryit":false,"bar":"Shell Test Setup","w":540,"h":307,"sh":307,"wide":0,"scrollbars":0,"font":"\"Setup Serif\", \"Iowan Old Style\", \"Palatino Linotype\", Palatino, Georgia, serif","errors":0,"first":[]}
@@ -54,9 +54,11 @@ PASS for everyone: the program and installed.txt in C:\Program Files\Shell Test
 PASS for everyone: the Start menu shortcut, named Shell Test, opens C:\Program Files\Shell Test\Shell Test.exe
 PASS for everyone: the desktop shortcut, named Shell Test
 PASS for everyone: the shortcut carries the app's taskbar identity (com.yannieforest.shelltest.win)
-PASS for everyone: Settings, Apps lists it (Shell Test 6.5, Ada Quill, 0.9 MB, 20261116)
+PASS for everyone: Settings, Apps lists it (Shell Test 6.5, Ada Quill, 1 MB, 20261121)
 PASS uninstalled for everyone from the quiet command (exit 0)
 PASS uninstalled for everyone: its folder is gone (C:\Program Files\Shell Test)
 PASS uninstalled for everyone: its shortcuts are gone
 PASS uninstalled for everyone: its entry in Settings, Apps is gone
 PASS uninstalled for everyone: the saved work is removed, as ticked
+{"out":"D:\\a\\_temp\\wintest\\Tide Check Setup.exe","kind":"setup","size":1004745,"sha256":"f7962a6895e6004f062c024dd6e507aa2eb4184ad2fc59350969363fd3ea3897","exe":"Tide Check Setup.exe","exeSize":1004745,"exeSha256":"f7962a6895e6004f062c024dd6e507aa2eb4184ad2fc59350969363fd3ea3897","id":"com.yannieforest.tidecheck.win","icons":6,"ms":41}
+PASS a page signed with a key the shell does not carry: refused before it ran, the shell's own page in its place: {"file":"signed_test.html","why":"is signed with a key this app does not know","check":"ING-SHELL-CHECK-1 CdbXeLQDHJ63NSC4cT0xnK,iej1hHjzk8YQm5BBv-52cR"}
