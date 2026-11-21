@@ -8,6 +8,7 @@ Part of the record, written from Ingenium 7.54's sources (20 November 2026).
 * **Each person's work from the others on one device**: each profile has its own stores, its own sign-in and its own data key (record 04).
 * **Her work in transit between her devices**: sealed end to end once they are paired (record 06, section 4); Ingenium Cloud keeps only sealed parts (record 06, section 5).
 * **Plain copies leaving the device**: Ask before each export (record 06, section 2); backups sealed whole while the sign-in is on.
+* **Ingenium itself, on her computers**: from 7.58 each release can be signed with her owner key on her own device, and the Mac and Windows apps check the page against her signature at every start, before anything of it runs: a changed copy does not open and says which file changed (record 06, section 9).
 * **Her ownership of her apps**: the licence, her owner keys and her permissions (record 06, section 6); the editions carry nothing of hers (record 06, section 8).
 
 ## 2. What it does not protect against (said plainly)
@@ -17,7 +18,8 @@ Part of the record, written from Ingenium 7.54's sources (20 November 2026).
 * Anyone who holds her password, her ten words, or her recovery key file with the device.
 * Malicious software already on the device, or a browser extension that reads pages.
 * Model files, the engine, the training lab's models and Fabrica's finds by meaning, which are not sealed; a run's working files while the run is still running.
-* Not yet built: signed packages, scrambled code, Ingenium itself signed and checked, the folder search's index and apps kept on a drive sealed (record 06, section 7).
+* Anyone who can change the computer app itself, or take its signatures away, can stop the check of Ingenium itself (it then says Not signed yet); the iPhone, iPad and Fire apps and the copies she gives do not check yet.
+* Not yet built: signed packages, scrambled code, the check of Ingenium itself on the iPhone, iPad and Fire apps, the folder search's index and apps kept on a drive sealed (record 06, section 7).
 
 There is no maker's key and no back door. A copy opens only with what its owner keeps, so a forgotten password with no way back in cannot be undone by anyone.
 
@@ -52,6 +54,7 @@ Each profile has its own record and its own data key. The Cloud has its own key,
 | Sealed between devices | `build/modules/r319.js`, `build/desktop/app_seal_737.py` | 06 |
 | Ingenium Cloud | `build/modules/r255.js`, `build/desktop/app_cloud_657.py` | 06 |
 | Ownership, licence, permissions | `build/modules/r162.js`, `build/thoughts/permit_core.html`, `security/permits.py`, `security/owner_keys.json` | 06 |
+| Ingenium itself, signed and checked | `build/modules/r348.js`, `build/desktop/app_self_758.py` | 06 |
 | The editions | `build/editions.py` | 06 |
 | The Storage page (what each store is) | `build/modules/r142.js` | 05 |
 | Her ways of working | `build/modules/r327.js` | 07 |

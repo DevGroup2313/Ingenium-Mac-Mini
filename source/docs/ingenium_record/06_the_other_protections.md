@@ -17,7 +17,7 @@ A room in Settings that says how many protections are on, then each, with its tr
   * Clear a copied secret (on): a password, a recovery word or a pairing code copied from Ingenium is cleared from the clipboard after a minute, where the browser lets a page do so.
   * A record of every opening (on): when and on which device Ingenium opened, and every wrong password, kept in the desk, so sealed with it.
   * Ask before each export (off until turned on; needs the sign-in; turning it off asks for the password too): section 2.
-* **Not yet**, said so with the release planned: signed packages, scrambled code, the owner key on her apps, Ingenium itself signed and checked.
+* **Not yet**, said so with the release planned: signed packages, scrambled code, the owner key on her apps. Ingenium itself, signed and checked, is built for the Mac and Windows apps from 7.58 (section 9).
 * `window.IngSecurity` gives the others `cfg()` (the switches), `set(key, value)`, `view()` (which part of the room is shown), `paint()`, `log()` (the record of every opening, kept in the desk as `state.secLog`) and the Offline only helpers (`net`, `allowed(url)`, `allow`).
 
 ## 2. Ask before each export (`r341.js`, 7.51)
@@ -65,8 +65,19 @@ Her words: "The app is my sole original work and only I am able to do distribute
 
 * The folder search's index sealed (approved 20 November 2026, at the cost measured on a prototype: building about three times as long; the first vector search of a session about 3.5 s, later ones 37 to 74 ms with a cache of opened sectors in the worker's memory). The prototype: each 4 KiB sector of the index's file sealed with XChaCha20-Poly1305 (`@noble/ciphers` 2.4.0), the sector's number and the file's salt bound in; its key from the data key (HKDF, info `"ingenium-rag 1"`).
 * Fabrica's apps kept on a drive, sealed (approved): only the repositories Ingenium writes itself; any other folder only at the owner's choice, one at a time; with Export a plain copy.
-* From the Security preview: Your apps signed when shipped, Your apps' code scrambled, and Ingenium itself signed and checked (this last needs her decision on where the owner key signs each release).
+* From the Security preview: Your apps signed when shipped, and Your apps' code scrambled. Ingenium itself, signed and checked: part one is built (section 9); the iPhone, iPad and Fire apps, and the copies she gives carrying her signature, come later.
 
 ## 8. The editions carry nothing of hers
 
 The full, gift and demo editions are built from the same sources by `build/editions.py`. Every edition but the master leaves out her own modules (`skip_modules`: Lector's recipe, the Workshop, the Author Studio, Troubleshoot, the Offline Project, her demonstrations, her build library, Ingenium's own rules in its folder, her plans in Vocatio, this record (`r345.js`), the Desk's five apps outside the master), takes out her ways of working (`var HERS=[];`) and her later rules (`var LATER=[];`), and must find each exactly once or the build stops. `rig/t_745_owner_free.js` reads the whole text of each edition for anything of hers.
+
+## 9. Ingenium itself, signed and checked (`r348.js` and `desktop/app_self_758.py`, 7.58)
+
+The Security room's promise: "each release signed with your owner key, and checked by the computer apps ... before Ingenium opens: a copy changed by anyone else refuses to open, and says which file changed." Where her owner key signs, her choice (20 November 2026): on her own device, a "Sign this release" key in her master copy, so the key never leaves it.
+
+* **The check** (the Mac and Windows apps, at every start, before the window is made): the built page is read once, its SHA-256 and size and the version and edition it names. The build number a device build stamps into its first `<meta name="ingenium-build">` is left out, so the fingerprint is the one `BUILD_INFO.txt` lists for the release and one signature serves every device build of it. Her signatures (`<the app's folder>/signatures/*.ingsig`) are checked with the owner's public keys the app carries (`_SELF_KEYS`) for its release (`_SELF_RELEASE`), both written in by `release.py` (`self_stamp()`) at every release: ECDSA P-256 with SHA-256 over PermitCore's fixed order.
+* **The three outcomes**: Signed: the page opens. Changed (a signature of hers names this release and the page is not the one signed): the window opens on the app's own page, which says which file changed, what was signed and what is there now, with Show the file and Quit; nothing of the changed page runs, and the app's own address serves none of it. Not signed: it opens, and Security says so. Her own page (6.19) is never refused, and a fault in the check never keeps Ingenium closed. A refusal is kept (the last ten) and told once Ingenium opens again.
+* **Signing** (Settings, Security, Ingenium itself, master edition, with the owner's key on the device): her owner key's password is asked in a card of the room's own kind; the release's fields are signed with PermitCore's `signWith` and handed to the computer app (`self_signature_put`), which checks it with the public keys it carries and keeps it only when it is hers and names this very copy. The key and its password never leave the page; the signature is no secret. Also: Save the signature (for her other computers on the same release), Bring a signature in, Check it now.
+* **Its limits, said in the room**: someone who can change the computer app itself, or take its signatures away, can stop the check; without a computer app (a browser, the iPhone, iPad and Fire apps) the room says Not yet.
+* Interface: `window.IngSelfSign` (`state()`, `describe(mine)`, `check(again)`, `sign()`, `bring()`, `save()`, `put(text)`); the computer app's bridge `self_check`, `self_signature_put`, `self_signature_get`, `self_reveal`, `self_quit`.
+

@@ -28,7 +28,7 @@ Her words (20 November 2026): "I want you to document the sign-in and sign-out f
 
 ## How it is kept true
 
-* It was written on 20 November 2026 from Ingenium 7.54's sources, each statement checked against the module it names. Where a section says a thing is planned, it is not built.
+* It was written on 20 November 2026 from Ingenium 7.54's sources, each statement checked against the module it names, and brought up to date with 7.58 on 21 November 2026 (Ingenium itself, signed and checked, in the Mac and Windows apps; record 06, section 9). Where a section says a thing is planned, it is not built.
 * The same files are kept with Ingenium's sources (`source/docs/ingenium_record/` in the Ingenium-Mac-Mini repository), so a model working in any repository can be pointed to them.
 * When a release changes the sign-in, the profiles, the sealing or the look, the record is brought up to date in the same release, and the folder's copies are replaced (a copy changed by the owner in her folder is kept, and the new version added beside it).
 * It names no person's private data: invented people only in its examples, and no device, plan or document of the owner's beyond what Ingenium's own code already says.

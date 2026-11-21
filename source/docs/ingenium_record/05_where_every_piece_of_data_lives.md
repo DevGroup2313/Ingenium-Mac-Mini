@@ -49,6 +49,7 @@ The folder search keeps its index in the browser's private file system (OPFS), p
 * `desk.json` and `big/*.txt`: the computer app's own copy of the desk and the long texts. Sealed with the sign-in on, by the page, through the shell's bridge (record 02, section 4).
 * Each profile's files are its own folder on the disk (`desktop/app_profiles_744.py`: `profile_current`, `profile_use`, `profile_drop`).
 * Sealed with the disk key while the owner is signed in (record 06, section 3): the apps waiting for her devices and Fabrica's runs, their logs and files (7.49); the records of waiting apps under names that say nothing, a run's record once it ends, and texts for training (7.50).
+* From 7.58: her signatures of Ingenium's releases (`<the app's folder>/signatures/*.ingsig`, no secret: a signature proves, it opens nothing), and the last ten refusals of a changed copy, for Settings, Security.
 * Not sealed: models on the disk, the engine, and a run's working files while the run is still running (sealed when it ends).
 
 ## 4. What leaves the device

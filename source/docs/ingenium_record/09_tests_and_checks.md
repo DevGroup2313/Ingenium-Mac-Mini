@@ -15,6 +15,7 @@ Part of the record, written from Ingenium 7.54's sources (20 November 2026). Eve
 | `t_749_disk_page.js <page url>` | the disk key's hand-over and drop (record 06, section 3), with a stand-in computer app that records each call | 15/15 |
 | `t_750_disk_page.js <master url> [<gift url>]` | what the room says the computer app seals | 8/8; 12/12 with the gift edition |
 | `t_736_leak_hunt.js` | a survey: a real computer app runs, protection is turned on as the owner would, a mark is written into every kind of thing she makes, then every store is read raw (localStorage, sessionStorage, every IndexedDB database, Cache Storage, the private file system, and the disk), so anything still readable without her password is found | run when the sealing changes |
+| `t_758_self_check.py` and `t_758_self_page.js` (with `t_758_run_self.py`) | Ingenium itself, signed and checked (record 06, section 9): the app's side with a test key (signed, changed, a stamped build, another version or edition, other keys and changed signatures refused, her own page never refused, the app's own address, the bridge); the page signs in the browser, the app checks in Python, Node checks again apart from both | 7.58 |
 | `t_754_ways_rule.js <master url>` | her tenth rule added once to her ways of working, in her own profile only | 7/7 |
 
 ## 2. The tests of the editions (before any push)

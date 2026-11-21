@@ -68,6 +68,8 @@ Keep exactly as they are, since they are the security: PBKDF2-SHA-256 with at le
 * **Opening a database by name makes an empty one**: ask `indexedDB.databases()` first (r344's `dbThere`).
 * **Writing while a page closes**: only synchronous work finishes in `pagehide`; that is why r197 carries a plain JavaScript AES-GCM (`sealTextSync`) beside WebCrypto. A database cannot be written then at all.
 * **A store refused**: every write to the lock record is checked (`writeRec` returns false; "This browser's store refused the change"), and nothing is left half done.
+* **Two parts of the computer app took the same names** (7.49 to 7.57): the disk seal defined `_DISK`, `_disk_status` and `_disk_write`, names the drive's repositories already used, and being set later it won, so every drive repository failed until 7.57 renamed the seal's. Give each part's names its own prefix, and scan for any function defined twice.
+* **A build that renames words also renames them in quoted text**: Ingenium's build changes a page's old names to their new ones (Adamas's old name, for one) wherever they stand, and it changed one quoted label inside this record (7.55). Quote what the screen shows, and test the shipped page, not only the sources.
 * **Comments in a shipped page**: Ingenium's release build takes comments out; never put meaning in a comment that the code needs.
 
 ## 7. Notes for each of her apps

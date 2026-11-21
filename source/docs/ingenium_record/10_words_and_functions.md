@@ -61,6 +61,7 @@ Hooks on `window`: `__ingBeforeLock(why)` (waited for before the keys go), `__in
 * `window.IngSecurity` (r318): `cfg()` (More protection's switches), `set(key, value)`, `items`, `paint()`, `ask()` (the first start's question), `net`, `allowed(url)`, `allow`, `tick`, `slept()`, `fails`, `clip`, `log()` (the record of every opening, `state.secLog`), `view(v)`.
 * `window.IngExportAsk` (r341): `on()`, `sealed(data)`.
 * `window.IngDiskSeal` (r340): `state()`, `describe(hasFabrica)`, `status()`, `sealNow()`; the computer app's `disk_key_hold`, `disk_key_drop`, `disk_unseal_all`, `disk_status`.
+* `window.IngSelfSign` (r348, 7.58): `state()`, `describe(mine)`, `check(again)`, `sign()`, `bring()`, `save()`, `put(text)`; the computer app's `self_check`, `self_signature_put`, `self_signature_get`, `self_reveal`, `self_quit`.
 * `window.saveFileNative(name, type, bytes)`: every file Ingenium saves goes through it.
 * `window.ingAsk({title, text, yes, no})`, `window.ingToast(text)`: Ingenium's own question and note.
 
