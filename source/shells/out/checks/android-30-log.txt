@@ -1,9 +1,3 @@
 --------- beginning of main
 --------- beginning of system
 --------- beginning of kernel
-11-21 15:00:56.890  5522  5522 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (33413)
-11-21 15:00:56.891  5522  5522 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (33414)
-11-21 15:00:56.893  5522  5522 I IngeniumShell: WARNING Unrecognized feature: 'web-share'. (33414)
-11-21 15:01:13.790  5758  5758 W IngeniumShell: not opened, not as its maker signed it: signed_test.html is signed with a key this app does not know
-11-21 15:01:14.067  5758  5758 I IngeniumShell: ERROR Refused to load the image 'https://appassets.androidplatform.net/favicon.ico' because it violates the following Content Security Policy directive: "img-src data:".
-11-21 15:01:14.067  5758  5758 I IngeniumShell:  (0)

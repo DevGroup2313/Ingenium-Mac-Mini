@@ -7,7 +7,10 @@ Success
 PASS version 2 installs over it and keeps its storage (run 1, then run 2): {"title":"Shell Test run 2","text":48,"errors":0,"storage":true,"bridge":true}
 Performing Streamed Install
 Success
-PASS The Forge (13 MB page) opens by its launcher name: {"title":"The Forge","text":6099,"errors":0,"storage":true,"bridge":true}
+PASS The Forge (13 MB page) opens by its launcher name: {"title":"The Forge","text":6346,"errors":0,"storage":true,"bridge":true}
 Performing Streamed Install
 Success
 PASS a page signed with a key the shell does not carry: refused before it ran, the shell's own page in its place: {"file":"signed_test.html","why":"is signed with a key this app does not know","check":"ING-SHELL-CHECK-1 CdbXeLQDHJ63NSC4cT0xnK,iej1hHjzk8YQm5BBv-52cR"}
+Performing Streamed Install
+Success
+PASS the door's needs: Web Crypto in a secure context, and the page stops where its first script stops it: {"title":"Door check: crypto","text":20,"errors":0,"storage":true,"bridge":true}
