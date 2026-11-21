@@ -214,8 +214,12 @@ function dropKeys(){var had=!!K.raw;K.raw=null;K.key=null;K.js=null;K.via=null;
 /* 7.49: the computer's disk is sealed with a key of its own, derived from the data key (HKDF-SHA-256, info "ingenium-disk 1"): the
    computer app holds it in memory while she is signed in (modules/r340.js, desktop/app_disk_749.py); its id is the first 8 bytes of
    its SHA-256, so a file sealed under another sign-in is known as such */
-function diskKey(){var s=S();if(!s||!K.raw)return Promise.reject(new Error("locked"));
-  return s.importKey("raw",K.raw,"HKDF",false,["deriveBits"]).then(function(k){return s.deriveBits({name:"HKDF",hash:"SHA-256",salt:new Uint8Array(32),info:TE.encode("ingenium-disk 1")},k,256);})
+function diskKey(){return subKey("ingenium-disk 1");}
+/* 7.59: the folder search's index is sealed with a key of its own in the same way (info "ingenium-rag 1"), handed to its store worker
+   (rag/seal.js) while she is signed in, one per profile, since each profile has its own data key */
+function ragKey(){return subKey("ingenium-rag 1");}
+function subKey(info){var s=S();if(!s||!K.raw)return Promise.reject(new Error("locked"));
+  return s.importKey("raw",K.raw,"HKDF",false,["deriveBits"]).then(function(k){return s.deriveBits({name:"HKDF",hash:"SHA-256",salt:new Uint8Array(32),info:TE.encode(info)},k,256);})
     .then(function(b){var u=new Uint8Array(b);return s.digest("SHA-256",u).then(function(h){var x=new Uint8Array(h),hex="";for(var i=0;i<8;i++)hex+=("0"+x[i].toString(16)).slice(-2);return {b64:b64e(u),kid:hex};});});}
 function makeRecord(user,password,phrase){var dekRaw=rnd(32),salt=rnd(16),rsalt=rnd(16);
   return calibrate().then(function(iter){return Promise.all([kdf(password,salt,iter),kdf(normPhrase(phrase),rsalt,iter)]).then(function(ks){var iv1=rnd(12),iv2=rnd(12);
@@ -621,6 +625,8 @@ function disable(){var c=progressView("Turning protection off");prog(c,"Writing 
     .then(function(){return walkRecs("open",function(n,N){prog(c,"Opening what you brought in from elsewhere, the signing keys and Fabrica\'s pages: "+n+" of "+N+"…",0.7+0.12*(N?n/N:1));});})
     .then(function(){return walkRecs("open",function(n,N){prog(c,"Opening your app library, and Fabrica\'s apps and packages: "+n+" of "+N+"…",0.82+0.13*(N?n/N:1));},BSTORES);})
     .then(function(){return walkLegacy("open");})
+    /* 7.59: the folder search's index opened again while its key is still in hand (rag/main.js); a failure keeps protection on */
+    .then(function(){if(typeof W_.__ingBeforeOff!=="function")return;prog(c,"Opening the folder search\'s index…",0.97);return W_.__ingBeforeOff();})
     .then(function(){
       try{localStorage.removeItem(LSK);}catch(e){}REC=null;dropKeys();OFF=false;try{W_.SNAPRING.forEach(function(k){localStorage.removeItem(k);});W_._snapAt=0;}catch(e){}try{W_.saveState();}catch(e){}
       prog(c,"Done.",1);var c2=view('<h2>Protection is off</h2><p>Ingenium opens without a sign-in again, and what it keeps on this device is plain text, as it was before. The recovery phrase you wrote down opens nothing now.</p><div class="ild-keys"><button type="button" class="ild-key" id="ildDone">Done</button></div>',true);
@@ -900,7 +906,7 @@ W_.addEventListener("storage",function(e){if(!e||e.key!==LSK)return;
 try{var og=W_.go;if(typeof og==="function"){W_.go=function(p){var r=og.apply(this,arguments);try{if(p==="settings")ensureCard();}catch(e){}return r;};}}catch(e){}
 setTimeout(function(){try{ensureCard();}catch(e){}},600);
 try{doorKey();}catch(e){warn(e);}
-W_.IngLock={active:active,on:on,diskKey:diskKey,confirm:confirmAsk,locked:function(){return active()&&!canOpen();},ready:ready,sealed:sealed,sealText:sealText,openText:openText,sealTextSync:sealTextSync,isRecEnv:isRecEnv,binStores:BSTORES.map(function(x){return x.slice();}),
+W_.IngLock={active:active,on:on,diskKey:diskKey,ragKey:ragKey,confirm:confirmAsk,locked:function(){return active()&&!canOpen();},ready:ready,sealed:sealed,sealText:sealText,openText:openText,sealTextSync:sealTextSync,isRecEnv:isRecEnv,binStores:BSTORES.map(function(x){return x.slice();}),
   /* 6.32: what a part writes to a sealed store waits for the keys while the page is locked, so nothing is written there in clear */
   sealFor:function(db,sn,k,v){return active()?ready().then(function(){return sealRec(db,sn,k,v);}):Promise.resolve(v);},
   deskWrite:deskWrite,isDeskEnvelope:isDeskEnv,openDesk:openDesk,adoptRaw:adoptRaw,lockedNow:adoptRaw,openRecs:openRecs,sealRecs:sealRecs,sealRec:sealRec,openRec:openRec,openValues:openValues,lockNow:lockNow,

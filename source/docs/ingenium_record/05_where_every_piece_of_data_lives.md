@@ -42,7 +42,7 @@ sessionStorage holds marks for the length of a session, renamed per profile as l
 | `cd_scriba_store` | "The speech engine: What writes down your dictation on this device" | per profile (it is not among the shared names) | no (an engine, not her words) |
 | Cache Storage `cd-scriba-1044` | the speech engine's files | shared (the profiles' wrapper does not cover Cache Storage) | no |
 
-The folder search keeps its index in the browser's private file system (OPFS), per profile through its own reader (`p:<id>`); sealing that index is approved and planned (record 06, section 7).
+The folder search keeps its index in the browser's private file system (OPFS, the folder `.ingenium-rag`), in the Mac and Windows apps only. From 7.59 each profile has an index of its own: the owner's `rag.sqlite3`, another profile's `rag-<id>.sqlite3`. Until 7.58 every profile's folders were in the one file, kept apart by a reader for each (`me`, `p:<id>`); the first start of 7.59 moves each other profile's folders into its own file and takes them out of the shared one (record 06, section 10). With the sign-in on, each is sealed with that profile's own key.
 
 ## 3. On the computer apps' disk (Mac and Windows)
 

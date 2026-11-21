@@ -61,9 +61,9 @@ Her words: "The app is my sole original work and only I am able to do distribute
 * Terms and privacy (`r320.js`, 7.37): a card beside the licence: In short, the Privacy notice, the Terms of use, and in the master edition Your contact; a first draft, marked Draft in the master edition, for a lawyer in the US and the UK to read before it is final.
 * The Android signing keys: no page carries one; the builds take them from each repository's secrets (`security/KEYS.md`).
 
-## 7. Approved and not yet built (as of 7.54)
+## 7. Approved and not yet built (as of 7.59)
 
-* The folder search's index sealed (approved 20 November 2026, at the cost measured on a prototype: building about three times as long; the first vector search of a session about 3.5 s, later ones 37 to 74 ms with a cache of opened sectors in the worker's memory). The prototype: each 4 KiB sector of the index's file sealed with XChaCha20-Poly1305 (`@noble/ciphers` 2.4.0), the sector's number and the file's salt bound in; its key from the data key (HKDF, info `"ingenium-rag 1"`).
+* The folder search's index: built in 7.59 (section 10).
 * Fabrica's apps kept on a drive, sealed (approved): only the repositories Ingenium writes itself; any other folder only at the owner's choice, one at a time; with Export a plain copy.
 * From the Security preview: Your apps signed when shipped, and Your apps' code scrambled. Ingenium itself, signed and checked: part one is built (section 9); the iPhone, iPad and Fire apps, and the copies she gives carrying her signature, come later.
 
@@ -81,3 +81,16 @@ The Security room's promise: "each release signed with your owner key, and check
 * **Its limits, said in the room**: someone who can change the computer app itself, or take its signatures away, can stop the check; without a computer app (a browser, the iPhone, iPad and Fire apps) the room says Not yet.
 * Interface: `window.IngSelfSign` (`state()`, `describe(mine)`, `check(again)`, `sign()`, `bring()`, `save()`, `put(text)`); the computer app's bridge `self_check`, `self_signature_put`, `self_signature_get`, `self_reveal`, `self_quit`.
 
+## 10. The folder search's index, sealed, one per profile (`rag/seal.js`, `rag/store.worker.js`, `rag/main.js`, `r197.js`, `r340.js`; 7.59)
+
+Approved on 20 November 2026 at the cost measured on a prototype. Her choice the next day, between one index for every profile and one for each: "One index per profile".
+
+* **Where**: the browser's private file system (OPFS), through SQLite's `opfs-sahpool` file system, in the Mac and Windows apps only (the folder search needs the computer app's folder bridge). The owner's index is `rag.sqlite3`; another person's profile has `rag-<id>.sqlite3`.
+* **The move** (once): until 7.58 every profile's folders were in `rag.sqlite3`, kept apart by a reader for each. At its first open, while that file can still be read, each other profile's folders, files, passages, words (FTS5), vectors (vec0) and cached vectors are copied into that profile's own file, then taken out of the shared one; a folder the owner shares stays with her too. The word index is then merged and the file rebuilt (VACUUM), so no freed page keeps a moved passage. Nothing is read or embedded again. This happens with no key held, so no profile's rows are ever sealed under another profile's key. A sealed shared file cannot be read without the owner's key, and is left as it is.
+* **How it is sealed**: `rag/seal.js` takes over the read, write, size and truncate of each file's access handle, in the store worker only. Past the pool's own 4,096-byte header, a file keeps a 64-byte head (`INGRAGS1`, the key's id, the plain size, a salt), then sectors of 4,096 plain bytes, each sealed with XChaCha20-Poly1305 (`@noble/ciphers` 2.4.0, carried in `rag/vendor/noble`), with a fresh 24-byte nonce, the file's salt and the sector's number bound in. Opened sectors are kept in the worker's memory (at most 192 MiB, the least recently used let go first).
+* **The key**: `IngLock.ragKey()` derives it from the profile's data key (HKDF-SHA-256, info `"ingenium-rag 1"`); its id is the first 8 bytes of its SHA-256. `rag/main.js` waits for the sign-in, then opens the index with it. The key is kept in the worker's memory only.
+* **When it changes**: the sign-in turned on with the index open seals it in place at once (`seal.key`); a plain index is sealed in place the first time it opens with a key. Lock now and Sign out start the page again, and the worker goes with it. Turning the sign-in off: r197 waits for `window.__ingBeforeOff` before the lock record goes, and the index is opened again in place (`seal.openAll`) while the key is still in hand; if that fails, protection stays on, so the index is never left sealed under a key nobody can derive any more.
+* **Refusals**, each said as such and never taken for a damaged index (which the card would offer to start again): no key (`LOCKED`), another sign-in's key (`OTHER_KEY`), a sector changed (`SEAL_BROKEN`), the cipher missing from the app (`SEAL_UNAVAILABLE`). The pool turns an error thrown in a read into an I/O failure, so `seal.js` keeps its last error for the worker to report.
+* **Removing a profile** deletes its index file (`IngRag.dropProfile`).
+* **Settings, Security, The computer's disk** says the index's true state, asked of the folder search (`IngRag.sealState()`).
+* **Its cost**, measured on the prototype (20,000 passages, 121 MB, headless Chromium): building about three times as long as plain; the first vector search of a session about 3.5 s, later ones 37 to 74 ms, against 0.8 to 1.4 s for the plain index.

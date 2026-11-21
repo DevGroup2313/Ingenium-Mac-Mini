@@ -49,8 +49,8 @@ function describe(fab){var a=api(),l=L(),on=!!(l&&l.active&&l.active());
   var tr=!a||(ST.kinds||[]).indexOf("training")>=0;   /* 7.50: what this computer app says it seals */
   var what=fab?(tr?"Fabrica's runs with their records and logs, the apps waiting for your devices, and texts for training":"Fabrica's runs and their logs, and the apps waiting for your devices")
     :(tr?"Texts for training":"");   /* 7.50: an edition without Fabrica sends no app to the devices (r316 is Fabrica's), so it names none */
-  var later=fab?(tr?"Fabrica apps kept on a drive, and the folder search's index":"Fabrica apps kept on a drive, the folder search's index and texts for training")
-    :(tr?"the folder search's index":"the folder search's index and texts for training");
+  var later=fab?(tr?"Fabrica apps kept on a drive":"Fabrica apps kept on a drive and texts for training")
+    :(tr?"":"texts for training");   /* 7.59: the folder search's index is sealed (index(), below) */
   var h="";
   if(!a)h='<p>This copy runs without a computer app, so nothing of it is kept in files on a computer\'s disk. In the Mac and Windows apps, '+esc(mid(what))+' are sealed with your password.</p>';
   else if(!on)h='<p>Off: the computer app\'s own files are plain, as they always were.'+(what?' Turn on your sign-in (This device) and '+esc(mid(what))+' are sealed with its password.':'')+'</p>';
@@ -60,8 +60,21 @@ function describe(fab){var a=api(),l=L(),on=!!(l&&l.active&&l.active());
       :' A run still runs on plain files while it runs; its log and its files are sealed when it ends.</p>')
     +'<p>'+(ST.files?(ST.sealed===ST.files?(ST.files===1?"Its one file is sealed.":"All "+ST.files+" of its files are sealed."):ST.sealed+" of "+ST.files+" files sealed."):"Nothing of these is on the disk yet.")+'</p>'
     +'<div class="sc-keys"><button type="button" class="sc-key pri" data-a="disk-seal"'+(ST.held?'':' disabled')+'>Seal them now</button></div>';
-  h+='<p class="sc-fine">Not sealed yet, the next stage: '+esc(later)+'. Kept readable on purpose: '+(fab?'an app you serve for the Home Screen (Safari has to read it), and your model files':'your model files')+'.</p>';
+  h+=index(on);
+  h+='<p class="sc-fine">'+(later?'Not sealed yet, the next stage: '+esc(later)+'. ':'')+'Kept readable on purpose: '+(fab?'an app you serve for the Home Screen (Safari has to read it), and your model files':'your model files')+'.</p>';
   return h;}
+/* 7.59: the folder search's index, sealed by the page itself with this profile's own key (rag/seal.js), so with any computer app; its
+   true state is asked of the folder search (IngRag.sealState) at most every four seconds, and the room painted again if it changed */
+var RS={asked:0,s:null};
+function index(on){var R=W.IngRag;if(!R||typeof R.sealState!=="function")return "";
+  if(Date.now()-RS.asked>4000){RS.asked=Date.now();Promise.resolve(R.sealState()).then(function(s){var was=JSON.stringify(RS.s);RS.s=s;if(JSON.stringify(s)!==was)repaint();},function(){});}
+  var s=RS.s,t;
+  if(!on)t="The folder search\'s index is plain too. With your sign-in on, it is sealed with the same password, and in another person\'s profile with that profile\'s own.";
+  else if(!s)t="The folder search\'s index: asking it now.";
+  else if(!s.open)t="The folder search\'s index: sealed with the same password each time the folder search opens. It is not open now.";
+  else if(s.keyed&&s.files&&s.files.sealed&&!s.files.plain)t="The folder search\'s index: sealed with the same password, and opened only in the folder search\'s memory while you are signed in. Another person\'s profile has an index of its own, sealed with that profile\'s password.";
+  else t="The folder search\'s index: not sealed now. Lock Ingenium and sign in again to seal it.";
+  return '<p>'+t+'</p>';}
 D.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest('#secCard [data-a="disk-seal"]');if(b){e.preventDefault();sealNow(b);}});
 /* at start: signed in, the key is handed over; opened locked, any key the app still held is dropped */
 function boot(){var l=L();if(!api()||!l)return;if(l.active&&l.active()&&!(l.locked&&l.locked()))hold();else drop();status().then(function(x){if(x&&x.changed){x.changed=false;repaint();}});}

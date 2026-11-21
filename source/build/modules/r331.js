@@ -300,7 +300,9 @@ function removeProfile(id){var r=reg();if(id==="owner"||!isOwner())return;var t=
   /* its folders in the folder search: the reader "p:<id>" and the folders only it could read */
   var rag=Promise.resolve().then(function(){if(!W.IngRag||!IngRag._store)return;var st=IngRag._store;
     return Promise.resolve(st.principal.find({name:"p:"+id})).then(function(pr){if(!pr||!pr.id)return;return Promise.resolve(st.folder.list({principalId:pr.id})).then(function(fs){
-      return Promise.all((fs||[]).map(function(f){return Promise.resolve(IngRag.removeFolder(f.id)).catch(function(){});}));});});}).catch(function(){});
+      return Promise.all((fs||[]).map(function(f){return Promise.resolve(IngRag.removeFolder(f.id)).catch(function(){});}));});});}).catch(function(){})
+    /* 7.59: one index per profile: its own file goes too (rag/main.js dropProfile); the lines above still clear a folder left in the shared one */
+    .then(function(){if(W.IngRag&&typeof IngRag.dropProfile==="function")return Promise.resolve(IngRag.dropProfile(id)).catch(function(){});});
   Promise.all([X.drop(id),disk,rag]).then(function(){UI.said=t.name+"'s profile was removed, with what it kept on this device.";paint();paintKey();});}
 function manage(){try{if(typeof W.go==="function")go("settings");}catch(e){}
   setTimeout(function(){try{var tab=[].filter.call(D.querySelectorAll("#page-settings button"),function(x){return x.textContent.trim()==="Security"&&x.offsetParent;})[0];if(tab)tab.click();}catch(e){}

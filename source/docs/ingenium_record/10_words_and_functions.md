@@ -41,9 +41,10 @@ Part of the record, written from Ingenium 7.54's sources (20 November 2026). The
 | `user()` | the user name |
 | `words` | the 512 words of the recovery phrase |
 | `diskKey()` | the disk key, `{b64, kid}`, while signed in |
+| `ragKey()` | the folder search index's key, `{b64, kid}`, while signed in (7.59) |
 | `confirm(title, text, okText)` | ask the password over the open page; a promise of true or false |
 
-Hooks on `window`: `__ingBeforeLock(why)` (waited for before the keys go), `__ingAfterOpen()` (after a sign-in, before the door goes). Event on `window`: `ing-keys`, `detail.held` true or false (and `locking` true when a lock begins). Globals set at load: `__ingLockedRaw` (the sealed desk, raw), `__ingLocked` (true while it is not open).
+Hooks on `window`: `__ingBeforeLock(why)` (waited for before the keys go), `__ingAfterOpen()` (after a sign-in, before the door goes), `__ingBeforeOff()` (7.59: waited for while the sign-in is being turned off, before the lock record goes; a refusal keeps protection on). Event on `window`: `ing-keys`, `detail.held` true or false (and `locking` true when a lock begins). Globals set at load: `__ingLockedRaw` (the sealed desk, raw), `__ingLocked` (true while it is not open).
 
 ## 3. `window.IngSignOut` (r344)
 
@@ -60,6 +61,7 @@ Hooks on `window`: `__ingBeforeLock(why)` (waited for before the keys go), `__in
 
 * `window.IngSecurity` (r318): `cfg()` (More protection's switches), `set(key, value)`, `items`, `paint()`, `ask()` (the first start's question), `net`, `allowed(url)`, `allow`, `tick`, `slept()`, `fails`, `clip`, `log()` (the record of every opening, `state.secLog`), `view(v)`.
 * `window.IngExportAsk` (r341): `on()`, `sealed(data)`.
+* `window.IngRag` (rag/main.js), its sealing (7.59): `sealState()` (`{open, on, keyed, files: {sealed, plain, empty}}`), `dropProfile(id)`; the store worker's `seal.key`, `seal.openAll`, `seal.state`, `profile.drop`.
 * `window.IngDiskSeal` (r340): `state()`, `describe(hasFabrica)`, `status()`, `sealNow()`; the computer app's `disk_key_hold`, `disk_key_drop`, `disk_unseal_all`, `disk_status`.
 * `window.IngSelfSign` (r348, 7.58): `state()`, `describe(mine)`, `check(again)`, `sign()`, `bring()`, `save()`, `put(text)`; the computer app's `self_check`, `self_signature_put`, `self_signature_get`, `self_reveal`, `self_quit`.
 * `window.saveFileNative(name, type, bytes)`: every file Ingenium saves goes through it.
@@ -67,4 +69,4 @@ Hooks on `window`: `__ingBeforeLock(why)` (waited for before the keys go), `__in
 
 ## 6. Additional data strings (the places bound into each seal)
 
-`"ingenium-lock dek"`, `"ingenium-lock recovery"`, `"ingenium-lock check"`, `"ingenium-lock phrase"`, `"ingenium-lock file"`, `"ingenium-lock device"`; `"desk"`; `"big:" + id`; `"rec:" + db + "/" + store + "/" + key`; `"carried " + key`; `"scriba recording " + id`; `"ingenium-cloud 1 " + id`. HKDF info: `"ingenium-disk 1"` (built); `"ingenium-rag 1"` (planned).
+`"ingenium-lock dek"`, `"ingenium-lock recovery"`, `"ingenium-lock check"`, `"ingenium-lock phrase"`, `"ingenium-lock file"`, `"ingenium-lock device"`; `"desk"`; `"big:" + id`; `"rec:" + db + "/" + store + "/" + key`; `"carried " + key`; `"scriba recording " + id`; `"ingenium-cloud 1 " + id`. HKDF info: `"ingenium-disk 1"` (7.49); `"ingenium-rag 1"` (7.59). The index's sectors: the file's salt and the sector's number.

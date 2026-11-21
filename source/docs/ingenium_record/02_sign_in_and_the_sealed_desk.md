@@ -52,7 +52,7 @@ A change of password (`rewrap`) seals the same data key again under a new salt a
 ### 2.4 Keys derived from the data key
 
 * The computer's disk (Ingenium 7.49): `diskKey()` derives 32 bytes with HKDF-SHA-256 (salt of 32 zero bytes, info `"ingenium-disk 1"`). Its id is the first 8 bytes of its SHA-256, in hexadecimal, so that a file sealed under another sign-in is recognised as such. The computer app holds it in memory only while the owner is signed in (`modules/r340.js`, `desktop/app_disk_749.py`).
-* Planned, not built: the folder search's index, with HKDF info `"ingenium-rag 1"` (see record 07).
+* The folder search's index (Ingenium 7.59): `ragKey()` derives its key in the same way, with HKDF info `"ingenium-rag 1"`, and the same kind of id. Each profile has its own data key, so each profile's index has its own key (record 06, section 10).
 
 ## 3. The envelopes
 

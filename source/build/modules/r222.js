@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.59", "In the Mac and Windows apps, the folder search's index is sealed with your password while your sign-in is on, and opened only in the folder search's memory while you are signed in. Each profile on the device now has an index of its own, sealed with that profile's own password; the folders it had are moved into it at the first start, so nothing is read again. Turning the sign-in off opens the index again first."],
   ["7.58", "Settings, Security, Ingenium itself: the Mac and Windows apps check this copy against its signature at every start. A signed copy changed by anyone else does not open, and its window says which file changed."],
   ["7.58", "Sign this release, in Settings, Security, Ingenium itself: your owner key signs the copy you installed, on this device, and the key never leaves it. Save the signature, and bring it in on your other computers that run the same release.", "master"],
   ["7.57", "A repository with other repositories inside it (git's submodules) keeps them in every version Fabrica makes in Ingenium; until now a version kept here left them out. A merge, a version brought in, an undo and a rebase take the other side's change to one, as git does.", "fabrica"],

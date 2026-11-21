@@ -395,6 +395,34 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.59 (21 November 2026): the folder search's index sealed with the sign-in, one index per profile, in the Mac and Windows apps.
+Approved on 20 November 2026 at the cost measured on a prototype (building about three times as long; the first vector search of a
+session about 3.5 s, later ones 37 to 74 ms). Sealing it with the owner's key would have locked the other profiles out of their own
+folder search; her choice between the ways (21 November 2026): "One index per profile".
+- `rag/seal.js` (new): in the store worker only, it takes over the read, write, getSize and truncate of each OPFS access handle under
+  SQLite's opfs-sahpool file system, so each file's data past the pool's 4,096-byte header is kept as a 64-byte head (INGRAGS1, the key's
+  id, the plain size, a salt) and sectors of 4,096 plain bytes sealed with XChaCha20-Poly1305 (`@noble/ciphers` 2.4.0, `rag/vendor/noble`),
+  the file's salt and the sector's number bound in. A plain file is sealed in place from its last sector to its first, a sealed one
+  opened in place from its first; opened sectors are kept in the worker's memory (at most 192 MiB). Its errors (LOCKED, OTHER_KEY,
+  SEAL_BROKEN) are kept for the worker to report, since the pool turns them into a bare I/O failure.
+- `rag/store.worker.js`: the sealing is always loaded for OPFS, so a sealed index read without its key is refused as sealed and never
+  taken for a damaged one (which the card would offer to start again); without the cipher a plain index still opens. `splitShared()`:
+  the first open moves each other profile's folders, files, passages, FTS5 rows, vectors and cached vectors from `rag.sqlite3` into
+  `rag-<id>.sqlite3`, with no key held, keeps a folder the owner shares, takes the rest out, then merges the word index and rebuilds the
+  shared file (VACUUM), so no freed page keeps a moved passage (found by the test: deleted rows had stayed readable in free pages). New
+  operations seal.key, seal.openAll, seal.state, profile.drop; info() says sealed and what the split did. The pool holds 32 files (was 12).
+- `rag/main.js`: the index's name per profile; it opens with the profile's key when it has a sign-in (after the sign-in), seals the
+  open index when the sign-in is turned on, and opens it again in place when it is turned off; IngRag.sealState() and dropProfile(id).
+- `build/modules/r197.js`: IngLock.ragKey() (HKDF-SHA-256 from the data key, info "ingenium-rag 1", id the first 8 bytes of its SHA-256);
+  turning the sign-in off waits for window.__ingBeforeOff before the lock record goes, and a refusal keeps protection on.
+- `r340.js`: Settings, Security, The computer's disk says the index's true state, asked of the folder search; `r318.js` no longer lists
+  it as planned. `r331.js`: removing a profile deletes its own index. What is new (r222): one line for every edition.
+- `build/release.py`: seal.js among the folder search's files; RAG_VENDOR_SHA256 for the rebuilt rag-vendor.zip, which carries noble/.
+- The record in Ingenium's folder: records 00, 01, 02, 04, 05, 06 (section 10, new), 09 and 10.
+- rig: `t_759_rag_seal.js` (the store: the move, each profile's own, the seal read raw, no key, another key, a changed byte, opened and
+  sealed again in place, a sealed shared index left alone, a removed profile's index) and `t_759_rag_page.js` (the page, with the folder
+  bridge standing in: plain, sealed when the sign-in is turned on, after Lock now, opened again when it is turned off, and the room).
+
 Ingenium 7.58 (20 November 2026): Ingenium itself, signed and checked, part one, in the Mac and Windows apps.
 The Security room's promise (modules/r318.js, approved on the live preview of 18 November 2026): "each release signed with your owner
 key, and checked by the computer apps ... before Ingenium opens: a copy changed by anyone else refuses to open, and says which file

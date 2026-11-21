@@ -52,7 +52,7 @@ Everything is saved (`saveState`, and the computer app's copy flushed), the comp
 
 * Only the owner adds or removes a profile, and only while her sign-in is on: adding asks for it first (the key "Turn on your sign-in", `#profLockSetup`, when it is off).
 * Adding: a name (refused if empty or already used), a tile, and how it opens (its own password, or none). "<name>'s profile is ready: <name> chooses its password the first time it opens."
-* Removing asks once more, then takes away everything that profile kept on the device: its stores (`drop`), its files on the computer app's disk (`profile_drop`), and its folders in the folder search (the reader `p:<id>` and the folders only it could read).
+* Removing asks once more, then takes away everything that profile kept on the device: its stores (`drop`), its files on the computer app's disk (`profile_drop`), and its folders in the folder search (from 7.59 its own index file, `rag-<id>.sqlite3`, through `IngRag.dropProfile`; and, for a profile whose folders were never moved, the reader `p:<id>` and the folders only it could read in the shared one).
 * The card also says what a profile holds and keeps apart, part by part (conversations and memory; folders and the folder search; Lector and Vocatio records, or notes in its folders; Display and sounds; connections and their keys; shared: the models).
 
 ## 7. Where the profiles are reached

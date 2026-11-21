@@ -19,7 +19,7 @@ Part of the record, written from Ingenium 7.54's sources (20 November 2026).
 * Malicious software already on the device, or a browser extension that reads pages.
 * Model files, the engine, the training lab's models and Fabrica's finds by meaning, which are not sealed; a run's working files while the run is still running.
 * Anyone who can change the computer app itself, or take its signatures away, can stop the check of Ingenium itself (it then says Not signed yet); the iPhone, iPad and Fire apps and the copies she gives do not check yet.
-* Not yet built: signed packages, scrambled code, the check of Ingenium itself on the iPhone, iPad and Fire apps, the folder search's index and apps kept on a drive sealed (record 06, section 7).
+* Not yet built: signed packages, scrambled code, the check of Ingenium itself on the iPhone, iPad and Fire apps, and apps kept on a drive sealed (record 06, section 7). The folder search's index is sealed from 7.59 (record 06, section 10).
 
 There is no maker's key and no back door. A copy opens only with what its owner keeps, so a forgotten password with no way back in cannot be undone by anyone.
 

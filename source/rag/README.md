@@ -37,7 +37,15 @@ may read its folder (`chunk.get`). It is built and tested with a second test use
 the local profiles the owner plans on top of the optional sign-in.
 
 **This client-side ACL separates the app's users. It does not protect against a person with direct access to the browser profile's
-storage**: the index is a file of this computer's browser storage, and whoever can open that storage can read it whole.
+storage**: the index is a file of this computer's browser storage, and whoever can open that storage can read a plain index whole.
+
+**From 7.59 each profile has an index of its own, sealed with its own key while it has a sign-in** (her choice, 21 November 2026:
+"One index per profile"). The owner keeps `rag.sqlite3`; another person's profile has `rag-<id>.sqlite3` (`main.js`, `DBNAME`). The
+first open moves each other profile's folders out of the shared file into its own (`store.worker.js`, `splitShared`), with no key
+held, then merges the word index and rebuilds the shared file so no freed page keeps them. `seal.js` seals each file's data past the
+pool's header in sectors of 4,096 bytes with XChaCha20-Poly1305 (`vendor/noble`, `@noble/ciphers` 2.4.0), under a key derived from
+the profile's data key (`IngLock.ragKey`, HKDF info `"ingenium-rag 1"`) and kept in the store worker's memory only. Without its key
+the index is refused as sealed (`LOCKED`), never taken for a damaged one. Tests: `rig/t_759_rag_seal.js`, `rig/t_759_rag_page.js`.
 
 The folders themselves are protected by the app, not by the page: the app reads only folders chosen in its dialog, refuses paths that
 leave them, hidden files, other file types and symbolic links that point outside (`build/desktop/app_rag_692.py`).
@@ -51,6 +59,7 @@ leave them, hidden files, other file types and symbolic links that point outside
 | `indexer.js`, `parse.worker.js`, `chunker.js` | page, worker | walks a folder, parses (txt, md, html, json, csv; pdf with pdf.js; docx with mammoth), cuts into passages of 300 to 450 tokens with 10 to 15% overlap, hashes, embeds, writes each file in one transaction |
 | `embedder.js`, `embedder.worker.js` | page, worker | Transformers.js with `Xenova/bge-small-en-v1.5` (384 values, q8), batches of 16, one or more workers |
 | `store.js`, `store.worker.js` | page, worker | the only SQLite connection (SQLite 3.45.3 with FTS5 and sqlite-vec 0.1.6, OPFS), schema and migrations, every read and write |
+| `seal.js` | worker | 7.59: each index file's data sealed with its profile's key (XChaCha20-Poly1305 over 4 KiB sectors), under SQLite's OPFS pool |
 | `scheduler.js`, `scheduler.worker.js` | page, worker | phase 4: the clock (setInterval in a worker) and its page side; the reconcile is in `main.js` |
 | `prompt.js` | page | phase 3: NOT_FOUND, her grounding prompt, the citation reader and the sentence check (pure functions) |
 | `reranker.js`, `reranker.worker.js` | page, worker | phase 5: the optional reranker (`Xenova/ms-marco-MiniLM-L-6-v2`, q8), off by default, loaded the first time a search asks for it; it reorders the best 20 of the fusion and the best 5 are kept |
@@ -72,7 +81,7 @@ opened the first time the card scrolls into view, and the reading model is loade
   modules are joined in name order). The demo edition (`ING_EDITION=demo`) builds with it: that build checks that the page names no
   page the demo leaves out, and finds nothing new.
 * **Beside the page.** `rag/*.js` are shipped as plain files in `<page folder>/rag/` and the third-party files in
-  `<page folder>/rag/vendor/` (`sqlite/`, `transformers/`, `ort/`, `pdfjs/`, `mammoth/`, `models/Xenova/bge-small-en-v1.5/`; about
+  `<page folder>/rag/vendor/` (`sqlite/`, `transformers/`, `ort/`, `pdfjs/`, `mammoth/`, `noble/` from 7.59, `models/Xenova/bge-small-en-v1.5/`; about
   84 MB). They cannot go inside the page: workers must be real files on the app's own address, never `blob:` (WebKit refused those).
   Every address is relative to the page (`new URL('rag/vendor/...', location.href)`). This is the owner's decision: the assets ship
   inside the desktop apps, nothing is fetched from the web at run time.
