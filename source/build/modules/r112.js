@@ -1244,10 +1244,17 @@ function sheetName(title,lead,fn,ph){var sh=sheet(title,lead),inp=h("input");inp
   var end=h("div","end"),ok=btn("pri","Done",function(){var v=inp.value.trim();if(!v){inp.focus();return;}ok.disabled=true;Promise.resolve().then(function(){return fn(v);}).then(sh.close,function(e){ok.disabled=false;fail(e);});});
   end.appendChild(ok);sh.box.appendChild(end);inp.onkeydown=function(e){if(e.key==="Enter")ok.click();};setTimeout(function(){inp.focus();},60);}
 function pickFile(accept,fn){var i=document.createElement("input");i.type="file";i.accept=accept;i.style.display="none";document.body.appendChild(i);i.onchange=function(){var f=i.files&&i.files[0];i.remove();if(f)fn(f);};i.click();}
-function importFile(file,into,want){busy("Bringing "+file.name+" in…");file.arrayBuffer().then(function(ab){var u8=new Uint8Array(ab),name=want||file.name.replace(/\.(zip|bundle|html?)$/i,"");
+/* 7.62: a page or a zip is checked as it comes in (modules/r352.js): one not as it was signed comes in only if she says so */
+function importFile(file,into,want){busy("Bringing "+file.name+" in…");var seen=null;file.arrayBuffer().then(function(ab){var u8=new Uint8Array(ab),name=want||file.name.replace(/\.(zip|bundle|html?)$/i,"");
+    var sign=window.IngAppSign&&IngAppSign.cameIn&&/\.(html?|zip)$/i.test(file.name)?IngAppSign.cameIn(u8,name):Promise.resolve(null);
+    return sign.then(function(x){if(x&&!x.go){var e=new Error("Left out, as you chose: "+name+" is not as it was signed.");e.ingLeft=1;throw e;}seen=x;return go2();});
+    function go2(){
     if(/\.html?$/i.test(file.name)){var files=[{path:file.name,data:u8}];if(into)return IngRepo.putMany(into.id,files).then(function(){return {id:into.id};});return IngRepo.fromFiles(files,{name:name,msg:"Brought in from "+file.name});}
     if(into&&u8[0]===0x50&&u8[1]===0x4b){return IngRepo.core.unzipData?Promise.reject(new Error("choose the app's own page to add to an app that is here; a zip comes in as an app of its own")):Promise.reject(new Error("a zip comes in as an app of its own"));}
-    return IngRepo.importAny(u8,{name:name});}).then(function(x){var id=x.id||(x.repo&&x.repo.id)||(x.summary&&x.summary.id);if(id){FBS().sel=id;S.home=false;saveSoon();}S.view="history";C.diff={};C.files={};C.log={};return refresh();}).then(function(){unbusy();paint();toast(file.name+" is here.");},function(e){unbusy();fail(e);});}
+    return IngRepo.importAny(u8,{name:name});}}).then(function(x){var id=x.id||(x.repo&&x.repo.id)||(x.summary&&x.summary.id);if(id){FBS().sel=id;S.home=false;saveSoon();}S.view="history";C.diff={};C.files={};C.log={};return refresh();}).then(function(){unbusy();paint();
+      var st=seen&&seen.s&&seen.s.state,mine=typeof ING_EDITION!=="string"||ING_EDITION==="master";
+      toast(file.name+" is here"+(st==="signed"?", signed by "+(mine?"you":"its maker")+" and as it was signed":st==="changed"?", kept though it is not as it was signed":st==="foreign"?", kept though its signature is not the owner's":"")+".");},
+    function(e){unbusy();if(e&&e.ingLeft)toast(e.message);else fail(e);});}
 var busyEl=null;function busy(m){unbusy();busyEl=h("div","f-toast",esc(m));$("fb").appendChild(busyEl);}
 function unbusy(){if(busyEl){busyEl.remove();busyEl=null;}}
 

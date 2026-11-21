@@ -19,8 +19,9 @@
    - Check a package (the Ship card): a page or a web app's zip, read here: Signed by you, as signed; or changed, and which file; or not
      signed. Any copy of Ingenium checks with the owner's public keys every copy carries (IngPermit.keys).
    Signatures: ECDSA P-256 with SHA-256 over PermitCore's fixed order (canon), as the release signatures of r348.
-   Not yet, said in the room: the Mac, Windows, Android and iPhone apps check the page at every start (their shells are built on
-   GitHub's machines), and an app brought into Ingenium's library is checked as it comes in.
+   Part two (modules/r352.js, 7.62): the Mac, Windows, Android and iPhone apps check the page at every start (the check compiled into
+   their shells, source/shells), and an app brought into Ingenium's library is checked as it comes in. Still not yet, said in the room:
+   an app built from its build kit, on GitHub or in the terminal, carries the signature but does not check it at start.
    Its card rises in, and its keys lift and sink, as the room's own; Minimal or reduced motion keeps them still.
    window.IngAppSign: plain(u8), signPage(html, ctx), check(u8, name), checkFile(), packageRow(box, r, pref), lineFor(r), signedNote(n, k)
    Shown to her as eight pictures one by one at full size (previews/app_sign: the room, Package details, the card, the Ship card, Check a
@@ -267,7 +268,7 @@ function lineFor(id){return !master()?"":wanted(id)?"and with your owner key":"n
 function signedNote(n,k){return !!(n&&n["ownerSigned_"+k]);}
 function packageRow(box,r,pref){if(!master())return null;var on=pref.sign!==false;
   var b=D.createElement("button");b.type="button";b.className="r349-row";b.setAttribute("role","switch");b.setAttribute("aria-checked",String(on));
-  b.innerHTML='<span class="t"><b>Signed with your owner key</b><small>Every package carries your signature inside its page, and the web app checks its own files: a changed file is caught, and the web app refuses to open and says which. Your owner key\'s password is asked once each time you make them.</small></span><span class="tr"></span>';
+  b.innerHTML='<span class="t"><b>Signed with your owner key</b><small>Every package carries your signature inside its page, and every app made from it checks the signature each time it starts: a changed copy refuses to open and says which file. Your owner key\'s password is asked once each time you make them.</small></span><span class="tr"></span>';
   b.onclick=function(){on=!on;b.setAttribute("aria-checked",String(on));};box.appendChild(b);
   sealedKey().then(function(k){if(!k){var s=b.querySelector("small");s.textContent="Your owner key is not on this device (Settings, Licence and permissions): until it is, what you make here is made unsigned, and Ingenium says so.";}});
   return {on:function(){return on;}};}
@@ -279,10 +280,10 @@ function state(){if(!master())return "soon";if(Date.now()-KEYASKED>4000)readKey(
 function well(chip){var st=state(),already="Already, too: your Android and Fire packages are signed with your Android key (Fabrica, Ship), as Android requires, and an iPhone or iPad app with your Apple ID, through Sideloadly.";
   /* an edition other than the owner's own: no owner key here; what it can do is check */
   if(!master())return '<div class="sc-well"><div class="sc-wh"><b>Signed with your key</b>'+chip("soon")+'</div><p>'+esc("Already: your Android and Fire packages are signed with your Android key (Fabrica, Ship), as Android requires, and an iPhone or iPad app with your Apple ID, through Sideloadly. The owner's own copy also signs every package with the owner key; here, Check a package (Fabrica, Ship) reads the signature any package carries.")+'</p></div>';
-  var p=st==="on"?"On: every package Fabrica makes carries your owner key's signature inside its page, and the web app checks its own files before it opens. A changed file is caught: the web app refuses and says which, and Check a package (Fabrica, Ship) says so of any copy. "+already
+  var p=st==="on"?"On: every package Fabrica makes carries your owner key's signature inside its page, and every app it makes checks that signature each time it starts: on a Mac, on Windows, on a Fire tablet or Android, on an iPhone or iPad, and on the web. A changed copy does not open, and says which file changed. Check a package (Fabrica, Ship) reads any copy, and an app brought into your library is checked as it comes in. "+already
     :KEYSTATE==="foreign"?"Off on this device: your owner key here is not one Ingenium carries, so no copy could check it, and what you make here is made unsigned. Save its public half (Settings, Licence and permissions) for the next release. "+already
     :"Off on this device: your owner key is not here (Settings, Licence and permissions), so what you make here is made unsigned. "+already;
-  return '<div class="sc-well"><div class="sc-wh"><b>Signed with your key</b>'+chip(st)+'</div><p>'+esc(p)+'</p><p class="sc-fine">Not yet: the Mac, Windows, Android and iPhone apps check the signature at every start, and an app brought into Ingenium\'s library is checked as it comes in. Turned off for an app in Package details, its packages are made unsigned.</p></div>';}
+  return '<div class="sc-well"><div class="sc-wh"><b>Signed with your key</b>'+chip(st)+'</div><p>'+esc(p)+'</p><p class="sc-fine">Not yet: an app built from its build kit, on GitHub or in the terminal, carries your signature but does not check it at start. An app made before 7.62 checks itself once it is made again. Turned off for an app in Package details, its packages are made unsigned.</p></div>';}
 setTimeout(function wait(){if(W.__ingReady===true)readKey();else setTimeout(wait,800);},600);
 W.IngAppSign={state:state,well:well,plain:plain,signPage:signPage,check:check,checkPage:checkPage,checkZip:checkZip,checkFile:checkFile,packageRow:packageRow,lineFor:lineFor,signedNote:signedNote,swPrelude:swPrelude,signZip:signZip,
   _session:function(){return SESSION;},_drop:function(){SESSION=null;}};

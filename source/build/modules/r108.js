@@ -467,6 +467,8 @@ function paintBrief(){var box=$("l7Bf");if(!box)return;syncApps();var S=L7(),B=S
     var old=meta?staleRun(k,B.depth):null,fresh=old&&!useEarlier(k)?freshFor(k,B.depth):null;
     var st=!meta?"Not added yet":old&&!useEarlier(k)?(fresh?"Read in part: "+(fresh.done||0)+" of "+(fresh.total||0):"Read from "+(old.version||"an earlier copy")):run&&run.status==="done"?"Read "+lxDate(run.finished||run.updated):run?"Read in part: "+(run.done||0)+" of "+(run.total||0):"Not read yet";
     b.appendChild(h("span","st",esc(st+(meta&&meta.version?" · "+meta.version:""))));
+    /* 7.62: what was found when it came in: signed, changed, or not signed (modules/r352.js) */
+    if(meta&&meta.sig&&window.IngAppSign&&IngAppSign.libChip){var sg=document.createElement("span");sg.innerHTML=IngAppSign.libChip(meta.sig);if(sg.firstChild)b.appendChild(sg.firstChild);}
     b.onclick=function(){if(busy){ingToast("Lector is at work on a set. Pause it to change the brief.");return;}
       if(!kept(k)){ingToast(nm(k)+" is not on this device yet. Add your apps first.");return;}
       var i=B.apps.indexOf(k);if(i>=0){if(B.apps.length>1)B.apps.splice(i,1);}else B.apps.push(k);B.apps=sorted(B.apps);saveSoon();prepare(k);paintBrief();paintModel();paintTabs();paintDoc();paintMain();};
