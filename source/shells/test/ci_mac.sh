@@ -100,4 +100,17 @@ if has "$R" "is signed with a key this app does not know" && has "$R" "ING-SHELL
 else
   say "FAIL a page signed with a key the shell does not carry: ${R:-(no report)}"; tail -n 10 "$LOG" | sed 's/^/     | /' >> "$REPORT"; fail=1
 fi
+
+# 7.63: what the door of an app for its owner alone needs (modules/r354.js): Web Crypto here, and a page that stops where its first
+# script stops it (the title says what was found; the script after the stop never runs)
+node "$T/make_mac.mjs" $M "$ZIP" "$T/door_check.html" $I "$W/door.zip" com.yannieforest.doorcheck.mac "Door Check" CarpeNative | tail -1 > /dev/null || exit 1
+D="$W/x-door"; rm -rf "$D"; mkdir -p "$D"; ditto -x -k "$W/door.zip" "$D"
+APP=$(ls -d "$D"/*.app | head -1); EXE=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Contents/Info.plist")
+LOG="$W/door.log"
+"$APP/Contents/MacOS/$EXE" -shell_pagetest > "$LOG" 2>&1 &
+wait_for "$LOG" "SHELL_PAGETEST DONE" 90
+quit_app "$APP/Contents/MacOS/$EXE"
+R=$(report "$LOG")
+if has "$R" '"title":"Door check: crypto"'; then say "PASS the door's needs: Web Crypto in a secure context, and the page stops where its first script stops it: $R"
+else say "FAIL the door's needs: ${R:-(no report)}"; fail=1; fi
 exit $fail

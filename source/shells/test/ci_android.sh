@@ -88,5 +88,15 @@ elif adb install "$W/refused.apk" 2>&1 | tee -a "$REPORT" | grep -q Success; the
   else say "FAIL a page signed with a key the shell does not carry: ${R:-(no report)}"; fail=1; fi
   quick shell am force-stop com.yannieforest.tidecheck
 else say "FAIL the refused case's APK did not install"; fail=1; fi
+# 7.63: what the door of an app for its owner alone needs (modules/r354.js): Web Crypto here, and a page that stops where its first
+# script stops it (the title says what was found; the script after the stop never runs)
+FABRICA_VC=$VC node "$T/make_apk.mjs" $M $D "$T/door_check.html" $I "$W/door.apk" com.yannieforest.doorcheck "Door Check" "$W/test.p12" test-pass-123 | tail -1 > /dev/null || exit 1
+if ! alive; then say "FAIL the emulator stopped answering before the door check"; fail=1
+elif adb install "$W/door.apk" 2>&1 | tee -a "$REPORT" | grep -q Success; then
+  R=$(report com.yannieforest.doorcheck com.yannieforest.doorcheck/$SHELL_ACT)
+  if echo "$R" | grep -q '"title":"Door check: crypto"'; then say "PASS the door's needs: Web Crypto in a secure context, and the page stops where its first script stops it: $R"
+  else say "FAIL the door's needs: ${R:-(no report)}"; fail=1; fi
+  quick shell am force-stop com.yannieforest.doorcheck
+else say "FAIL the door check's APK did not install"; fail=1; fi
 alive && quick logcat -d -s IngeniumShell:* AndroidRuntime:E | tail -40 > "$OUT/android-$API-log.txt"
 exit $fail

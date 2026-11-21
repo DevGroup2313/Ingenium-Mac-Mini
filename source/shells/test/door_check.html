@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+/* Ingenium 7.63: what a door at the head of a page (modules/r354.js) needs from the shell that opens it: Web Crypto, in a secure
+   context, and a page that stops where its first script stops it. The title says what was found; the script after the stop must
+   never run (its title would say so). */
+(function () {
+  var ok = !!(window.isSecureContext && window.crypto && window.crypto.subtle && window.crypto.subtle.importKey);
+  try { window.stop(); } catch (e) {}
+  document.documentElement.innerHTML = '<head><meta charset="utf-8"><title>Door check: ' + (ok ? 'crypto' : 'no crypto') + '</title></head><body><p>The door stood here.</p></body>';
+})();
+</script>
+<title>Door check: not reached</title>
+</head>
+<body>
+<script>document.title = 'Door check: ran past the door';</script>
+<p>The app.</p>
+</body>
+</html>

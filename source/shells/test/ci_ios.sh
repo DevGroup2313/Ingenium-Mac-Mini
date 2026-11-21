@@ -47,5 +47,19 @@ if xcrun simctl install "$UDID" "$APP"; then
   else say "FAIL a page signed with a key the shell does not carry: ${R:-(no report)}"; fail=1; fi
   xcrun simctl terminate "$UDID" com.yannieforest.tidecheck > /dev/null 2>&1
 else say "FAIL the refused case did not install"; fail=1; fi
+# 7.63: what the door of an app for its owner alone needs (modules/r354.js): Web Crypto here, and a page that stops where its first
+# script stops it (the title says what was found; the script after the stop never runs)
+node "$T/make_ipa.mjs" $M "$ZIP" "$T/door_check.html" $I "$W/door.ipa" com.yannieforest.doorcheck "Door Check" CarpeNative | tail -1 > /dev/null || exit 1
+rm -rf "$W/x" && mkdir -p "$W/x" && (cd "$W/x" && unzip -q "$W/door.ipa")
+APP=$(ls -d "$W"/x/Payload/*.app | head -1)
+if xcrun simctl install "$UDID" "$APP"; then
+  LOG="$W/door.log"; xcrun simctl launch --console-pty "$UDID" com.yannieforest.doorcheck -shell_pagetest > "$LOG" 2>&1 & LP=$!
+  for i in $(seq 1 40); do grep -q "SHELL_PAGETEST PAGE" "$LOG" 2>/dev/null && break; sleep 3; done
+  kill "$LP" > /dev/null 2>&1
+  L=$(grep "SHELL_PAGETEST PAGE" "$LOG" | tail -1); R="${L#*SHELL_PAGETEST PAGE }"
+  if echo "$R" | grep -q '"title":"Door check: crypto"'; then say "PASS the door's needs: Web Crypto in a secure context, and the page stops where its first script stops it: $R"
+  else say "FAIL the door's needs: ${R:-(no report)}"; fail=1; fi
+  xcrun simctl terminate "$UDID" com.yannieforest.doorcheck > /dev/null 2>&1
+else say "FAIL the door check did not install"; fail=1; fi
 sleep 2; xcrun simctl io "$UDID" screenshot "$OUT/ios-home.png" > /dev/null 2>&1
 exit $fail
