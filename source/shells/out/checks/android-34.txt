@@ -9,3 +9,4 @@ Performing Streamed Install
 Success
 FAIL The Forge (13 MB page) opens by its launcher name: (the emulator stopped answering)
 FAIL the emulator stopped answering before the refused case
+FAIL the emulator stopped answering before the door check
