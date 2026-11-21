@@ -73,5 +73,20 @@ elif adb install "$W/forge.apk" 2>&1 | tee -a "$REPORT" | grep -q Success; then
   R=$(report com.yannieforest.theforge.test com.yannieforest.theforge.test/com.yannie.carpediem.MainActivity); check "The Forge (13 MB page) opens by its launcher name" "$R" "[^\"]*Forge[^\"]*"
   sleep 4; alive && quick exec-out screencap -p > "$OUT/android-$API-forge.png"
 else say "FAIL The Forge's APK did not install$(alive || echo ': the emulator stopped answering')"; fail=1; fi
+# 7.62: a page signed with a key the shell does not carry (a test key, shells/common/test): the shell refuses it before anything
+# of it runs, and shows its own page in its place (modules/r352.js)
+node source/shells/common/test/page_from_case.mjs source/shells/common/test/vectors.json "signed, as Fabrica made it" "$W/signed_test.html" > /dev/null || exit 1
+FABRICA_VC=$VC node "$T/make_apk.mjs" $M $D "$W/signed_test.html" $I "$W/refused.apk" com.yannieforest.tidecheck "Tide Check" "$W/test.p12" test-pass-123 | tail -1 || exit 1
+if ! alive; then say "FAIL the emulator stopped answering before the refused case"; fail=1
+elif adb install "$W/refused.apk" 2>&1 | tee -a "$REPORT" | grep -q Success; then
+  quick shell am start -n com.yannieforest.tidecheck/$SHELL_ACT --ez ingenium_pagetest true > /dev/null 2>&1
+  R=""; end=$((SECONDS + 90))
+  while [ $SECONDS -lt $end ]; do R=$(quick logcat -d -s IngeniumPage:I 2>/dev/null | grep "INGENIUM_SELFTEST REFUSED" | tail -1); [ -n "$R" ] && break; alive || break; sleep 2; done
+  sleep 4; alive && quick exec-out screencap -p > "$OUT/android-$API-refused.png"
+  if echo "$R" | grep -q "is signed with a key this app does not know" && echo "$R" | grep -q "ING-SHELL-CHECK-1"; then
+    say "PASS a page signed with a key the shell does not carry: refused before it ran, the shell's own page in its place: ${R#*INGENIUM_SELFTEST REFUSED }"
+  else say "FAIL a page signed with a key the shell does not carry: ${R:-(no report)}"; fail=1; fi
+  quick shell am force-stop com.yannieforest.tidecheck
+else say "FAIL the refused case's APK did not install"; fail=1; fi
 alive && quick logcat -d -s IngeniumShell:* AndroidRuntime:E | tail -40 > "$OUT/android-$API-log.txt"
 exit $fail

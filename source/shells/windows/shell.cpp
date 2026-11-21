@@ -60,6 +60,8 @@
 #include <cwctype>
 #include "WebView2.h"
 #include "WebView2EnvironmentOptions.h"
+#include "shell_common.h"      // 7.62: the owner's public keys, and the page shown in place of one not as its maker signed it
+#include "signature_check.h"   // 7.62: the check of the page against its maker's signature
 
 using Microsoft::WRL::ComPtr;
 using Microsoft::WRL::Callback;
@@ -842,8 +844,32 @@ static void keepPlace() {
     std::ofstream f(std::filesystem::path(g_dataDir + L"\\window.txt"));
     f << r.left << " " << r.top << " " << (r.right - r.left) << " " << (r.bottom - r.top) << " " << (wp.showCmd == SW_SHOWMAXIMIZED ? 1 : 0);
 }
+/* 7.62: the page as its maker signed it (signature_check.h): checked before anything of it runs. shell.txt's signature_kid
+   says the package was made signed, so a page whose signature was taken away is refused too. When the page is not as its
+   maker signed it, g_refused is the shell's own page, shown in its place, and the app's page is given nothing. */
+static std::string g_refused;
+static void checkPage() {
+    std::string page = narrow(conf("page", L"index.html"));
+    bool marked = g_conf.count("signature_kid") > 0;
+    std::string kid = marked ? narrow(g_conf["signature_kid"]) : "", app = g_conf.count("signature_app") ? narrow(g_conf["signature_app"]) : "";
+    const char* why = nullptr;
+    auto it = g_files.find(page);
+    if (it == g_files.end()) why = marked ? ingsig::MISSING : nullptr;
+    else {
+        std::vector<ingsig::Key> keys;
+        for (size_t i = 0; i < SHELL_OWNER_KEY_COUNT; i++) keys.push_back({SHELL_OWNER_KEYS[i].kid, SHELL_OWNER_KEYS[i].x, SHELL_OWNER_KEYS[i].y});
+        ingsig::WinCrypto cr;
+        why = ingsig::check((const uint8_t*)g_payload.data() + it->second.first, it->second.second, marked, kid, app, keys, cr);
+    }
+    if (!why) return;
+    size_t slash = page.find_last_of('/');
+    g_refused = ingsig::fill(SHELL_REFUSED_PAGE, narrow(conf("title", L"This app")), slash == std::string::npos ? page : page.substr(slash + 1), why);
+    testLog(L"SHELL_PAGETEST REFUSED {\"file\":" + jsonStr(widen(page)) + L",\"why\":" + jsonStr(widen(why)) + L",\"check\":" + jsonStr(widen(SHELL_MARKER)) + L"}");
+}
+
 static void startWebView() {
     bool setup = g_mode != Mode::App;
+    if (!setup) checkPage();
     std::wstring flag = g_dataDir + L"\\starting.flag", safe = g_dataDir + L"\\safe_graphics.txt";
     bool soft = GetFileAttributesW(safe.c_str()) != INVALID_FILE_ATTRIBUTES;
     if (!soft && (GetFileAttributesW(flag.c_str()) != INVALID_FILE_ATTRIBUTES || graphicsChipIsAmd())) {
@@ -894,6 +920,17 @@ static void startWebView() {
                             bool inSetup = g_mode != Mode::App;
                             if (path.empty()) path = inSetup ? "__setup/index.html" : narrow(conf("page", L"index.html"));
                             ComPtr<IStream> body; int status = 200; const wchar_t* mime = mimeFor(path);
+                            if (!inSetup && !g_refused.empty()) {   // 7.62: the shell's own page alone, in place of the app's
+                                bool own = path == narrow(conf("page", L"index.html"));
+                                if (own) body.Attach(SHCreateMemStream((const BYTE*)g_refused.data(), (UINT)g_refused.size()));
+                                else body.Attach(SHCreateMemStream((const BYTE*)"", 0));
+                                ComPtr<ICoreWebView2WebResourceResponse> resp;
+                                g_env->CreateWebResourceResponse(body.Get(), own ? 200 : 404, own ? L"OK" : L"Not Found",
+                                    own ? L"Content-Type: text/html; charset=utf-8\r\nContent-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; img-src data:\r\nCache-Control: no-store"
+                                        : L"Content-Type: text/plain\r\nCache-Control: no-store", &resp);
+                                args->put_Response(resp.Get());
+                                return S_OK;
+                            }
                             // the installer's window serves the installer's page alone, and the app never serves it
                             auto it = inSetup == (path.rfind("__setup/", 0) == 0) ? g_files.find(path) : g_files.end();
                             if (it != g_files.end()) {
@@ -911,6 +948,7 @@ static void startWebView() {
                         }).Get(), &tok);
                     g_webview->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(
                         [](ICoreWebView2*, ICoreWebView2WebMessageReceivedEventArgs* args) -> HRESULT {
+                            if (g_mode == Mode::App && !g_refused.empty()) return S_OK;   // 7.62: nothing is taken from a page not as its maker signed it
                             LPWSTR src = nullptr; args->get_Source(&src); bool own = src && ownUri(src); CoTaskMemFree(src);
                             if (!own) return S_OK;
                             LPWSTR m = nullptr;
@@ -946,7 +984,11 @@ static void startWebView() {
                                 g_started = true; DeleteFileW(flag.c_str());
                                 g_controller->MoveFocus(COREWEBVIEW2_MOVE_FOCUS_REASON_PROGRAMMATIC);   // the keys go to the page
                             }
-                            if (g_pageTest && !g_pageTestSent) { g_pageTestSent = true; g_webview->ExecuteScript(pageTestScript().c_str(), nullptr); }
+                            if (g_pageTest && !g_pageTestSent) {
+                                g_pageTestSent = true;
+                                if (!g_refused.empty()) testLog(L"SHELL_PAGETEST DONE");   // 7.62: the shell's own page asks nothing
+                                else g_webview->ExecuteScript(pageTestScript().c_str(), nullptr);
+                            }
                             if (g_setupTest && !g_setupTestSent) { g_setupTestSent = true; g_webview->ExecuteScript(setupTestScript().c_str(), nullptr); }
                             return S_OK;
                         }).Get(), &tok);
@@ -957,8 +999,10 @@ static void startWebView() {
                                 g_webview->Reload();   // the page comes back; the work is safe in storage
                             return S_OK;
                         }).Get(), &tok);
-                    g_webview->AddScriptToExecuteOnDocumentCreated((setup ? setupInfoScript() : bridgeScript()).c_str(), nullptr);
-                    if (g_pageTest || g_setupTest) g_webview->AddScriptToExecuteOnDocumentCreated(ERROR_CATCHER, nullptr);
+                    if (setup || g_refused.empty()) {   // 7.62: a page not as its maker signed it is given nothing
+                        g_webview->AddScriptToExecuteOnDocumentCreated((setup ? setupInfoScript() : bridgeScript()).c_str(), nullptr);
+                        if (g_pageTest || g_setupTest) g_webview->AddScriptToExecuteOnDocumentCreated(ERROR_CATCHER, nullptr);
+                    }
                     std::wstring entry = std::wstring(ORIGIN) + L"/" + (setup ? std::wstring(L"__setup/index.html") : conf("page", L"index.html"));
                     g_webview->Navigate(entry.c_str());
                     return S_OK;

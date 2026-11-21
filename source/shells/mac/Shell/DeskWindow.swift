@@ -46,6 +46,15 @@ final class DeskWindowController: NSWindowController, NSWindowDelegate, WKNaviga
 
     /// started by the cloud build with -shell_pagetest: the page reports back once
     static let pageTest = ProcessInfo.processInfo.arguments.contains("-shell_pagetest")
+
+    /// 7.62: the page as its maker signed it (SignatureCheck.swift): nil when it may open; otherwise what is wrong with it.
+    /// shell.json's "signature" says the package was made signed, so a page whose signature was taken away is refused too.
+    static let refusal: String? = {
+        guard let root = ShellSchemeHandler.www else { return nil }
+        let mark = config["signature"] as? [String: Any]
+        return SignatureCheck.check(pageAt: root.appendingPathComponent((config["page"] as? String) ?? "index.html"), marked: mark != nil,
+                                    kid: (mark?["kid"] as? String) ?? "", app: (mark?["app"] as? String) ?? "", keys: ShellCommon.ownerKeys)
+    }()
     /// in that check only: a save goes straight into this folder, with no panel to answer
     static let testSaveDir: URL? = {
         guard pageTest, let p = ProcessInfo.processInfo.environment["SHELL_PAGETEST_SAVE_DIR"], !p.isEmpty else { return nil }
@@ -84,14 +93,27 @@ final class DeskWindowController: NSWindowController, NSWindowDelegate, WKNaviga
         cfg.preferences.javaScriptCanOpenWindowsAutomatically = false
         if #available(macOS 12.3, *) { cfg.preferences.isElementFullscreenEnabled = true }
         let scripts = cfg.userContentController
-        scripts.add(self, name: "pySaveFile")
-        scripts.add(self, name: "shellLog")
-        scripts.addScriptMessageHandler(ShellClipboard(), contentWorld: .page, name: "shellClipboard")
-        scripts.addUserScript(WKUserScript(source: DeskWindowController.bridge,
-                                           injectionTime: .atDocumentStart, forMainFrameOnly: false))
-        if DeskWindowController.pageTest {
-            scripts.addUserScript(WKUserScript(source: DeskWindowController.errorCatcher,
-                                               injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        if let why = DeskWindowController.refusal {
+            /* 7.62: a page that is not as its maker signed it is never shown: the shell's own page is, and nothing is given to it */
+            let name = (DeskWindowController.config["page"] as? String) ?? "index.html"
+            ShellSchemeHandler.refused = (path: DeskWindowController.entryURL.path,
+                                          html: SignatureCheck.fill(ShellCommon.refusedPage, name: DeskWindowController.title,
+                                                              file: (name as NSString).lastPathComponent, why: why))
+            if DeskWindowController.pageTest,
+               let d = try? JSONSerialization.data(withJSONObject: ["file": name, "why": why, "check": ShellCommon.marker]),
+               let line = String(data: d, encoding: .utf8) {
+                DeskWindowController.log("SHELL_PAGETEST REFUSED " + line)
+            }
+        } else {
+            scripts.add(self, name: "pySaveFile")
+            scripts.add(self, name: "shellLog")
+            scripts.addScriptMessageHandler(ShellClipboard(), contentWorld: .page, name: "shellClipboard")
+            scripts.addUserScript(WKUserScript(source: DeskWindowController.bridge,
+                                               injectionTime: .atDocumentStart, forMainFrameOnly: false))
+            if DeskWindowController.pageTest {
+                scripts.addUserScript(WKUserScript(source: DeskWindowController.errorCatcher,
+                                                   injectionTime: .atDocumentStart, forMainFrameOnly: true))
+            }
         }
 
         webView = WKWebView(frame: NSRect(x: 0, y: 0, width: 1280, height: 860), configuration: cfg)
@@ -364,7 +386,8 @@ final class DeskWindowController: NSWindowController, NSWindowDelegate, WKNaviga
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         if DeskWindowController.pageTest && !pageTestSent {
             pageTestSent = true
-            webView.evaluateJavaScript(DeskWindowController.pageTestJS, completionHandler: nil)
+            if DeskWindowController.refusal != nil { DeskWindowController.log("SHELL_PAGETEST DONE") }   // its own page asks nothing
+            else { webView.evaluateJavaScript(DeskWindowController.pageTestJS, completionHandler: nil) }
         }
     }
 

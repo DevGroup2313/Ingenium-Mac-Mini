@@ -44,6 +44,13 @@ try {
       "/MANIFESTINPUT:$(Join-Path $here 'shell.manifest')" $lib `
       user32.lib ole32.lib shell32.lib shlwapi.lib advapi32.lib crypt32.lib comdlg32.lib version.lib uuid.lib dwmapi.lib gdi32.lib
   if ($LASTEXITCODE) { throw "cl failed" }
+  # 7.62: the shell's check of its page (signature_check.h), built alone with Windows' own cryptography, against the cases
+  # every shell is tested against (shells/common/test): each answer must be the one the case names
+  $tests = Join-Path (Split-Path -Parent $here) 'common\test'
+  & cl.exe /nologo /O2 /EHsc /std:c++17 /MT /W3 "/I$here" (Join-Path $tests 'check_test.cpp') /Fe:check_test.exe /link bcrypt.lib
+  if ($LASTEXITCODE) { throw "the test of the page's check did not build" }
+  & .\check_test.exe (Join-Path $tests 'vectors.json')
+  if ($LASTEXITCODE) { throw "the shell's check of its page answered a case wrongly" }
 } finally { Pop-Location }
 Copy-Item (Join-Path $w 'Shell.exe') (Join-Path $Out 'win-shell.exe') -Force
 Set-Content -Path (Join-Path $Out 'win-shell-sdk.txt') -Value "Microsoft.Web.WebView2 $ver (NuGet), sha256 $sha" -Encoding utf8

@@ -42,6 +42,7 @@ on:
       - '!source/shells/out/**'
       - 'source/build/modules/r136.js'
       - 'source/build/modules/r170.js'
+      - 'source/security/owner_keys.json'
       - '.github/workflows/build-shells.yml'
   # 7.24: started by hand, it can build one family of shells alone (the others stay as they are kept)
   workflow_dispatch:
@@ -72,6 +73,9 @@ jobs:
         run: |
           xcodebuild -version
           brew install xcodegen
+
+      - name: What every shell carries is in step with the owner's keys (7.62)
+        run: python3 source/shells/common/make_common.py --check
 
       - name: Make the Xcode project
         working-directory: source/shells/ios
@@ -242,6 +246,15 @@ jobs:
       - name: Get the sources
         uses: actions/checkout@v5
 
+      - name: The Android shell's check of its page, against its cases (7.62)
+        run: |
+          set +e
+          python3 source/shells/common/make_common.py --check || exit 1
+          mkdir -p "$RUNNER_TEMP/jt"
+          javac -nowarn --release 8 -d "$RUNNER_TEMP/jt" source/shells/android/src/studio/ingenium/shell/SignatureCheck.java source/shells/common/test/CheckTest.java || exit 1
+          java -cp "$RUNNER_TEMP/jt" studio.ingenium.shell.CheckTest source/shells/common/test/vectors.json > "$RUNNER_TEMP/jt.txt"; rc=$?
+          cat "$RUNNER_TEMP/jt.txt"; echo "Android shell's check: $(tail -1 "$RUNNER_TEMP/jt.txt")" >> "$GITHUB_STEP_SUMMARY"; exit $rc
+
       - name: Let the emulator use hardware acceleration
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -297,7 +310,16 @@ jobs:
       - name: Build the shell (one program for both kinds of Mac, sealed ad hoc)
         run: |
           xcrun swiftc --version
+          python3 source/shells/common/make_common.py --check
           bash source/shells/mac/build_mac.sh "$RUNNER_TEMP/macshell"
+
+      - name: The Mac and iPhone shells' check of their page, against its cases (7.62)
+        run: |
+          set +e
+          cmp source/shells/mac/Shell/SignatureCheck.swift source/shells/ios/Shell/SignatureCheck.swift || { echo "::error::the Mac's and the iPhone's SignatureCheck.swift differ"; exit 1; }
+          xcrun swiftc -O -parse-as-library source/shells/mac/Shell/SignatureCheck.swift source/shells/common/test/check_test.swift -o "$RUNNER_TEMP/check_test" || exit 1
+          "$RUNNER_TEMP/check_test" source/shells/common/test/vectors.json > "$RUNNER_TEMP/check_test.txt"; rc=$?
+          cat "$RUNNER_TEMP/check_test.txt"; echo "Mac and iPhone shells' check: $(tail -1 "$RUNNER_TEMP/check_test.txt")" >> "$GITHUB_STEP_SUMMARY"; exit $rc
 
       - name: Fill it as Fabrica does, and open it (Apple silicon)
         timeout-minutes: 20
@@ -405,9 +427,11 @@ jobs:
       - name: Get the sources
         uses: actions/checkout@v5
 
-      - name: Build the shell (64-bit, WebView2's loader and the C++ runtime inside)
+      - name: Build the shell (64-bit, WebView2's loader and the C++ runtime inside), and test its check of its page (7.62)
         shell: pwsh
-        run: pwsh -File source/shells/windows/build_windows.ps1 "$env:RUNNER_TEMP\winshell"
+        run: |
+          python source/shells/common/make_common.py --check; if ($LASTEXITCODE) { exit 1 }
+          pwsh -File source/shells/windows/build_windows.ps1 "$env:RUNNER_TEMP\winshell"
 
       - name: Fill it as Fabrica does, and open it
         timeout-minutes: 20

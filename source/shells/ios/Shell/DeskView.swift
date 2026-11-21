@@ -45,6 +45,15 @@ final class DeskViewController: UIViewController, WKNavigationDelegate, WKUIDele
     /// started by the cloud build with -shell_pagetest: the page reports back once
     static let pageTest = ProcessInfo.processInfo.arguments.contains("-shell_pagetest")
 
+    /// 7.62: the page as its maker signed it (SignatureCheck.swift): nil when it may open; otherwise what is wrong with it.
+    /// shell.json's "signature" says the package was made signed, so a page whose signature was taken away is refused too.
+    static let refusal: String? = {
+        guard let root = ShellSchemeHandler.www else { return nil }
+        let mark = config["signature"] as? [String: Any]
+        return SignatureCheck.check(pageAt: root.appendingPathComponent((config["page"] as? String) ?? "index.html"), marked: mark != nil,
+                                    kid: (mark?["kid"] as? String) ?? "", app: (mark?["app"] as? String) ?? "", keys: ShellCommon.ownerKeys)
+    }()
+
     private var webView: WKWebView!
     private let topFill = UIView()
     private var lightTop = true
@@ -62,18 +71,32 @@ final class DeskViewController: UIViewController, WKNavigationDelegate, WKUIDele
         config.allowsInlineMediaPlayback = true
         config.mediaTypesRequiringUserActionForPlayback = []
         let scripts = config.userContentController
-        scripts.add(self, name: "pySaveFile")
-        scripts.add(self, name: "shellEdge")
-        scripts.add(self, name: "shellLog")
-        // 9s58: the clipboard for the page's own menu, with a reply (ShellClipboard, below)
-        scripts.addScriptMessageHandler(ShellClipboard(), contentWorld: .page, name: "shellClipboard")
-        scripts.addUserScript(WKUserScript(source: DeskViewController.bridge,
-                                           injectionTime: .atDocumentStart, forMainFrameOnly: false))
-        scripts.addUserScript(WKUserScript(source: DeskViewController.edgeScript,
-                                           injectionTime: .atDocumentEnd, forMainFrameOnly: true))
-        if DeskViewController.pageTest {
-            scripts.addUserScript(WKUserScript(source: DeskViewController.errorCatcher,
-                                               injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        if let why = DeskViewController.refusal {
+            /* 7.62: a page that is not as its maker signed it is never shown: the shell's own page is, and nothing is given to it */
+            let name = (DeskViewController.config["page"] as? String) ?? "index.html"
+            let title = (DeskViewController.config["title"] as? String).flatMap { $0.isEmpty ? nil : $0 }
+                ?? (Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String) ?? "This app"
+            ShellSchemeHandler.refused = (path: DeskViewController.entryURL.path,
+                                          html: SignatureCheck.fill(ShellCommon.refusedPage, name: title, file: (name as NSString).lastPathComponent, why: why))
+            if DeskViewController.pageTest,
+               let d = try? JSONSerialization.data(withJSONObject: ["file": name, "why": why, "check": ShellCommon.marker]),
+               let line = String(data: d, encoding: .utf8) {
+                print("SHELL_PAGETEST REFUSED " + line)
+            }
+        } else {
+            scripts.add(self, name: "pySaveFile")
+            scripts.add(self, name: "shellEdge")
+            scripts.add(self, name: "shellLog")
+            // 9s58: the clipboard for the page's own menu, with a reply (ShellClipboard, below)
+            scripts.addScriptMessageHandler(ShellClipboard(), contentWorld: .page, name: "shellClipboard")
+            scripts.addUserScript(WKUserScript(source: DeskViewController.bridge,
+                                               injectionTime: .atDocumentStart, forMainFrameOnly: false))
+            scripts.addUserScript(WKUserScript(source: DeskViewController.edgeScript,
+                                               injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+            if DeskViewController.pageTest {
+                scripts.addUserScript(WKUserScript(source: DeskViewController.errorCatcher,
+                                                   injectionTime: .atDocumentStart, forMainFrameOnly: true))
+            }
         }
 
         webView = WKWebView(frame: .zero, configuration: config)
@@ -360,7 +383,8 @@ final class DeskViewController: UIViewController, WKNavigationDelegate, WKUIDele
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         if DeskViewController.pageTest && !pageTestSent {
             pageTestSent = true
-            webView.evaluateJavaScript(DeskViewController.pageTestJS, completionHandler: nil)
+            if DeskViewController.refusal != nil { print("SHELL_PAGETEST DONE") }   // its own page asks nothing
+            else { webView.evaluateJavaScript(DeskViewController.pageTestJS, completionHandler: nil) }
         }
     }
 

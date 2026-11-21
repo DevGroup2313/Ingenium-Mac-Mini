@@ -86,6 +86,12 @@ public class ShellActivity extends Activity {
     private boolean pageTest = false;
     private boolean pageTestSent = false;
 
+    /* 7.62: the page as its maker signed it (SignatureCheck). shell.json's "signature" says the package was made signed;
+       when the page is not as it was signed, refusedHtml is the shell's own page, shown in its place */
+    private boolean marked = false;
+    private String markKid = "", markApp = "", title = "";
+    private volatile String refusedHtml = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,10 +112,6 @@ public class ShellActivity extends Activity {
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setTextZoom(100);
         web.setBackgroundColor(background);
-
-        // only the app's own page, served from inside the package, can reach these
-        ShellBridge bridge = new ShellBridge();
-        for (int i = 0; i < bridges.size(); i++) web.addJavascriptInterface(bridge, bridges.get(i));
 
         web.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -161,6 +163,7 @@ public class ShellActivity extends Activity {
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 Uri u = request.getUrl();
                 if (u == null || !HOST.equals(u.getHost())) return null;
+                if (refusedHtml != null) return (PREFIX + page).equals(u.getPath()) ? refusedPage() : notFound();
                 return asset(u.getPath());
             }
 
@@ -180,7 +183,7 @@ public class ShellActivity extends Activity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                if (pageTest && !pageTestSent) {
+                if (pageTest && !pageTestSent && refusedHtml == null) {
                     pageTestSent = true;
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override public void run() { web.evaluateJavascript(PAGE_TEST_JS, null); }
@@ -219,8 +222,53 @@ public class ShellActivity extends Activity {
             }
         });
 
-        web.loadUrl("https://" + HOST + PREFIX + page);
         setContentView(web);
+        // 7.62: the page is checked against its maker's signature before anything of it runs, away from the screen's thread
+        final Handler ui = new Handler(Looper.getMainLooper());
+        new Thread(new Runnable() {
+            @Override public void run() {
+                String why;
+                try {
+                    InputStream in = getAssets().open(page);
+                    try { why = SignatureCheck.check(in, marked, markKid, markApp, ShellCommon.OWNER_KEYS); } finally { in.close(); }
+                } catch (Exception e) {
+                    why = marked ? SignatureCheck.MISSING : null;
+                }
+                final String w = why;
+                ui.post(new Runnable() { @Override public void run() { start(w); } });
+            }
+        }, "ingenium-signature-check").start();
+    }
+
+    /* the page, once checked: as it was signed, it opens with its bridges; otherwise the shell's own page says why, and the
+       app's page is given nothing */
+    private void start(String why) {
+        if (why != null) {
+            String name = title.length() > 0 ? title : String.valueOf(getTitle());
+            refusedHtml = SignatureCheck.fill(ShellCommon.REFUSED_PAGE, name, page.substring(page.lastIndexOf('/') + 1), why);
+            Log.w(TAG, "not opened, not as its maker signed it: " + page + " " + why);
+            if (pageTest) {
+                JSONObject r = new JSONObject();
+                try { r.put("file", page); r.put("why", why); r.put("check", ShellCommon.MARKER); } catch (JSONException ignored) { }
+                Log.i("IngeniumPage", "INGENIUM_SELFTEST REFUSED " + r);
+            }
+        } else {
+            // only the app's own page, served from inside the package, can reach these
+            ShellBridge bridge = new ShellBridge();
+            for (int i = 0; i < bridges.size(); i++) web.addJavascriptInterface(bridge, bridges.get(i));
+        }
+        web.loadUrl("https://" + HOST + PREFIX + page);
+    }
+
+    private WebResourceResponse refusedPage() {
+        Map<String, String> h = new HashMap<String, String>();
+        h.put("Cache-Control", "no-store");
+        h.put("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; img-src data:");
+        try {
+            return new WebResourceResponse("text/html", "utf-8", 200, "OK", h, new ByteArrayInputStream(refusedHtml.getBytes("UTF-8")));
+        } catch (Exception e) {
+            return notFound();
+        }
     }
 
     /* ------------------------------------------------------------ the page */
@@ -232,6 +280,9 @@ public class ShellActivity extends Activity {
             JSONObject o = new JSONObject(new String(readAll(in), "UTF-8"));
             in.close();
             page = o.optString("page", page);
+            title = o.optString("title", "");
+            JSONObject sg = o.optJSONObject("signature");
+            if (sg != null) { marked = true; markKid = sg.optString("kid", ""); markApp = sg.optString("app", ""); }
             String bg = o.optString("background", "");
             if (bg.length() > 0) { try { background = Color.parseColor(bg); } catch (Exception ignored) { } }
             JSONArray b = o.optJSONArray("bridges");

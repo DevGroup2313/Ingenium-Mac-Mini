@@ -82,4 +82,22 @@ one() {
 }
 one "$W/test.zip" "a test page in the Mac app Fabrica made" "Shell Test run 1" "Shell Test run 2" "mac-$TAG-test.png"
 one "$W/forge.zip" "The Forge (13 MB page) in the Mac app Fabrica made" "[^\"]*Forge[^\"]*" "" "mac-$TAG-forge.png"
+
+# 7.62: a page signed with a key the shell does not carry (a test key, shells/common/test): the shell refuses it before anything
+# of it runs, and shows its own page in its place (modules/r352.js)
+node source/shells/common/test/page_from_case.mjs source/shells/common/test/vectors.json "signed, as Fabrica made it" "$W/signed_test.html" > /dev/null || exit 1
+node "$T/make_mac.mjs" $M "$ZIP" "$W/signed_test.html" $I "$W/refused.zip" com.yannieforest.tidecheck.mac "Tide Check" CarpeNative | tail -1 | tee -a "$REPORT" || exit 1
+D="$W/x-refused"; rm -rf "$D"; mkdir -p "$D"; ditto -x -k "$W/refused.zip" "$D"
+APP=$(ls -d "$D"/*.app | head -1); EXE=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Contents/Info.plist")
+LOG="$W/refused.log"
+"$APP/Contents/MacOS/$EXE" -shell_pagetest > "$LOG" 2>&1 &
+wait_for "$LOG" "SHELL_PAGETEST DONE" 90
+sleep 2; screencapture -x "$OUT/mac-$TAG-refused.png" > /dev/null 2>&1 || true
+quit_app "$APP/Contents/MacOS/$EXE"
+R=$(grep "SHELL_PAGETEST REFUSED" "$LOG" | tail -1)
+if has "$R" "is signed with a key this app does not know" && has "$R" "ING-SHELL-CHECK-1"; then
+  say "PASS a page signed with a key the shell does not carry: refused before it ran, the shell's own page in its place: ${R#*SHELL_PAGETEST REFUSED }"
+else
+  say "FAIL a page signed with a key the shell does not carry: ${R:-(no report)}"; tail -n 10 "$LOG" | sed 's/^/     | /' >> "$REPORT"; fail=1
+fi
 exit $fail

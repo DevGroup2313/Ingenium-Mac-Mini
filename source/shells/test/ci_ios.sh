@@ -30,5 +30,22 @@ one() {   # $1 ipa, $2 bundle id, $3 what, $4 title wanted (a pattern), $5 pictu
 }
 one "$W/test.ipa" com.yannieforest.shelltest "a test page in the shell Fabrica filled" "Shell Test run 1" ios-test.png
 one "$W/forge.ipa" com.yannieforest.theforge.test "The Forge (13 MB page) in the shell Fabrica filled" "[^\"]*Forge[^\"]*" ios-forge.png
+# 7.62: a page signed with a key the shell does not carry (a test key, shells/common/test): the shell refuses it before anything
+# of it runs, and shows its own page in its place (modules/r352.js)
+node source/shells/common/test/page_from_case.mjs source/shells/common/test/vectors.json "signed, as Fabrica made it" "$W/signed_test.html" > /dev/null || exit 1
+node "$T/make_ipa.mjs" $M "$ZIP" "$W/signed_test.html" $I "$W/refused.ipa" com.yannieforest.tidecheck "Tide Check" CarpeNative | tail -1 || exit 1
+rm -rf "$W/x" && mkdir -p "$W/x" && (cd "$W/x" && unzip -q "$W/refused.ipa")
+APP=$(ls -d "$W"/x/Payload/*.app | head -1)
+if xcrun simctl install "$UDID" "$APP"; then
+  LOG="$W/refused.log"; xcrun simctl launch --console-pty "$UDID" com.yannieforest.tidecheck -shell_pagetest > "$LOG" 2>&1 & LP=$!
+  for i in $(seq 1 40); do grep -q "SHELL_PAGETEST DONE" "$LOG" 2>/dev/null && break; sleep 3; done
+  sleep 2; xcrun simctl io "$UDID" screenshot "$OUT/ios-refused.png" > /dev/null 2>&1
+  kill "$LP" > /dev/null 2>&1
+  R=$(grep "SHELL_PAGETEST REFUSED" "$LOG" | tail -1)
+  if echo "$R" | grep -q "is signed with a key this app does not know" && echo "$R" | grep -q "ING-SHELL-CHECK-1"; then
+    say "PASS a page signed with a key the shell does not carry: refused before it ran, the shell's own page in its place: ${R#*SHELL_PAGETEST REFUSED }"
+  else say "FAIL a page signed with a key the shell does not carry: ${R:-(no report)}"; fail=1; fi
+  xcrun simctl terminate "$UDID" com.yannieforest.tidecheck > /dev/null 2>&1
+else say "FAIL the refused case did not install"; fail=1; fi
 sleep 2; xcrun simctl io "$UDID" screenshot "$OUT/ios-home.png" > /dev/null 2>&1
 exit $fail

@@ -24,6 +24,15 @@
 "use strict";
 var TE=new TextEncoder(),TD=new TextDecoder();
 function utf8(s){return TE.encode(String(s));}
+/* 7.62: a page signed with its maker's key (modules/r349.js) makes a package that says so (modules/r352.js): shell.json's
+   "signature" (and on Windows shell.txt's signature_kid and signature_app), so the shell refuses the page if its signature is
+   ever taken away. The tag is found as r349 finds it: the first that matches in the page's first MiB. Unsigned: null. */
+function signMark(html){try{var u8=typeof html==="string"?utf8(html):html;if(!u8||!u8.length)return null;
+  var s=new TextDecoder("iso-8859-1").decode(u8.subarray(0,Math.min(u8.length,1<<20)));
+  var m=/<meta name="ingenium-signature" content="([A-Za-z0-9_-]{0,8000})">/.exec(s);if(!m||!m[1])return null;
+  var b=m[1].replace(/-/g,"+").replace(/_/g,"/");while(b.length%4)b+="=";var bin=atob(b),raw=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)raw[i]=bin.charCodeAt(i);
+  var f=JSON.parse(new TextDecoder().decode(raw));
+  return f&&typeof f.kid==="string"&&f.kid&&f.release&&typeof f.release.app==="string"?{kid:f.kid,app:f.release.app}:null;}catch(e){return null;}}
 function cat(list){var n=0,i;for(i=0;i<list.length;i++)n+=list[i].length;var o=new Uint8Array(n),k=0;for(i=0;i<list.length;i++){o.set(list[i],k);k+=list[i].length;}return o;}
 function b64e(u8){var s="",CH=0x8000;for(var i=0;i<u8.length;i+=CH)s+=String.fromCharCode.apply(null,u8.subarray(i,i+CH));return btoa(s);}
 function b64d(s){var bin=atob(String(s).replace(/\s+/g,"")),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u;}
@@ -336,7 +345,8 @@ function makeApk(o){var step=o.onStep||function(){};var id=cleanId(o.id);if(!id)
       {name:"resources.arsc",data:arsc(id),store:true,align:4}];
     DENSITIES.forEach(function(d){var png=o.icons&&o.icons[d[0]];if(!png)throw new Error("the "+d[0]+" icon is missing");files.push({name:iconPath(d),data:png,store:true,align:4});});
 /* 7.29: her apps carry no credit naming Ingenium (her words, 17 November 2026: "I don't want to keep seeing Ingenium's own app files and logo when I try to ship a new version of the Forge or Carpe Diem or Inkwell or any future app"). The audit of that day (rig/t_729_family_real.js) found "Ingenium Fabrica" in each ready-made app's shell.json and shell.txt, and in an APK's signature files (Created-By); no shell reads it. It says "Fabrica" now, as the kits' guides do. */
-    files.push({name:"assets/shell.json",data:utf8(JSON.stringify({page:page,background:o.background||"#ffffff",bridges:bridges,title:title,made:"Fabrica"}))});
+    var mark=signMark(html),sj={page:page,background:o.background||"#ffffff",bridges:bridges,title:title,made:"Fabrica"};if(mark)sj.signature=mark;
+    files.push({name:"assets/shell.json",data:utf8(JSON.stringify(sj))});
     (o.files||[]).forEach(function(f){var p=String(f.path).replace(/^\/+/,"");if(!p||p===page||/^shell\.json$/.test(p))return;files.push({name:"assets/"+p,data:typeof f.data==="string"?utf8(f.data):f.data});});
     files.push({name:"assets/"+page,data:html});
     step("Signing it (v1)");
@@ -372,7 +382,8 @@ function makeIpa(o){var step=o.onStep||function(){};var id=cleanId(o.id);if(!id)
           out.push({name:dest,data:data,mode:e.mode||0o100644,madeBy:3});});});},Promise.resolve()).then(function(){
       if(!out.some(function(f){return /\.app\/Info\.plist$/.test(f.name);}))throw new Error("the shell has no Info.plist");
       var www="Payload/"+folder+"/www/";if(!out.some(function(f){return f.name===www;}))out.push({name:www,dir:true,mode:0o40755,madeBy:3});
-      out.push({name:www+"shell.json",data:utf8(JSON.stringify({page:page,bridges:o.bridges||["CarpeNative"],title:title,made:"Fabrica"})),mode:0o100644,madeBy:3});
+      var mark=signMark(html),sj={page:page,bridges:o.bridges||["CarpeNative"],title:title,made:"Fabrica"};if(mark)sj.signature=mark;
+      out.push({name:www+"shell.json",data:utf8(JSON.stringify(sj)),mode:0o100644,madeBy:3});
       (o.files||[]).forEach(function(f){var p=String(f.path).replace(/^\/+/,"");if(!p||p===page||p==="shell.json")return;out.push({name:www+p,data:typeof f.data==="string"?utf8(f.data):f.data,mode:0o100644,madeBy:3});});
       out.push({name:www+page,data:html,mode:0o100644,madeBy:3});
       out.unshift({name:"Payload/",dir:true,mode:0o40755,madeBy:3});
@@ -410,7 +421,7 @@ function iconsFor(html,title,colour,fallback){var src=iconSource(html)||fallback
 
 root.IngApk={make:makeApk,keys:keys,versionCodeNow:versionCodeNow,cleanId:cleanId,iconsFor:iconsFor,iconSource:iconSource,
   core:{axml:axml,arsc:arsc,manifest:manifest,zipBuild:zipBuild,zipRead:zipRead,signV1:signV1,signV2:signV2,readP12:readP12,writeP12:writeP12,makeKeyPair:makeKeyPair,certParts:certParts,
-    crc32:crc32,sha256:sha256,hex:hex,b64e:b64e,b64d:b64d,DENSITIES:DENSITIES}};
+    crc32:crc32,sha256:sha256,hex:hex,b64e:b64e,b64d:b64d,DENSITIES:DENSITIES,/* 7.62 */signMark:signMark}};
 root.IngIpa={make:makeIpa,iosName:iosName,icons:IOS_ICONS,has:function(){if(root.__ingIosShell)return true;var e=typeof document!=="undefined"&&document.getElementById("ing-ios-shell");return !!(e&&e.textContent.trim());}};
 })(typeof window!=="undefined"?window:globalThis);
 ;try{window.__ingParts["p57"]="running";}catch(_){}

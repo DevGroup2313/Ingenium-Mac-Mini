@@ -9,9 +9,25 @@ final class ShellSchemeHandler: NSObject, WKURLSchemeHandler {
 
     static let www: URL? = Bundle.main.resourceURL?.appendingPathComponent("www", isDirectory: true)
 
+    /// 7.62: when the app's page is not as its maker signed it (SignatureCheck.swift), the path of its page and the page shown
+    /// in its place, set before the page loads; then nothing else of the app's folder is served, and that page runs nothing
+    static var refused: (path: String, html: String)? = nil
+
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         guard let url = urlSchemeTask.request.url, let root = ShellSchemeHandler.www else {
             urlSchemeTask.didFailWithError(URLError(.badURL))
+            return
+        }
+        if let r = ShellSchemeHandler.refused {
+            let own = url.path == r.path
+            let body = own ? Data(r.html.utf8) : Data()
+            let response = HTTPURLResponse(url: url, statusCode: own ? 200 : 404, httpVersion: "HTTP/1.1",
+                                           headerFields: ["Content-Type": own ? "text/html; charset=utf-8" : "text/plain",
+                                                          "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; img-src data:",
+                                                          "Content-Length": String(body.count), "Cache-Control": "no-store"])!
+            urlSchemeTask.didReceive(response)
+            urlSchemeTask.didReceive(body)
+            urlSchemeTask.didFinish()
             return
         }
         let parts = url.path.split(separator: "/").map { String($0).removingPercentEncoding ?? String($0) }

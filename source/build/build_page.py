@@ -1804,6 +1804,30 @@ for _sid, _sf, _sj, _what in (("ing-mac-shell", "mac-shell.zip", "mac-shell.json
     if len(_sb) != _rec["bytes"] or _hl.sha256(_sb).hexdigest() != _rec["sha256"]:
         sys.exit(_sf + ": its size or fingerprint does not match " + _sj)
     _apps += '<script type="ingenium/b64" id="' + _sid + '">' + _b64.b64encode(_sb).decode("ascii") + '</script>\n'
+# ---- R352 (Ingenium 7.62, 21 November 2026): each shell checks its page against its maker's signature at every start, with the
+#      owner's public keys compiled in (shells/common/make_common.py writes them, with the line MARKER that names them). A release
+#      carries only shells built with that check and with the keys of security/owner_keys.json: each must name MARKER ----
+_common = json.load(open(os.path.join(HERE, "..", "shells", "common", "common.json"), encoding="utf-8"))
+_marker = _common["marker"].encode("ascii")
+_owner_kids = sorted(k["kid"] for k in json.load(open(os.path.join(HERE, "..", "security", "owner_keys.json"), encoding="utf-8"))["keys"])
+if sorted(_common["kids"]) != _owner_kids:
+    sys.exit("shells/common/common.json names other keys than security/owner_keys.json: run shells/common/make_common.py, then build the shells again")
+def _shell_bytes(_f):
+    import zipfile as _zf
+    _p = os.path.join(_shells, _f)
+    if not os.path.isfile(_p):
+        return None
+    if _f.endswith(".zip"):
+        with _zf.ZipFile(_p) as _z:
+            _exe = [n for n in _z.namelist() if n.endswith(".app/Shell") or n.endswith(".app/Contents/MacOS/Shell")]
+            return b"".join(_z.read(n) for n in _exe) if _exe else b""
+    return open(_p, "rb").read()
+_unchecked = [_f for _f in ("android-shell.dex", "ios-shell.zip", "mac-shell.zip", "win-shell.exe") if (_shell_bytes(_f) is not None) and _marker not in _shell_bytes(_f)]
+if _unchecked:
+    _say = "these shells were not built with the check of their page and the owner's keys of now (" + ", ".join(_unchecked) + "): build them again (.github/workflows/build-shells.yml; the Android one with shells/android/build_dex.sh)"
+    if os.environ.get("ING_RELEASE") == "1":
+        sys.exit(_say)
+    print("warning: " + _say)
 # ---- R157 (Ingenium 6.2, 22 October 2026): Ingenium's eyes, the picture reader that needs no model that can see
 #      (eyes/eyes.pack, made by eyes/make_eyes.py: TensorFlow.js, MobileNet v2 in eight bits, Tesseract and its English
 #      data, all Apache-2.0), checked here against eyes.json. The lean copy the Forge carries leaves it out. ----

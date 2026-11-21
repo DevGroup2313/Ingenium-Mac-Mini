@@ -237,4 +237,16 @@ if ($admin) {
   Check ($c -eq 0) "uninstalled for everyone from the quiet command (exit 0)" "uninstalling for everyone: exit $c"
   Gone 'uninstalled for everyone' $allDir $cprogs $pdesk $keyAll $false
 } else { say "     (this account has no administrator's rights here, so For everyone is not tried: Windows would ask a person)" }
+# 7.62: a page signed with a key the shell does not carry (a test key, shells/common/test): the shell refuses it before anything
+# of it runs, and shows its own page in its place (modules/r352.js)
+node source/shells/common/test/page_from_case.mjs source/shells/common/test/vectors.json "signed, as Fabrica made it" "$W\signed_test.html" | Out-Null
+node "$T/make_win.mjs" $M $Shell "$W\signed_test.html" $I "$W\Tide Check Setup.exe" com.yannieforest.tidecheck.win "Tide Check" CarpeNative "Ada Quill" | Select-Object -Last 1 | ForEach-Object { say $_ }
+$D = Join-Path $W 'x-refused'; New-Item -ItemType Directory -Force $D | Out-Null; Copy-Item "$W\Tide Check Setup.exe" $D -Force
+$log = Join-Path $W 'refused.log'; Remove-Item $log -ErrorAction SilentlyContinue
+$p = Start-App (Join-Path $D 'Tide Check Setup.exe') $log ''
+if (WaitFor $log 'SHELL_PAGETEST DONE' 90) { Start-Sleep 2; Shot (Join-Path $Out 'windows-refused.png') }
+Close-App $p
+$r = ''; if (Test-Path $log) { $r = Get-Content $log -Encoding utf8 | Where-Object { $_ -like 'SHELL_PAGETEST REFUSED *' } | Select-Object -Last 1 }
+if ($r -and $r -like '*is signed with a key this app does not know*' -and $r -like '*ING-SHELL-CHECK-1*') { say "PASS a page signed with a key the shell does not carry: refused before it ran, the shell's own page in its place: $($r.Substring(23))" }
+else { say "FAIL a page signed with a key the shell does not carry: $(if ($r) { $r } else { '(no report)' })"; $script:fail = 1 }
 exit $script:fail
