@@ -16,6 +16,8 @@
      in once, and their apps check that copy at every start (Signed by its maker).
    window.IngSelf2: api(), words(mine, st), keys(s, mine, canSign), alsoSign(api, key, kid, st), act(k, ctx), askNote(st) */
 #r348Ask .r355-ed{font-weight:600;color:inherit}
+/* a fingerprint breaks only between its groups, never inside one: on a phone the room is narrow, and r348's break-all cut a group in two */
+#secCard .r348-fp,#r348Ask .r348-fp{word-break:normal;overflow-wrap:anywhere}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p355"]="started";}catch(_){}
 /* R355 · Ingenium itself, signed and checked, part two: see the note at the top of its styles */
