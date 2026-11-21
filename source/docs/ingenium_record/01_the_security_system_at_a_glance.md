@@ -1,6 +1,6 @@
 # Ingenium record 01 · The security system at a glance
 
-Part of the record, written from Ingenium 7.54's sources and brought up to 7.63 (21 November 2026).
+Part of the record, written from Ingenium 7.54's sources and brought up to 7.64 (21 November 2026).
 
 ## 1. What is protected, and from whom
 
@@ -10,6 +10,7 @@ Part of the record, written from Ingenium 7.54's sources and brought up to 7.63 
 * **Plain copies leaving the device**: Ask before each export (record 06, section 2); backups sealed whole while the sign-in is on.
 * **Ingenium itself, on her computers**: from 7.58 each release can be signed with her owner key on her own device, and the Mac and Windows apps check the page against her signature at every start, before anything of it runs: a changed copy does not open and says which file changed (record 06, section 9).
 * **Her ownership of her apps**: the licence, her owner keys and her permissions (record 06, section 6); the editions carry nothing of hers (record 06, section 8).
+* **Ingenium itself, on her phones and tablets** (7.64): the iPhone, iPad and Fire apps check their copy against her signature at every start too; Sign this release signs both copies, Save the signature saves one file for every device, and Sign a copy you give signs the full or gift edition she gives (record 06, section 13).
 * **An app meant for her alone** (7.63): turned on in its Package details, every package of it opens only where she opened it once with her owner key, or for someone she gave a permission to use it (record 06, section 12).
 * **Ingenium itself, from being changed by anyone else**: the Mac and Windows apps check the page against her signature at every start, and a changed copy does not open (record 06, section 9).
 * **What the device shares, from anyone who opens the practice studio**: it opens without a password, so it reads the device's models, protection and pairing but can change none of them (record 04, section 9).

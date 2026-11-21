@@ -1,5 +1,5 @@
 <style id="r355-css">
-/* ============ R355 · INGENIUM ITSELF, SIGNED AND CHECKED, PART TWO (Ingenium 7.64, held until her word on its pictures) ============
+/* ============ R355 · INGENIUM ITSELF, SIGNED AND CHECKED, PART TWO (Ingenium 7.64, 21 November 2026; approved on its eight pictures: "I approve of the previews, please commit and push it everywhere and continue working on my requests") ============
    The Security room's promise (modules/r318.js, approved on the live preview of 18 November 2026): "each release signed with your owner
    key, and checked by the computer apps and the iPhone, iPad and Fire apps before Ingenium opens: a copy changed by anyone else refuses
    to open, and says which file changed." Part one (7.58: modules/r348.js, desktop/app_self_758.py) is the Mac and Windows apps. Part

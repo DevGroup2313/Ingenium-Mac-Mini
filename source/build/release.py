@@ -141,7 +141,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_disk_750", "_disk_more_750", ("mini", "intel", "win")),  # 7.50: their records too, and texts for training
            ("app_disk_fix_757", "_disk_seal_status", ("mini", "intel", "win")),  # 7.57: the seal's names its own; drive repositories work again
            ("app_pick_757", "_disk_pick_757", ("mini", "intel", "win")),  # 7.57: Fabrica's stage 3, part two, on a drive
-           ("app_self_758", "_self_758", ("mini", "intel", "win"))]  # 7.58: Ingenium itself, signed and checked (Security)
+           ("app_self_758", "_self_758", ("mini", "intel", "win")),  # 7.58: Ingenium itself, signed and checked (Security)
+           ("app_self2_764", "_self2_764", ("mini", "intel", "win"))]  # 7.64: part two, the copy her phones and tablets carry
 
 
 def desktop():
@@ -173,6 +174,16 @@ def self_stamp():
         if t != s:
             open(p, "w", encoding="utf-8").write(t)
             print("the computer app's release and keys written in:", k, v)
+    # 7.64 (part two): the iPhone, iPad and Fire apps carry the same, as self.json beside their copy of the page (SelfCore reads it)
+    phone = json.dumps({"release": v, "keys": json.loads(keys)}, indent=1) + "\n"
+    for rel in (("ingenium_android_project", "app", "src", "main", "assets", "self.json"), ("ingenium_ios_project", "Ingenium", "self.json")):
+        p = os.path.join(R["fire"], *rel)
+        if not os.path.isdir(os.path.dirname(p)):
+            sys.exit("%s: no folder for the phones' release and keys" % p)
+        old = open(p, encoding="utf-8").read() if os.path.exists(p) else None
+        if old != phone:
+            open(p, "w", encoding="utf-8").write(phone)
+            print("the phones' and tablets' release and keys written in:", "/".join(rel), v)
 
 
 DEMO_PAGE = os.path.join(H, "ingenium_demo.html")  # 6.77: the demo edition of this release, built by page() before the master page

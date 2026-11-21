@@ -234,6 +234,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.64", "Settings, Security, Ingenium itself: the iPhone, iPad and Fire apps check this copy against its signature at every start, before anything of it runs, as the Mac and Windows apps do. Bring a signature in takes the file saved on a computer; a signed copy changed by anyone else does not open, and its own page says which file changed."],
+  ["7.64", "Sign this release signs the copy your computers run and the copy your iPhone, iPad and Fire tablet carry, and Save the signature saves one file that each of your devices takes. A release signed before has Sign it for your phones and tablets.", "master"],
+  ["7.64", "Sign a copy you give: choose the full or gift edition's page on your computer; it is signed with your owner key and saved as a file to give with that copy. Whoever runs it brings it in once, and their apps check that copy at every start: Signed by its maker.", "master"],
   ["7.63", "Opens only with your owner key, in an app's Package details: every package of that app then opens only where you open it once with your owner key, or for someone you give a permission to use it. On a device without your owner key nothing is made for it, and Settings, Security says what it keeps out and what it cannot.", "master"],
   ["7.63", "Settings, Licence and permissions: a permission can be given for an app you keep for yourself alone.", "master"],
   ["7.63", "An app made to open only for its owner stands behind a door: it opens with the owner key's file and its password, once on each device, or with a permission from its owner, and the door says why a permission does not open it (ended, withdrawn, or for another app).", "fabrica"],

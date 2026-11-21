@@ -1,6 +1,6 @@
 # Ingenium record 10 · Words and functions
 
-Part of the record, written from Ingenium 7.54's sources and brought up to 7.61 (21 November 2026). The words Ingenium uses, and every function, hook, event and name another part (or another app) relies on.
+Part of the record, written from Ingenium 7.54's sources and brought up to 7.64 (21 November 2026). The words Ingenium uses, and every function, hook, event and name another part (or another app) relies on.
 
 ## 1. Words
 
@@ -68,6 +68,7 @@ Hooks on `window`: `__ingBeforeLock(why)` (waited for before the keys go), `__in
 * `window.IngDiskSeal` (r340): `state()`, `describe(hasFabrica)`, `status()`, `sealNow()`; the computer app's `disk_key_hold`, `disk_key_drop`, `disk_unseal_all`, `disk_status`.
 * `window.IngAppSign` (r349, 7.60; r352, 7.62): `state()`, `check(u8)`, `signPage(html, ctx)`, `checkPage`, `checkZip`, `checkFile`, `packageRow`, `lineFor`, `signedNote`, `cameIn(u8, name)` (checked as it comes in: `{go, r, s}`), `brief(r)`, `libChip(s)`.
 * `window.IngOwnerOnly` (r354, 7.63): `wanted(id)`, `door(html, ctx)` (the page with its door first: `ctx` `{id, app, name}`), `blocked(html)` (a page that runs only its own scripts), `packageRow(box, r, pref, signRow)`, `well(chip)`, `apps()` (the apps kept for her alone, for the permission form: `{id, name}`), `namesOf(id, slug)`. The door's own words: an opening `{kind:"ingenium-app-opened", body:{kind, v:1, app, device, made}, kid, sig}` kept as `ingenium-door:<app>`; a kept permission is PermitCore's file as it came.
+* `window.IngSelf2` (r355, 7.64): `api()` (the phone's or tablet's bridge as r348 asks it), `words(mine, st)`, `keys(s, mine, canSign)`, `alsoSign(api, key, kid, st)`, `act(k, ctx)`, `askNote(st)`. The computer app's `self_mobile_fields()`, `self_mobile_signature_put(text)`, `self_give_pick()`; the phone's and tablet's bridge `selfCheck({again})`, `selfSignaturePut({text})`, `selfSignatureGet()`. A signature of the copy for phones and tablets: the release's `app` is `ingenium-mobile`; one file for every device: `{"kind": "ingenium-release-signatures", "v": 1, "signatures": [...]}`.
 * `window.IngSelfSign` (r348, 7.58): `state()`, `describe(mine)`, `check(again)`, `sign()`, `bring()`, `save()`, `put(text)`; the computer app's `self_check(again)`, `self_signature_put(text)`, `self_signature_get()`, `self_reveal()`, `self_quit()`. A signature file: `{kind:"ingenium-release-signature", v:1, release:{kind:"ingenium-release", v:1, app:"ingenium", version, edition, files, made}, kid, sig}`, the release's fields signed with PermitCore's `signWith` (ECDSA P-256, SHA-256, its fixed order).
 * `window.IngPeek` (r351): `scan()` (every password field not yet given its key), `show(input, on)`; each field wrapped in `.ing-peek-wrap`, its key `.ing-peek` (`aria-label` Show the password or Hide the password, `aria-pressed`), the field marked `data-peek` and `data-secret`.
 * `window.saveFileNative(name, type, bytes)`: every file Ingenium saves goes through it.

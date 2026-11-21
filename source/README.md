@@ -395,6 +395,40 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.64 (21 November 2026): Ingenium itself, signed and checked, part two: the iPhone, iPad and Fire apps, and the copies she gives.
+The Security room's promise (modules/r318.js, approved on the live preview of 18 November 2026): "each release signed with your owner
+key, and checked by the computer apps and the iPhone, iPad and Fire apps before Ingenium opens". Part one (7.58) was the Mac and Windows
+apps. Shown to her as eight pictures one by one at full size (`previews/self_sign2`: the scripts; the pictures stay out of the repository;
+first made by session 01E1RQBJcMzrWTBAb5ip2Gr8, taken again by session 01QVxDzBf9j53xYyRwyin6eP after what they showed was put right,
+5e88638), and her word: "I approve of the previews, please commit and push it everywhere and continue working on my requests."
+- `build/modules/r355.js` (out of held.json) with its hooks in `r348.js`: on a phone or tablet the room asks the app's own bridge (INB:
+  selfCheck, selfSignaturePut, selfSignatureGet) and speaks of this iPhone, iPad or Fire tablet; in her master copy on a computer, Sign
+  this release signs the copy her computers run and the copy her phones and tablets carry with the same key while it is open, and Save
+  the signature saves one file that each of her devices takes; a release signed before has Sign it for your phones and tablets; Sign a
+  copy you give signs a full or gift edition's page and its copy for phones and tablets, saved as a file to give with that copy.
+- `build/desktop/app_self2_764.py` (the Mac and Windows apps): the copy for phones and tablets made from the app's own page, in memory, by
+  `tools/app_page.py`'s own steps in its order (the build number empty), and read as phones read theirs (self_mobile_fields); its
+  signature kept beside hers when it is hers and names those very files (self_mobile_signature_put); self_check says mobile_signed;
+  self_signature_get gives one file with both signatures; self_signature_put takes that file and keeps both; self_give_pick reads a full
+  or gift edition's page chosen in the system's dialog (the master edition's is refused). The 7.58 check reads only signatures of the app
+  "ingenium", so the new files change nothing in it.
+- The Fire and iPhone repository: `SelfCore.java` and `SelfCheck.java` (Fire and Android: the check before the page, in `MainActivity`,
+  the three calls in `Bridge`, the refusal page `assets/self_refused.html` with Check again), `SelfCore.swift` and `SelfStore.swift`
+  (iPhone and iPad: the same, in `WebViewController` and `EngineBridge`). Each file of the copy is read whole and hashed with SHA-256,
+  the stamped build number left out of the page; a signature of hers is checked with the owner's public keys in `self.json`, written in by
+  `release.py` (`self_stamp`) at each release, as the computer apps' are. Only a device with a signature kept checks at start; one with
+  none opens at once and says Not signed yet. Both cores are built from the shells' own check of 7.62, and both are run at each build on
+  GitHub against the same cases (`tools/selftest`: `make_vectors.py`, `SelfCoreTest.java`, `main.swift`).
+- What is new (r222): one line for every edition, two for the master's.
+- The record in Ingenium's folder: record 06 section 13 (new), section 7 and section 9's limits, records 00, 01, 09 and 10.
+- rig: `t_764_self2.py` (24 checks: the copy made here is app_page.py's own, on a test page and on the 7.63 release page; one with a build
+  number stamped in reads the same; the signature kept or refused; one file for every device; Sign a copy you give; both bridges) and
+  `t_764_self_core.py` with `selfcore/SelfCoreTest.java` (21 checks of `SelfCore.java` on this computer, a real release's phone copy
+  among them).
+
+    python3 -I rig/t_764_self2.py <ingenium_app.py> <Fire and iPhone repository>/tools/app_page.py [<release page>]
+    python3 -I rig/t_764_self_core.py <ingenium_app.py> <app_page.py> <SelfCore.java> <self_refused.html> [<release page>]
+
 Ingenium 7.63 (21 November 2026): opens only with your owner key.
 The Security room's promise (modules/r318.js, approved on the live preview of 18 November 2026): "For an app meant for you alone: it
 opens fully only on a device that holds your owner key, as the master edition does." Shown to her as nine pictures one by one at full
