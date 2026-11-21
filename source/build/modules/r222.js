@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.62", "The Author Studio stands raised as the rest of Ingenium does: its rooms' cards rise in one after another, the Editor's kinds are raised tiles with their room's mark that lean toward the pointer, lift and sink when pressed, its rows lift, its fields are lit wells, and the chosen layer is a key that slides under the choice. Minimal motion keeps them still.", "master"],
   ["7.62", "Every app Fabrica makes for a device checks your signature each time it starts, before anything of it runs: the Mac and Windows apps, the Fire tablet's and Android's, the iPhone's and iPad's. A copy that is not as you signed it does not open: the app shows its own card instead, saying which file and why.", "master"],
   ["7.62", "An app brought into Lector's library, or into Fabrica with Bring one in, is checked as it comes in. A copy that is not as it was signed comes in only if you say so, and the card opens on Leave it out; Lector's tiles mark each app Signed, Not signed or Changed.", "fabrica"],
   ["7.62", "Nothing changes in this edition: 7.62 brings the signature check to parts of Ingenium this edition does not carry.", "nofabrica"],

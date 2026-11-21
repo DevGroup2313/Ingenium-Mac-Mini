@@ -430,8 +430,20 @@ requests."
   the older card). window.IngAppSign gains cameIn(u8, name), brief(r), libChip(s).
 - r349 and r112: the Security room and Package details say that every app made checks its signature at each start; what is still not yet,
   said in the room: an app built from its build kit, on GitHub or in the terminal, carries the signature but does not check it at start.
-- What is new (r222): one line for the master, one where there is a Fabrica, one where there is none.
-- The record in Ingenium's folder: record 06 section 11 (new), records 01, 09 and 10.
+- The Author Studio, raised (`build/modules/r353.js`, new; the master's alone, as the studio is: editions.py). Her words (21 November
+  2026): "The Editor page and other pages inside of Ingenium's Author Studio look flat, stiff and rigid, they lack the popped out animated
+  3D look and effect of the rest of the app, please fix it and give them the animation and 3D look and effect that they are missing to
+  match the rest of the app." Shown to her as ten pictures one by one at full size and a live preview made from the running studio
+  (`previews/author_raised`: the scripts; https://claude.ai/artifact/HpxY87hApV7UCBZ8aWNAdD, private), and her word: "I approve of the
+  preview, please commit and push it everywhere and continue working on my requests." 6.38 had made the studio flat at her word then
+  ("Everything inside the Author Studio looks big and chunky"), so its measures stay those of 6.38; only depth and movement are added, the
+  rest of the app's own, those of Settings, raised (r313, 7.28): the cards are raised slabs that rise in one after another; the Editor's
+  kinds are raised tiles, each with its room's mark on a violet disc, that lean toward the pointer (at most 4 degrees), lift and sink when
+  pressed; the Names cards and the ready looks are raised tiles and keys; the rows of Words, Names and the Change log are raised plates that
+  lift; the fields are lit wells; the layers' strip is a well whose chosen part is a raised key sliding under the choice; the top bar's keys
+  lift and sink. The rail stays as she approved it in 7.42. Minimal motion, the calm look and the system's reduced motion keep it still.
+- What is new (r222): one line for the master, one where there is a Fabrica, one where there is none, and one for the master's Author Studio.
+- The record in Ingenium's folder: record 06 section 11 (new), records 01, 09 and 10, and record 07 (the Author Studio raised).
 - rig: `t_762_app_sign2.js` (20 checks: the room's and Package details' words; a page signed with a test owner key as Ship makes it;
   cameIn signed, unsigned, changed (the card, Leave it out, Escape, Keep it anyway), and signed with a key no copy carries; Lector's
   library: each copy's check kept and marked, a changed copy left out and said so, one kept anyway, a copy from before 7.62 checked again;
