@@ -65,7 +65,9 @@ body[data-motion="minimal"] #r348Ask *:hover{transform:none !important}
 "use strict";
 if(window.IngSelfSign)return;
 var W=window,D=document;
-function api(){try{var a=W.pywebview&&W.pywebview.api;return a&&typeof a.self_check==="function"?a:null;}catch(e){return null;}}
+function api(){try{var a=W.pywebview&&W.pywebview.api;if(a&&typeof a.self_check==="function")return a;}catch(e){}
+  /* part two (modules/r355.js, held until her word on its pictures): the iPhone, iPad and Fire apps answer the same calls */
+  try{return W.IngSelf2&&IngSelf2.api?IngSelf2.api():null;}catch(e){return null;}}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 function edition(){try{return typeof ING_EDITION==="string"?ING_EDITION:"master";}catch(e){return "master";}}
 function toast(m){try{if(typeof W.ingToast==="function")W.ingToast(m);else if(typeof W.toast==="function")W.toast(m);}catch(e){}}
@@ -87,7 +89,7 @@ function readKey(){KEYREAD=true;if(edition()!=="master"||!W.PermitCore||!PermitC
   return PermitCore._.get("key").then(function(k){var was=!!KEY;KEY=k&&k.kid&&k.enc?k:null;if(was!==!!KEY)repaint();return KEY;},function(){KEY=null;return null;});}
 function carried(){return !!(KEY&&ST&&Array.isArray(ST.keys)&&ST.keys.indexOf(KEY.kid)>=0);}
 function state(){if(!api())return "soon";if(!ST)return "off";return ST.state==="signed"&&!ST.own?"on":"off";}
-function words(mine){return {
+function words(mine){if(W.IngSelf2&&IngSelf2.words){try{var x=IngSelf2.words(mine,ST);if(x)return x;}catch(e){warn(e);}}return {
   noapp:mine?"Already: Ingenium's Fire app is signed with your Android key, so the tablet refuses an update signed with any other. In the Mac and Windows apps, a release you sign with your owner key is checked at every start: a copy changed by anyone else refuses to open, and says which file changed. Not yet: the iPhone, iPad and Fire apps check it too."
     :"Already: Ingenium's Fire app is signed by its maker, so the tablet refuses an update signed with any other key. In the Mac and Windows apps, a release signed by its maker is checked at every start: a copy changed by anyone else refuses to open, and says which file changed. Not yet: the iPhone, iPad and Fire apps check it too.",
   signed:function(d){return mine?"Signed with your owner key"+(d?" on "+d:"")+", and checked at this start: this is the copy you signed. From now on, a copy of it changed by anyone else refuses to open, and says which file changed."
@@ -119,12 +121,13 @@ function describe(mine){var a=api(),w=words(mine);
   else p=w.unsigned;
   h+='<p>'+p+'</p>';
   var keys="";
-  if(mine&&s.state==="unsigned"&&!s.own){if(KEY&&carried())keys+='<button type="button" class="sc-key pri" data-ss="sign">Sign this release</button>';
+  if(mine&&s.state==="unsigned"&&!s.own&&!s.mobile){if(KEY&&carried())keys+='<button type="button" class="sc-key pri" data-ss="sign">Sign this release</button>';
     else if(KEY)h+='<p class="sc-fine">Your owner key on this device is not one this copy carries, so its signature could not be checked here. Save its public half (Settings, Licence and permissions) for the next release.</p>';
     else if(KEYREAD)h+='<p class="sc-fine">Your owner key is not on this device. Bring it in (Settings, Licence and permissions), or bring in the signature you made on another computer.</p>';}
-  if(s.state==="signed")keys+='<button type="button" class="sc-key lav" data-ss="save">Save the signature</button>';
+  if(s.state==="signed"&&!s.mobile)keys+='<button type="button" class="sc-key lav" data-ss="save">Save the signature</button>';   /* a phone or tablet takes the signature from her computer */
   else if(s.state!=="unchecked"||s.can)keys+='<button type="button" class="sc-key lav" data-ss="bring">Bring a signature in</button>';
   keys+='<button type="button" class="sc-key lav" data-ss="check">Check it now</button>';
+  if(W.IngSelf2&&IngSelf2.keys){try{keys+=IngSelf2.keys(s,mine,!!(KEY&&carried()));}catch(e){warn(e);}}
   h+='<div class="sc-keys">'+keys+'</div><p class="r348-say'+(SAY.cls?" "+SAY.cls:"")+'" aria-live="polite">'+esc(SAY.t)+'</p></div>';
   var rf=(s.refused||[]).slice(-1)[0];
   if(rf)h+='<div class="sc-well"><div class="sc-wh"><b>Refused to open</b><span class="sc-chip off">'+esc(dayOf(rf.at))+'</span></div><p>Ingenium '+esc(rf.version||"")+' did not open: '
@@ -138,6 +141,7 @@ function ask(){if(!ST||!KEY||!carried()||BUSY)return;closeAsk();var pg=(ST.files
   w.innerHTML='<form class="sa-card" autocomplete="off"><div class="eye">Ingenium itself, signed and checked</div><h2 id="r348AskH">Sign this release</h2>'
     +'<p>Ingenium '+esc(ST.version)+', the '+esc(ST.edition)+' edition. Its page\'s fingerprint:</p><p class="r348-fp">'+esc(fp(pg.sha256))+'</p>'
     +'<p>Sign only a copy you installed from your own release. Your key stays on this device.</p>'
+    +(W.IngSelf2&&IngSelf2.askNote?IngSelf2.askNote(ST):'')
     +'<label for="r348Pw">Your owner key\'s password<input type="password" id="r348Pw" autocomplete="off" spellcheck="false"></label>'
     +'<p class="r348-say" id="r348Say" aria-live="polite"></p>'
     +'<div class="sa-keys"><button type="button" class="sc-key quiet" id="r348No">Not now</button><button type="submit" class="sc-key pri" id="r348Yes">Sign this release</button></div></form>';
@@ -155,9 +159,13 @@ function ask(){if(!ST||!KEY||!carried()||BUSY)return;closeAsk();var pg=(ST.files
 /* the release's fields, signed with PermitCore's own signWith (its fixed order), then checked and kept by the computer app */
 function sign(pw){var a=api();if(!a||!ST||!KEY)return Promise.resolve({ok:false,error:"This copy cannot be signed here."});
   var body={kind:"ingenium-release",v:1,app:"ingenium",version:ST.version,edition:ST.edition,files:ST.files,made:new Date().toISOString()},kid=KEY.kid;
-  return PermitCore.openKey(KEY,pw).then(function(k){return PermitCore.signWith(k,body);}).then(function(sg){
+  var key=null;
+  return PermitCore.openKey(KEY,pw).then(function(k){key=k;return PermitCore.signWith(k,body);}).then(function(sg){
     return Promise.resolve(a.self_signature_put(JSON.stringify({kind:"ingenium-release-signature",v:1,release:body,kid:kid,sig:sg})));}).then(function(r){
-      if(r&&r.state){ST=r;}return r&&r.ok&&r.state==="signed"?r:{ok:false,error:(r&&r.error)||"The computer app did not keep the signature."};});}
+      if(r&&r.state){ST=r;}if(!(r&&r.ok&&r.state==="signed"))return {ok:false,error:(r&&r.error)||"The computer app did not keep the signature."};
+      /* part two (r355): the same key, while it is open, signs the copy her phones and tablets carry */
+      if(W.IngSelf2&&IngSelf2.alsoSign)return Promise.resolve(IngSelf2.alsoSign(a,key,kid,ST)).then(function(s2){if(s2&&s2.state)ST=s2;return r;},function(e){warn(e);return r;});
+      return r;});}
 function put(text){var a=api();if(!a)return Promise.resolve(null);SAY={t:"Checking the signature…",cls:""};repaint();
   return Promise.resolve(a.self_signature_put(String(text||""))).then(function(r){
     if(r&&r.ok&&r.state){ST=r;SAY=r.state==="signed"?{t:"Brought in and checked: this copy is the one signed.",cls:"ok"}:{t:"Brought in.",cls:""};if(r.state==="signed")toast("The signature is brought in, and this copy is the one signed.");}
@@ -178,10 +186,11 @@ function save(){var a=api();if(!a)return Promise.resolve(null);
 function again(){SAY={t:"Checking this copy…",cls:""};repaint();return check(true).then(function(s){
   SAY=s?{t:s.state==="signed"?"Checked just now: this copy is the one signed.":s.state==="changed"?"Checked just now: this copy is not the one signed.":s.state==="unchecked"?"Not checked: "+(s.why||""):"Checked just now: not signed yet.",cls:s.state==="signed"?"ok":s.state==="changed"?"bad":""}:SAY;show();return s;});}
 D.addEventListener("click",function(e){var b=e.target&&e.target.closest&&e.target.closest("#secCard [data-ss]");if(!b)return;e.preventDefault();var k=b.getAttribute("data-ss");
-  if(k==="sign")ask();else if(k==="bring")bring();else if(k==="save")save();else if(k==="check")again();});
+  if(k==="sign")ask();else if(k==="bring")bring();else if(k==="save")save();else if(k==="check")again();
+  else if(W.IngSelf2&&IngSelf2.act)IngSelf2.act(k,{st:function(){return ST;},key:function(){return KEY;},api:api,set:function(x){if(x&&x.state)ST=x;},say:function(t,c){SAY={t:t,cls:c||""};show();},busy:function(v){if(v!=null)BUSY=!!v;return BUSY;}});});
 /* at start: the computer app's answer, and the owner's key, once the page is ready */
 (function wait(){var n=0;(function t(){if(W.__ingReady===true){setTimeout(function(){if(api()){check(false);readKey();}},600);return;}if(++n<400)setTimeout(t,500);})();})();
-W.IngSelfSign={state:state,describe:describe,check:check,sign:function(){ask();},bring:bring,save:save,put:put,_st:function(){return ST;},_key:readKey};
+W.IngSelfSign={state:state,describe:describe,check:check,sign:function(){ask();},bring:bring,save:save,put:put,_st:function(){return ST;},_key:readKey,_esc:esc,_fp:fp,_day:day,_bytes:bytes};
 })();
 ;try{window.__ingParts["p348"]="running";}catch(_){}
 </script>
