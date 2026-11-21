@@ -395,6 +395,35 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.60 (21 November 2026): your apps signed when shipped, part one.
+The Security room's promise (modules/r318.js): "your owner key's signature on every package, the computer ones too, so a changed file is
+caught and the app refuses to open and says so." Shown to her as eight pictures one by one at full size (`previews/app_sign`: the
+script; the pictures stay out of the repository), and her word: "I approve of your preview, please commit and push it everywhere and
+continue working on my requests."
+- `build/modules/r349.js` (new; IngAppSign), in the master edition with her owner key on the device (PermitCore's own): every package
+  Fabrica makes from an app's page carries her owner key's signature inside that page (`<meta name="ingenium-signature">`, over the page
+  with that tag's content and the build tag `<meta name="ingenium-build">` left empty, as app_self_758.py reads Ingenium's page), so the
+  one page, the APK, the IPA, the Mac and Windows apps and the kits all carry it. Her owner key's password is asked once, in a card of
+  the room's own kind; the key is held two minutes after the last package, then dropped; Not now makes nothing. On a device without her
+  owner key, or with one Ingenium does not carry, what she makes is made unsigned, and Ingenium says so. The web app, however it was
+  made (r111's, or r178's from the app's templates or Ingenium's family, with r330's additions), also carries signature.ingsig (every
+  file in it, signed together) and a check at the head of its service worker: when the worker is installed it compares every file with
+  the signature; a changed or missing one, and the app is answered with a page that says which file, instead of opening (what it found is
+  kept in the app's own IndexedDB, apart from its caches). The first visit, before the worker is installed, opens as the browser fetched
+  it. Check a package reads a page or a web app's zip with the owner's public keys every copy carries (IngPermit.keys).
+- `build/modules/r112.js`: the package's line says "and with your owner key" (or "not"), Check a package beside Package details, a
+  Signed chip on each package made signed, the switch Signed with your owner key in Package details (kept with Keep these), and each page
+  made says which package it is for (target), so the Ship card can mark it.
+- `build/modules/r318.js`: Your apps signed when shipped asks IngAppSign for its state (On where her owner key is on the device, Off
+  where it is not; Not yet outside the master) and for its words in Your code and apps. Not yet, said there: the Mac, Windows, Android
+  and iPhone apps check the signature at every start (their shells are built on GitHub's machines), and an app brought into Ingenium's
+  library is checked as it comes in.
+- What is new (r222): two lines for the master, one where there is a Fabrica, one where there is none.
+- rig: `t_760_app_sign.js` (a test key made by the page's own PermitCore: the card, a wrong password, the session, Not now, the Ship
+  card's Signed, the signature checked apart from the page, a stamped build number, a changed word, off, no key on the device, the web
+  app made, checked, served over http and opened through its service worker, and refused with one file changed, Check a package);
+  `t_736_security.js`: Your apps signed when shipped is Off on a fresh copy, which holds no owner key.
+
 Ingenium 7.59 (21 November 2026): the folder search's index sealed with the sign-in, one index per profile, in the Mac and Windows apps.
 Approved on 20 November 2026 at the cost measured on a prototype (building about three times as long; the first vector search of a
 session about 3.5 s, later ones 37 to 74 ms). Sealing it with the owner's key would have locked the other profiles out of their own

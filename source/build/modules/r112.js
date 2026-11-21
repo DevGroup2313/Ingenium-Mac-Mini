@@ -858,7 +858,7 @@ window.fbKnown=KNOWN;
 /* 6.1 · Download as an app (R139), from the version kept: every device with its emoji, one at a time or all; what is made is kept
    under Releases like the cards' own */
 function downloadAsApp(r){if(!window.IngDownload){toast("This copy has no Download as an app.");return;}if(!r||!r.head){toast("Keep a first version first.");return;}var P=pkgOf(r),snap=null;
-  IngDownload.open({getHtml:function(){busy("Reading the version you kept…");return IngShip.onePage(r.id,{quiet:true}).then(function(x){unbusy();snap=x;return x.html;},function(e){unbusy();fail(e);return "";});},
+  IngDownload.open({getHtml:function(){busy("Reading the version you kept…");return IngShip.onePage(r.id,{quiet:true,target:"download"}).then(function(x){unbusy();snap=x;return x.html;},function(e){unbusy();fail(e);return "";});},
     title:P.title,id:P.id,version:P.version||verOf(r)||"",keyId:P.keyId,app:P.app,alias:P.alias,
     onMade:function(k,name,mime,bytes){if(!snap)return;var kind={kits:"kits",mac:"mac",windows:"win",ipa:"ipa",apk:"apk",web:"web",html:"page"}[k]||"page";
       return keepMade(r,snap.commit,kind,name,mime,bytes).then(function(){return IngRepo.setNote(r.id,snap.commit,NOTE[kind],{at:Date.now(),size:bytes.length,name:name});}).then(function(){return refresh();}).then(paint);}});}
@@ -887,6 +887,7 @@ function paintShip(){var r=cur(),cb=$("fbChecks");cb.innerHTML="";var n=r?notesO
     var ft=e.querySelector(".foot");
     if(typeof prog==="number"){if(mk.say&&mk.say[k])ft.appendChild(h("span","f-hint",esc(mk.say[k])));}
     else{if(note)ft.appendChild(h("span","f-chip ok",'<span class="d"></span>Made · '+kb(note.size||0)));
+      if(note&&window.IngAppSign&&IngAppSign.signedNote(n,k))ft.appendChild(h("span","f-chip ok r349-signed","Signed"));  /* 7.60 (modules/r349.js) */
       else ft.appendChild(h("span","f-chip",!r?"":!r.head?"After a first version":tested(r)?"Ready to make":"After its test"));
       if(r&&r.head&&here)ft.appendChild(btn("quiet sm",k==="ipa"&&window.IngIphone?"Choose a way":note?"Make and save again":"Make and save",function(ev){ev.stopPropagation();if(k==="kits")sheetKits(r);else if(k==="ipa"&&window.IngIphone)IngIphone.open(r);else makeOne(r,k);}));}
     function toggle(){if(!r)return;if(!here){toast(whyNot(k));return;}var i=pref.chosen.indexOf(k);if(i>=0)pref.chosen.splice(i,1);else pref.chosen.push(k);saveSoon();paintShip();}
@@ -894,8 +895,9 @@ function paintShip(){var r=cur(),cb=$("fbChecks");cb.innerHTML="";var n=r?notesO
     tg.appendChild(e);});
   var pk=$("fbPkg");pk.innerHTML="";pk.hidden=!r;
   if(r){var P=pkgOf(r);pk.innerHTML="<span>"+esc(P.title)+" · <code>"+esc(P.id)+"</code>"+(P.version?" · version "+esc(P.version):"")+"</span>";
-    var kl=h("span",null,"signed with "+(P.keyId==="device"?"this device's key":"a key you brought in"));pk.appendChild(kl);
+    var kl=h("span",null,"signed with "+(P.keyId==="device"?"this device's key":"a key you brought in")+(window.IngAppSign&&IngAppSign.lineFor(r.id)?" "+IngAppSign.lineFor(r.id):""));pk.appendChild(kl);
     pk.appendChild(btn("quiet sm","Package details",function(){sheetPackage(r);}));
+    if(window.IngAppSign)pk.appendChild(btn("quiet sm","Check a package",function(){IngAppSign.checkFile();}));  /* 7.60 (modules/r349.js) */
     if(window.IngDownload&&r.head)pk.appendChild(btn("sm","📦 Download as an app…",function(){downloadAsApp(r);}));}
   var chosen=r?pref.chosen.filter(targetHere):[],all=r&&chosen.length&&chosen.every(function(k){return !!n[NOTE[k]];});
   var ss=$("fbShipState");ss.className="f-chip"+(all?" ok":"");ss.innerHTML=!r?"":all?'<span class="d"></span>Made':r.head?(tested(r)?"Ready to make":"After its test"):"After a first version";
@@ -926,7 +928,7 @@ function makeOne(r,what,opt){opt=opt||{};if(!r.head)return Promise.resolve();
     IngPublisher.confirm(what,pkgOf(r).title,function(){opt.named=true;res(makeOne(r,what,opt));},function(){if(!opt.quiet)toast("Nothing was made.");res(false);},r);});
   making(r,what,5);
   var p;
-  if(what==="page")p=IngShip.onePage(r.id).then(function(x){var name=x.name||(r.slug+".html");return saveBytes(name,"text/html",x.bytes).then(function(){return keepMade(r,x.commit,what,name,"text/html",x.bytes);}).then(function(){return x.bytes.length;});});
+  if(what==="page")p=IngShip.onePage(r.id,{target:"page"}).then(function(x){var name=x.name||(r.slug+".html");return saveBytes(name,"text/html",x.bytes).then(function(){return keepMade(r,x.commit,what,name,"text/html",x.bytes);}).then(function(){return x.bytes.length;});});
   else if(what==="web")p=IngShip.webApp(r.id,{pkg:pkgOf(r)}).then(function(x){return saveBytes(x.name,"application/zip",x.bytes).then(function(){return keepMade(r,x.commit,what,x.name,"application/zip",x.bytes);}).then(function(){return x.bytes.length;});});
   else if(what==="apk"||what==="ipa"||what==="mac"||what==="win")p=makeDevice(r,what);
   else p=makeKits(r,opt.kits||shipPrefs(r).kits);
@@ -936,7 +938,7 @@ function makeOne(r,what,opt){opt=opt||{};if(!r.head)return Promise.resolve();
    (R136; the Mac and Windows shells from 6.5, R170) */
 function makeDevice(r,what){var P=pkgOf(r),said=function(t){say(r,what,t);};
   said("Reading the version you kept…");
-  return IngShip.onePage(r.id,{quiet:true}).then(function(x){var vn=String(P.version||verOf(r)||IngShip._.numberOf(x.html,x.recipe||{})||"1.0").replace(/^v(?=\d)/,"");
+  return IngShip.onePage(r.id,{quiet:true,target:what}).then(function(x){var vn=String(P.version||verOf(r)||IngShip._.numberOf(x.html,x.recipe||{})||"1.0").replace(/^v(?=\d)/,"");
     said("Drawing its icons…");making(r,what,25);
     if(what==="mac"||what==="win"){var M=what==="mac"?IngMac:IngWin;
       return M.iconsFor(x.html,P.title,colorOf(r),flatSrc(P.app)||null).then(function(icons){making(r,what,45);
@@ -972,7 +974,7 @@ function sheetKits(r){var pref=shipPrefs(r),sh=sheet("Build kits","A kit holds e
    after says */
 function kitsKey(n){return "Make kits for "+n+" device"+(n===1?"":"s");}
 function makeKits(r,ids){ids=(ids&&ids.length?ids:KITS.map(function(k){return k[0];})).filter(function(i){return KITS.some(function(k){return k[0]===i;});});
-  return IngShip.onePage(r.id,{quiet:true}).then(function(x){var P=pkgOf(r),name=r.name.replace(/[^\w .-]+/g,"").trim()||"App",file=name.replace(/\s+/g,""),who={isNew:true,name:name,id:P.id.slice(0,60),file:file,title:P.title,version:P.version,app:P.app,colour:colorOf(r)},page=x.html;
+  return IngShip.onePage(r.id,{quiet:true,target:"kits"}).then(function(x){var P=pkgOf(r),name=r.name.replace(/[^\w .-]+/g,"").trim()||"App",file=name.replace(/\s+/g,""),who={isNew:true,name:name,id:P.id.slice(0,60),file:file,title:P.title,version:P.version,app:P.app,colour:colorOf(r)},page=x.html;
     return kitStore().then(function(store){var total=0,chain=Promise.resolve(),made=[],seen={};
       /* 6.7 (R178): a kit may be drawn before it is ready (the app's own icons, or its own templates); two devices that share one package (iPhone and iPad, from an app's own templates) save it once */
       ids.forEach(function(id,i){chain=chain.then(function(){say(r,"kits","The "+KITS.filter(function(k){return k[0]===id;})[0][1]+" kit…");return Promise.resolve(kitAssemble(store,id,who,page)).then(function(k){if(seen[k.zip]){seen[k.zip].push(id);return;}seen[k.zip]=[id];var bytes=k.bytes||makeZip(k.entries);total+=bytes.length;made.push({name:k.zip,size:bytes.length,kit:id});
@@ -1294,9 +1296,10 @@ function sheetPackage(r){var P=pkgOf(r),pref=shipPrefs(r),sh=sheet("Package deta
   kr.appendChild(btn("sm","Save this key (.p12)",function(){var id=ks.value||"device";sheetName("A password for the key's file","At least six characters. Keep the file and its password safe: anyone holding both can sign an app that installs over yours.",function(pw){
       return IngApk.keys.save(id,pw).then(function(u8){return saveBytes((id==="device"?"ingenium-device":"ingenium-"+id)+"-signing.p12","application/x-pkcs12",u8);}).then(function(){toast("Saved. keytool and the online builds open it with the password you chose.");});},"");}));
   sh.box.appendChild(kr);
+  var signRow=window.IngAppSign&&IngAppSign.packageRow?IngAppSign.packageRow(sh.box,r,pref):null;  /* 7.60 (modules/r349.js) */
   var end=h("div","end");
   end.appendChild(btn("pri","Keep these",function(){var id=fI.value.trim();if(!IngApk.cleanId(id)){fI.focus();toast("“"+id+"” cannot be an id: letters, digits and dots, such as com.yannieforest.myapp.");return;}
-    pref.title=fT.value.trim()||r.name;pref.id=id;pref.version=fV.value.trim();pref.alias=fA.value.trim();pref.keyId=ks.value||"device";saveSoon();sh.close();paintShip();toast("Kept. The next APK and IPA carry them.");}));
+    pref.title=fT.value.trim()||r.name;pref.id=id;pref.version=fV.value.trim();pref.alias=fA.value.trim();pref.keyId=ks.value||"device";if(signRow)pref.sign=signRow.on();saveSoon();sh.close();paintShip();toast("Kept. The next APK and IPA carry them.");}));
   sh.box.appendChild(end);}
 /* the app's files, written here: any text file, saved as a change to keep (The Forge's file editor, in Ingenium) */
 var BIN=/\.(png|jpe?g|gif|webp|ico|woff2?|ttf|otf|pdf|zip|gz|wasm|mp3|mp4|m4a|ogg|wav|webm|avif|jks|keystore|p12|apk|ipa)$/i;
