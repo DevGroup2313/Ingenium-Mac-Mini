@@ -1,5 +1,5 @@
 <style id="r353-css">
-/* ============ R353 · THE AUTHOR STUDIO, RAISED (Ingenium 7.63, 21 November 2026; the master edition only) ============
+/* ============ R353 · THE AUTHOR STUDIO, RAISED (Ingenium 7.62, 21 November 2026; the master edition only) ============
    Her words (21 November 2026): "The Editor page and other pages inside of Ingenium's Author Studio look flat, stiff and rigid, they lack
    the popped out animated 3D look and effect of the rest of the app, please fix it and give them the animation and 3D look and effect that
    they are missing to match the rest of the app."
