@@ -28,7 +28,18 @@ const fill = (name, file, why) => REFUSED.split('{{NAME}}').join(escH(name)).spl
     if (!(box.x1 > box.x0)) { console.log(key, 'NOT TAKEN: nothing of', frameSel, 'is on screen'); return; }
     const P = pad == null ? 30 : pad; const x = Math.max(0, box.x0 - P), y = Math.max(0, box.y0 - P);
     const w = Math.min((vw || VW) - x, box.x1 - box.x0 + 2 * P), h = Math.min((vh || VH) - y, box.y1 - box.y0 + 2 * P);
-    console.log(key, 'ringed', n); await pg.screenshot({ path: path.join(OUT, key + '.png'), clip: { x, y, width: w, height: h } }); };
+    // her rule from the pictures she sent back: no edge cuts through a line of words. An edge that would is moved just clear of it,
+    // inwards (the top down, the bottom up), so a picture never shows half a label
+    const cut = await pg.evaluate(([x, y, w, h]) => { const lines = []; const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let n = tw.nextNode(); n; n = tw.nextNode()) { if (!n.nodeValue.trim()) continue; const r = document.createRange(); r.selectNodeContents(n);
+        for (const q of r.getClientRects()) if (q.width && q.right > x && q.left < x + w && q.bottom > y - 1 && q.top < y + h + 1) lines.push([q.top, q.bottom]); }
+      let top = y, bot = y + h;
+      for (const [t, b] of lines) if (t < top && b > top) top = Math.max(top, Math.ceil(b) + 4);
+      for (const [t, b] of lines) if (t < bot && b > bot) bot = Math.min(bot, Math.floor(t) - 4);
+      return { top, bot }; }, [x, y, w, h]);
+    const y2 = cut.top, h2 = Math.max(40, cut.bot - cut.top);
+    console.log(key, 'ringed', n, y2 !== y || h2 !== h ? '(edges moved clear of text: ' + Math.round(y2 - y) + ' px at the top, ' + Math.round((y + h) - (y2 + h2)) + ' at the foot)' : '');
+    await pg.screenshot({ path: path.join(OUT, key + '.png'), clip: { x, y: y2, width: w, height: h2 } }); };
   await p.goto(URL_, { waitUntil: 'domcontentloaded', timeout: 300000 }); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 });
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); try { tourEnd(); } catch (e) {} go('fabrica'); }); await sleep(2000);
   await p.evaluate(async (PW) => { const s = await PermitCore.makeKey(PW); await PermitCore._.put('key', s); IngPermit.keys.push({ kid: s.kid, jwk: { kty: 'EC', crv: 'P-256', x: s.pub.x, y: s.pub.y } }); }, PW);

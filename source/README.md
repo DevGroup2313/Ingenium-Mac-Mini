@@ -395,6 +395,48 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.62 (21 November 2026): your apps signed when shipped, part two: every app Fabrica makes checks its signature at each start,
+and an app is checked as it comes into her library.
+The Security room's promise (modules/r318.js, approved on the live preview of 18 November 2026): "a changed file is caught, and the app
+refuses to open and says so." Her words on starting it (21 November 2026): "Yes, please start on the signing card and continue working on my
+requests." Shown to her as ten pictures one by one at full size (`previews/app_sign2`: the scripts; the pictures stay out of the
+repository), first by session 01E1RQBJcMzrWTBAb5ip2Gr8, then taken again from the same scripts by session 01QVxDzBf9j53xYyRwyin6eP, and her
+word: "I approved of the previews from the other session and this one, please commit and push it everywhere and continue working on my
+requests."
+- The shells (source/shells): each app Fabrica makes for a device checks its page against its maker's signature at every start, before
+  anything of it runs: the Mac and iPhone shells (SignatureCheck.swift), the Windows shell (signature_check.h), the Android shell
+  (SignatureCheck.java), the same steps as r349's own check. The owner's public keys and the refusal page (shells/common/refused.html,
+  r349's approved refusal) are compiled into each (shells/common/make_common.py, from security/owner_keys.json), so a changed copy cannot
+  change them. A page not as it was signed gets the shell's own page in its place, saying which file and why, and nothing else of it runs.
+  r136 and r170 write into each package made from a signed page that it was signed (shell.json's signature; shell.txt's signature_kid and
+  signature_app on Windows), so a page whose signature was taken away is refused too. build_page.py refuses a release whose shells were not
+  built with the check and the owner's keys of now (each must carry the line common.json names).
+- 32 cases every shell's check is tested against (shells/common/test, made with throwaway test keys). On GitHub's machines
+  (build-shells.yml, run 44916687413): the Mac shell's check (Swift) and the Windows shell's (with Windows' own cryptography) against the
+  cases; each shell filled as Fabrica fills it and opened, on Apple silicon and Intel Macs, Windows, the iPhone simulator, and the Android
+  9 and 11 emulators, with a page signed with a key the shell does not carry: refused before it ran, the shell's own page in its place (the
+  pictures in shells/out/checks). Android 14's emulator stopped answering while it opened The Forge's 13 MB page, before the refused case,
+  as it has done before (6.1), so that case is not yet seen on Android 14.
+- Two faults in the checks themselves, found on GitHub's first run of 7.62 and fixed: the Android check could not make its signing key in
+  Node since 7.44 (r136 asks window.__ingGuest; rig's shells/test/load.mjs now gives Node the page's window, as a page has it), so the
+  emulator checks had not run since; and the Windows check's new case looked for its maker in a folder named after a time
+  (PowerShell's names ignore case: the uninstall check had set $t, which the new line read as the test folder $T).
+- `build/modules/r352.js` (new): an app brought into her library is checked as it comes in: Lector's app library (Add your apps, the app
+  library file, one app's page) and Fabrica's Bring one in (a page or a zip; r112). Signed and as it was signed: kept, marked Signed by
+  you (Signed, outside the master). Not signed: kept as before, marked Not signed. Changed, or signed with a key that is not the owner's:
+  a card of r349's own kind says so and asks; Leave it out is the key it opens on, and Escape leaves it out; Keep it anyway keeps it
+  marked Changed (or Not the owner's). What she left out is said as such in the library's note, never as a page that could not be read.
+  Copies kept before 7.62 are checked once, quietly. The marks are small raised chips under each app's name on Lector's tiles (r108 for
+  the older card). window.IngAppSign gains cameIn(u8, name), brief(r), libChip(s).
+- r349 and r112: the Security room and Package details say that every app made checks its signature at each start; what is still not yet,
+  said in the room: an app built from its build kit, on GitHub or in the terminal, carries the signature but does not check it at start.
+- What is new (r222): one line for the master, one where there is a Fabrica, one where there is none.
+- The record in Ingenium's folder: record 06 section 11 (new), records 01, 09 and 10.
+- rig: `t_762_app_sign2.js` (20 checks: the room's and Package details' words; a page signed with a test owner key as Ship makes it;
+  cameIn signed, unsigned, changed (the card, Leave it out, Escape, Keep it anyway), and signed with a key no copy carries; Lector's
+  library: each copy's check kept and marked, a changed copy left out and said so, one kept anyway, a copy from before 7.62 checked again;
+  Fabrica's Bring one in, a changed page left out and a signed one brought in).
+
 Ingenium 7.61 (21 November 2026): the practice studio; see the password as it is typed; the record brought up to this release.
 - The practice studio (`build/modules/r350.js`, with its part in `build/boot/profiles_boot.js`). Her words (20 November 2026): "I want a
   practice page built into Ingenium or a Guest page built into the app that users are able to view when they are signed out of their

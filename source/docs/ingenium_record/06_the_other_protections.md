@@ -17,7 +17,7 @@ A room in Settings that says how many protections are on, then each, with its tr
   * Clear a copied secret (on): a password, a recovery word or a pairing code copied from Ingenium is cleared from the clipboard after a minute, where the browser lets a page do so.
   * A record of every opening (on): when and on which device Ingenium opened, and every wrong password, kept in the desk, so sealed with it.
   * Ask before each export (off until turned on; needs the sign-in; turning it off asks for the password too): section 2.
-* **Not yet**, said so with the release planned: her apps' code scrambled. Ingenium itself, signed and checked, is built for the Mac and Windows apps from 7.58 (section 9); her apps signed when shipped is part one from 7.60 (the packages Fabrica makes carry her owner key's signature; their shells' check at every start comes later).
+* **Not yet**, said so with the release planned: her apps' code scrambled. Ingenium itself, signed and checked, is built for the Mac and Windows apps from 7.58 (section 9); her apps signed when shipped from 7.60 and 7.62 (section 11): the check at start of an app built from its build kit comes later.
 * **In the practice studio** (record 04, section 9): a line before the room says this device's protection can be read but not changed there, and that there is no sign-in; the switches' names are not written from it.
 * `window.IngSecurity` gives the others `cfg()` (the switches), `set(key, value)`, `view()` (which part of the room is shown), `paint()`, `log()` (the record of every opening, kept in the desk as `state.secLog`) and the Offline only helpers (`net`, `allowed(url)`, `allow`).
 
@@ -63,11 +63,11 @@ Her words: "The app is my sole original work and only I am able to do distribute
 * Terms and privacy (`r320.js`, 7.37): a card beside the licence: In short, the Privacy notice, the Terms of use, and in the master edition Your contact; a first draft, marked Draft in the master edition, for a lawyer in the US and the UK to read before it is final.
 * The Android signing keys: no page carries one; the builds take them from each repository's secrets (`security/KEYS.md`).
 
-## 7. Approved and not yet built (as of 7.61)
+## 7. Approved and not yet built (as of 7.62)
 
 * The folder search's index: built in 7.59 (section 10).
 * Fabrica's apps kept on a drive, sealed (approved): only the repositories Ingenium writes itself; any other folder only at the owner's choice, one at a time; with Export a plain copy.
-* From the Security preview: Your apps' code scrambled; Your apps signed when shipped, part one built in 7.60, its later parts (each app's shell checking at every start, an app brought into the library checked as it comes in) to come. Ingenium itself, signed and checked: part one is built (section 9); the iPhone, iPad and Fire apps, and the copies she gives carrying her signature, come later.
+* From the Security preview: Your apps' code scrambled; Your apps signed when shipped is built (7.60 and 7.62, section 11), except the check at start of an app built from its build kit. Ingenium itself, signed and checked: part one is built (section 9); the iPhone, iPad and Fire apps, and the copies she gives carrying her signature, come later.
 
 ## 8. The editions carry nothing of hers
 
@@ -96,3 +96,16 @@ Approved on 20 November 2026 at the cost measured on a prototype. Her choice the
 * **Removing a profile** deletes its index file (`IngRag.dropProfile`).
 * **Settings, Security, The computer's disk** says the index's true state, asked of the folder search (`IngRag.sealState()`).
 * **Its cost**, measured on the prototype (20,000 passages, 121 MB, headless Chromium): building about three times as long as plain; the first vector search of a session about 3.5 s, later ones 37 to 74 ms, against 0.8 to 1.4 s for the plain index.
+
+## 11. Her apps signed when shipped (`r349.js`, 7.60; `r352.js` and the shells' check, `source/shells`, 7.62)
+
+The Security room's promise, approved on its live preview (18 November 2026): "your owner key's signature on every package, the computer ones too, so a changed file is caught and the app refuses to open and says so."
+
+* **Signing** (r349, the master edition, with her owner key on the device, PermitCore's own): in Fabrica's Ship, her owner key's password is asked once, in a card of the room's own kind, and the key is held two minutes after the last package, then dropped (Not now makes nothing). Every package made from an app's page carries the signature inside that page (`<meta name="ingenium-signature">`, over the page with that tag's content and the build tag `<meta name="ingenium-build">` left empty, as Ingenium's own check reads its page), so the one page, the APK, the IPA and the Mac and Windows apps all carry it. Package details has a switch for each app, on unless she turns it off. Signatures: ECDSA P-256 with SHA-256 over PermitCore's fixed order. On a device without her owner key, or with one no copy carries, what she makes is made unsigned, and Ingenium says so.
+* **The web app** also carries `signature.ingsig` (every file, signed together) and a check at the head of its service worker: when the worker is installed it compares every file with the signature; a changed or missing file, and the app answers with a page that says which file, instead of opening. The first visit, before the worker is installed, opens as the browser fetched it.
+* **Each device's app** (7.62): the Mac, Windows, Android (Fire) and iPhone and iPad shells check the page against the signature at every start, before anything of it runs, with the owner's public keys and the refusal page compiled into each (`shells/common/make_common.py`, from `security/owner_keys.json` and `shells/common/refused.html`). A page not as it was signed gets the shell's own page in its place, saying which file and why. The package also records that it was made signed, so a page whose signature was taken away is refused too. A release is refused by `build_page.py` if any shell was not built with the check and the keys of now.
+* **As it comes in** (7.62, r352): an app brought into her library (Lector's app library; Fabrica's Bring one in) is checked first. Signed and as it was signed: kept, marked Signed by you. Not signed: kept, marked Not signed. Changed, or signed with a key that is not the owner's: a card asks, opening on Leave it out (Escape leaves it out too); Keep it anyway keeps it marked Changed. What she left out is said as such, never as a page that could not be read. Copies kept before 7.62 are checked once, quietly.
+* **Check a package** (Ship card): a page or a web app's zip read here, with the owner's public keys every copy carries (`IngPermit.keys`).
+* **Not yet**, said in the room: an app built from its build kit, on GitHub or in the terminal, carries the signature but does not check it at start.
+* Interface: `window.IngAppSign` (`state()`, `check(u8)`, `signPage(html, ctx)`, `checkPage`, `checkZip`, `checkFile`, `packageRow`, `lineFor`, `signedNote`, `cameIn(u8, name)`, `brief(r)`, `libChip(s)`).
+

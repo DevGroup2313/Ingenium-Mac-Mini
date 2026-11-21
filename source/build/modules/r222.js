@@ -234,6 +234,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.62", "Every app Fabrica makes for a device checks your signature each time it starts, before anything of it runs: the Mac and Windows apps, the Fire tablet's and Android's, the iPhone's and iPad's. A copy that is not as you signed it does not open: the app shows its own card instead, saying which file and why.", "master"],
+  ["7.62", "An app brought into Lector's library, or into Fabrica with Bring one in, is checked as it comes in. A copy that is not as it was signed comes in only if you say so, and the card opens on Leave it out; Lector's tiles mark each app Signed, Not signed or Changed.", "fabrica"],
+  ["7.62", "Nothing changes in this edition: 7.62 brings the signature check to parts of Ingenium this edition does not carry.", "nofabrica"],
   ["7.61", "The practice studio: while no one is signed in, the sign-in and Who is using Ingenium offer Open the practice studio. It is Ingenium with sample work, to show it or to try it. Nothing of anyone's is in it, it changes nothing this device shares, and everything tried there is taken away when it is left or Ingenium closes."],
   ["7.61", "In the practice studio, Home says what it is, the top bar keeps a Practice studio key, and the Status panel offers Start again and Leave the practice studio."],
   ["7.61", "Every password field, the sign-in's first, has a key at its right edge that shows what you typed and hides it again. The field keeps the focus, and the password is never spell-checked or kept by the browser."],
