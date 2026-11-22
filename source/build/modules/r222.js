@@ -234,6 +234,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.68", "Settings, Security, Ingenium itself: Read it as written. Make your reading key here, on your own device: it is kept only under its own password, and its public half, saved as a file, goes into the next release, which scrambles every copy of Ingenium and opens it for you as written.", "master"],
+  ["7.68", "A scrambled copy of one of your apps that comes back to you opens as written: Fabrica's Bring one in opens that app at the version it was made from, instead of bringing a scrambled copy in, and Lector's app library keeps it as written.", "fabrica"],
+  ["7.68", "Nothing changes in this edition: 7.68 brings parts of Ingenium this edition does not carry.", "nofabrica"],
   ["7.67", "Scrambled code, in an app's Package details: every package Fabrica makes carries the app's code shrunk and the names inside it scrambled, and the pages it carries inside too, before it is signed, so it is much slower to read or copy. Your sources in Fabrica stay as you wrote them, and Ingenium itself is never scrambled.", "fabrica"],
   ["7.67", "Before a package is made, its scrambled copy is run beside yours: if it shows an error yours does not, the package carries your code as written, and Ingenium says so. The Ship card marks what was made scrambled, and Settings, Security says Scrambled code is on.", "fabrica"],
   ["7.67", "Settings, Security says that Scrambled code is off in this copy, and why.", "nofabrica"],

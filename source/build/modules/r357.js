@@ -5,6 +5,8 @@
    on it and have it scrambled afterwards so that others may not be able to steal, replicate or modify my work. I want that capability
    built in as well please". Her answers that day: Read it as written for her apps, "Yes, add it"; Ingenium itself, "Every copy" (the
    master release page too, the Author Studio showing it as written); "A separate reading key"; and this before the build kit check.
+   Shown to her as eight pictures one by one at full size (previews/readable), and her word (22 November 2026): "I approve of the previews,
+   please commit and push it everywhere and continue working on my requests."
    Part one (this module):
    - Your reading key (Settings, Security, Ingenium itself; her master copy, her own profile): a P-256 key for opening alone (ECDH),
      made on her own device and kept there only under its own password (PBKDF2-SHA-256, 600,000 rounds, then AES-256-GCM, as her owner
