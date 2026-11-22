@@ -85,6 +85,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const ftest = brought && brought.id ? await p.evaluate(async (id) => { try { const out = await IngShip.test(id); const c = (out.checks || []).filter(x => x.id === 'number')[0] || null;
       return { number: c, ok: out.ok, states: (out.checks || []).map(x => x.id + ':' + x.state) }; } catch (e) { return { error: e.message }; } }, brought.id) : { error: 'not brought in' };
   ok(ftest.number && ftest.number.state === 'ok' && new RegExp('build ' + BI.version).test(ftest.number.detail || ''), "Fabrica's test of Clavis reads its build number (" + BI.version + '), with no warning about it', ftest);
+  // 7.66 (Clavis 106): the page names no file it does not carry, and opens in Fabrica's test window with no error of its own
+  ok(Array.isArray(ftest.states) && ftest.states.indexOf('names:ok') >= 0 && ftest.states.indexOf('opens:ok') >= 0 && ftest.states.indexOf('reads:ok') >= 0,
+    "Fabrica's test of Clavis passes: it reads cleanly, every file it names is here, and it opens with no errors", ftest.states);
   await sleep(2500);
   const fab = await p.evaluate(async () => { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); try { go('home'); go('fabrica'); } catch (e) {} await new Promise(r => setTimeout(r, 2500));
     const sheetOpen = [...document.querySelectorAll('div')].some(x => /^Bring an app in/.test((x.textContent || '').trim()) && x.offsetParent);
