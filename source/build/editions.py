@@ -647,13 +647,14 @@ def _reset_words(ed):
     return [(old, new, "Reset everything: what it clears, in this edition", 1)]
 
 
-def _no_clavis():
+def _no_clavis(ed):
     """7.65 (21 November 2026): Clavis, her search engine, is carried and named in the master edition alone, as Lakay is (6.55). Her words
     (21 November 2026): "I want the app to be built into my master edition of Ingenium like the other apps"; and before (19 November
     2026): "I do not want any of my apps built-in any editions outside of the master edition." So every other edition has none of its
     page, seal or layers (build_page.py carries them only where editions.carries_apps), and its name is nowhere in the page, not even in
-    the code: each line that names it is taken back to what it was before 7.65 here, before _no_lakay runs."""
-    return [
+    the code: each line that names it is taken back to what it was before 7.65 here, before _no_lakay runs. A module the edition does
+    not carry needs no rule: r258 is the master's alone, and r276 is carried where Fabrica is (skip_modules)."""
+    E = [
         ('var LIB_KEYS=["cd","forge","inkwell","ingenium","lakay","clavis"],LIB_NAMES={cd:"Carpe Diem",forge:"The Forge",inkwell:"Inkwell",ingenium:"Ingenium",lakay:"Lakay",clavis:"Clavis"};',
          'var LIB_KEYS=["cd","forge","inkwell","ingenium","lakay"],LIB_NAMES={cd:"Carpe Diem",forge:"The Forge",inkwell:"Inkwell",ingenium:"Ingenium",lakay:"Lakay"};',
          "the app library without Clavis", 1),
@@ -676,13 +677,6 @@ def _no_clavis():
          "Home's Lector without Clavis", 1),
         ('var BEYOND=(typeof ING_EDITION!=="string"||ING_EDITION==="master")?["lakay","clavis"]:[];\n',
          'var BEYOND=(typeof ING_EDITION!=="string"||ING_EDITION==="master")?["lakay"]:[];\n', "the library's list without Clavis", 1),
-        ("var ORDER=['carpe diem','forge','ingenium','inkwell','lakay','clavis','offline project'];  /* 7.65: Clavis after Lakay */",
-         "var ORDER=['carpe diem','forge','ingenium','inkwell','lakay','offline project'];", "the folders' order without Clavis", 1),
-        ('  if(/lakay/.test(n))return "lakay";if(/(^|[^a-z])clavis([^a-z]|$)/.test(n))return "clavis";  /* 7.65: Clavis-Mac, Clavis-Window, Clavis-IOS-Android */\n'
-         '  if(/offline[-_ ]?(pro|project)/.test(n))return "master";return null;}',
-         '  if(/lakay/.test(n))return "lakay";if(/offline[-_ ]?(pro|project)/.test(n))return "master";return null;}', "GitHub's logos without Clavis's name", 1),
-        ('  if(k&&k!=="lakay"&&k!=="clavis"&&k!=="master"&&W.IngSeal&&typeof IngSeal.el==="function")',
-         '  if(k&&k!=="lakay"&&k!=="master"&&W.IngSeal&&typeof IngSeal.el==="function")', "GitHub's logos: the seals", 1),
         ('  if(n==="clavis")return "clavis";\n', "", "app logos without Clavis's name", 1),
         ('function clavisSrc(){return flat(night()&&W.ING_SEALS&&ING_SEALS.clavisN?"clavisN":"clavis");}\n', "", "app logos without Clavis's pictures", 1),
         ('if(k==="clavis")return clavisSrc();', "", "app logos: an app's own logo, kept, without Clavis", 1),
@@ -693,6 +687,15 @@ def _no_clavis():
          "function on(){try{new MutationObserver(go).observe(D.body,{attributes:true,attributeFilter:[\"data-theme\"]});}catch(e){}}if(D.body)on();else D.addEventListener(\"DOMContentLoaded\",on);})();\n",
          "", "app logos: Clavis's night picture not followed", 1),
     ]
+    if has_fabrica(ed):  # a repository brought from GitHub (modules/r276.js), where there is a Fabrica
+        E += [
+            ('  if(/lakay/.test(n))return "lakay";if(/(^|[^a-z])clavis([^a-z]|$)/.test(n))return "clavis";  /* 7.65: Clavis-Mac, Clavis-Window, Clavis-IOS-Android */\n'
+             '  if(/offline[-_ ]?(pro|project)/.test(n))return "master";return null;}',
+             '  if(/lakay/.test(n))return "lakay";if(/offline[-_ ]?(pro|project)/.test(n))return "master";return null;}', "GitHub's logos without Clavis's name", 1),
+            ('  if(k&&k!=="lakay"&&k!=="clavis"&&k!=="master"&&W.IngSeal&&typeof IngSeal.el==="function")',
+             '  if(k&&k!=="lakay"&&k!=="master"&&W.IngSeal&&typeof IngSeal.el==="function")', "GitHub's logos: the seals", 1),
+        ]
+    return E
 
 
 def _no_lakay():
@@ -741,7 +744,7 @@ def _no_lakay():
 def edits(ed):
     if ed == "master":
         return []
-    E = _no_clavis() + _no_lakay() + _fixed_name()  # 7.65: Clavis first, so the lines naming Lakay are as _no_lakay knows them
+    E = _no_clavis(ed) + _no_lakay() + _fixed_name()  # 7.65: Clavis first, so the lines naming Lakay are as _no_lakay knows them
     for old, new, label, times in _personal():
         if label == "the edition":
             new = 'var ING_EDITION="%s";' % ed
