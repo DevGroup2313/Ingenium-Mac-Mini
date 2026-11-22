@@ -1,4 +1,4 @@
-"""Ingenium 7.70: asking and offering, with Accept (the computer that lends). Held until her word on its pictures.
+"""Ingenium 7.70: asking and offering, with Accept (the computer that lends). Released in 7.70 on her word on its pictures (previews/lend_ask).
 
 Her words (22 November 2026): "Currently when one Ingenium (A - Request Sender) sends a request to another Ingenium (B - Request Receiver)
 there's no significant visual confirmation that either machine has connected successfully. Pop-up notifications must appear for each
@@ -13,7 +13,8 @@ option"); A is told when B accepts, too.
                                                     the code, as before. At most one waiting ask for each device, six a minute in all.
   GET  /ingenium/ask/state?rid=                     no code: wait, no, or ok with what /ingenium/pair2/state answers
   POST /ingenium/ask/decline {id}                   no code: a device declines this computer's offer; her page is told
-  hello: "ask": 1, "offers": the ids of the devices this computer offers its models to now ("*" for any device nearby)
+  hello: "ask": 1, "offers": the ids of the devices this computer offers its models to now ("*" for a device nearby: the first that
+                                                    accepts takes it; each offer lasts ten minutes)
   share_asks(), share_offer(dev_id, on), share_usage(), share_memory()   for this computer's own page
   Usage: each paired device's requests to the models, today and in all, its last use and model, kept over a restart.
 
@@ -85,9 +86,18 @@ def _ask_start(h):
         if len(_ASK["times"]) >= 6:
             return h._err(429, "Too many requests at once. Wait a minute, then ask again.")
         _ASK["times"].append(now)
-    offers = _ask_offers_now()
-    if mode == "offer" and dev["id"] not in offers and "*" not in offers:
-        return h._json(410, {"error": {"message": "%s no longer offers its models. Ask it instead." % _share_computer_name(), "code": 410}, "state": "gone"})
+    if mode == "offer":
+        # her offer is taken as it is accepted, in one step: an offer to one device by that device; an offer to "a device nearby"
+        # by the first device that accepts it, and by no other (it would otherwise let every device nearby pair for ten minutes)
+        _ask_offers_now()
+        with _ASK["lock"]:
+            if dev["id"] in _ASK["offers"]:
+                _ASK["offers"].pop(dev["id"], None)
+            elif "*" in _ASK["offers"]:
+                _ASK["offers"].pop("*", None)
+            else:
+                return h._json(410, {"error": {"message": "%s no longer offers its models. Ask it instead." % _share_computer_name(), "code": 410},
+                                     "state": "gone"})
     import secrets
     rid = secrets.token_urlsafe(12)
     words = _seal_words(_seal_pub(), pub)
@@ -109,8 +119,6 @@ def _ask_start(h):
         except Exception as e:
             x["state"] = "no"
             return h._err(500, "Pairing did not finish: %s" % e)
-        with _ASK["lock"]:
-            _ASK["offers"].pop(dev["id"], None)
         _ask_answer_note(dev, "offer", "accepted")
     return h._json(200, {"ok": True, "rid": rid, "pub": base64.b64encode(_seal_pub()).decode("ascii"), "words": words,
                          "computer": _share_computer_name(), "id": _share_id(), "state": x["state"]})

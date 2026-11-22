@@ -1,6 +1,6 @@
 # Ingenium record 05 · Where every piece of data lives
 
-Part of the record of Ingenium's security system, written from Ingenium 7.54's sources and brought up to 7.69 (22 November 2026). The labels in quotation marks are the ones the Storage page shows (`build/modules/r142.js`, `LABELS`). "Per profile" means the store is renamed with `@<profile id>` in every profile but the owner's (record 04, section 3); "shared" means the device keeps one copy for every profile. "Sealed" means sealed under the data key while the sign-in is on (record 02).
+Part of the record of Ingenium's security system, written from Ingenium 7.54's sources and brought up to 7.70 (22 November 2026). The labels in quotation marks are the ones the Storage page shows (`build/modules/r142.js`, `LABELS`). "Per profile" means the store is renamed with `@<profile id>` in every profile but the owner's (record 04, section 3); "shared" means the device keeps one copy for every profile. "Sealed" means sealed under the data key while the sign-in is on (record 02).
 
 ## 1. The browser's small store (localStorage)
 
@@ -53,6 +53,7 @@ The folder search keeps its index in the browser's private file system (OPFS, th
 * Sealed with the disk key while the owner is signed in (record 06, section 3): the apps waiting for her devices and Fabrica's runs, their logs and files (7.49); the records of waiting apps under names that say nothing, a run's record once it ends, and texts for training (7.50).
 * From 7.58: her signatures of Ingenium's releases (`<the app's folder>/signatures/*.ingsig`, no secret: a signature proves, it opens nothing), and the last ten refusals of a changed copy, for Settings, Security.
 * Not sealed: models on the disk, the engine, and a run's working files while the run is still running (sealed when it ends).
+* Lending's settings, `share.json` beside the models' folder: from 7.70 also each paired device's use of the models (`usage`: its requests today and in all, its last use, the model it used last; sixty devices at most, written at most every thirty seconds). Not sealed: it holds counts and model names, none of her words (record 06, section 17).
 * The practice studio's files: a profile folder of its own (`practice`, through `profile_use`), dropped when it is left (`profile_drop`).
 * Her signatures of Ingenium's releases (7.58): `<the app's folder>/signatures/*.ingsig`, beside its storage; nothing secret is in them (record 06, section 9).
 

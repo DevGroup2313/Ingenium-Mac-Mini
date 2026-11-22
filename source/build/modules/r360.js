@@ -1,5 +1,5 @@
 <style id="r360-css">
-/* ============ R360 · ASKING AND OFFERING, WITH ACCEPT (Ingenium 7.70, 22 November 2026; held until her word on its pictures) ============
+/* ============ R360 · ASKING AND OFFERING, WITH ACCEPT (Ingenium 7.70, 22 November 2026; released on her word on its pictures) ============
    Her words (22 November 2026): "Currently when one Ingenium (A - Request Sender) sends a request to another Ingenium (B - Request
    Receiver) there's no significant visual confirmation that either machine has connected successfully. Pop-up notifications must appear for
    each step displayed below: When A sends a request to B, B must show a pop-up displaying what that request is for (request to lend A's
@@ -12,7 +12,8 @@
      usage." or "You declined A's request."; on A, "B accepted: you can now use B's models." or "B declined your request."
    - A offers to lend B its models (Offer my models, beside each device in Your devices on A): on B, A offers to lend you its models, Accept
      and Decline; then on B, "A's models are now available for you to use." or "You declined A's request."; on A, "B accepted: your models
-     are now lent to B. Go to the Mentes page to track B's usage." or "B declined your request."
+     are now lent to B. Go to the Mentes page to track B's usage." or "B declined your request." Offer my models to a device nearby (under
+     the devices that use its models) offers them to the first device nearby that accepts, and to no other; each offer lasts ten minutes.
    The computer's side is build/desktop/app_ask_770.py (POST /ingenium/ask, its state, a declined offer, hello's offers, share_asks,
    share_offer); r319 and r274 carry the hooks, which do nothing without this part. Sealed always: only a device that seals may ask without
    the code; one that cannot types the code, as before. */

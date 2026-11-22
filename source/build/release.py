@@ -142,7 +142,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_disk_fix_757", "_disk_seal_status", ("mini", "intel", "win")),  # 7.57: the seal's names its own; drive repositories work again
            ("app_pick_757", "_disk_pick_757", ("mini", "intel", "win")),  # 7.57: Fabrica's stage 3, part two, on a drive
            ("app_self_758", "_self_758", ("mini", "intel", "win")),  # 7.58: Ingenium itself, signed and checked (Security)
-           ("app_self2_764", "_self2_764", ("mini", "intel", "win"))]  # 7.64: part two, the copy her phones and tablets carry
+           ("app_self2_764", "_self2_764", ("mini", "intel", "win")),  # 7.64: part two, the copy her phones and tablets carry
+           ("app_ask_770", "_ask_start", ("mini", "intel", "win"))]  # 7.70: asking and offering with Accept, each device's use, the memory now
 
 
 def desktop():

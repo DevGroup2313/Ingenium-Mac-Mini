@@ -1,6 +1,6 @@
 # Ingenium record 01 · The security system at a glance
 
-Part of the record, written from Ingenium 7.54's sources and brought up to 7.69 (22 November 2026).
+Part of the record, written from Ingenium 7.54's sources and brought up to 7.70 (22 November 2026).
 
 ## 1. What is protected, and from whom
 
@@ -14,12 +14,14 @@ Part of the record, written from Ingenium 7.54's sources and brought up to 7.69 
 * **Her apps' code, from being read or copied easily** (7.67): every package Fabrica makes carries the app's code shrunk and the names inside it scrambled, and the pages it carries inside too, before it is signed; her sources in Fabrica stay as she wrote them, and Ingenium itself is never scrambled (record 06, section 14).
 * **Her code, readable to her** (7.68): her sources in Fabrica stay as she wrote them, a scrambled copy of one of her apps that comes back to her opens as written from Fabrica, and her reading key is made for the release that scrambles every copy of Ingenium and opens it for her as written (record 06, section 15).
 * **Ingenium, from the apps she runs in its preview** (7.69): each runs in a sandboxed frame with no origin of its own and never reaches Ingenium's stores; the stage kit gives it stores of its own, and what it keeps is kept for it, sealed, and handed back only to it (record 06, section 16).
+* **Who may use her computer's models** (7.70): a device may ask without the code only while the computer lends, only if it seals, and at most six asks a minute reach the computer; she accepts or declines each ask there, after checking that the four words match the device's. An offer she makes goes to the device she chose, or to the first device nearby that accepts it, and lasts ten minutes (record 06, section 17).
 * **An app meant for her alone** (7.63): turned on in its Package details, every package of it opens only where she opened it once with her owner key, or for someone she gave a permission to use it (record 06, section 12).
 * **Ingenium itself, from being changed by anyone else**: the Mac and Windows apps check the page against her signature at every start, and a changed copy does not open (record 06, section 9).
 * **What the device shares, from anyone who opens the practice studio**: it opens without a password, so it reads the device's models, protection and pairing but can change none of them (record 04, section 9).
 
 ## 2. What it does not protect against (said plainly)
 
+* While she offers her models to a device nearby (ten minutes at most), the first device nearby that accepts pairs without her checking its words on the computer; she is told at once which device it was, and can Remove it (record 06, section 17).
 * The keys an app in the preview made (7.69): kept as the browser keeps keys, usable on this device and never readable as bytes, but not sealed with the sign-in; what the app keeps besides is sealed (record 06, section 16).
 * Anyone at the device while it is open and signed in. Lock now, Sign out, the lock after time away and the lock when the computer sleeps close that window of time.
 * Anyone who can sign in to her computer as her, if she turned on the computer's own sign-in as a way back in (said when it is turned on).

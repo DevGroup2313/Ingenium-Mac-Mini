@@ -1,5 +1,5 @@
 <style id="r361-css">
-/* ============ R361 · WHOSE MODELS ANSWER, AND THE MEMORY THEY TAKE (Ingenium 7.70, 22 November 2026; held until her word) ============
+/* ============ R361 · WHOSE MODELS ANSWER, AND THE MEMORY THEY TAKE (Ingenium 7.70, 22 November 2026; released on her word on its pictures) ====
    Her words (22 November 2026): "I also want the 'who answers' widget to pulse with a faint colour glow based on which Ingenium's models are
    being used. If A Lends to B - A's model widget should pulse outward B's model widget should pulse in reverse with the same dimensions.
    Finally add another widget in Mentes which only appears when ingenium lend's it's models, displaying the live amount of RAM being used the

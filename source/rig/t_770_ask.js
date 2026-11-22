@@ -10,7 +10,8 @@
 //   3. a second device asks; Decline: on the Mac, "You declined <device>'s request."; on the device, "<Mac> declined your request."
 //   4. the Mac offers its models to the second device: it sees "<Mac> offers to lend you its models", declines: "You declined <Mac>'s
 //      request."; on the Mac, "<device> declined your request."; offered again, it accepts: "<Mac>'s models are now available for you to
-//      use."; on the Mac, "<device> accepted: your models are now lent to <device>."
+//      use."; on the Mac, "<device> accepted: your models are now lent to <device>."; an offer to a device nearby is taken by the first
+//      device that accepts it, and by no other
 //   5. the device that cannot seal is told to type the code; asking while the Mac does not lend is refused plainly
 //   6. usage: the Mac counts each device's requests to its models (share_usage); its memory now (share_memory)
 //   7. the glow: the device using the Mac's models pulses inward in the Mac's colour; the Mac, lending while a device used it, outward,
@@ -109,6 +110,14 @@ const waitSel = (pg, sel, ms) => pg.waitForSelector(sel, { timeout: ms || 30000 
   await p.evaluate(() => IngAsk._lenderPoll()); await waitSel(p, '#akDone'); const md4 = await text(p, '#akDone');
   ok(md4 && / accepted: your models are now lent to /.test(md4) && /Go to the Mentes page to track/.test(md4), 'on the Mac: "<device> accepted: your models are now lent to <device>. Go to the Mentes page …"', md4);
   await p.evaluate(() => { const v = document.getElementById('akDone'); if (v) v.remove(); }); await q2.evaluate(() => { const v = document.getElementById('akDone'); if (v) v.remove(); });
+
+  /* 4b: an offer to "a device nearby" is taken by the first device that accepts it, and by no other */
+  const rawKey = async () => { const k = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits']); return Buffer.from(await crypto.subtle.exportKey('raw', k.publicKey)).toString('base64'); };
+  const askOffer = async (id, name) => fetch(base + '/ingenium/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, kind: 'tablet', name, pub: await rawKey(), mode: 'offer' }) }).then((r) => r.json(), (e) => ({ err: String(e) }));
+  await api(A.port, 'share_offer', ['*', true]);
+  const near1 = await askOffer('near-device-01', 'Near Tablet'), near2 = await askOffer('near-device-02', 'Other Tablet');
+  const hello2 = await fetch(base + '/ingenium/hello').then((r) => r.json(), () => ({}));
+  ok(near1 && near1.state === 'ok' && near2 && near2.state === 'gone' && !(hello2.offers || []).includes('*'), 'an offer to a device nearby is taken by the first device that accepts it, and by no other', { near1: near1 && near1.state, near2, offers: hello2.offers });
 
   /* 5: refusals in plain words */
   const noPub = await (await fetch(base + '/ingenium/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'plain-device-01', kind: 'browser', name: 'Old browser' }) })).json();
