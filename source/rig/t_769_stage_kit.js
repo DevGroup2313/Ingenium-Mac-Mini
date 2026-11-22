@@ -202,6 +202,12 @@ const serve = (port) => new Promise((res) => { const s = http.createServer((q, r
   await p.evaluate(() => { try { closeStickyMenus(); } catch (e) {} });
   ok(sn && sn.rowBg === 'rgba(0, 0, 0, 0)' && sn.rowImg === 'none' && sn.rowShadow === 'none' && sn.rowBorder === '0px' && sn.radius === '16px' && sn.pad === '8px' && sn.danger && sn.danger !== 'rgb(34, 26, 46)',
     'her standard for side menus: a sticky note\'s menu is one raised card with quiet rows; Delete note stays red', sn);
+  // its paper swatches by night: raised as by day (a light on the face, a shadow under), not a flat rim
+  await p.evaluate(() => { state.theme = 'night'; applyTheme(); }); await sleep(700);
+  await p.evaluate(() => { const n = document.querySelector('.sticky-note'); const k = n && [...n.querySelectorAll('button')].find((x) => /⋯|…|···/.test(x.textContent)); if (k) k.click(); }); await sleep(900);
+  const dots = await p.evaluate(() => { const d = document.querySelector('.sn-menu .sn-dot:not(.sel)'); if (!d) return null; const c = getComputedStyle(d); return { img: c.backgroundImage.slice(0, 40), shadow: c.boxShadow, inline: d.style.getPropertyValue('box-shadow') }; });
+  await p.evaluate(() => { try { closeStickyMenus(); } catch (e) {} state.theme = 'day'; applyTheme(); });
+  ok(dots && /radial-gradient/.test(dots.img) && /0px 2px 0px/.test(dots.shadow) && !dots.inline, 'by night a note\'s paper swatches stay raised (a light on the face, a wall and a cast), as by day', dots);
 
   ok(errs.length === 0, 'no page errors', errs);
   console.log(P + ' passed, ' + F + ' failed');

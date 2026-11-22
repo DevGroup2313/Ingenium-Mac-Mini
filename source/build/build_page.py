@@ -1622,6 +1622,17 @@ edit('t:"✦ The seal",b:"The seal at the top left opens the introduction again:
 edit('"The top bar":"The seal, what is running, the look, and About."', '"The top bar":"The logo, what is running, the look, and About."',
      "6.74 the Guide names the logo in the top bar")
 
+# ---- 7.69 (22 November 2026): the paper swatches by night keep the day's raised look and its motion. Her words: "I don't want the
+#      colour swatches to be flat on dark mode, I want them to have the same 3d popped out look and animation on dark mode that they do on
+#      light mode". The night dress (tintDots) wrote each swatch's night paper and a flat rim inline, as important, which no style could
+#      raise and no pointer could lift; it now writes the paper under a light falling on it from above, and leaves the shadows (the raised
+#      look, its lift and press, modules/r359.js) to the page's styles. ----
+edit("""          els[i].style.setProperty('background', n.p, 'important');
+          els[i].style.setProperty('box-shadow', 'inset 0 0 0 1px rgba(255,246,228,0.30)', 'important');""",
+     """          els[i].style.setProperty('background', 'radial-gradient(circle at 34% 28%,rgba(255,255,255,.34) 0%,rgba(255,255,255,.10) 38%,rgba(255,255,255,0) 58%,rgba(0,0,0,.22) 100%),' + n.p, 'important');
+          els[i].style.removeProperty('box-shadow');""",
+     "7.69 the paper swatches by night raised, as by day")
+
 for old, new, label, times in EDITS:
     n = out.count(old)
     if n != times:

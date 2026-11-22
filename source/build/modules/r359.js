@@ -32,6 +32,18 @@ body[data-theme="night"] .sn-menu.sn-menu .menu-btn.menu-btn:hover,body[data-the
 .sn-menu.sn-menu .menu-btn.menu-btn.danger,.sn-menu.sn-menu .menu-btn.menu-btn.danger:hover,
 .ing-side-menu.ing-side-menu .menu-btn.menu-btn.danger,.ing-side-menu.ing-side-menu .menu-btn.menu-btn.danger:hover{color:var(--bad)}
 .sn-menu.sn-menu .col-row{padding:4px 8px 8px}
+/* The paper swatches by night (her words, 22 November 2026: "I don't want the colour swatches to be flat on dark mode, I want them to have
+   the same 3d popped out look and animation on dark mode that they do on light mode"): the night papers are dark, so the day's light lip
+   and shade did not read on the dark card. Each swatch now has a light falling on it from above (a soft highlight on its face), a bright
+   lip, a shaded foot, a wall and a cast that read on the dark card, and the day's lift and press. The same for Schedae's swatches. */
+body[data-theme="night"] .sn-menu .sn-dot[data-sn-col],body[data-theme="night"] #schedaePanel .sch-dot{
+  background-image:radial-gradient(circle at 34% 28%,rgba(255,255,255,.34) 0%,rgba(255,255,255,.10) 38%,rgba(255,255,255,0) 58%,rgba(0,0,0,.22) 100%) !important;
+  box-shadow:inset 0 0 0 1px rgba(255,246,228,.26),inset 0 1.5px 1px rgba(255,255,255,.38),inset 0 -2px 3px rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.62),0 4px 8px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.05)}
+body[data-theme="night"] .sn-menu .sn-dot[data-sn-col]:hover,body[data-theme="night"] #schedaePanel .sch-dot:hover{transform:translateY(-2px) scale(1.08);
+  box-shadow:inset 0 0 0 1px rgba(255,246,228,.32),inset 0 1.5px 1px rgba(255,255,255,.42),inset 0 -2px 3px rgba(0,0,0,.4),0 3.5px 0 rgba(0,0,0,.58),0 7px 12px rgba(0,0,0,.52),0 0 0 1px rgba(255,255,255,.07)}
+body[data-theme="night"] .sn-menu .sn-dot[data-sn-col]:active,body[data-theme="night"] #schedaePanel .sch-dot:active{transform:translateY(1px);box-shadow:inset 0 0 0 1px rgba(255,246,228,.22),inset 0 2px 4px rgba(0,0,0,.6)}
+body[data-theme="night"] .sn-menu .sn-dot.sel[data-sn-col]{box-shadow:0 0 0 2px #a98be0,inset 0 1.5px 1px rgba(255,255,255,.38),inset 0 -2px 3px rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.62),0 4px 8px rgba(0,0,0,.5)}
+body[data-motion="minimal"] .sn-menu .sn-dot[data-sn-col]:hover{transform:none}
 body[data-motion="minimal"] .sn-menu.sn-menu .menu-btn.menu-btn:hover,body[data-motion="minimal"] .ing-side-menu.ing-side-menu .menu-btn.menu-btn:hover{transform:none}
 @media (prefers-reduced-motion:reduce){.sn-menu.sn-menu .menu-btn.menu-btn,.ing-side-menu.ing-side-menu .menu-btn.menu-btn{transition:none}}
 </style>
