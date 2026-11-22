@@ -43,12 +43,12 @@
  "clavis": {
   "key": "clavis",
   "title": "Clavis",
-  "version": "106",
-  "build": "bbf59d1544",
+  "version": "108",
+  "build": "fb681fe5b2",
   "date": "2026-11-22",
   "color": "#b8862f",
-  "size": 5392364,
-  "sha256": "454bfff9844a5c67481bae5d9f60e8a841e4a93ac23be1a723d15571c3460f17",
+  "size": 5401009,
+  "sha256": "106e92174dd6b85ef7eaaf23d1af601c0046f54ee787da2cba266a9b60aba6a4",
   "name": "clavis.html"
  }
 }
