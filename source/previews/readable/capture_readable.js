@@ -89,8 +89,11 @@ const APP = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n
   await p.evaluate(() => { const t = document.getElementById('ingToast'); if (t) t.remove(); });
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find((x) => /Bring one in/.test(x.textContent) && x.offsetParent); if (k) k.click(); }); await sleep(900);
   const fc = p.waitForEvent('filechooser', { timeout: 15000 }); await p.evaluate(() => { const r = [...document.querySelectorAll('.f-opt')].filter((x) => /A page or a zip/.test(x.textContent) && x.offsetParent).pop(); if (r) r.click(); });
-  await (await fc).setFiles(path.join(OUT, 'Tide Clock.html')); await sleep(4500);
-  await grab(p, '6-fabrica', '#ingToast', '#ingToast', { pad: 24, keepToast: true, backdrop: true });
+  await (await fc).setFiles(path.join(OUT, 'Tide Clock.html'));
+  // Fabrica says it in its own toast (.f-toast in #fb), which stays a few seconds: held still for the picture once it is there
+  await p.waitForFunction(() => { const t = document.querySelector('#fb .f-toast'); return t && /is a scrambled copy of/.test(t.textContent); }, null, { timeout: 30000 });
+  await p.evaluate(() => { const t = document.querySelector('#fb .f-toast'); const c = t.cloneNode(true); c.id = 'pvFbToast'; t.replaceWith(c); c.scrollIntoView({ block: 'center' }); }); await sleep(600);
+  await grab(p, '6-fabrica', '#pvFbToast', '#pvFbToast', { pad: 24, keepToast: true });
   // 7. in Lector's app library
   await p.evaluate(() => { const t = document.getElementById('ingToast'); if (t) t.remove(); });
   await p.evaluate(async (html) => { await libKeep('tide-clock-copy', { title: 'Tide Clock' }, new TextEncoder().encode(html), html); }, pkg.html); await sleep(700);

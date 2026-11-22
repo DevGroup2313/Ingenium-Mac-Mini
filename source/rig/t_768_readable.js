@@ -131,11 +131,15 @@ const serve = (port) => new Promise((res) => { const s = http.createServer((q, r
   ok(came.go && came.aw && came.aw.id === id && came.aw.commit === pkg.commit && came.aw.plain && !came.aw.mark && came.s2 === 'unsigned', 'as it comes in, the copy is matched to the version her Fabrica holds, and that version is read as written', came);
   fs.writeFileSync(path.join(DIR, 'Tide Clock.html'), pkg.html);
   const before = await p.evaluate(() => IngRepo.list().then((r) => r.length));
+  // Fabrica says what it did in its own toast (.f-toast in #fb, gone after a few seconds): each one is kept as it appears
+  await p.evaluate(() => { window.__fbToasts = []; new MutationObserver(() => { document.querySelectorAll('#fb .f-toast').forEach((t) => { const s = t.textContent; if (window.__fbToasts.indexOf(s) < 0) window.__fbToasts.push(s); }); })
+    .observe(document.getElementById('fb'), { childList: true, subtree: true }); });
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find((x) => /Bring one in/.test(x.textContent) && x.offsetParent); if (k) k.click(); }); await sleep(900);
   const fc2 = p.waitForEvent('filechooser', { timeout: 15000 });
   await p.evaluate(() => { const r = [...document.querySelectorAll('button,[role="button"],.f-opt,div')].filter((x) => /^⇩?\s*A page or a zip/.test((x.textContent || '').trim()) && x.offsetParent).pop(); if (r) r.click(); });
-  let brought = 'no chooser'; try { const ch2 = await fc2; await ch2.setFiles(path.join(DIR, 'Tide Clock.html')); await sleep(4000); brought = 'chosen'; } catch (e) {}
-  const after = await p.evaluate(() => IngRepo.list().then((r) => r.length)); const sel = await p.evaluate(() => fbHubHost.FBS().sel); const t5 = await toastText();
+  let brought = 'no chooser'; try { const ch2 = await fc2; await ch2.setFiles(path.join(DIR, 'Tide Clock.html')); brought = 'chosen';
+    await p.waitForFunction(() => (window.__fbToasts || []).some((s) => /is a scrambled copy of|is here/.test(s)), null, { timeout: 30000 }).catch(() => {}); } catch (e) {}
+  const after = await p.evaluate(() => IngRepo.list().then((r) => r.length)); const sel = await p.evaluate(() => fbHubHost.FBS().sel); const t5 = await p.evaluate(() => (window.__fbToasts || []).join(' | '));
   ok(brought === 'chosen' && after === before && sel === id && /is a scrambled copy of Tide Clock, version [0-9a-f]{7}: your Fabrica holds it as written, and it is open here/.test(t5),
     "Fabrica's Bring one in: the app opens, as written, and nothing is brought in", { brought, before, after, sel, id, t5 });
   const lib = await p.evaluate(async (html) => { await libKeep('tide-clock-copy', { title: 'Tide Clock' }, new TextEncoder().encode(html), html); await new Promise((r) => setTimeout(r, 400));
