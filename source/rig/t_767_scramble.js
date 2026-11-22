@@ -113,6 +113,18 @@ const blockOf = (html, id) => { const m = new RegExp('<script[^>]*id="' + id + '
     ok(!api.lib && r.row === null && r.state === 'off' && r.item === 'off' && r.wanted === false, api.ed + ' edition: no scrambler carried, no switch, nothing scrambled, and the room says Off', r);
     ok(/\[off\]/.test(r.well) && /Off in this copy: what you make here is shipped as you wrote it\./.test(r.well) && !/Fabrica/.test(r.well), "its words say why, and name nothing this edition does not have", r.well);
     ok(errs.length === 0, 'no page errors', errs); console.log(P + ' passed, ' + F + ' failed'); await b.close(); srv.close(); process.exit(F ? 1 : 0); }
+  if (api.ed === 'full') {   // the full edition has a Fabrica: Scrambled code is its only row in Package details, and a package is scrambled (made unsigned: no owner key there)
+    ok(api.api && api.lib && api.bytes === 1104314, 'full edition: r356 runs, and Terser 5.51.2 rides beside it', api);
+    await p.evaluate(() => go('fabrica')); await sleep(1200);
+    const fid = await p.evaluate(async (t) => { const x = await IngRepo.fromFiles([{ path: 'index.html', data: t }], { name: 'Tide Clock', msg: 'first' }); const id = x.id || (x.repo && x.repo.id);
+      fbHubHost.FBS().sel = id; fbHubHost.S.home = false; await fbHubHost.refresh(); fbHubHost.setPanel('ship'); fbHubHost.paint(); return id; }, TIDE); await sleep(1200);
+    await p.evaluate(() => { const k = [...document.querySelectorAll('#fbPkg button')].find((x) => x.textContent.trim() === 'Package details'); k.click(); }); await sleep(800);
+    const frows = await p.evaluate(() => [...document.querySelectorAll('.r349-row')].map((r) => r.querySelector('b').textContent + ':' + r.getAttribute('aria-checked')));
+    ok(frows.length === 1 && frows[0] === 'Scrambled code:true', 'full edition: Package details has Scrambled code alone (the owner key rows are the master\'s), on', frows);
+    const fone = await p.evaluate((id) => IngShip.onePage(id, { target: 'page' }).then((x) => ({ scr: x.scrambled || null, plain: /harbourOffsetMinutes/.test((/<script>([\s\S]*?)<\/script>/.exec(x.html) || [])[1] || ''), signed: !!x.signed })), fid);
+    const froom = await p.evaluate(() => (IngSecurity.items().filter((x) => x.t === "Your apps' code scrambled")[0] || {}).s);
+    ok(fone.scr && fone.scr.scripts === 2 && !fone.plain && !fone.signed && froom === 'on', 'full edition: a package made, its code scrambled (unsigned: no owner key in this edition), and the room says On', { fone, froom });
+    ok(errs.length === 0, 'no page errors', errs); console.log(P + ' passed, ' + F + ' failed'); await b.close(); srv.close(); process.exit(F ? 1 : 0); }
   ok(api.api && api.lib && api.bytes === 1104314 && api.ed === 'master', 'r356 runs in the master edition, and Terser 5.51.2 rides beside it (1,104,314 bytes unpacked)', api);
   await p.evaluate(() => go('fabrica')); await sleep(1200);
   const mk = (html, name) => p.evaluate(async (a) => { const x = await IngRepo.fromFiles([{ path: 'index.html', data: a.html }], { name: a.name, msg: a.name + ', the first version' }); return x.id || (x.repo && x.repo.id); }, { html, name });
