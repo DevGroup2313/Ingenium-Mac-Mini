@@ -234,6 +234,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.66", "Clavis is carried at build 105, which names its build number in its page: your app library and Fabrica read it there, so Fabrica's test says build 105 and sees each Clavis build move forward.", "master"],
   ["7.65", "Clavis, your search engine, is carried inside Ingenium at its latest build (104) and kept with your other apps on first start: in the app library, Lector, Fabrica's Bring one in, Adamas's Open an app, Code's Your apps and Ingenia, where its folder wears its gold key by day and by night. Opened from Ingenium, it runs in a window of its own.", "master"],
   ["7.65", "The app library knows a newer page of Lakay or Clavis that you add yourself by its name, as it knows your other apps.", "master"],
   ["7.65", "Code's Your apps card speaks of the apps kept in your app library, not of four apps."],

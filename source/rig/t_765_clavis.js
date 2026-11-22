@@ -37,6 +37,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   ok(kept.version === BI.version && kept.source === 'built in' && kept.sha === BI.sha256 && kept.size === BI.size && kept.color === '#b8862f',
     'kept as Clavis ' + BI.version + ', built in, its size and fingerprint as builtin.json records them, in its gold', kept);
   ok(kept.head === 'Clavis' && kept.det === 'clavis', 'its page reads back whole, and the library knows it as Clavis', { head: kept.head, det: kept.det, len: kept.len });
+  // 7.66: since Clavis 105 its page names its build number in its head, where Fabrica (IngShip's numberOf) and the app library read it
+  const num = await p.evaluate(async () => { const t = await libText('clavis'); const m = /<meta name="version" content="(\d+)">/.exec(String(t || '').slice(0, 40000));
+    return { meta: m ? m[1] : null, lib: libVersionOf('clavis', t), fabrica: (window.IngShip && IngShip._ && IngShip._.numberOf) ? IngShip._.numberOf(t, null) : 'no IngShip' }; });
+  ok(num.meta === BI.version && num.lib === BI.version && num.fabrica === BI.version, 'its page names its build number (' + BI.version + '), and the app library and Fabrica read it there', num);
 
   // 2. wherever her apps are listed
   const lists = await p.evaluate(() => { const o = {};
@@ -78,6 +82,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     for (let i = 0; i < 120; i++) { await new Promise(r => setTimeout(r, 1000)); const rs = await IngRepo.list(); const r = rs.filter(x => x.app === 'clavis' || /^Clavis\b/.test(x.name))[0]; if (r) return { id: r.id, name: r.name, app: r.app || null, s: i }; }
     return { error: 'not brought in within two minutes' }; }, BI.version);
   ok(brought && !brought.error && brought.app === 'clavis', 'Clavis comes into Fabrica from the app library as one of her own apps', brought);
+  const ftest = brought && brought.id ? await p.evaluate(async (id) => { try { const out = await IngShip.test(id); const c = (out.checks || []).filter(x => x.id === 'number')[0] || null;
+      return { number: c, ok: out.ok, states: (out.checks || []).map(x => x.id + ':' + x.state) }; } catch (e) { return { error: e.message }; } }, brought.id) : { error: 'not brought in' };
+  ok(ftest.number && ftest.number.state === 'ok' && new RegExp('build ' + BI.version).test(ftest.number.detail || ''), "Fabrica's test of Clavis reads its build number (" + BI.version + '), with no warning about it', ftest);
   await sleep(2500);
   const fab = await p.evaluate(async () => { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); try { go('home'); go('fabrica'); } catch (e) {} await new Promise(r => setTimeout(r, 2500));
     const sheetOpen = [...document.querySelectorAll('div')].some(x => /^Bring an app in/.test((x.textContent || '').trim()) && x.offsetParent);

@@ -1574,6 +1574,13 @@ edit('  if(/<meta name="lakay-build"/i.test(head.slice(0,40000))||/<title>\\s*La
      '  if(/<meta name="lakay-build"/i.test(head.slice(0,40000))||/<title>\\s*Lakay\\b/i.test(head.slice(0,40000)))return "lakay";\n'
      '  if(/<title>\\s*Clavis\\b/i.test(head.slice(0,40000))&&/CLAVIS\\s*\\|\\s*Copyright/.test(head.slice(0,4000)))return "clavis";\n',
      "7.65 a Clavis page known as Clavis")
+# 7.66 (22 November 2026): Clavis names its build number in its page since build 105 (<meta name="version">, from its app.json's pass),
+# where Fabrica reads an app's number (modules/r111.js); the app library reads it there too, as Lakay's from its lakay-build line. Her
+# words: "I want you to add the build number to Clavis so that there are no issues with Fabrica's tests."
+edit('  if(key==="lakay"&&(m=/<meta name="lakay-build" content="(\\d+)"/.exec(s.slice(0,40000))))return m[1];\n',
+     '  if(key==="lakay"&&(m=/<meta name="lakay-build" content="(\\d+)"/.exec(s.slice(0,40000))))return m[1];\n'
+     '  if(key==="clavis"&&(m=/<meta name="version" content="(\\d+)"/.exec(s.slice(0,40000))))return m[1];\n',
+     "7.66 Clavis's build number as its version")
 # 7.65: the app library's later reading of a page (the base page's second libDetect, which replaces the first) knew neither Lakay nor
 # Clavis, so a newer page of either, added by hand, was kept as some other app; now it is known by name, as her other apps are
 edit('libDetect=function(text){var s=String(text||""),head=s.slice(0,600000),t=((/<title>([^<]{0,200})<\\/title>/i.exec(head)||[])[1]||"").trim();\n',

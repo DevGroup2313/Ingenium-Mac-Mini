@@ -662,6 +662,9 @@ def _no_clavis(ed):
          "no Clavis page known by name", 1),
         ('  if(/^Clavis\\b/i.test(t)&&/CLAVIS\\s*\\|\\s*Copyright/.test(head.slice(0,4000)))return "clavis";\n', "",
          "no Clavis page known by name (the later reading)", 1),
+        # 7.66: nor its build number read from its page
+        ('  if(key==="clavis"&&(m=/<meta name="version" content="(\\d+)"/.exec(s.slice(0,40000))))return m[1];\n', "",
+         "no Clavis build number read", 1),
         # Lector's PDF (modules/r109.js), Fabrica (r112), the first start (r120), Home (r147), the library's list (r240), the folders a chat
         # import makes (r258), a repository brought from GitHub (r276) and the one place an app's logo is found (r277)
         ('try{if(window.LIB_NAMES&&LIB_NAMES.clavis&&!NAMES.clavis)NAMES.clavis=LIB_NAMES.clavis;}catch(e){}\n', "", "Lector's PDF without Clavis", 1),
