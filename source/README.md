@@ -407,7 +407,9 @@ Her words (22 November 2026): "I want you to add the build number to Clavis so t
 - `apps/clavis_bring.py` brought Clavis 106 in (Build bbf59d1544). `build_page.py`: the app library reads Clavis's number from the
   same line (libVersionOf), as Lakay's from its lakay-build line; `editions.py` takes that line out of every other edition.
 - rig/t_765_clavis.js: the carried page names its number, the app library and Fabrica's rule read it, and Fabrica's own test of the
-  brought-in Clavis says its build with no warning.
+  brought-in Clavis reads cleanly: its build, every file it names, and no error when it opens.
+- The master page: 94,683,877 bytes (about 90.3 MiB), 555 bytes more than 7.65's. `release.py` now gives each page's size in bytes; it
+  gave the length of the page's text before, which is a little shorter than its bytes (the size written under 7.65 is corrected there).
 
 Ingenium 7.65 (21 November 2026): Clavis, her search engine, built into the master edition as her other apps are.
 Her words (21 November 2026): "I have a new app named Clavis. I have given you access to its repositories on GitHub. Please add it to
@@ -433,7 +435,8 @@ and anywhere else. I want the app to be built into my master edition of Ingenium
   no origin) and its settings last only while that window is open. The installed Clavis apps keep their library on the device.
 - No other edition carries any of it, nor its name, even in the code (`editions.py`, `_no_clavis`, run before `_no_lakay`); none in
   another person's profile on the master copy (r120 and r336, as for every app of hers).
-- The master page grows by about 5.5 MB, to 94,676,199 bytes (about 90.3 MiB; GitHub refuses a file over 100 MiB).
+- The master page grows by about 5.5 MB, to 94,683,322 bytes (about 90.3 MiB; GitHub refuses a file over 100 MiB). (First written
+  here as 94,676,199, the length of its text, not its bytes; corrected in 7.66.)
 - rig: `t_765_clavis.js` (the library keeps it, every page that lists her apps names it, Fabrica brings it in and it wears its layered seal,
   Ingenia day and night, opened from Ingenium in a frame with no origin); `t_627_editions` and `t_746_no_apps` also look for Clavis.
 

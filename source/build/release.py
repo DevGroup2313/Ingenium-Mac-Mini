@@ -258,7 +258,8 @@ def build(out, edition="master", demo=None):
             print("NOTE: the demo edition's kit store differs from this page's, so it is carried whole (were both built from the same commits?)")
     pg = tail.tail(pg)  # 6.8.1: and at the end of the page again, after its last part
     open(out, "w", encoding="utf-8").write(pg)
-    print("%s edition: page %d bytes; kit store %d files (%.0f KB) from %s" % (edition, len(pg), len(files), total / 1024, commits))
+    # 7.66: the page's size in bytes as written (UTF-8); len(pg) is the length of its text, a little shorter (7.65's notes gave that)
+    print("%s edition: page %d bytes; kit store %d files (%.0f KB) from %s" % (edition, len(pg.encode("utf-8")), len(files), total / 1024, commits))
     return pg
 
 
