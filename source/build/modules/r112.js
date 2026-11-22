@@ -891,7 +891,7 @@ function paintShip(){var r=cur(),cb=$("fbChecks");cb.innerHTML="";var n=r?notesO
     else{if(note)ft.appendChild(h("span","f-chip ok",'<span class="d"></span>Made · '+kb(note.size||0)));
       if(note&&window.IngAppSign&&IngAppSign.signedNote(n,k))ft.appendChild(h("span","f-chip ok r349-signed","Signed"));  /* 7.60 (modules/r349.js) */
       else ft.appendChild(h("span","f-chip",!r?"":!r.head?"After a first version":tested(r)?"Ready to make":"After its test"));
-      if(note&&window.IngScramble&&IngScramble.madeNote(n,k))ft.appendChild(h("span","f-chip ok r356-scr","Scrambled"));  /* 7.65 (modules/r356.js) */
+      if(note&&window.IngScramble&&IngScramble.madeNote(n,k))ft.appendChild(h("span","f-chip ok r356-scr","Scrambled"));  /* 7.67 (modules/r356.js) */
       if(r&&r.head&&here)ft.appendChild(btn("quiet sm",k==="ipa"&&window.IngIphone?"Choose a way":note?"Make and save again":"Make and save",function(ev){ev.stopPropagation();if(k==="kits")sheetKits(r);else if(k==="ipa"&&window.IngIphone)IngIphone.open(r);else makeOne(r,k);}));}
     function toggle(){if(!r)return;if(!here){toast(whyNot(k));return;}var i=pref.chosen.indexOf(k);if(i>=0)pref.chosen.splice(i,1);else pref.chosen.push(k);saveSoon();paintShip();}
     e.onclick=toggle;e.onkeydown=function(ev){if(ev.target!==e)return;if(ev.key===" "||ev.key==="Enter"){ev.preventDefault();toggle();}};
@@ -899,7 +899,7 @@ function paintShip(){var r=cur(),cb=$("fbChecks");cb.innerHTML="";var n=r?notesO
   var pk=$("fbPkg");pk.innerHTML="";pk.hidden=!r;
   if(r){var P=pkgOf(r);pk.innerHTML="<span>"+esc(P.title)+" · <code>"+esc(P.id)+"</code>"+(P.version?" · version "+esc(P.version):"")+"</span>";
     var kl=h("span",null,"signed with "+(P.keyId==="device"?"this device's key":"a key you brought in")+(window.IngAppSign&&IngAppSign.lineFor(r.id)?" "+IngAppSign.lineFor(r.id):""));pk.appendChild(kl);
-    if(window.IngScramble&&IngScramble.lineFor(r.id))pk.appendChild(h("span","r356-line",esc(IngScramble.lineFor(r.id))));  /* 7.65 (modules/r356.js) */
+    if(window.IngScramble&&IngScramble.lineFor(r.id))pk.appendChild(h("span","r356-line",esc(IngScramble.lineFor(r.id))));  /* 7.67 (modules/r356.js) */
     pk.appendChild(btn("quiet sm","Package details",function(){sheetPackage(r);}));
     if(window.IngAppSign)pk.appendChild(btn("quiet sm","Check a package",function(){IngAppSign.checkFile();}));  /* 7.60 (modules/r349.js) */
     if(window.IngDownload&&r.head)pk.appendChild(btn("sm","📦 Download as an app…",function(){downloadAsApp(r);}));}
@@ -1309,7 +1309,7 @@ function sheetPackage(r){var P=pkgOf(r),pref=shipPrefs(r),sh=sheet("Package deta
   sh.box.appendChild(kr);
   var signRow=window.IngAppSign&&IngAppSign.packageRow?IngAppSign.packageRow(sh.box,r,pref):null;  /* 7.60 (modules/r349.js) */
   var ownRow=window.IngOwnerOnly&&IngOwnerOnly.packageRow?IngOwnerOnly.packageRow(sh.box,r,pref,signRow):null;  /* 7.63 (modules/r354.js) */
-  var scrRow=window.IngScramble&&IngScramble.packageRow?IngScramble.packageRow(sh.box,r,pref):null;  /* 7.65 (modules/r356.js) */
+  var scrRow=window.IngScramble&&IngScramble.packageRow?IngScramble.packageRow(sh.box,r,pref):null;  /* 7.67 (modules/r356.js) */
   var end=h("div","end");
   end.appendChild(btn("pri","Keep these",function(){var id=fI.value.trim();if(!IngApk.cleanId(id)){fI.focus();toast("“"+id+"” cannot be an id: letters, digits and dots, such as com.yannieforest.myapp.");return;}
     pref.title=fT.value.trim()||r.name;pref.id=id;pref.version=fV.value.trim();pref.alias=fA.value.trim();pref.keyId=ks.value||"device";if(signRow)pref.sign=signRow.on();if(ownRow){pref.ownerOnly=ownRow.on();if(pref.ownerOnly)pref.sign=true;}if(scrRow&&!scrRow.fixed)pref.scramble=scrRow.on();saveSoon();sh.close();paintShip();toast("Kept. The next APK and IPA carry them.");}));

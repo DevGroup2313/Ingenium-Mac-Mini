@@ -1,5 +1,5 @@
 {
-  "_about": "Terser, the scrambler of modules/r356.js (7.65): the npm package's own browser bundle (dist/bundle.min.js), unchanged, with its licence. build_page.py checks it against the fingerprint below and carries it deflated in the page (<script type=\"ingenium/b64\" id=\"ing-terser\">), where Fabrica is.",
+  "_about": "Terser, the scrambler of modules/r356.js (7.67): the npm package's own browser bundle (dist/bundle.min.js), unchanged, with its licence. build_page.py checks it against the fingerprint below and carries it deflated in the page (<script type=\"ingenium/b64\" id=\"ing-terser\">), where Fabrica is.",
   "name": "terser",
   "version": "5.51.2",
   "published": "2026-08-27",

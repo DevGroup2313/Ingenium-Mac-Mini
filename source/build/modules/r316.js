@@ -2436,7 +2436,7 @@ function keys(box){var k=mk("div","r316-keys");box.appendChild(k);return k;}
 
 /* ---------- 1. inside Ingenium: sent to her paired devices, or as a file ---------- */
 function sendTo(r,dev,row){var h=H(),a=shell();row.querySelector(".st").textContent="Sending…";
-  return IngShip.onePage(r.id,{quiet:true,ship:"send"}).then(function(x){var bytes=x.bytes||new TextEncoder().encode(x.html||"");  /* 7.65: ship, so its code is scrambled (modules/r356.js) */
+  return IngShip.onePage(r.id,{quiet:true,ship:"send"}).then(function(x){var bytes=x.bytes||new TextEncoder().encode(x.html||"");  /* 7.67: ship, so its code is scrambled (modules/r356.js) */
     return a.apps_send(slugOf(r),r.name,(h&&h.headTag?h.headTag(r):"")||"",b64(bytes),[dev.id]);}).then(function(res){
     if(!res||!res.ok)throw new Error(res&&res.error||"it could not be sent");
     row.querySelector(".st").textContent="Waiting for it";toast(r.name+" waits for "+(dev.name||"the device")+": Ingenium there offers it in Fabrica, Your apps.");},

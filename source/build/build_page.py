@@ -1943,10 +1943,10 @@ def _modtext(m):
         t = open(os.path.join(HERE, "thoughts", "fabrica_rooms.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r167.js":  # R167: Fabrica part by part (the Forge carries the same)
         t = open(os.path.join(HERE, "thoughts", "fabrica_parts.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
-    if os.path.basename(m) == "r356.js" and editions.has_fabrica(ED):  # R356 (7.65): the scrambler, after the module that runs it, where there is a Fabrica
+    if os.path.basename(m) == "r356.js" and editions.has_fabrica(ED):  # R356 (7.67): the scrambler, after the module that runs it, where there is a Fabrica
         t = t + "\n" + _terser_block()
     return t
-# ---- R356 (Ingenium 7.65, 22 November 2026): Terser, the npm package's own browser bundle (terser/bundle.min.js, BSD-2-Clause),
+# ---- R356 (Ingenium 7.67, 22 November 2026): Terser, the npm package's own browser bundle (terser/bundle.min.js, BSD-2-Clause),
 #      checked against terser/terser.json and carried deflated in base64; a page without modules/r356.js carries none of it ----
 def _terser_block():
     import zlib as _zl

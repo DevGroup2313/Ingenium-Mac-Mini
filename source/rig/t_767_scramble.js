@@ -1,4 +1,4 @@
-// Ingenium 7.65 · your apps' code scrambled (modules/r356.js; its hooks in r349, r112, r114, r178, r316 and r318; Terser in build/terser).
+// Ingenium 7.67 · your apps' code scrambled (modules/r356.js; its hooks in r349, r112, r114, r178, r316 and r318; Terser in build/terser).
 // Invented apps (Tide Clock, Harbour Desk and the notes it carries, Name Keeper, Rough Draft, a page that says it is Ingenium) and a test
 // owner key made by the page's own PermitCore. With --apps, the apps the page carries built in (build/apps/builtin) are scrambled in the
 // page and each is opened beside its scrambled copy.
@@ -9,10 +9,10 @@
 //   4. the pages an app carries packed inside (base64, and gzipped base64) scrambled and packed again as they were
 //   5. a copy that shows an error hers does not: made as written, and said; a script the scrambler cannot read: left as written, and said
 //   6. turned off for an app: as written; a page that is Ingenium itself: never scrambled; the Ship card's chip and line
-//     node rig/t_765_scramble.js <ingenium page file> [--apps <builtin folder>] [--cd]
+//     node rig/t_767_scramble.js <ingenium page file> [--apps <builtin folder>] [--cd]
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path'); const http = require('http'); const os = require('os'); const zlib = require('zlib');
 const args = process.argv.slice(2), PAGE = args[0], AI = args.indexOf('--apps'), APPS = AI >= 0 ? args[AI + 1] : null, WITH_CD = args.includes('--cd');
-if (!PAGE) { console.log('usage: node rig/t_765_scramble.js <ingenium page file> [--apps <builtin folder>] [--cd]'); process.exit(2); }
+if (!PAGE) { console.log('usage: node rig/t_767_scramble.js <ingenium page file> [--apps <builtin folder>] [--cd]'); process.exit(2); }
 let P = 0, F = 0;
 function ok(c, m, d) { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + JSON.stringify(d).slice(0, 900))); c ? P++ : F++; }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

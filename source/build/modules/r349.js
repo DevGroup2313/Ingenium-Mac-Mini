@@ -178,7 +178,7 @@ function mark(id,commit,target,file){if(!target||!W.IngRepo||typeof IngRepo.setN
   return IngRepo.setNote(id,commit,"ownerSigned_"+target,{at:Date.now(),kid:file.kid,made:file.release.made}).catch(function(){});}
 /* the page every package carries */
 var o1=IngShip.onePage;
-/* 7.65 (modules/r356.js): what is shipped has its code scrambled first, before the door and the signature (the version is read before it) */
+/* 7.67 (modules/r356.js): what is shipped has its code scrambled first, before the door and the signature (the version is read before it) */
 function scrambled(id,x,opt){return W.IngScramble?IngScramble.onePage(id,x,opt):Promise.resolve(x);}
 IngShip.onePage=function(id,opt){opt=opt||{};return o1.apply(IngShip,arguments).then(function(x){if(!wanted(id)||opt.unsigned)return scrambled(id,x,opt);
   return IngRepo.info(id).then(function(info){var name=(x.recipe&&x.recipe.name)||info.name||"this app",ver=String(IngShip._.numberOf(x.html,x.recipe||{})||(x.commit||"").slice(0,7)||"1.0");

@@ -1,5 +1,5 @@
 <style id="r356-css">
-/* ============ R356 · YOUR APPS' CODE SCRAMBLED (Ingenium 7.65, 22 November 2026) ============
+/* ============ R356 · YOUR APPS' CODE SCRAMBLED (Ingenium 7.67, 22 November 2026) ============
    The Security room's promise (modules/r318.js, approved on the live preview of 18 November 2026): "The shipped code shrunk and its
    names scrambled: much slower to read or copy, never impossible. Your sources stay as you wrote them." Her request (18 November
    2026): "my data is protected and also my code is protected and anything that I build inside of Ingenium"; her answers that day named
