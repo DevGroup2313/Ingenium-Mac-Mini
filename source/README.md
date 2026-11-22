@@ -419,7 +419,7 @@ and anywhere else. I want the app to be built into my master edition of Ingenium
   no origin) and its settings last only while that window is open. The installed Clavis apps keep their library on the device.
 - No other edition carries any of it, nor its name, even in the code (`editions.py`, `_no_clavis`, run before `_no_lakay`); none in
   another person's profile on the master copy (r120 and r336, as for every app of hers).
-- The master page grows by about 4.6 MB to about 93.8 MB (GitHub refuses a file over 100 MiB).
+- The master page grows by about 5.5 MB, to 94,676,199 bytes (about 90.3 MiB; GitHub refuses a file over 100 MiB).
 - rig: `t_765_clavis.js` (the library keeps it, every page that lists her apps names it, Fabrica brings it in and it wears its layered seal,
   Ingenia day and night, opened from Ingenium in a frame with no origin); `t_627_editions` and `t_746_no_apps` also look for Clavis.
 
