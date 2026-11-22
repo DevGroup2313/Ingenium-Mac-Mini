@@ -1945,7 +1945,32 @@ def _modtext(m):
         t = open(os.path.join(HERE, "thoughts", "fabrica_parts.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r356.js" and editions.has_fabrica(ED):  # R356 (7.67): the scrambler, after the module that runs it, where there is a Fabrica
         t = t + "\n" + _terser_block()
+    if os.path.basename(m) == "r357.js":  # R357 (7.68): the public halves of her reading keys this build carries
+        if t.count("/*ING_READING_KEYS*/[]") != 1:
+            sys.exit("modules/r357.js: its place for the reading keys is not there once")
+        t = t.replace("/*ING_READING_KEYS*/[]", _reading_keys_js(), 1)
     return t
+# ---- R357 (Ingenium 7.68, 22 November 2026): the public halves of her reading keys (security/reading_keys.json, as Settings, Security
+#      saves them: "Save its public half"; or ING_READING_KEYS=<file>). As with her owner keys, a file that holds a private part, or a
+#      key whose number is not its own fingerprint, stops the build: only public halves ever go into a page. No file: none carried ----
+def _reading_keys_js():
+    sys.path.insert(0, os.path.normpath(os.path.join(HERE, "..", "security")))
+    import permits as _pm
+    p = os.environ.get("ING_READING_KEYS") or os.path.normpath(os.path.join(HERE, "..", "security", "reading_keys.json"))
+    if not os.path.exists(p):
+        return "[]"
+    d = json.load(open(p, encoding="utf-8"))
+    if d.get("kind") != "ingenium-reading-public-key":
+        sys.exit(p + ": this is not the public half of a reading key (Settings, Security, Ingenium itself: Save its public half)")
+    out = []
+    for k in d.get("keys", []):
+        j = k.get("jwk") or {}
+        if "d" in j or j.get("kty") != "EC" or j.get("crv") != "P-256" or not j.get("x") or not j.get("y"):
+            sys.exit(p + ": each reading key must be the public half of a P-256 key (and never its private part)")
+        if k.get("rid") != _pm._kid(j):
+            sys.exit(p + ": the reading key numbered %r is not that key's own fingerprint" % k.get("rid"))
+        out.append({"rid": k["rid"], "jwk": {"kty": "EC", "crv": "P-256", "x": j["x"], "y": j["y"]}, "made": k.get("made", "")})
+    return json.dumps(out, separators=(",", ":"))
 # ---- R356 (Ingenium 7.67, 22 November 2026): Terser, the npm package's own browser bundle (terser/bundle.min.js, BSD-2-Clause),
 #      checked against terser/terser.json and carried deflated in base64; a page without modules/r356.js carries none of it ----
 def _terser_block():

@@ -89,7 +89,9 @@ if(typeof W.libKeep==="function"){var oKeep=W.libKeep;
   W.libKeep=function(key,meta,u8,text){var self=this,args=arguments;if(!u8||!u8.length)return oKeep.apply(self,args);
     var label=String((meta&&(meta.title||meta.name))||key).replace(/\.html?$/i,"");
     return cameIn(u8,label).then(function(x){if(!x.go){LEFT.push(label);throw leftError(label);}
-      return Promise.resolve(oKeep.call(self,key,Object.assign({},meta,{sig:x.s}),u8,text)).then(function(r){
+      /* 7.68 (modules/r357.js): a scrambled copy of one of her apps whose version her Fabrica holds is kept as written */
+      var aw=x.asWritten;if(aw){u8=new TextEncoder().encode(aw.html);text=aw.html;try{if(typeof W.ingToast==="function")W.ingToast(label+" is a scrambled copy of your own app: kept as written, from Fabrica (version "+aw.commit.slice(0,7)+").");}catch(e){}}
+      return Promise.resolve(oKeep.call(self,key,Object.assign({},meta,{sig:aw&&x.s2?x.s2:x.s}),u8,text)).then(function(r){
         /* the same copy, kept before 7.62: what was found is added to it */
         try{var m=W.libState().apps[key];if(r==="same"&&m&&!m.sig){m.sig=x.s;if(typeof W.saveState==="function")W.saveState();}}catch(e){}return r;});});};}
 /* Add your apps: what she left out is said as such, never as a page that could not be read */

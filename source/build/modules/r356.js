@@ -166,6 +166,11 @@ var CACHE=[],SAID={};
 function note(id,commit,key,val){if(!commit||!key||!W.IngRepo||typeof IngRepo.setNote!=="function")return Promise.resolve();
   return Promise.resolve(IngRepo.setNote(id,commit,"scrambled_"+key,val)).catch(function(){});}
 /* what Fabrica ships: the page every package is made from, with its code scrambled (r349 asks, before the door and the signature) */
+/* 7.68 (modules/r357.js): the version a scrambled page was made from, named inside it (signed with it), so her own Fabrica can open
+   that version as written when the copy comes back to her: the app's name in small letters and the version's id, nothing of its code */
+function markIn(html,slug,commit){slug=String(slug||"").toLowerCase().replace(/[^a-z0-9._-]+/g,"-").replace(/^[^a-z0-9]+/,"").slice(0,80);
+  if(!slug||!/^[0-9a-f]{40}$/.test(String(commit||"")))return html;var tag='<meta name="ingenium-source" content="'+slug+' '+commit+'">';
+  return /<head(\s[^>]*)?>/i.test(html.slice(0,1<<20))?html.replace(/<head(\s[^>]*)?>/i,function(m){return m+"\n"+tag;}):tag+"\n"+html;}
 function infoOf(id){try{return W.IngRepo&&typeof IngRepo.info==="function"?Promise.resolve(IngRepo.info(id)).catch(function(){return null;}):Promise.resolve(null);}catch(e){return Promise.resolve(null);}}
 function onePage(id,x,opt){opt=opt||{};var key=keyOf(opt);if(!key||!x||typeof x.html!=="string")return Promise.resolve(x);
   if(!wanted(id)||isIngenium(id,x.html))return note(id,x.commit,key,{off:true,at:Date.now()}).then(function(){return x;});
@@ -177,7 +182,7 @@ function onePage(id,x,opt){opt=opt||{};var key=keyOf(opt);if(!key||!x||typeof x.
       if(!res.html){if(!res.quiet&&!SAID[o.k]){SAID[o.k]=1;toast("Made with "+name+"'s code as written: "+res.why+".");}
         return note(id,x.commit,key,{off:true,at:Date.now(),why:res.why}).then(function(){return x;});}
       if(res.info.left&&!SAID[o.k]){SAID[o.k]=1;toast(res.info.left+" of "+name+"'s scripts could not be read by the scrambler, and "+(res.info.left===1?"is":"are")+" left as written.");}
-      x.html=res.html;x.bytes=TE.encode(res.html);x.scrambled=res.info;
+      x.html=markIn(res.html,(info&&info.slug)||name,x.commit);x.bytes=TE.encode(x.html);x.scrambled=res.info;
       return note(id,x.commit,key,res.info).then(function(){return x;});});});}
 
 /* ---------- Package details, the Ship card and the Security room ---------- */
@@ -197,7 +202,7 @@ function well(chip){var st=state();
   var c=counts(),p=st==="on"?"On: every package Fabrica makes carries its code shrunk and the names inside it scrambled, and the pages it carries inside too, before it is signed: much slower to read or copy, never impossible. Your sources in Fabrica stay as you wrote them. The scrambled copy is run beside yours first; if it shows an error yours does not, the package carries your code as written, and Ingenium says so."
       +(c.off?" Turned off for "+c.off+(c.off===1?" app":" apps")+" in Package details.":"")
     :"Off: it is turned off for every app in Package details, so every package carries its code as written.";
-  return '<div class="sc-well"><div class="sc-wh"><b>Scrambled code</b>'+chip(st)+'</div><p>'+esc(p)+'</p><p class="sc-fine">'+esc("The names the parts of a page share with one another, and those its markup calls, stay as written, so the app keeps working; everything inside them is scrambled. Data it carries, such as JSON, stays as it is. Ingenium itself is never scrambled.")+'</p></div>';}
+  return '<div class="sc-well"><div class="sc-wh"><b>Scrambled code</b>'+chip(st)+'</div><p>'+esc(p+(W.IngReadable&&st==="on"?" A scrambled copy of one of your apps that comes back to you opens as written, from Fabrica.":""))+'</p><p class="sc-fine">'+esc("The names the parts of a page share with one another, and those its markup calls, stay as written, so the app keeps working; everything inside them is scrambled. Data it carries, such as JSON, stays as it is. Ingenium itself is never scrambled.")+'</p></div>';}
 W.IngScramble={ships:ships,wanted:wanted,onePage:onePage,page:function(html){return page(String(html||"")).then(function(r){return {html:r.html,scripts:r.acc.scripts,pages:r.acc.pages,left:r.acc.left.slice(),before:r.acc.before,after:r.acc.after};});},
   packageRow:packageRow,lineFor:lineFor,madeNote:madeNote,state:state,well:well,engine:ENGINE,_scripts:scripts,_packedKind:packedKind};
 })();
