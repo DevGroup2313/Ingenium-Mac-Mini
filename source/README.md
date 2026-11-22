@@ -395,6 +395,27 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.68 (22 November 2026): read it as written, part one; Clavis 109 carried.
+Two parts, each approved on its pictures with the same words, "I approve of the previews, please commit and push it everywhere and
+continue working on my requests".
+- Read it as written, part one (built in session 016zEHoDq4VN5kppHeMu331S, which committed the version numbers, the computer app's
+  release and the sources at 15:25 and was interrupted before the page was built): `build/modules/r357.js`, out of held.json. Settings,
+  Security, Ingenium itself: Your reading key (an ECDH P-256 key made on her device and kept only under its own password, as her owner key
+  is; its public half saved as a file, a sealed backup, bringing it back from the backup); a scrambled copy of one of her apps that comes
+  back to her opens as written (Fabrica's Bring one in opens the app at the version it was made from; Lector's app library keeps it as
+  written). Each scrambled page names the version it was made from. What is new (r222) describes Ingenium in its own words, at her rule of
+  5 November 2026. The record: record 06 section 15, sections 7 and 8; records 00, 01, 09 and 10. Its own test, `rig/t_768_readable.js`,
+  passed 15/15 on that session's 7.68 test page; it was not run again here.
+- Clavis 109 carried in place of 106 (Build daaa40add2, 5,421,623 bytes; its page 01d092c4ea91b467; Clavis-Mac 15940c0, Clavis-Window
+  33ef6bc, Clavis-IOS-Android 1efda1b): its keys are real keys standing on their own edge, its day paper is Ivory, its Home is its own (the
+  search set in a card catalogue's drawer, with no great logo over it), its About is short, its seal is a silent fidget button with the
+  same slim key everywhere, and pressing it in the bar brings the welcome door back. `apps/clavis_bring.py` brought it in; What is new
+  (r222, the master edition only) and record 08 follow. Its own tests on that page: t_smoke 119/119, t_lang all passed.
+- Tests on the release page (the server's copy checked first against the page's SHA-256):
+  t_765_clavis 27/27 (Fabrica's test of Clavis reads cleanly: build 109, every file it names, no error when it opens), t_655_fixes
+  23/23, t_683_logos 12/12, t_685_folders 37/37, t_677_offline 20/20, t_763_owner_door 24/24, t_755_record 10/10, t_626_guide 27/27,
+  t_762_sign_check 25/25. The master page is 95,036,627 bytes (fingerprint a1f88ddc44430bbc).
+
 Ingenium 7.67 (22 November 2026): your apps' code scrambled.
 The Security room's promise (modules/r318.js, approved on the live preview of 18 November 2026): "The shipped code shrunk and its names
 scrambled: much slower to read or copy, never impossible. Your sources stay as you wrote them." Her choice (21 November 2026), of the three
