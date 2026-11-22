@@ -178,14 +178,16 @@ function mark(id,commit,target,file){if(!target||!W.IngRepo||typeof IngRepo.setN
   return IngRepo.setNote(id,commit,"ownerSigned_"+target,{at:Date.now(),kid:file.kid,made:file.release.made}).catch(function(){});}
 /* the page every package carries */
 var o1=IngShip.onePage;
-IngShip.onePage=function(id,opt){opt=opt||{};return o1.apply(IngShip,arguments).then(function(x){if(!wanted(id)||opt.unsigned)return x;
+/* 7.65 (modules/r356.js): what is shipped has its code scrambled first, before the door and the signature (the version is read before it) */
+function scrambled(id,x,opt){return W.IngScramble?IngScramble.onePage(id,x,opt):Promise.resolve(x);}
+IngShip.onePage=function(id,opt){opt=opt||{};return o1.apply(IngShip,arguments).then(function(x){if(!wanted(id)||opt.unsigned)return scrambled(id,x,opt);
   return IngRepo.info(id).then(function(info){var name=(x.recipe&&x.recipe.name)||info.name||"this app",ver=String(IngShip._.numberOf(x.html,x.recipe||{})||(x.commit||"").slice(0,7)||"1.0");
     /* 7.63 (modules/r354.js): an app for its owner alone carries its door, written in before the page is signed, and is never made unsigned */
     var own=W.IngOwnerOnly&&IngOwnerOnly.wanted(id);
-    return session(name).then(function(s){if(!s){if(own)throw new Error("Nothing was made: "+name+" opens only with your owner key, and it can only be made signed, with your owner key on this device.");return x;}
-      var page=own?IngOwnerOnly.door(x.html,{id:id,app:info.slug||"",name:name}):x.html;
+    return session(name).then(function(s){if(!s){if(own)throw new Error("Nothing was made: "+name+" opens only with your owner key, and it can only be made signed, with your owner key on this device.");return scrambled(id,x,opt);}
+      return scrambled(id,x,opt).then(function(x){var page=own?IngOwnerOnly.door(x.html,{id:id,app:info.slug||"",name:name}):x.html;
       return signPage(page,{s:s,app:info.slug||"",name:name,version:ver}).then(function(sp){
-      x.html=sp.html;x.bytes=TE.encode(sp.html);x.signed=sp.file;return mark(id,x.commit,opt.target,sp.file).then(function(){return x;});});});});});};
+      x.html=sp.html;x.bytes=TE.encode(sp.html);x.signed=sp.file;return mark(id,x.commit,opt.target,sp.file).then(function(){return x;});});});});});});};
 /* the web app, however it was made (r111's own, r178's from the app's templates or Ingenium's family of designs, with r330's additions):
    the finished zip is read, every file in it listed and signed together (signature.ingsig, beside them), and a check put at the head of
    its service worker. Its page already carries its own signature: r178 makes it from the one page, signed above. */

@@ -1,0 +1,13 @@
+{
+  "_about": "Terser, the scrambler of modules/r356.js (7.65): the npm package's own browser bundle (dist/bundle.min.js), unchanged, with its licence. build_page.py checks it against the fingerprint below and carries it deflated in the page (<script type=\"ingenium/b64\" id=\"ing-terser\">), where Fabrica is.",
+  "name": "terser",
+  "version": "5.51.2",
+  "published": "2026-08-27",
+  "licence": "BSD-2-Clause",
+  "source": "https://registry.npmjs.org/terser/-/terser-5.51.2.tgz",
+  "tarball_sha1": "555912425a7f2ff7737425c3718fa76c7069f6ef",
+  "tarball_integrity": "sha512-bWnjSNscmuI+GJze6ZupnHP8G/cTcsJF+bXCeQknk2SHQsgbNJnLrqiH9jZ2W4STPVXH2mDKKRX3iwPhc9Cn/Q==",
+  "file": "bundle.min.js",
+  "bytes": 1104314,
+  "sha256": "379f8758191b03c07745486e785cbf4bed6a7ae368aa40a5a819556743f3ad1c"
+}

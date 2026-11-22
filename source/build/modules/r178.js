@@ -423,7 +423,7 @@ if(baseRender){var render=function(){var r=baseRender.apply(this,arguments);try{
 /* Fabrica's web app card: an app with templates gets its own web package (as Fabrica's Build kits get its own projects) */
 if(window.IngShip&&typeof IngShip.webApp==="function"&&!IngShip.webApp.__r178){var baseWebApp=IngShip.webApp;
   IngShip.webApp=function(id,opt){var self=this,args=arguments;opt=opt||{};
-    return IngShip.onePage(id,{quiet:true,ref:opt.ref}).then(function(x){var T=templatesOf(x.html),own=canTemplate(T,"web");
+    return IngShip.onePage(id,{quiet:true,ref:opt.ref,ship:"web"}).then(function(x){var T=templatesOf(x.html),own=canTemplate(T,"web");  /* 7.65: ship, so its code is scrambled (modules/r356.js) */
       if(!own&&(!familyHere()||isIngenium(null,x.html)))return baseWebApp.apply(self,args);
       var P=opt.pkg||{};return IngRepo.info(id).then(function(info){var who={isNew:true,title:P.title||(info&&info.name)||"",id:P.id,version:P.version,base:info&&info.slug,app:P.app,alias:P.alias};
           return own?templated(T,"web",x.html,who):viaFamily("web",x.html,who);})

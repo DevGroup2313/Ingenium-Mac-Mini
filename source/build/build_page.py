@@ -1902,7 +1902,19 @@ def _modtext(m):
         t = open(os.path.join(HERE, "thoughts", "fabrica_rooms.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r167.js":  # R167: Fabrica part by part (the Forge carries the same)
         t = open(os.path.join(HERE, "thoughts", "fabrica_parts.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
+    if os.path.basename(m) == "r356.js" and editions.has_fabrica(ED):  # R356 (7.65): the scrambler, after the module that runs it, where there is a Fabrica
+        t = t + "\n" + _terser_block()
     return t
+# ---- R356 (Ingenium 7.65, 22 November 2026): Terser, the npm package's own browser bundle (terser/bundle.min.js, BSD-2-Clause),
+#      checked against terser/terser.json and carried deflated in base64; a page without modules/r356.js carries none of it ----
+def _terser_block():
+    import zlib as _zl
+    _tj = json.load(open(os.path.join(HERE, "terser", "terser.json"), encoding="utf-8"))
+    _tb = open(os.path.join(HERE, "terser", _tj["file"]), "rb").read()
+    if len(_tb) != _tj["bytes"] or _hl.sha256(_tb).hexdigest() != _tj["sha256"]:
+        sys.exit("terser/" + _tj["file"] + ": its size or fingerprint does not match terser.json")
+    return ('<script type="ingenium/b64" id="ing-terser" data-bytes="%d" data-version="%s">' % (len(_tb), _tj["version"])
+            + _b64.b64encode(_zl.compress(_tb, 9)).decode("ascii") + '</script>')
 # 6.2: a module's script ends only where it means to: "</script" written inside its code or a comment would end it early
 for _m in mods:
     _t = open(_m, encoding="utf-8").read()
