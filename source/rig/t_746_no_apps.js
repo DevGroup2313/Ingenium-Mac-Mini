@@ -19,7 +19,7 @@ const pw = require('/opt/node-tools/node_modules/playwright'); const fs = requir
 const [URL_, OUT, MODE] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true });
 const GUEST = MODE === 'guest', OWNER = MODE === 'owner';
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + JSON.stringify(d).slice(0, 700))); c ? pass++ : fail++; return !!c; };
-const HERS = /Carpe Diem|The Forge|\bthe Forge\b|Inkwell|Lakay|Offline Project/;
+const HERS = /Carpe Diem|The Forge|\bthe Forge\b|Inkwell|Lakay|Clavis|Offline Project/;
 (async () => {
   const b = await pw.chromium.launch(); const ctx = await b.newContext({ viewport: { width: 1360, height: 860 } });
   if (GUEST) await ctx.addInitScript(() => { try { localStorage.setItem('ingenium_profiles', JSON.stringify({ list: [{ id: 'pguest1', name: 'Guest', pw: 'none', t: 1 }], cur: 'pguest1' })); } catch (e) {} });
@@ -31,7 +31,7 @@ const HERS = /Carpe Diem|The Forge|\bthe Forge\b|Inkwell|Lakay|Offline Project/;
   };
   // what every list shows, and what each page says
   const look = async (pages) => p.evaluate(async (pages) => {
-    const HERS = /Carpe Diem|The Forge|\bthe Forge\b|Inkwell|Lakay|Offline Project/; const r = { said: {} };
+    const HERS = /Carpe Diem|The Forge|\bthe Forge\b|Inkwell|Lakay|Clavis|Offline Project/; const r = { said: {} };
     const visible = (root) => { const out = []; const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n;
       while ((n = w.nextNode())) { const e = n.parentElement; if (!e || !e.offsetParent || e.closest('.msg,textarea,input,pre,code')) continue; const t = n.nodeValue.trim(); if (t && HERS.test(t)) out.push(t.slice(0, 160)); } return out; };
     try { r.edition = ING_EDITION; } catch (e) {}
@@ -60,7 +60,7 @@ const HERS = /Carpe Diem|The Forge|\bthe Forge\b|Inkwell|Lakay|Offline Project/;
     } else {
       ok(f.edition !== 'master', '1. this page is not her own: edition ' + f.edition + (GUEST ? ' (another person\'s profile on the master)' : ''), f.edition);
       ok(!f.builtin && f.kept.length === 0 && (f.libApps.length === 0), '   a fresh start keeps nothing in the app library, Ingenium itself included', { builtin: f.builtin, kept: f.kept, libApps: f.libApps });
-      ok(Array.isArray(f.libKeys) ? f.libKeys.length === 0 || !f.libKeys.some((k) => /^(cd|forge|inkwell|ingenium|lakay)$/.test(k)) : true, '   the library knows no app of hers by name', f.libKeys);
+      ok(Array.isArray(f.libKeys) ? f.libKeys.length === 0 || !f.libKeys.some((k) => /^(cd|forge|inkwell|ingenium|lakay|clavis)$/.test(k)) : true, '   the library knows no app of hers by name', f.libKeys);
       ok(Array.isArray(f.offer) && f.offer.length === 0, '   Folders, Your apps: nothing offered', f.offer);
       const named = Object.entries(f.said).filter(([k, v]) => v.length);
       ok(named.length === 0, '   no page names an app of hers (' + PAGES.join(', ') + ')', named);
@@ -78,14 +78,14 @@ const HERS = /Carpe Diem|The Forge|\bthe Forge\b|Inkwell|Lakay|Offline Project/;
       state.lector.runs.push({ id: 'lr1', kind: 'app', name: 'Carpe Diem', at: 1 }, { id: 'lr2', kind: 'app', name: 'Inkwell', at: 2 });
       state.appLib = state.appLib && state.appLib.apps ? state.appLib : { apps: {} };
       const A = state.appLib.apps; const m = (t, v, src) => ({ title: t, version: v, build: '', date: '', size: 10, sha256: 'x', name: t + '.html', source: src, ref: 'ref-' + t.replace(/\W/g, ''), at: 1 });
-      A.cd = m('Carpe Diem', '1091', 'built in'); A.inkwell = m('Inkwell', '7.52', 'built in'); A.forge = m('The Forge', '656', 'built in'); A.lakay = m('Lakay', '14', 'built in'); A.ingenium = m('Ingenium', '7.45', 'this copy');
+      A.cd = m('Carpe Diem', '1091', 'built in'); A.inkwell = m('Inkwell', '7.52', 'built in'); A.forge = m('The Forge', '656', 'built in'); A.lakay = m('Lakay', '14', 'built in'); A.clavis = m('Clavis', '103', 'built in'); A.ingenium = m('Ingenium', '7.45', 'this copy');
       saveState(); });
     await p.reload(); await boot(p);
     const c = await look(['home', 'folders', 'fabrica']);
     if (OWNER) {
       ok(c.offer.indexOf('Carpe Diem') >= 0 && c.offer.indexOf('Inkwell') >= 0, 'control: in her own profile the same work brought in offers her apps in Folders (so the work below is read)', c.offer);
     } else {
-      ok(c.libApps.length === 0, '2. work brought in from the master (the library\'s copies of Carpe Diem, Inkwell, The Forge, Lakay and Ingenium): none listed', c.libApps);
+      ok(c.libApps.length === 0, '2. work brought in from the master (the library\'s copies of Carpe Diem, Inkwell, The Forge, Lakay, Clavis and Ingenium): none listed', c.libApps);
       ok(Array.isArray(c.offer) && !c.offer.some((n) => HERS.test(n) || /^Ingenium$/.test(n)), '   Folders, Your apps: none of hers offered from a CV or from Lector\'s readings', c.offer);
       const named = Object.entries(c.said).filter(([k, v]) => v.length);
       ok(named.length === 0, '   Home, Folders and Fabrica name none of them', named);

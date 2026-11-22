@@ -234,6 +234,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.65", "Clavis, your search engine, is carried inside Ingenium at its latest build (104) and kept with your other apps on first start: in the app library, Lector, Fabrica's Bring one in, Adamas's Open an app, Code's Your apps and Ingenia, where its folder wears its gold key by day and by night. Opened from Ingenium, it runs in a window of its own.", "master"],
+  ["7.65", "The app library knows a newer page of Lakay or Clavis that you add yourself by its name, as it knows your other apps.", "master"],
+  ["7.65", "Code's Your apps card speaks of the apps kept in your app library, not of four apps."],
   ["7.64", "Settings, Security, Ingenium itself: the iPhone, iPad and Fire apps check this copy against its signature at every start, before anything of it runs, as the Mac and Windows apps do. Bring a signature in takes the file saved on a computer; a signed copy changed by anyone else does not open, and its own page says which file changed."],
   ["7.64", "Sign this release signs the copy your computers run and the copy your iPhone, iPad and Fire tablet carry, and Save the signature saves one file that each of your devices takes. A release signed before has Sign it for your phones and tablets.", "master"],
   ["7.64", "Sign a copy you give: choose the full or gift edition's page on your computer; it is signed with your owner key and saved as a file to give with that copy. Whoever runs it brings it in once, and their apps check that copy at every start: Signed by its maker.", "master"],

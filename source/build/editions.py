@@ -647,6 +647,54 @@ def _reset_words(ed):
     return [(old, new, "Reset everything: what it clears, in this edition", 1)]
 
 
+def _no_clavis():
+    """7.65 (21 November 2026): Clavis, her search engine, is carried and named in the master edition alone, as Lakay is (6.55). Her words
+    (21 November 2026): "I want the app to be built into my master edition of Ingenium like the other apps"; and before (19 November
+    2026): "I do not want any of my apps built-in any editions outside of the master edition." So every other edition has none of its
+    page, seal or layers (build_page.py carries them only where editions.carries_apps), and its name is nowhere in the page, not even in
+    the code: each line that names it is taken back to what it was before 7.65 here, before _no_lakay runs."""
+    return [
+        ('var LIB_KEYS=["cd","forge","inkwell","ingenium","lakay","clavis"],LIB_NAMES={cd:"Carpe Diem",forge:"The Forge",inkwell:"Inkwell",ingenium:"Ingenium",lakay:"Lakay",clavis:"Clavis"};',
+         'var LIB_KEYS=["cd","forge","inkwell","ingenium","lakay"],LIB_NAMES={cd:"Carpe Diem",forge:"The Forge",inkwell:"Inkwell",ingenium:"Ingenium",lakay:"Lakay"};',
+         "the app library without Clavis", 1),
+        ('  if(/<title>\\s*Clavis\\b/i.test(head.slice(0,40000))&&/CLAVIS\\s*\\|\\s*Copyright/.test(head.slice(0,4000)))return "clavis";\n', "",
+         "no Clavis page known by name", 1),
+        ('  if(/^Clavis\\b/i.test(t)&&/CLAVIS\\s*\\|\\s*Copyright/.test(head.slice(0,4000)))return "clavis";\n', "",
+         "no Clavis page known by name (the later reading)", 1),
+        # Lector's PDF (modules/r109.js), Fabrica (r112), the first start (r120), Home (r147), the library's list (r240), the folders a chat
+        # import makes (r258), a repository brought from GitHub (r276) and the one place an app's logo is found (r277)
+        ('try{if(window.LIB_NAMES&&LIB_NAMES.clavis&&!NAMES.clavis)NAMES.clavis=LIB_NAMES.clavis;}catch(e){}\n', "", "Lector's PDF without Clavis", 1),
+        ('try{if(window.LIB_NAMES&&LIB_NAMES.clavis&&!APPS.clavis){APPS.clavis={name:LIB_NAMES.clavis,color:"#b8862f"};DELAY.clavis=8.5;}}catch(e){}\n', "",
+         "Fabrica without Clavis", 1),
+        ('  var order=["cd","forge","inkwell","lakay","clavis","ingenium","offline","offline3"];  /* 7.65: Clavis after Lakay */\n',
+         '  var order=["cd","forge","inkwell","lakay","ingenium","offline","offline3"];\n', "Fabrica's order without Clavis", 1),
+        ('var KEYS=["inkwell","forge","cd","lakay","clavis"].filter(function(k){return BI[k];}),DONE={},RUN=null;  /* 6.55: and Lakay; 7.65: and Clavis, her search engine, named by its pass */\n',
+         'var KEYS=["inkwell","forge","cd","lakay"].filter(function(k){return BI[k];}),DONE={},RUN=null;\n', "the first start without Clavis", 1),
+        ('try{if(window.LIB_NAMES&&LIB_NAMES.clavis&&!FAPPS.clavis)FAPPS.clavis=LIB_NAMES.clavis;}catch(e){}  /* 7.65: and Clavis */\n', "",
+         "Home's Fabrica without Clavis", 1),
+        ('try{if(window.LIB_NAMES&&LIB_NAMES.clavis&&!LNAMES.clavis){LNAMES.clavis=LIB_NAMES.clavis;LORDER.push("clavis");}}catch(e){}  /* 7.65: and Clavis */\n', "",
+         "Home's Lector without Clavis", 1),
+        ('var BEYOND=(typeof ING_EDITION!=="string"||ING_EDITION==="master")?["lakay","clavis"]:[];\n',
+         'var BEYOND=(typeof ING_EDITION!=="string"||ING_EDITION==="master")?["lakay"]:[];\n', "the library's list without Clavis", 1),
+        ("var ORDER=['carpe diem','forge','ingenium','inkwell','lakay','clavis','offline project'];  /* 7.65: Clavis after Lakay */",
+         "var ORDER=['carpe diem','forge','ingenium','inkwell','lakay','offline project'];", "the folders' order without Clavis", 1),
+        ('  if(/lakay/.test(n))return "lakay";if(/(^|[^a-z])clavis([^a-z]|$)/.test(n))return "clavis";  /* 7.65: Clavis-Mac, Clavis-Window, Clavis-IOS-Android */\n'
+         '  if(/offline[-_ ]?(pro|project)/.test(n))return "master";return null;}',
+         '  if(/lakay/.test(n))return "lakay";if(/offline[-_ ]?(pro|project)/.test(n))return "master";return null;}', "GitHub's logos without Clavis's name", 1),
+        ('  if(k&&k!=="lakay"&&k!=="clavis"&&k!=="master"&&W.IngSeal&&typeof IngSeal.el==="function")',
+         '  if(k&&k!=="lakay"&&k!=="master"&&W.IngSeal&&typeof IngSeal.el==="function")', "GitHub's logos: the seals", 1),
+        ('  if(n==="clavis")return "clavis";\n', "", "app logos without Clavis's name", 1),
+        ('function clavisSrc(){return flat(night()&&W.ING_SEALS&&ING_SEALS.clavisN?"clavisN":"clavis");}\n', "", "app logos without Clavis's pictures", 1),
+        ('if(k==="clavis")return clavisSrc();', "", "app logos: an app's own logo, kept, without Clavis", 1),
+        ('  if(k&&k!=="lakay"&&k!=="clavis"&&W.IngSeal&&typeof IngSeal.el==="function")', '  if(k&&k!=="lakay"&&W.IngSeal&&typeof IngSeal.el==="function")',
+         "app logos: the seals, without Clavis", 1),
+        ('  if(k==="clavis"&&clavisSrc())return img(clavisSrc(),size,"clavis");\n', "", "app logos: no Clavis picture", 1),
+        ("(function(){function go(){[].forEach.call(D.querySelectorAll('img[data-applogo=\"clavis\"]'),function(im){var s=clavisSrc();if(s&&im.src!==s)im.src=s;});}"
+         "function on(){try{new MutationObserver(go).observe(D.body,{attributes:true,attributeFilter:[\"data-theme\"]});}catch(e){}}if(D.body)on();else D.addEventListener(\"DOMContentLoaded\",on);})();\n",
+         "", "app logos: Clavis's night picture not followed", 1),
+    ]
+
+
 def _no_lakay():
     """6.55: Lakay, her store's app, is carried and named in the master edition alone: every other edition's app library has the list
     it had before (and the full edition's rule below then leaves Ingenium alone in it), and knows no Lakay page by name."""
@@ -658,6 +706,9 @@ def _no_lakay():
          "no Lakay page known by name", 1),
         ('  if(key==="lakay"&&(m=/<meta name="lakay-build" content="(\\d+)"/.exec(s.slice(0,40000))))return m[1];\n', "",
          "no Lakay build number read", 1),
+        # 7.65: nor by the library's later reading of a page (the base page's second libDetect)
+        ('  if(/<meta name="lakay-build"/i.test(head.slice(0,40000))||/^Lakay\\b/i.test(t))return "lakay";\n', "",
+         "no Lakay page known by name (the later reading)", 1),
         # 6.83: the one place an app's logo is found (modules/r277.js) knows Lakay's own pictures in the master edition alone
         ('  if(n==="lakay")return "lakay";if(/^offline (project|pro)$/.test(n))return "master";return null;}',
          '  if(/^offline (project|pro)$/.test(n))return "master";return null;}', "app logos without Lakay's name", 1),
@@ -690,7 +741,7 @@ def _no_lakay():
 def edits(ed):
     if ed == "master":
         return []
-    E = _no_lakay() + _fixed_name()
+    E = _no_clavis() + _no_lakay() + _fixed_name()  # 7.65: Clavis first, so the lines naming Lakay are as _no_lakay knows them
     for old, new, label, times in _personal():
         if label == "the edition":
             new = 'var ING_EDITION="%s";' % ed

@@ -69,7 +69,7 @@ const snap = (p, s) => p.evaluate((s) => { const e = document.querySelector(s), 
   const lk = await p.evaluate(() => { const m = libState().apps.lakay || {}; return { st: window.__ingBuiltin && __ingBuiltin.states.lakay, keys: libKeys(), title: m.title, version: m.version, source: m.source, color: m.color, seal: !!(window.ING_SEALS && ING_SEALS.lakay), layers: window.LX7_LAYERS && LX7_LAYERS.lakay ? LX7_LAYERS.lakay.length : 0, night: window.LX7_LAYERS && LX7_LAYERS.lakayN ? LX7_LAYERS.lakayN.length : 0 }; });
   ok(lk.st === 'kept' || lk.st === 'same', 'Lakay is kept on first start from inside Ingenium, checked against its fingerprint', lk);
   ok(lk.title === 'Lakay' && /^\d+$/.test(lk.version || '') && lk.source === 'built in' && lk.color === LAKAY_COLOUR, 'it is kept as Lakay, by its build number, in its own colour (' + LAKAY_COLOUR + ', as builtin.json records it)', lk);
-  ok(lk.keys.slice(0, 4).join() === 'cd,forge,inkwell,ingenium' && lk.keys.indexOf('lakay') === 4, 'it is listed with her apps, after the four', lk.keys);
+  ok(lk.keys.slice(0, 4).join() === 'cd,forge,inkwell,ingenium' && lk.keys.indexOf('lakay') >= 4, 'it is listed with her apps, after the four (7.65: by name, beside Clavis)', lk.keys);
   ok(lk.seal && lk.layers === 16 && lk.night === 16, 'its seal and its mark in its planes (Build 6: sixteen), by day and by night', lk);
   await p.evaluate(() => go('lector')); await p.waitForTimeout(2500);
   const lt = await p.evaluate(() => { const t = [...document.querySelectorAll('#lx7 .l-app')].find(x => /Lakay/.test(x.textContent)); return t ? { text: t.textContent.replace(/\s+/g, ' ').trim(), layers: t.querySelectorAll('img.ls-l').length } : null; });

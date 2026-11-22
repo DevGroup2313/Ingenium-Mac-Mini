@@ -495,6 +495,7 @@ function lower(s){return s?s.charAt(0).toLowerCase()+s.slice(1):"";}
 var FAPPS={cd:"Carpe Diem",forge:"The Forge",ingenium:"Ingenium",inkwell:"Inkwell"};
 /* 6.55: her apps beyond the four that the library names (Lakay, in the master edition), by the library's own name and colour */
 try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!FAPPS.lakay)FAPPS.lakay=LIB_NAMES.lakay;}catch(e){}
+try{if(window.LIB_NAMES&&LIB_NAMES.clavis&&!FAPPS.clavis)FAPPS.clavis=LIB_NAMES.clavis;}catch(e){}  /* 7.65: and Clavis */
 function repoState(r,st,n){if(!r.head)return ["Started · nothing kept yet","none"];
   if(st&&!st.clean){var k=(st.changes||[]).length;return [plural(k,"change")+" to keep",""];}
   var t=n&&n.test,tested=!!(t&&t.ok&&(t.checks||[]).some(function(c){return c.id==="reads"&&c.state==="ok";}));
@@ -528,8 +529,9 @@ function fillFabrica(){var ul=list("fabrica");if(!ul)return Promise.resolve();va
 /* Lector: the documents written for each set of apps, newest first */
 var LNAMES={cd:"Carpe Diem",forge:"The Forge",ingenium:"Ingenium",inkwell:"Inkwell"},LORDER=["cd","forge","ingenium","inkwell"];
 try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!LNAMES.lakay){LNAMES.lakay=LIB_NAMES.lakay;LORDER.push("lakay");}}catch(e){}
+try{if(window.LIB_NAMES&&LIB_NAMES.clavis&&!LNAMES.clavis){LNAMES.clavis=LIB_NAMES.clavis;LORDER.push("clavis");}}catch(e){}  /* 7.65: and Clavis */
 function setName(a){a=LORDER.filter(function(k){return (a||[]).indexOf(k)>=0;});var n=a.map(function(k){return LNAMES[k];});
-  if(a.length===4)return "The Offline Project";if(n.length<2)return n[0]||"Your apps";return n.slice(0,-1).join(", ")+" and "+n[n.length-1];}
+  if(a.length===4&&["cd","forge","ingenium","inkwell"].every(function(k){return a.indexOf(k)>=0;}))return "The Offline Project";if(n.length<2)return n[0]||"Your apps";return n.slice(0,-1).join(", ")+" and "+n[n.length-1];}
 function docLabel(kind,a,p){var all=(a||[]).filter(function(k){return LNAMES[k];}).length===4;
   return {dossier:all?"Master project dossier":"Project dossier",appendix:all?"Master appendix":"Appendix",portfolio:"Portfolio piece",
     cover:p==="programme"?"Cover letter for the programme":"Cover letter",cv:"CV entry",analysis:"Notes and analysis"}[kind]||"A document";}

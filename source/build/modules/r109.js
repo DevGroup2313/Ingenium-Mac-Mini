@@ -28,6 +28,8 @@ var LATIN=["IANVARII","FEBRVARII","MARTII","APRILIS","MAII","IVNII","IVLII","AVG
 var NAMES={cd:"Carpe Diem",forge:"The Forge",ingenium:"Ingenium",inkwell:"Inkwell"};
 /* 6.55: her apps beyond the four that the library names (Lakay, in the master edition), by the library's own name and colour */
 try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!NAMES.lakay)NAMES.lakay=LIB_NAMES.lakay;}catch(e){}
+/* 7.65: and Clavis, her search engine (her words, 21 November 2026: "I want the app to be built into my master edition of Ingenium like the other apps"), the same way */
+try{if(window.LIB_NAMES&&LIB_NAMES.clavis&&!NAMES.clavis)NAMES.clavis=LIB_NAMES.clavis;}catch(e){}
 var PW=595.28,PH=841.89,ML=72,MR=72,MT=72,MB=64,TW=PW-ML-MR;
 function code(ch){var c=ch.charCodeAt(0);if(c>=32&&c<127)return c;if(c>=160&&c<=255)return c;if(HI[c])return HI[c];if(c===9)return 32;return null;}
 /* text in WinAnsi bytes; anything else becomes its plain equivalent */

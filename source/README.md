@@ -395,6 +395,36 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.65 (21 November 2026): Clavis, her search engine, built into the master edition as her other apps are.
+Her words (21 November 2026): "I have a new app named Clavis. I have given you access to its repositories on GitHub. Please add it to
+Ingenium as one of my apps into all of its pages, Fabrica, Adamas, the chat pages, Lector, and Vocatio and most of all the Ingenia page
+and anywhere else. I want the app to be built into my master edition of Ingenium like the other apps." Done as Lakay was in 6.55.
+- `build/apps/clavis_bring.py` (run on the Clavis-Mac repository): `builtin/clavis.html.gz` (its page, `clavis.html`, the whole app in one
+  file), its record in `builtin/builtin.json` (its pass as its version, 104 at 7.65, Build d6eef19730, its date, its gold `#b8862f`, size and SHA-256)
+  and `builtin/clavis_mark.json` (its seal's four layers, plate, rays, key and star, at Clavis's own depths as a share of the width, and the
+  seal laid flat at 256 pixels by day and by night). `build_page.py` carries them in the master edition alone (not the lean copy The Forge
+  carries): the page as `ing-builtin-clavis`, the seal as `ING_SEALS.clavis` and `clavisN`, the layers in `LX7_LAYERS`.
+- The app library knows it by name (`LIB_KEYS`, `LIB_NAMES`) and by its page (its title with its copyright line), in both of the page's
+  readings; the later one (the base page's second `libDetect`) knew neither Lakay nor Clavis before, so a newer page of either added by
+  hand was kept as some other app. `r120` keeps the carried copy on first start (Clavis 104, built in); `r240` lists it once kept (as
+  Lakay); Lector (`r108` through the library, `r109` for its PDFs), Adamas's Open an app and Code's Your apps (`IngApps`), Fabrica (`r112`:
+  Bring one in from the app library, then one of her own apps in its gold, with its layered seal), Home (`r147`), the folders a chat import
+  makes (`r258`), a repository brought from GitHub named Clavis (`r276`) and the one place an app's logo is found (`r277`: its own picture
+  by day and by night, so Ingenia's folder, card and opened folder wear it). Vocatio draws on Lector's reading of an app, as for every app.
+  In another person's profile What is new hides a line that names Clavis (`r336`).
+- Code's Your apps card spoke of "your four apps"; it now speaks of the apps kept in the app library.
+- `r147`: a set of four apps is called the Offline Project only when it is the four (with Lakay and Clavis, four may be another four).
+- Inside Ingenium, Clavis opens as her other apps do: in a window of its own that keeps to itself (`thoughts/open_apart.html`, a sandboxed
+  frame with no origin). Its searches reach the services it asks, but its library cannot be kept there (IndexedDB refuses a frame with
+  no origin) and its settings last only while that window is open. The installed Clavis apps keep their library on the device.
+- No other edition carries any of it, nor its name, even in the code (`editions.py`, `_no_clavis`, run before `_no_lakay`); none in
+  another person's profile on the master copy (r120 and r336, as for every app of hers).
+- The master page grows by about 4.6 MB to about 93.8 MB (GitHub refuses a file over 100 MiB).
+- rig: `t_765_clavis.js` (the library keeps it, every page that lists her apps names it, Fabrica brings it in and it wears its layered seal,
+  Ingenia day and night, opened from Ingenium in a frame with no origin); `t_627_editions` and `t_746_no_apps` also look for Clavis.
+
+    node rig/t_765_clavis.js <master page url> <out folder>
+
 Ingenium 7.64 (21 November 2026): Ingenium itself, signed and checked, part two: the iPhone, iPad and Fire apps, and the copies she gives.
 The Security room's promise (modules/r318.js, approved on the live preview of 18 November 2026): "each release signed with your owner
 key, and checked by the computer apps and the iPhone, iPad and Fire apps before Ingenium opens". Part one (7.58) was the Mac and Windows

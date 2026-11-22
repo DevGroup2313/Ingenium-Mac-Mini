@@ -26,7 +26,7 @@ if(window.__ingGuest)BI=null;
    the full edition holds only the pages the person adds. */
 if(typeof ING_EDITION==="string"&&ING_EDITION!=="master")BI=null;
 if(!BI||typeof libKeep!=="function"||typeof libState!=="function")return;
-var KEYS=["inkwell","forge","cd","lakay"].filter(function(k){return BI[k];}),DONE={},RUN=null;  /* 6.55: and Lakay */
+var KEYS=["inkwell","forge","cd","lakay","clavis"].filter(function(k){return BI[k];}),DONE={},RUN=null;  /* 6.55: and Lakay; 7.65: and Clavis, her search engine, named by its pass */
 
 /* ---------- versions: a pass (630), a dotted version (7.42) or a Forge stamp (9s62); unlike kinds are not compared ---------- */
 function parts(v){v=String(v||"").trim();var m;

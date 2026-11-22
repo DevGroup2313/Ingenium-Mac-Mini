@@ -164,7 +164,7 @@ function bring(file){if(!file)return Promise.resolve(null);
       try{var have=(W.IngFolders&&IngFolders.folders?IngFolders.folders():[]).map(function(p){return norm(p.name);});
         /* her order of the apps (8 November 2026), then the rest by name; a folder is made with its name only: the parts' names (Scriba,
            Fontes, Focus ...) also name parts of Ingenium, and as a folder's words they would sort other conversations into it */
-        var ORDER=['carpe diem','forge','ingenium','inkwell','lakay','offline project'];
+        var ORDER=['carpe diem','forge','ingenium','inkwell','lakay','clavis','offline project'];  /* 7.65: Clavis after Lakay */
         Object.keys(apps).sort(function(x,y){var i=ORDER.indexOf(norm(x)),j=ORDER.indexOf(norm(y));i=i<0?99:i;j=j<0?99:j;return i-j||x.localeCompare(y);})
           .forEach(function(a){if(have.indexOf(norm(a))<0&&W.IngFolders&&IngFolders.make(a))made.push(a);});}catch(e){}
       return {meta:meta,made:made,had:had,added:added,updated:updated};});});}

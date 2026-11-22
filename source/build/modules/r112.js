@@ -504,6 +504,8 @@ var APPS={cd:{name:"Carpe Diem",color:"#1B6B93"},forge:{name:"The Forge",color:"
 var DELAY={cd:0,forge:1.7,ingenium:3.4,inkwell:5.1};
 /* 6.55: her apps beyond the four that the library names (Lakay, in the master edition), by the library's own name and colour */
 try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!APPS.lakay){APPS.lakay={name:LIB_NAMES.lakay,color:"#5c63c6"};DELAY.lakay=6.8;}}catch(e){}
+/* 7.65: and Clavis, her search engine (her words, 21 November 2026: "I want the app to be built into my master edition of Ingenium like the other apps"), in its own gold */
+try{if(window.LIB_NAMES&&LIB_NAMES.clavis&&!APPS.clavis){APPS.clavis={name:LIB_NAMES.clavis,color:"#b8862f"};DELAY.clavis=8.5;}}catch(e){}
 /* 7.23: a repository is known as one of the family's apps by its record, else by its name, as r276 knows one brought from GitHub (a
    repository opened from the drive, or brought in from a file, carried no record of it, and an Inkwell made there wore a gold I) */
 function famOf(name){var n=String(name||"").toLowerCase();if(/offline[\s._-]*project/.test(n))return null;  /* the Offline Project gathers the apps: it is none of them (iconOf knows it by name) */
@@ -1075,7 +1077,7 @@ function libEntries(){var lib=libList(),keys=[],own=[],made=[],seen={};
   try{if(window.IngOffline&&typeof IngOffline.data==="function"&&IngOffline.data())keys.push("offline","offline3");}catch(e){}
   C.repos.forEach(function(r){var k=keyOf(r);if(k){own.push({k:k,r:r});seen[k]=1;}else made.push({k:null,r:r});});
   keys.forEach(function(k){if(seen[k])return;own.push({k:k,r:null,m:lib.filter(function(x){return x.key===k;})[0]||null});});
-  var order=["cd","forge","inkwell","lakay","ingenium","offline","offline3"];
+  var order=["cd","forge","inkwell","lakay","clavis","ingenium","offline","offline3"];  /* 7.65: Clavis after Lakay */
   own.sort(function(a,b){var x=order.indexOf(a.k),y=order.indexOf(b.k);return (x<0?99:x)-(y<0?99:y)||String(a.r?a.r.name:"").localeCompare(String(b.r?b.r.name:""));});
   made.sort(function(a,b){return String(a.r.name).localeCompare(String(b.r.name));});
   return {own:own,made:made};}

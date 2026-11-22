@@ -1559,6 +1559,33 @@ edit('function libVersionOf(key,text){var s=String(text||""),m;\n',
      '  if(key==="lakay"&&(m=/<meta name="lakay-build" content="(\\d+)"/.exec(s.slice(0,40000))))return m[1];\n',
      "6.55 Lakay's build number as its version")
 
+# ---- 7.65 (21 November 2026): Clavis, her search engine, among her apps, as Lakay is (6.55). Her words (21 November 2026): "I have a new
+#      app named Clavis. I have given you access to its repositories on GitHub. Please add it to Ingenium as one of my apps into all of
+#      its pages, Fabrica, Adamas, the chat pages, Lector, and Vocatio and most of all the Ingenia page and anywhere else. I want the app
+#      to be built into my master edition of Ingenium like the other apps." The app library knows it by name (Clavis) and knows its page
+#      (its title, Clavis, with its copyright line, CLAVIS | Copyright, in its first lines); its page names no build number of its own,
+#      so the copy Ingenium carries is named by its pass (104 at 7.65) from builtin.json. The master edition carries its latest page
+#      (apps/builtin/clavis.html.gz, from apps/clavis_bring.py) and modules/r120.js keeps it on first start; no other edition carries or
+#      names it (editions.py, _no_clavis) ----
+edit('var LIB_KEYS=["cd","forge","inkwell","ingenium","lakay"],LIB_NAMES={cd:"Carpe Diem",forge:"The Forge",inkwell:"Inkwell",ingenium:"Ingenium",lakay:"Lakay"};',
+     'var LIB_KEYS=["cd","forge","inkwell","ingenium","lakay","clavis"],LIB_NAMES={cd:"Carpe Diem",forge:"The Forge",inkwell:"Inkwell",ingenium:"Ingenium",lakay:"Lakay",clavis:"Clavis"};',
+     "7.65 Clavis in the app library's list")
+edit('  if(/<meta name="lakay-build"/i.test(head.slice(0,40000))||/<title>\\s*Lakay\\b/i.test(head.slice(0,40000)))return "lakay";\n',
+     '  if(/<meta name="lakay-build"/i.test(head.slice(0,40000))||/<title>\\s*Lakay\\b/i.test(head.slice(0,40000)))return "lakay";\n'
+     '  if(/<title>\\s*Clavis\\b/i.test(head.slice(0,40000))&&/CLAVIS\\s*\\|\\s*Copyright/.test(head.slice(0,4000)))return "clavis";\n',
+     "7.65 a Clavis page known as Clavis")
+# 7.65: the app library's later reading of a page (the base page's second libDetect, which replaces the first) knew neither Lakay nor
+# Clavis, so a newer page of either, added by hand, was kept as some other app; now it is known by name, as her other apps are
+edit('libDetect=function(text){var s=String(text||""),head=s.slice(0,600000),t=((/<title>([^<]{0,200})<\\/title>/i.exec(head)||[])[1]||"").trim();\n',
+     'libDetect=function(text){var s=String(text||""),head=s.slice(0,600000),t=((/<title>([^<]{0,200})<\\/title>/i.exec(head)||[])[1]||"").trim();\n'
+     '  if(/<meta name="lakay-build"/i.test(head.slice(0,40000))||/^Lakay\\b/i.test(t))return "lakay";\n'
+     '  if(/^Clavis\\b/i.test(t)&&/CLAVIS\\s*\\|\\s*Copyright/.test(head.slice(0,4000)))return "clavis";\n',
+     "7.65 the library's later reading knows Lakay and Clavis")
+# 7.65: the chat's Your apps card counted four apps; with Lakay (6.55) and Clavis it is six in the master edition, and in another edition only
+# what the person adds, so it counts none
+edit("<b>Your apps</b><span>The latest builds of your four apps, carried in this copy of Ingenium.</span>",
+     "<b>Your apps</b><span>The latest builds of your apps, kept in your app library.</span>", "7.65 the chat's Your apps card counts no apps")
+
 # ---- 6.55 (7 November 2026): the empty Chat and Code pages greet her by name, as Home does. Her words (7 November 2026): "I want the
 #      Chat pages inside of Ingenium to be aware of who I am and actually greet me like the Home page does". Home finds her name in her
 #      profile, else in the author's name Lector writes under (modules/r147.js, hello), and uses its first word; the chat looked in the
@@ -1619,6 +1646,13 @@ if editions.carries_apps(ED) and os.environ.get("ING_LEAN") != "1" and os.path.e
     _LAKAY_MARK = json.load(open(os.path.join(HERE, "apps", "builtin", "lakay_mark.json")))
     _seals["lakay"] = _LAKAY_MARK["seal"]["day"]
     _seals["lakayN"] = _LAKAY_MARK["seal"]["night"]  # 6.83: Lakay's Spiral by night too, wherever it is shown (modules/r277.js)
+# 7.65: Clavis's seal (its gold key on its ivory face, laid flat at 256 pixels by day and by night, apps/clavis_bring.py), where
+# Clavis is carried: the master edition, not the lean copy The Forge carries
+_CLAVIS_MARK = None
+if editions.carries_apps(ED) and os.environ.get("ING_LEAN") != "1" and os.path.exists(os.path.join(HERE, "apps", "builtin", "clavis_mark.json")):
+    _CLAVIS_MARK = json.load(open(os.path.join(HERE, "apps", "builtin", "clavis_mark.json")))
+    _seals["clavis"] = _CLAVIS_MARK["seal"]["day"]
+    _seals["clavisN"] = _CLAVIS_MARK["seal"]["night"]
 out = out[:_m.start(2)] + json.dumps(_seals) + out[_m.end(2):]
 
 MARK = '<script>/* R95: every part has now wrapped'
@@ -1713,7 +1747,7 @@ if os.environ.get("ING_LEAN") == "1" or not editions.carries_apps(ED):  # 6.2: o
 # app rides whole, as before.
 _SELF_COPY = {"cd": "cd-self-src-data"}
 _self_carried = False
-for _k in [k for k in ("forge", "inkwell", "cd", "lakay") if k in _bi]:  # R122: Carpe Diem rides along too; 6.55: and Lakay
+for _k in [k for k in ("forge", "inkwell", "cd", "lakay", "clavis") if k in _bi]:  # R122: Carpe Diem rides along too; 6.55: and Lakay; 7.65: and Clavis
     _z = open(os.path.join(HERE, "apps", "builtin", _k + ".html.gz"), "rb").read()
     _raw = _gz.decompress(_z)
     if len(_raw) != _bi[_k]["size"] or _hl.sha256(_raw).hexdigest() != _bi[_k]["sha256"]:
@@ -1969,6 +2003,8 @@ if "/*R107_LAYERS*/null" in blob:
     _lay = json.load(open(os.path.join(HERE, "lx_layers.json")))
     if _LAKAY_MARK and "lakay" in _bi:  # 6.55: Lakay's Spiral in its seven layers, by day and by night, where Lakay is carried
         _lay.update(_LAKAY_MARK["layers"])
+    if _CLAVIS_MARK and "clavis" in _bi:  # 7.65: Clavis's seal in its four layers (plate, rays, key, star), by day and by night
+        _lay.update(_CLAVIS_MARK["layers"])
     blob = blob.replace("/*R107_LAYERS*/null", json.dumps(_lay))
 if "/*R107_MASTER*/null" in blob:
     blob = blob.replace("/*R107_MASTER*/null", json.dumps({"night": "data:image/png;base64," + _ms["night"]["b64"]}))  # by day the page uses ING_SEALS.master

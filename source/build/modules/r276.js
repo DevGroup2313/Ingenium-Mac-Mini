@@ -103,10 +103,11 @@ function key(cls,text,fn){var b=mk("button",cls||"f-btn");b.type="button";b.text
 function famKey(name){var n=String(name||"").toLowerCase();
   if(/offline[-_ ]?(pro|project)/.test(n))return "master";  /* 7.23: first, since its name may hold an app's (without Inkwell) */
   if(/carpe[-_ ]?diem/.test(n))return "cd";if(/(^|[^a-z])forge([^a-z]|$)/.test(n))return "forge";if(/(^|[^a-z])ingenium([^a-z]|$)/.test(n))return "ingenium";if(/(^|[^a-z])(ink[-_ ]?well|inwell)([^a-z]|$)/.test(n))return "inkwell";  /* 7.23: whole words (a repository named forget-me-not is not The Forge) */
-  if(/lakay/.test(n))return "lakay";if(/offline[-_ ]?(pro|project)/.test(n))return "master";return null;}
+  if(/lakay/.test(n))return "lakay";if(/(^|[^a-z])clavis([^a-z]|$)/.test(n))return "clavis";  /* 7.65: Clavis-Mac, Clavis-Window, Clavis-IOS-Android */
+  if(/offline[-_ ]?(pro|project)/.test(n))return "master";return null;}
 function flat(k){try{var s=W.ING_SEALS&&ING_SEALS[k];return s&&s.b64?"data:image/png;base64,"+s.b64:"";}catch(e){return "";}}
 function logo(r,size){size=size||28;var k=famKey(r&&(r.name||r.full)),src="";
-  if(k&&k!=="lakay"&&k!=="master"&&W.IngSeal&&typeof IngSeal.el==="function"){try{var e=IngSeal.el([k],{size:size,alt:""});if(e){e.classList.add("hb-logo");e.style.width=e.style.height=size+"px";return e;}}catch(x){}}
+  if(k&&k!=="lakay"&&k!=="clavis"&&k!=="master"&&W.IngSeal&&typeof IngSeal.el==="function"){try{var e=IngSeal.el([k],{size:size,alt:""});if(e){e.classList.add("hb-logo");e.style.width=e.style.height=size+"px";return e;}}catch(x){}}
   if(k)src=flat(k);if(!src&&r&&r.icon&&/^data:image\/(png|jpeg|webp);base64,/.test(r.icon))src=r.icon;
   if(src){var im=new Image();im.src=src;im.alt="";im.className="hb-logo";im.style.width=im.style.height=size+"px";im.draggable=false;return im;}
   var em=mk("span","hb-logo hb-emblem",SPARK);em.style.setProperty("--s",size+"px");em.setAttribute("aria-hidden","true");return em;}
