@@ -213,7 +213,7 @@ const blockOf = (html, id) => { const m = new RegExp('<script[^>]*id="' + id + '
 
   // --apps: the apps the page carries, each beside its scrambled copy
   if (APPS) {
-    const names = ['lakay', 'inkwell', 'forge'].concat(WITH_CD ? ['cd'] : []);
+    const names = ['lakay', 'clavis', 'inkwell', 'forge'].concat(WITH_CD ? ['cd'] : []);
     for (const n of names) {
       const gz = path.join(APPS, n + '.html.gz'); if (!fs.existsSync(gz)) { ok(false, n + ': not found'); continue; }
       fs.writeFileSync(path.join(DIR, n + '.html'), zlib.gunzipSync(fs.readFileSync(gz)));
