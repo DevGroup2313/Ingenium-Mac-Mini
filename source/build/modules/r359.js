@@ -1,5 +1,5 @@
 <style id="r359-css">
-/* ============ R359 · CLEAR THE PREVIEW, AND MORE'S LIGHTER LOOK (Ingenium 7.69, 22 November 2026): see the note at the top of its script.
+/* ============ R359 · CLEAR THE PREVIEW, AND MORE'S LIGHTER LOOK, HER STANDARD FOR SIDE MENUS (Ingenium 7.69, 22 November 2026): see the note at the top of its script.
    Her choice of the three light designs for the preview's More (22 November 2026), on its pictures: Design A, "I choose this look for the
    light redesign of the Live Preview panel's more menu". More is one raised card; its rows lie quietly in it and rise only under the
    pointer (as she chose for the Code page's start window, 7.47); a row that is on keeps its pressed seat. Every row is in view: the chat's
@@ -13,6 +13,27 @@ body[data-theme="night"] #csMenu.cs-menu .menu-btn:hover{box-shadow:0 1px 1px rg
 body[data-theme="night"] #csMenu.cs-menu .menu-btn[aria-pressed="true"]{color:var(--accent-bright)}
 #csMenu.cs-menu .ctx-sep{margin:6px 10px}
 body[data-motion="minimal"] #csMenu.cs-menu .menu-btn:hover{transform:none}
+/* Her standard for a panel's side menu from now on (22 November 2026): "I want you to give the sticky notes' side menu panel the same
+   redesign look as the Live Preview panel, it should be made standard and added to my Ingenia files. I really like this look for the
+   panel." (record 07, section 6). A sticky note's menu takes it now (its paper dots stay as they are; Delete note stays red), and any
+   menu given the class .ing-side-menu takes it: one raised card, its rows quiet in it, each rising under the pointer. */
+.sn-menu.sn-menu,.ing-side-menu.ing-side-menu{padding:8px;border-radius:16px;background:var(--card-hi);border:1px solid rgba(34,26,46,.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 8px 20px rgba(40,20,70,.16),0 22px 44px rgba(40,20,70,.14)}
+body[data-theme="night"] .sn-menu.sn-menu,body[data-theme="night"] .ing-side-menu.ing-side-menu{background:#221b2e;border-color:rgba(255,255,255,.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 20px rgba(0,0,0,.45),0 22px 44px rgba(0,0,0,.35)}
+.sn-menu.sn-menu .menu-btn.menu-btn,.ing-side-menu.ing-side-menu .menu-btn.menu-btn{display:block;width:100%;box-sizing:border-box;text-align:left;margin-top:2px;
+  border:0;background:transparent;box-shadow:none;border-radius:10px;padding:9px 12px;font:600 12.5px/1.35 var(--sans);color:var(--ink-1);animation:none;
+  transition:transform .2s cubic-bezier(.34,1.3,.64,1),box-shadow .2s ease,background .14s ease,color .14s ease}
+.sn-menu.sn-menu .menu-btn.menu-btn:hover,.ing-side-menu.ing-side-menu .menu-btn.menu-btn:hover{background:linear-gradient(180deg,var(--card-hi),var(--card-lo));
+  box-shadow:0 1px 1px rgba(40,20,70,.08),0 4px 10px rgba(40,20,70,.10);transform:translateY(-1px);color:var(--accent-deep)}
+body[data-theme="night"] .sn-menu.sn-menu .menu-btn.menu-btn:hover,body[data-theme="night"] .ing-side-menu.ing-side-menu .menu-btn.menu-btn:hover{
+  box-shadow:0 1px 1px rgba(0,0,0,.4),0 4px 10px rgba(0,0,0,.3);color:var(--accent-bright)}
+.sn-menu.sn-menu .menu-btn.menu-btn:active,.ing-side-menu.ing-side-menu .menu-btn.menu-btn:active{transform:translateY(0);transition-duration:.04s;box-shadow:var(--seat)}
+.sn-menu.sn-menu .menu-btn.menu-btn.danger,.sn-menu.sn-menu .menu-btn.menu-btn.danger:hover,
+.ing-side-menu.ing-side-menu .menu-btn.menu-btn.danger,.ing-side-menu.ing-side-menu .menu-btn.menu-btn.danger:hover{color:var(--bad)}
+.sn-menu.sn-menu .col-row{padding:4px 8px 8px}
+body[data-motion="minimal"] .sn-menu.sn-menu .menu-btn.menu-btn:hover,body[data-motion="minimal"] .ing-side-menu.ing-side-menu .menu-btn.menu-btn:hover{transform:none}
+@media (prefers-reduced-motion:reduce){.sn-menu.sn-menu .menu-btn.menu-btn,.ing-side-menu.ing-side-menu .menu-btn.menu-btn{transition:none}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p359"]="started";}catch(_){}
 /* ============ R359 · CLEAR THE PREVIEW (Ingenium 7.69, 22 November 2026) ============

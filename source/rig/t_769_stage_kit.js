@@ -194,6 +194,14 @@ const serve = (port) => new Promise((res) => { const s = http.createServer((q, r
   await show(GUIDE, 'harbour-guide.html', 'test:guide'); await sleep(700);
   const q4 = await p.evaluate(() => ({ cur: !!window.csCur, mark: !!(curChat().stageCleared) }));
   ok(q4.cur && !q4.mark, 'a page she opens herself comes back, and ends the clearing', q4);
+  // her standard for side menus: a sticky note's menu wears it too
+  await p.evaluate(() => { go('home'); newStickyNote(); }); await sleep(900);
+  await p.evaluate(() => { const n = document.querySelector('.sticky-note'); const k = n && [...n.querySelectorAll('button')].find((x) => /⋯|…|···/.test(x.textContent)); if (k) k.click(); }); await sleep(700);
+  const sn = await p.evaluate(() => { const m = document.querySelector('.sn-menu'); if (!m) return null; const r = getComputedStyle(m.querySelector('.menu-btn')), c = getComputedStyle(m), d = m.querySelector('.menu-btn.danger');
+    return { rowBg: r.backgroundColor, rowImg: r.backgroundImage, rowShadow: r.boxShadow, rowBorder: r.borderTopWidth, radius: c.borderTopLeftRadius, pad: c.paddingTop, danger: d ? getComputedStyle(d).color : '' }; });
+  await p.evaluate(() => { try { closeStickyMenus(); } catch (e) {} });
+  ok(sn && sn.rowBg === 'rgba(0, 0, 0, 0)' && sn.rowImg === 'none' && sn.rowShadow === 'none' && sn.rowBorder === '0px' && sn.radius === '16px' && sn.pad === '8px' && sn.danger && sn.danger !== 'rgb(34, 26, 46)',
+    'her standard for side menus: a sticky note\'s menu is one raised card with quiet rows; Delete note stays red', sn);
 
   ok(errs.length === 0, 'no page errors', errs);
   console.log(P + ' passed, ' + F + ' failed');
