@@ -133,7 +133,8 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   ok(kept.name === 'The Offline Project (without Inkwell)' && /^Made from the demonstrations \(without Inkwell\): Carpe Diem \d+ · The Forge \d+ · Ingenium [0-9.]+$/.test(kept.title || ''), 'kept in Fabrica, its history says it was made from the demonstrations, with their builds', kept);
   const keys1 = await p.evaluate(() => Object.keys(libState().apps).sort());
   // the app library may have filled itself with the apps the page carries (reading Carpe Diem from it, above, does that); nothing else
-  const carried = ['cd', 'forge', 'inkwell', 'ingenium', 'lakay'];
+  // 7.65: the apps the page carries, as builtin.json records them (Clavis joined Lakay there), and Ingenium's own page
+  const carried = Object.keys(JSON.parse(fs.readFileSync(require('path').join(__dirname, '..', 'build', 'apps', 'builtin', 'builtin.json'), 'utf8'))).concat(['ingenium']);
   ok(keys1.every(k => carried.indexOf(k) >= 0) && !keys1.some(k => /offline|op-/i.test(k)), 'nothing of the Offline Project is kept in the app library', { keys0, keys1 });
   ok(errs.length === 0, 'no script errors on the page', errs);
   await b.close(); console.log(pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
