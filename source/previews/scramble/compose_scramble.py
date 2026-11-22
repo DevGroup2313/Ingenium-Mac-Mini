@@ -12,7 +12,7 @@ F = lambda n, b=False: ImageFont.truetype("/usr/share/fonts/opentype/inter/Inter
 STEPS = [
     ("1-package-details", "Package details: Scrambled code",
      "A new switch for each app, under the two you know: on for every app until you turn it off for one."),
-    ("2-ship-card", "The Ship card says so",
+    (("2a-ship-tile", "2b-ship-line"), "The Ship card says so",
      "What was made scrambled carries a Scrambled chip, and the package's line says its code is scrambled."),
     ("3-room-day", "The Security room: Scrambled code, On",
      "No longer Not yet: it says what is scrambled, what stays as you wrote it, and that it is never impossible to read."),
@@ -44,11 +44,32 @@ def wrap(dr, text, font, width):
     return out
 
 
+def picture(keys):
+    """one picture, or several (one part of the app each) stacked and centred, with a gap between them"""
+    ims = []
+    for k in keys:
+        f = os.path.join(SRC, k + ".png")
+        if not os.path.exists(f):
+            print("missing", k); return None
+        ims.append(Image.open(f).convert("RGB"))
+    if len(ims) == 1:
+        return ims[0]
+    gap = 48
+    w, h = max(i.size[0] for i in ims), sum(i.size[1] for i in ims) + gap * (len(ims) - 1)
+    out, y = Image.new("RGB", (w, h), bg), 0
+    for i in ims:
+        out.paste(i, ((w - i.size[0]) // 2, y)); ImageDraw.Draw(out).rectangle(((w - i.size[0]) // 2 - 1, y - 1, (w + i.size[0]) // 2, y + i.size[1]), outline=edge, width=2)
+        y += i.size[1] + gap
+    return out
+
+
 for n, (key, title, text) in enumerate(STEPS, 1):
-    f = os.path.join(SRC, key + ".png")
-    if not os.path.exists(f):
-        print("missing", key); continue
-    im = Image.open(f).convert("RGB")
+    keys = key if isinstance(key, tuple) else (key,)
+    im = picture(keys)
+    if im is None:
+        continue
+    stacked = len(keys) > 1
+    key = "%d-ship-card" % n if stacked else key
     W = max(im.size[0] + 2 * M, 1600)
     dr0 = ImageDraw.Draw(Image.new("RGB", (10, 10)))
     lines = wrap(dr0, text, F(36), W - 2 * M)
@@ -63,6 +84,7 @@ for n, (key, title, text) in enumerate(STEPS, 1):
         dr.text((M, M + 64 + 22 + 50 * i), l, font=F(36), fill=ink2)
     x = (W - im.size[0]) // 2
     out.paste(im, (x, head))
-    dr.rectangle((x - 2, head - 2, x + im.size[0] + 1, head + im.size[1] + 1), outline=edge, width=2)
+    if not stacked:
+        dr.rectangle((x - 2, head - 2, x + im.size[0] + 1, head + im.size[1] + 1), outline=edge, width=2)
     p = os.path.join(OUT, "Scrambled_code_%02d_%s.png" % (n, key.split("-", 1)[1].replace("-", "_")))
     out.save(p, optimize=True); print(p, out.size)

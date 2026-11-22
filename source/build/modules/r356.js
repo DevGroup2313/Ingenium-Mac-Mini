@@ -145,7 +145,9 @@ function page(html,depth,acc,memo){depth=depth||0;memo=memo||{};acc=acc||{script
 function check(orig,scr){var Q=W.IngShip&&IngShip._&&IngShip._.quietRun;if(typeof Q!=="function")return Promise.resolve(null);
   var both=orig.length<4e6?Promise.all([Q(orig,4),Q(scr,4)]):Q(orig,4).then(function(a){return Q(scr,4).then(function(b){return [a,b];});});
   return both.then(function(r){var a=r[0],b=r[1];if(b.errors.length<=a.errors.length)return null;
-    var extra=b.errors.filter(function(m){return a.errors.indexOf(m)<0;});return {why:String(extra[0]||b.errors[0]||"an error").slice(0,160)};});}
+    var extra=b.errors.filter(function(m){return a.errors.indexOf(m)<0;});return {why:plainWhy(extra[0]||b.errors[0])};});}
+/* the app's own words of an error, without the browser's (Uncaught, TypeError:, its line) */
+function plainWhy(m){return String(m||"").replace(/^Uncaught\s+/i,"").replace(/^[A-Za-z]*Error:\s*/,"").replace(/\s*\(line \d+\)\s*$/,"").trim().slice(0,160)||"an error";}
 function sha(s){return crypto.subtle.digest("SHA-256",TE.encode(s)).then(function(b){return [].map.call(new Uint8Array(b),function(x){return ("0"+x.toString(16)).slice(-2);}).join("");});}
 function scramble(id,x,name){name=name||nameOf(id,x);var orig=x.html,t0=Date.now();
   if(orig.length>2e6)toast("Scrambling "+name+"'s code before it is made…");
@@ -155,7 +157,7 @@ function scramble(id,x,name){name=name||nameOf(id,x);var orig=x.html,t0=Date.now
     if(typeof N==="function"&&String(N(orig,rec)||"")!==String(N(res.html,rec)||""))return {html:null,why:"its version read differently once scrambled"};
     var list=[{orig:orig,scr:res.html}].concat(acc.checks),chain=Promise.resolve(null);
     list.forEach(function(c){chain=chain.then(function(bad){return bad||check(c.orig,c.scr);});});
-    return chain.then(function(bad){if(bad)return {html:null,why:"the scrambled copy showed an error the one you wrote does not ("+bad.why+")"};
+    return chain.then(function(bad){if(bad)return {html:null,why:"the scrambled copy showed an error that yours does not: “"+bad.why+"”"};
       return {html:res.html,info:{at:Date.now(),scripts:acc.scripts,pages:acc.pages,left:acc.left.length,leftWhy:acc.left.slice(0,3),before:acc.before,after:acc.after,ms:Date.now()-t0,engine:ENGINE}};});})
   .catch(function(e){return {html:null,why:"the scrambler could not run here ("+String((e&&e.message)||e).slice(0,120)+")"};});}
 var CACHE=[],SAID={};

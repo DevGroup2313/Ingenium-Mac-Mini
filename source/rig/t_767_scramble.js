@@ -192,7 +192,7 @@ const blockOf = (html, id) => { const m = new RegExp('<script[^>]*id="' + id + '
   const keeper = await mk(KEEPER, 'Name Keeper');
   const kp = await p.evaluate((id) => IngShip.onePage(id, { target: 'page', unsigned: true }).then((x) => ({ html: x.html, scr: x.scrambled || null })), keeper); await sleep(300);
   const kt = await toastText();
-  ok(!kp.scr && /secretHelperName/.test(kp.html) && /Made with Name Keeper's code as written: the scrambled copy showed an error the one you wrote does not/.test(kt),
+  ok(!kp.scr && /secretHelperName/.test(kp.html) && /Made with Name Keeper's code as written: the scrambled copy showed an error that yours does not: “Name Keeper needs its own names”\./.test(kt),
     'a scrambled copy that shows an error hers does not: the package carries her code as written, and Ingenium says so', kt);
   const rough = await mk(ROUGH, 'Rough Draft');
   const rp = await p.evaluate((id) => IngShip.onePage(id, { target: 'page', unsigned: true }).then((x) => ({ html: x.html, scr: x.scrambled || null })), rough); await sleep(300);
