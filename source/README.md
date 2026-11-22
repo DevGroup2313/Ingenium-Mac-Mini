@@ -395,15 +395,19 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.66 (22 November 2026): Clavis 105 carried; its page names its build number, and Fabrica and the app library read it.
+Ingenium 7.66 (22 November 2026): Clavis 106 carried; its page names its build number, and Fabrica's test of Clavis passes.
 Her words (22 November 2026): "I want you to add the build number to Clavis so that there are no issues with Fabrica's tests."
 - Clavis 105 (Clavis-Mac, Clavis-Window and Clavis-IOS-Android, branch claude/tender-fermat-3f415n, on top of build 104): its
   tools/build.py writes `<meta name="version" content="105">` (its app.json's pass) into the page's head, where Fabrica already reads
-  an app's number (modules/r111.js, numberOf); nothing else in its page changed. Its tests: t_smoke 105/105, t_lang all passed.
-- `apps/clavis_bring.py` brought Clavis 105 in (Build 8e6f9e38fd). `build_page.py`: the app library reads Clavis's number from the
+  an app's number (modules/r111.js, numberOf). Fabrica's test of it then found its number, but failed "every file it names is here"
+  (manifest.webmanifest and icons/apple-touch-icon.png, which live beside it only on the website) and noted an error in its test
+  window (navigator.storage.persisted() refused there, uncaught). Clavis 106: the page links those two when served from the web, and
+  the storage questions catch a refusal; Fabrica's test of the page alone: every file named is here, it opened and ran with no errors,
+  build 106. Its tests: t_smoke 105/105, t_lang all passed.
+- `apps/clavis_bring.py` brought Clavis 106 in (Build bbf59d1544). `build_page.py`: the app library reads Clavis's number from the
   same line (libVersionOf), as Lakay's from its lakay-build line; `editions.py` takes that line out of every other edition.
 - rig/t_765_clavis.js: the carried page names its number, the app library and Fabrica's rule read it, and Fabrica's own test of the
-  brought-in Clavis says build 105 with no warning.
+  brought-in Clavis says its build with no warning.
 
 Ingenium 7.65 (21 November 2026): Clavis, her search engine, built into the master edition as her other apps are.
 Her words (21 November 2026): "I have a new app named Clavis. I have given you access to its repositories on GitHub. Please add it to
