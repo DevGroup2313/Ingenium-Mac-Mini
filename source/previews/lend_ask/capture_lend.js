@@ -25,7 +25,7 @@ async function shot(pg, sel, key, ring) { await pg.evaluate(([css, ring, sel]) =
   await pg.screenshot({ path: path.join(OUT, key + '.png'), clip: { x: Math.max(0, b.x - pad), y: Math.max(0, b.y - pad), width: Math.min(vw.width, b.w + 2 * pad), height: Math.min(vw.height, b.h + 2 * pad) } }); console.log(key, 'taken'); }
 const enter = async (pg) => { await pg.waitForFunction(() => window.__ingReady === true, null, { timeout: 600000, polling: 1000 }); await pg.waitForTimeout(1200);
   await pg.evaluate(() => { const k = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); try { tourEnd(); } catch (e) {} }); await pg.waitForTimeout(800);
-  await pg.evaluate(() => { const t = document.getElementById('tgTick'); if (t && !t.checked) t.click(); const k = [...document.querySelectorAll('.tg-veil button')].find((x) => x.offsetParent && !x.disabled); if (k) k.click(); state.theme = 'day'; applyTheme(); }); };
+  await pg.evaluate(() => { const t = document.getElementById('tgTick'); if (t && !t.checked) t.click(); const g = [...document.querySelectorAll('button')].find((x) => /^I agree$/.test(x.textContent.trim()) && x.offsetParent && !x.disabled); if (g) g.click(); state.theme = 'day'; applyTheme(); }); };
 (async () => {
   let ia = null; for (let i = 0; i < 240 && !ia; i++) { const m = /\{"page_port".*\}/.exec(out); if (m) ia = JSON.parse(m[0]); else await sleep(250); }
   const b = await pw.chromium.launch(); const errs = [];

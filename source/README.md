@@ -395,6 +395,40 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.70 (22 November 2026): asking and offering with Accept; whose models answer, in colour; Lending now in Mentes.
+Approved on its sixteen pictures (source/previews/lend_ask; the pictures stay out of the repository), sent to her one by one after the
+7.69 release: "I approve of the previews, please commit and push it everywhere and continue working on my requests."
+- Asking and offering with Accept (`build/modules/r360.js`, `build/desktop/app_ask_770.py`, hooks in r319 and r274). Her words (22
+  November 2026): "Pop-up notifications must appear for each step", with the text for each step, and her answers that day: Accept
+  replaces the code and the code stays as an option ("in case it fails ... nice to have as a bonus option"); B's pop-up after an offer
+  names A; A is told when B accepts, too. A device asks a computer that lends to use its models, with no code typed (POST /ingenium/ask:
+  only while the computer lends, only from a device that seals, at most six asks a minute, one waiting ask for each device); both screens
+  show the same four words; on the computer, who asks and what for, with Accept and Decline; each side is then told the answer in her
+  words. A computer offers its models (Offer my models, beside a device in Your devices; Offer my models to a device nearby): the device
+  shows the offer with Accept and Decline; Accept pairs at once, sealed, since she offered. Found before release, on reading the patch
+  again: an offer to a device nearby stood for ten minutes after the first device took it, so every device nearby that accepted in that
+  time would have paired without her; it is now taken by the first device that accepts it, and by no other (rig/t_770_ask.js checks it).
+  The code stays as the second way. Record 06 section 17, records 00, 01, 05, 09 and 10.
+- Whose models answer, and the memory they take (`build/modules/r361.js`). Her words: the who-answers widget pulses "with a faint colour
+  glow based on which Ingenium's models are being used. If A Lends to B - A's model widget should pulse outward B's model widget should
+  pulse in reverse with the same dimensions"; and her answer: each computer its own colour, chosen by itself, and she can change it. The
+  who-answers keys (beside the message box and in the top bar) glow in the colour of the computer whose models answer: outward on the
+  computer that lends while a device uses it, the same pulse reversed on the device. Eight colours, one for each computer by its id;
+  Colour, under each computer's name in Your devices and on the lender's column, opens them (the desk's state.lendColors). In Mentes,
+  only while the computer lends, Lending now: the memory in use, measured about four times a second while it is in view (share_memory), in 32
+  segments like a microphone's level meter (green, then amber, then rose near the top), its highest mark lit a moment when it falls; and
+  each device's use (share_usage: today, in all, its last use and model).
+- Tests: rig/t_770_ask.js 27/27 on the test page (a real computer app, rig/run_app.py, and two devices in plain browsers; invented names).
+  On the release page, the server's copy checked first against its SHA-256 (4f7bd5f7f033a7f9, 95,202,924 bytes): t_770_ask 27/27 (its
+  computer app the Mac mini repository's ingenium_app.py as release.py patched it), t_769_stage_kit 22/22, t_768_readable 15/15,
+  t_767_scramble 33/33 (--apps, --cd), t_760_app_sign 24/24, t_762_sign_check 25/25, t_763_owner_door 24/24, t_626_guide 27/27,
+  t_755_record 10/10, t_680_old_webview 12/12, t_765_clavis 27/27; t_736_security 14/14, alone.
+  The editions (full 87480459e93ab659, 43,781,318 bytes; gift c0595bbb4a76c8c3 and demo 293abfcdd30b173b, 42,088,986 bytes each; each
+  carries r360 and r361, none names an app of hers): t_627_editions 29/29, t_745_owner_free 21/21, t_745_to_full 15/15, t_746_no_apps
+  full 22/22, gift 19/19, demo 19/19 and the master page as a guest 22/22, t_763_owner_door full 2/2 and gift 2/2, t_767_scramble full
+  4/4, gift 3/3, demo 3/3, t_768_readable gift 2/2, t_769_stage_kit gift 22/22, t_770_ask gift 27/27, t_626_guide gift 27/27.
+  rig/t_769_stage_kit.js and rig/t_770_ask.js agree to the editions' terms with I agree (the first key in the terms is their In short tab).
+
 Ingenium 7.69 (22 November 2026): every app opens in the preview; Clear the preview; her standard for side menus.
 Approved on its pictures (source/previews/stage_preview) with her choice of Design A for More: "I approve of the previews and I choose this
 look for the light redesign of the Live Preview panel's more menu, please commit and push them everywhere and continue working on my

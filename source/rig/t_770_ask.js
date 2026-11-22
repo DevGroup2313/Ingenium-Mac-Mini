@@ -32,7 +32,7 @@ const api = (port, n, args) => fetch('http://127.0.0.1:' + port + '/call/' + n, 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const enter = async (pg) => { await pg.waitForFunction(() => window.__ingReady === true, null, { timeout: 600000, polling: 1000 }); await pg.waitForTimeout(1200);
   await pg.evaluate(() => { const k = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); try { tourEnd(); } catch (e) {} }); await pg.waitForTimeout(800);
-  await pg.evaluate(() => { const t = document.getElementById('tgTick'); if (t && !t.checked) t.click(); const k = [...document.querySelectorAll('.tg-veil button')].find((x) => x.offsetParent && !x.disabled); if (k) k.click(); }); };
+  await pg.evaluate(() => { const t = document.getElementById('tgTick'); if (t && !t.checked) t.click(); const g = [...document.querySelectorAll('button')].find((x) => /^I agree$/.test(x.textContent.trim()) && x.offsetParent && !x.disabled); if (g) g.click(); }); };
 const text = (pg, sel) => pg.evaluate((s) => { const e = document.querySelector(s); return e ? e.innerText.replace(/\s+/g, ' ').trim() : null; }, sel);
 const waitSel = (pg, sel, ms) => pg.waitForSelector(sel, { timeout: ms || 30000 }).then(() => true, () => false);
 (async () => {
