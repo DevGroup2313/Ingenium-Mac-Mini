@@ -39,5 +39,16 @@
   "size": 1557498,
   "sha256": "c4e2305704ea8f50de10f49d9f822ab34c36f00d0eae5f17bf7b40cbfa47d19e",
   "name": "Lakay.html"
+ },
+ "clavis": {
+  "key": "clavis",
+  "title": "Clavis",
+  "version": "106",
+  "build": "bbf59d1544",
+  "date": "2026-11-22",
+  "color": "#b8862f",
+  "size": 5392364,
+  "sha256": "454bfff9844a5c67481bae5d9f60e8a841e4a93ac23be1a723d15571c3460f17",
+  "name": "clavis.html"
  }
 }

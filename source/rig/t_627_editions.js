@@ -67,6 +67,9 @@ async function survey(b, ed, url) {
       ok(marked.length === 0, ed + ': no What is new line marked for the master edition is carried in the page', marked.map(x => x.slice(0, 100)));
       const lakay = (src.match(/Lakay/g) || []).length;
       ok(lakay === 0, ed + ': the page names Lakay nowhere, not even unseen (Lakay is carried in the master edition alone)', lakay);
+      // 7.65: nor Clavis, her search engine, in any letters (its page, seal, layers and code are the master edition's alone)
+      const clavis = (src.match(/clavis/gi) || []).length;
+      ok(clavis === 0, ed + ': the page names Clavis nowhere, in any letters, not even in its code (Clavis is carried in the master edition alone)', clavis);
     }
     if (kind === 'public') {
       ok(r.ed === ed && JSON.stringify(r.nav) === JSON.stringify(PUBLIC_PAGES), ed + ': the side bar holds only Home, Chat, Code, Folders, Focus, Models, Blend, Build, the Guide and Settings', r.nav);

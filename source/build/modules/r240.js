@@ -87,7 +87,8 @@ var oRep=W.repaintDesk;if(typeof oRep==="function")W.repaintDesk=function(){var 
 /* ---------- the list of the library: her four first, then any other app by name ---------- */
 /* 6.55: Lakay, her store's app, is one of her apps by name (LIB_KEYS) and is listed as the others after the four are: by name, in its colour */
 /* 7.46: outside the master edition no app of hers is listed by name, Lakay included; a page the person adds is listed as any other app */
-var BEYOND=(typeof ING_EDITION!=="string"||ING_EDITION==="master")?["lakay"]:[];
+/* 7.65: and Clavis, her search engine (her words, 21 November 2026: "I want the app to be built into my master edition of Ingenium like the other apps") */
+var BEYOND=(typeof ING_EDITION!=="string"||ING_EDITION==="master")?["lakay","clavis"]:[];
 function otherKeys(){var A=libState().apps;if(!allowed())return [];
   return Object.keys(A).filter(function(k){return (/^app-/.test(k)||BEYOND.indexOf(k)>=0)&&A[k]&&A[k].ref;}).sort(function(a,b){return String(A[a].title||a).localeCompare(String(A[b].title||b));});}
 function libKeys(){letGo();var base=(typeof LIB_KEYS!=="undefined"&&LIB_KEYS)?LIB_KEYS.filter(function(k){return BEYOND.indexOf(k)<0;}):[];return base.concat(otherKeys());}

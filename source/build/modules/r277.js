@@ -7,6 +7,7 @@
    - Carpe Diem, The Forge, Ingenium and Inkwell: their seals (r140's IngSeal), by day and by night, as before;
    - The Offline Project: its master logo, the crest of the four (IngSeal "master"), by day and by night;
    - Lakay: its Spiral, its own pictures by day and by night (apps/lakay_mark.json, carried as ING_SEALS.lakay and lakayN);
+   - Clavis (7.65): its gold key on its ivory face, by day and by night (apps/clavis_mark.json, carried as ING_SEALS.clavis and clavisN);
    - any other app, and every app to come: the logo in its own page, found in Fabrica (an app of the same name), in the app library,
      or in a repository brought from GitHub (r276), and kept once found;
    - while it is looked for, or when an app has no logo anywhere, a quiet raised disc: never a letter. */
@@ -26,21 +27,24 @@ if(window.IngAppLogo)return;
 var W=window,D=document,FIND={},MAXKEEP=180000;
 function norm(n){return String(n||"").trim().toLowerCase().replace(/[-_]+/g," ").replace(/\s+/g," ").replace(/^the /,"");}
 function key(name){var n=norm(name);if(n==="carpe diem")return "cd";if(n==="forge")return "forge";if(n==="ingenium")return "ingenium";if(n==="inkwell")return "inkwell";
+  if(n==="clavis")return "clavis";
   if(n==="lakay")return "lakay";if(/^offline (project|pro)$/.test(n))return "master";return null;}
 function night(){try{return D.body.getAttribute("data-theme")==="night";}catch(e){return false;}}
 function flat(k){try{var s=W.ING_SEALS&&ING_SEALS[k];return s&&s.b64?"data:image/png;base64,"+s.b64:"";}catch(e){return "";}}
 function kept(){var s=W.state;if(!s||typeof s!=="object")return {};if(!s.appLogos||typeof s.appLogos!=="object")s.appLogos={};return s.appLogos;}
 function lakaySrc(){return flat(night()&&W.ING_SEALS&&ING_SEALS.lakayN?"lakayN":"lakay");}
+function clavisSrc(){return flat(night()&&W.ING_SEALS&&ING_SEALS.clavisN?"clavisN":"clavis");}
 function own(name){var o=kept()[norm(name)];return o&&o.own&&o.src?o.src:"";}
-function src(name){var m=own(name);if(m)return m;var k=key(name);if(k==="lakay")return lakaySrc();var o=kept()[norm(name)];return o&&o.src||"";}
+function src(name){var m=own(name);if(m)return m;var k=key(name);if(k==="lakay")return lakaySrc();if(k==="clavis")return clavisSrc();var o=kept()[norm(name)];return o&&o.src||"";}
 function img(s,size,which){var im=new Image();im.src=s;im.alt="";im.className="ing-logo";im.draggable=false;im.decoding="async";if(size){im.style.width=im.style.height=Math.round(size)+"px";}
   if(which)im.setAttribute("data-applogo",which);return im;}
 function wait(size,name){var d=D.createElement("span");d.className="ing-logo-wait";d.style.setProperty("--s",Math.round(size||28)+"px");d.style.width=d.style.height=Math.round(size||28)+"px";d.setAttribute("data-applogo-wait",norm(name));d.setAttribute("aria-hidden","true");return d;}
 /* the element for an app's logo, now: its own picture when it is known, else a quiet disc that becomes its logo once found */
 function el(name,size){var k=key(name),mine=own(name);
   if(mine)return img(mine,size,"own");
-  if(k&&k!=="lakay"&&W.IngSeal&&typeof IngSeal.el==="function"){try{var e=IngSeal.el([k],{size:size,alt:""});if(e){e.style.width=Math.round(size)+"px";return e;}}catch(x){}}
+  if(k&&k!=="lakay"&&k!=="clavis"&&W.IngSeal&&typeof IngSeal.el==="function"){try{var e=IngSeal.el([k],{size:size,alt:""});if(e){e.style.width=Math.round(size)+"px";return e;}}catch(x){}}
   if(k==="lakay"&&lakaySrc())return img(lakaySrc(),size,"lakay");
+  if(k==="clavis"&&clavisSrc())return img(clavisSrc(),size,"clavis");
   if(k==="master"&&flat("master"))return img(flat("master"),size);
   var s=src(name);if(s)return img(s,size);
   var d=wait(size,name);find(name).then(function(found){if(!found)return;[].forEach.call(D.querySelectorAll('[data-applogo-wait="'+norm(name).replace(/"/g,"")+'"]'),function(w){
@@ -75,6 +79,8 @@ function find(name){var n=norm(name);if(!n)return Promise.resolve(null);var know
 function retheme(){[].forEach.call(D.querySelectorAll('img[data-applogo="lakay"]'),function(im){var s=lakaySrc();if(s&&im.src!==s)im.src=s;});}
 function boot(){try{new MutationObserver(retheme).observe(D.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}}
 if(D.body)boot();else D.addEventListener("DOMContentLoaded",boot);
+/* 7.65: and Clavis wears its night picture by night, and back by day */
+(function(){function go(){[].forEach.call(D.querySelectorAll('img[data-applogo="clavis"]'),function(im){var s=clavisSrc();if(s&&im.src!==s)im.src=s;});}function on(){try{new MutationObserver(go).observe(D.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}}if(D.body)on();else D.addEventListener("DOMContentLoaded",on);})();
 function setOwn(name,s){var n=norm(name);if(!n||!/^data:image\//.test(String(s||"")))return false;kept()[n]={src:s,at:Date.now(),own:true};delete FIND[n];try{W.saveState&&saveState();}catch(e){}return true;}
 function clearOwn(name){var n=norm(name),o=kept()[n];if(!o||!o.own)return false;delete kept()[n];delete FIND[n];try{W.saveState&&saveState();}catch(e){}return true;}
 W.IngAppLogo={key:key,el:el,find:find,src:src,norm:norm,own:own,setOwn:setOwn,clearOwn:clearOwn,iconOf:iconOf};
