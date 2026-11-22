@@ -1,6 +1,6 @@
 # Ingenium record 01 · The security system at a glance
 
-Part of the record, written from Ingenium 7.54's sources and brought up to 7.64 (21 November 2026).
+Part of the record, written from Ingenium 7.54's sources and brought up to 7.67 (22 November 2026).
 
 ## 1. What is protected, and from whom
 
@@ -11,6 +11,7 @@ Part of the record, written from Ingenium 7.54's sources and brought up to 7.64 
 * **Ingenium itself, on her computers**: from 7.58 each release can be signed with her owner key on her own device, and the Mac and Windows apps check the page against her signature at every start, before anything of it runs: a changed copy does not open and says which file changed (record 06, section 9).
 * **Her ownership of her apps**: the licence, her owner keys and her permissions (record 06, section 6); the editions carry nothing of hers (record 06, section 8).
 * **Ingenium itself, on her phones and tablets** (7.64): the iPhone, iPad and Fire apps check their copy against her signature at every start too; Sign this release signs both copies, Save the signature saves one file for every device, and Sign a copy you give signs the full or gift edition she gives (record 06, section 13).
+* **Her apps' code, from being read or copied easily** (7.67): every package Fabrica makes carries the app's code shrunk and the names inside it scrambled, and the pages it carries inside too, before it is signed; her sources in Fabrica stay as she wrote them, and Ingenium itself is never scrambled (record 06, section 14).
 * **An app meant for her alone** (7.63): turned on in its Package details, every package of it opens only where she opened it once with her owner key, or for someone she gave a permission to use it (record 06, section 12).
 * **Ingenium itself, from being changed by anyone else**: the Mac and Windows apps check the page against her signature at every start, and a changed copy does not open (record 06, section 9).
 * **What the device shares, from anyone who opens the practice studio**: it opens without a password, so it reads the device's models, protection and pairing but can change none of them (record 04, section 9).
@@ -22,8 +23,8 @@ Part of the record, written from Ingenium 7.54's sources and brought up to 7.64 
 * Anyone who holds her password, her ten words, or her recovery key file with the device.
 * Malicious software already on the device, or a browser extension that reads pages.
 * Model files, the engine, the training lab's models and Fabrica's finds by meaning, which are not sealed; a run's working files while the run is still running.
-* Anyone who can change the computer app itself, or take its signatures away, can stop the check of Ingenium itself (it then says Not signed yet); the iPhone, iPad and Fire apps and the copies she gives do not check yet.
-* Not yet built: her apps' code scrambled, the check of Ingenium itself on the iPhone, iPad and Fire apps, the check at start of an app built from its build kit, and apps kept on a drive sealed (record 06, section 7). The folder search's index is sealed from 7.59 (record 06, section 10); her apps are signed when shipped from 7.60 (the packages Fabrica makes carry her owner key's signature), and from 7.62 each app Fabrica makes checks it at every start, and an app is checked as it comes into her library (record 06, section 11).
+* Anyone who can change the computer app itself, or take its signatures away, can stop the check of Ingenium itself (it then says Not signed yet); so can someone who changes an iPhone, iPad or Fire app itself (each checks its own copy from 7.64).
+* Not yet built: the check at start of an app built from its build kit, and apps kept on a drive sealed (record 06, section 7). Her apps' code is scrambled from 7.67 (record 06, section 14): much slower to read or copy, never impossible, and the names a page shares and the data it carries stay readable. The folder search's index is sealed from 7.59 (record 06, section 10); her apps are signed when shipped from 7.60 (the packages Fabrica makes carry her owner key's signature), and from 7.62 each app Fabrica makes checks it at every start, and an app is checked as it comes into her library (record 06, section 11).
 * An app made to open only with her owner key (record 06, section 12) opened straight from its file in a browser, which does not check it, or taken apart on a device where it is open. A permission she withdraws closes only the copies made after it, which carry her newer list.
 * Anyone who opens the browser's own tools at an unlocked device: profiles and the practice studio are kept apart by the app, not by the browser, so every store can be read raw there. What keeps her work closed is the seal, which only her password or a way back in opens.
 

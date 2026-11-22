@@ -49,6 +49,8 @@ const serve = (dir, port) => new Promise((res) => { const s = http.createServer(
     const els = []; sel.split('|').forEach((q) => document.querySelectorAll(q).forEach((e) => { if (e.getClientRects().length) els.push(e); })); els.forEach((e) => e.classList.add('pv-ring')); return els.length; }, sel);
   // o: pad (both ways), padX, padY, xSel (the left and right edges are that element's own), keepToast
   const grab = async (pg, key, ringSel, frameSel, o) => { o = o || {}; await quiet(pg, o.keepToast); await sleep(500); const n = await ring(pg, ringSel); await sleep(700);
+    // o.backdrop: a plain sheet of the pictures' own tint behind what is ringed (the toast sits over the page: no half words around it)
+    if (o.backdrop) await pg.evaluate(() => { const d = document.createElement('div'); d.id = 'pvBack'; d.style.cssText = 'position:fixed;inset:0;z-index:899;background:#f1eef6'; document.body.appendChild(d); });
     const r = await pg.evaluate(([frameSel, xSel, PX, PY, VW, VH]) => {
       const boxOf = (s) => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; s.split('|').forEach((q) => document.querySelectorAll(q).forEach((e) => { const r = e.getBoundingClientRect(); if (!r.width) return;
         x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom); })); return { x0, y0, x1, y1 }; };
@@ -70,7 +72,8 @@ const serve = (dir, port) => new Promise((res) => { const s = http.createServer(
         if (!ch) break; moved++; }
       return { x: L, y: T, width: R - L, height: B - T, moved }; }, [frameSel, o.xSel || null, o.padX != null ? o.padX : (o.pad != null ? o.pad : 30), o.padY != null ? o.padY : (o.pad != null ? o.pad : 30), VW, VH]);
     if (!r) { console.log(key, 'NOT TAKEN: nothing of', frameSel, 'is on screen'); return; }
-    await pg.screenshot({ path: path.join(OUT, key + '.png'), clip: { x: r.x, y: r.y, width: r.width, height: r.height } }); console.log(key, 'ringed', n, r.moved ? '(edges moved clear of text)' : ''); };
+    await pg.screenshot({ path: path.join(OUT, key + '.png'), clip: { x: r.x, y: r.y, width: r.width, height: r.height } }); console.log(key, 'ringed', n, r.moved ? '(edges moved clear of text)' : '');
+    if (o.backdrop) await pg.evaluate(() => { const d = document.getElementById('pvBack'); if (d) d.remove(); }); };
   const theme = (t) => p.evaluate((t) => { state.theme = t; applyTheme(); try { saveState(); } catch (e) {} }, t);
   await p.goto(URL_, { waitUntil: 'domcontentloaded', timeout: 600000 }); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 600000 });
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); try { tourEnd(); } catch (e) {} });
@@ -114,7 +117,7 @@ const serve = (dir, port) => new Promise((res) => { const s = http.createServer(
   const kid = await mk(KEEPER, 'Name Keeper'); await show(kid); await sleep(1200);
   await p.evaluate(() => { const t = document.getElementById('ingToast'); if (t) t.remove(); });
   await p.evaluate((id) => IngShip.onePage(id, { target: 'page', unsigned: true }), kid); await sleep(400);
-  await grab(p, '7-safety', '#ingToast', '#ingToast', { pad: 18, keepToast: true });
+  await grab(p, '7-safety', '#ingToast', '#ingToast', { pad: 24, keepToast: true, backdrop: true });
   // 8. Ingenium itself: the switch is there, and fixed
   const sid = await mk(SELF, 'Ingenium');
   await show(sid); await sleep(1200); await p.evaluate((id) => { const r = (fbHubHost.C.repos || []).filter((x) => x.id === id)[0]; if (r) r.app = 'ingenium'; }, sid);

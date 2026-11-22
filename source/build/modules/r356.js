@@ -4,7 +4,9 @@
    names scrambled: much slower to read or copy, never impossible. Your sources stay as you wrote them." Her request (18 November
    2026): "my data is protected and also my code is protected and anything that I build inside of Ingenium"; her answers that day named
    her code "signed and tamper-evident, scrambled". Her choice (21 November 2026), of the three protections approved and not yet built:
-   "Scrambled code", then "Keep going with the scramble code please."
+   "Scrambled code", then "Keep going with the scramble code please." Shown to her as eight pictures one by one at full size
+   (previews/scramble), and her word (22 November 2026): "I approve of the previews, please commit and push it everywhere and continue
+   working on my requests." Her approval came before the pictures reached her; asked again once she had them: "Yes, release 7.67".
    - Package details (Fabrica, Ship), where there is a Fabrica: Scrambled code, on for every app unless she turns it off for one. Ingenium
      itself is never scrambled (its copy stays as she wrote it, and its own release signature is over that code).
    - Every package made from the app's page (the one page, the download, the APK, the IPA, the Mac and Windows apps, the build kits, the
