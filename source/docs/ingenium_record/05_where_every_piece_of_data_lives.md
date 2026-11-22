@@ -1,6 +1,6 @@
 # Ingenium record 05 · Where every piece of data lives
 
-Part of the record of Ingenium's security system, written from Ingenium 7.54's sources and brought up to 7.61 (21 November 2026). The labels in quotation marks are the ones the Storage page shows (`build/modules/r142.js`, `LABELS`). "Per profile" means the store is renamed with `@<profile id>` in every profile but the owner's (record 04, section 3); "shared" means the device keeps one copy for every profile. "Sealed" means sealed under the data key while the sign-in is on (record 02).
+Part of the record of Ingenium's security system, written from Ingenium 7.54's sources and brought up to 7.69 (22 November 2026). The labels in quotation marks are the ones the Storage page shows (`build/modules/r142.js`, `LABELS`). "Per profile" means the store is renamed with `@<profile id>` in every profile but the owner's (record 04, section 3); "shared" means the device keeps one copy for every profile. "Sealed" means sealed under the data key while the sign-in is on (record 02).
 
 ## 1. The browser's small store (localStorage)
 
@@ -24,7 +24,7 @@ sessionStorage holds marks for the length of a session, renamed per profile as l
 
 | Database | The Storage page's words | Per profile or shared | Sealed with the sign-in on |
 |---|---|---|---|
-| `ingenium_big` (store `t`) | "Long texts: Files and pages your chats, Lector, Code and Adamas hold" | per profile | yes, each text `"big:<id>"` |
+| `ingenium_big` (store `t`) | "Long texts: Files and pages your chats, Lector, Code and Adamas hold"; from 7.69 also what a page in the preview keeps in its database and cookies, one text for each page, named in the desk's `state.stageKits` (record 06, section 16) | per profile | yes, each text `"big:<id>"` |
 | `ingenium_desk` | "The desk's larger copy: Your desk, when the small store is too full for it" | per profile | yes, it holds the sealed desk |
 | `ingenium_claude` | conversations brought in from Claude, Claude Code and Ollama | per profile | yes, records |
 | `ingenium_keys` | "Signing keys: The keys your Android apps are signed with" | per profile | yes, records |
@@ -35,6 +35,7 @@ sessionStorage holds marks for the length of a session, renamed per profile as l
 | `ingenium_meaning` | "Fabrica's finds by meaning: What each file of your repositories means, as numbers ... made again if let go" | per profile | no (numbers only, made again when needed) |
 | `ingenium-buildlib` | "Your build library: The notes on how your apps were built, brought in on the Folders page" | per profile | no |
 | `ingenium_cloudkey` | "Ingenium Cloud's key: Made from your Cloud passphrase on this device; it never leaves it" | per profile | kept as a key the page cannot read out |
+| `ingenium_stage_keys` (store `k`) | "Keys your apps made in the preview: Kept for the apps you run in the preview, as the browser keeps keys: they cannot be read out" (7.69, record 06, section 16) | per profile | no: kept as keys the page cannot read out; what they seal is the page's own, and the page's data is sealed in `ingenium_big` |
 | `ingenium_files` | "Files and the engine: The engine, links to your files, and files you added" | shared | no (model files and the engine are not sealed) |
 | `the_foundry_files` | "An older store: Left from an earlier version" | shared | no |
 | `ingenium_seal` | the device's sealed pairing with a computer (record 06, section 4) | shared | its private key never leaves the store |

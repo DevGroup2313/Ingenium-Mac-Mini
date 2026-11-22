@@ -92,7 +92,7 @@ function quietRun(html,seconds){return new Promise(function(res){var nonce="t"+M
   function on(e){var d=e.data;if(!d||d.ingTest!==nonce||e.source!==frame.contentWindow)return;
     if(d.kind==="load")got.loaded=true;else if(d.kind==="self")got.self.push(d.msg);else if(d.kind==="missing")got.missing.push(d.msg);
     else if(NOISE.test(d.msg))got.env.push(d.msg);else got.errors.push(d.msg);}
-  window.addEventListener("message",on);frame.srcdoc=h;document.body.appendChild(frame);
+  window.addEventListener("message",on);frame.srcdoc=window.IngStageKit?IngStageKit.wrap(h,{}):h;document.body.appendChild(frame);
   setTimeout(function(){window.removeEventListener("message",on);try{frame.remove();}catch(e){}res(got);},Math.max(1500,(seconds||4)*1000));});}
 
 /* the five checks, recorded beside the version */

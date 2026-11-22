@@ -1945,11 +1945,27 @@ def _modtext(m):
         t = open(os.path.join(HERE, "thoughts", "fabrica_parts.html"), encoding="utf-8").read().rstrip("\n") + "\n" + t
     if os.path.basename(m) == "r356.js" and editions.has_fabrica(ED):  # R356 (7.67): the scrambler, after the module that runs it, where there is a Fabrica
         t = t + "\n" + _terser_block()
+    if os.path.basename(m) == "r358.js":  # R358 (7.69): the stage kit, checked against stagekit/stage_kit.json, every edition
+        if t.count('/*ING_STAGE_KIT*/""') != 1:
+            sys.exit("modules/r358.js: its place for the stage kit is not there once")
+        t = t.replace('/*ING_STAGE_KIT*/""', _stage_kit_js(), 1)
     if os.path.basename(m) == "r357.js":  # R357 (7.68): the public halves of her reading keys this build carries
         if t.count("/*ING_READING_KEYS*/[]") != 1:
             sys.exit("modules/r357.js: its place for the reading keys is not there once")
         t = t.replace("/*ING_READING_KEYS*/[]", _reading_keys_js(), 1)
     return t
+# ---- R358 (Ingenium 7.69, 22 November 2026): the stage kit (stagekit/stage_kit.min.js: stagekit/kit.js with fake-indexeddb 6.2.8,
+#      Apache-2.0, bundled by stagekit/make_kit.js), checked against stagekit/stage_kit.json and carried as a string in r358.js,
+#      which puts it first in every page Ingenium runs in a sandboxed frame ----
+def _stage_kit_js():
+    _sj = json.load(open(os.path.join(HERE, "stagekit", "stage_kit.json"), encoding="utf-8"))
+    _sb = open(os.path.join(HERE, "stagekit", _sj["file"]), "rb").read()
+    if len(_sb) != _sj["bytes"] or _hl.sha256(_sb).hexdigest() != _sj["sha256"]:
+        sys.exit("stagekit/" + _sj["file"] + ": its size or fingerprint does not match stage_kit.json")
+    _st = _sb.decode("utf-8")
+    if "</script" in _st.lower():
+        sys.exit("stagekit/" + _sj["file"] + ": it holds \"</script\", which would end the page's script early")
+    return json.dumps(_st).replace("</", "<\\/").replace("<!--", "<\\u0021--")
 # ---- R357 (Ingenium 7.68, 22 November 2026): the public halves of her reading keys (security/reading_keys.json, as Settings, Security
 #      saves them: "Save its public half"; or ING_READING_KEYS=<file>). As with her owner keys, a file that holds a private part, or a
 #      key whose number is not its own fingerprint, stops the build: only public halves ever go into a page. No file: none carried ----

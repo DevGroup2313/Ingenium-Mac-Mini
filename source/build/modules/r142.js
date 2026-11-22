@@ -380,7 +380,9 @@ var LABELS={
   /* 6.57: Ingenium Cloud's key, made from her passphrase on this device and kept here only (modules/r255.js) */
   ingenium_cloudkey:["Ingenium Cloud's key","Made from your Cloud passphrase on this device; it never leaves it"],
   /* 6.65: her build library (modules/r258.js), brought in from its zip on the Folders page */
-  "ingenium-buildlib":["Your build library","The notes on how your apps were built, brought in on the Folders page"]};
+  "ingenium-buildlib":["Your build library","The notes on how your apps were built, brought in on the Folders page"],
+  /* 7.69: the keys an app in the preview made (modules/r358.js); what it keeps besides is a long text, sealed */
+  ingenium_stage_keys:["Keys your apps made in the preview","Kept for the apps you run in the preview, as the browser keeps keys: they cannot be read out"]};
 function labelOf(name){return LABELS[name]||["Another store: "+name,"Kept by a part of Ingenium or an app it opened"];}
 function utf8Len(s){var n=0,L=s.length,c,i;for(i=0;i<L;i++){c=s.charCodeAt(i);if(c<0x80)n++;else if(c<0x800)n+=2;else if(c>=0xD800&&c<0xDC00&&i+1<L){n+=4;i++;}else n+=3;}return n;}
 function sizeOf(v,d){d=d||0;if(v==null)return 1;var t=typeof v;
@@ -479,7 +481,7 @@ function refIndex(){var live={},by={};
   scan(js(lx.runs),"lectorRuns");
   scan(js((function(){var o={};Object.keys(lx.sets||{}).forEach(function(k){var x=lx.sets[k]||{};o[k]={older:x.older,asks:x.asks};});return [o,lx.asks,lx.reqs];})()),"askVers");
   scan(js([st.projects,st.cc]),"code");
-  scan(js([st.buildDoc,st.stageStores,st.build]),"build");
+  scan(js([st.buildDoc,st.stageStores,st.stageKits,st.build]),"build");
   scan(js(st.appLib),"library");
   scan(js(st),"desk");
   try{(W.stagedFiles||[]).forEach(function(f){if(f&&f.ref)add(f.ref,"staged");if(f&&f.page)add(f.page,"staged");});}catch(e){}

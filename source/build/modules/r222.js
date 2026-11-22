@@ -234,6 +234,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.69", "Every app opens in the preview beside Chat and Code, and works there: an app that keeps its data in a database, as Lakay keeps its books, no longer stops at its door. What the app keeps (its database, its cookies) is kept for it on this device, sealed with the rest of your work, and comes back each time it runs, after an edit or a new start; it never reaches Ingenium's own stores. A link to a part of the app stays in the app, and a file it saves (a backup, an export) is saved as Ingenium saves its own."],
+  ["7.69", "The preview's More has Clear the preview, just above Close: the app leaves the preview and stops running, and the panel stays empty in that conversation until you open a page or a reply writes a new one. Nothing is deleted. More is lighter too: its rows lie quietly in one raised card and rise under the pointer."],
   ["7.68", "Settings, Security, Ingenium itself: Read it as written. Make your reading key here, on your own device: it is kept only under its own password, and its public half, saved as a file, goes into the next release, which scrambles every copy of Ingenium and opens it for you as written.", "master"],
   ["7.68", "A scrambled copy of one of your apps that comes back to you opens as written: Fabrica's Bring one in opens that app at the version it was made from, instead of bringing a scrambled copy in, and Lector's app library keeps it as written.", "fabrica"],
   ["7.68", "Nothing changes in this edition: 7.68 brings parts of Ingenium this edition does not carry.", "nofabrica"],

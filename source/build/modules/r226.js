@@ -71,6 +71,8 @@ body[data-theme="night"] #wsStudio .ws-list li.ok .m{color:#8fd0a9}body[data-the
 (function r226(){"use strict";
 if(window.IngWorkshop)return;
 var W=window,D=document;
+/* 7.69 (R358): a page of hers runs here with the stage kit first, as in the preview (its own stores, its links kept in the page) */
+function W358(h){return W.IngStageKit?W.IngStageKit.wrap(h,{}):h;}
 try{if(typeof ING_EDITION!=="undefined"&&ING_EDITION!=="master")return;}catch(e){}
 function $(id){return D.getElementById(id);}
 function mk(tag,cls,txt){var e=D.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
@@ -124,7 +126,7 @@ function applyPages(){var x=L(),main=D.querySelector("main.main")||D.querySelect
   x.pages.filter(function(p){return p.on!==false;}).forEach(function(p){var id="lyr-"+p.id;
     var sec=$("page-"+id);if(!sec){sec=mk("section","section");sec.id="page-"+id;sec.setAttribute("data-lyr",p.id);main.appendChild(sec);}
     sec.innerHTML="";var wrap=mk("div","ws-lyr-page");wrap.appendChild(mk("h1","page-title",p.name||"My page"));var fr=D.createElement("iframe");fr.setAttribute("sandbox","allow-scripts allow-forms allow-popups allow-modals");
-    fr.setAttribute("title",p.name||"My page");fr.srcdoc=String(p.html||"");wrap.appendChild(fr);sec.appendChild(wrap);
+    fr.setAttribute("title",p.name||"My page");fr.srcdoc=W358(String(p.html||""));wrap.appendChild(fr);sec.appendChild(wrap);
     if(host){var b=mk("button","nav-btn");b.type="button";b.setAttribute("data-page",id);b.setAttribute("data-lyr",p.id);b.setAttribute("onclick","go('"+id+"')");b.title=p.name||"My page";
       b.innerHTML='<span aria-hidden="true" style="display:inline-block;width:18px;text-align:center">'+String(p.icon||"✦").replace(/[<>&"]/g,"").slice(0,4)+"</span>";b.appendChild(D.createTextNode(p.name||"My page"));
       host.parent.insertBefore(b,at.nextSibling);at=b;}
@@ -132,7 +134,7 @@ function applyPages(){var x=L(),main=D.querySelector("main.main")||D.querySelect
 function applySections(){var x=L();if(!x)return;[].forEach.call(D.querySelectorAll(".ws-lyr-card"),function(c){c.remove();});if(SAFE)return;
   x.sections.filter(function(s){return s.on!==false;}).forEach(function(s){var pg=$("page-"+s.page);if(!pg)return;var c=mk("div","card ws-lyr-card");c.setAttribute("data-lyr",s.id);
     if(s.title)c.appendChild(mk("h2","sec",s.title));
-    if(s.kind==="html"){var fr=D.createElement("iframe");fr.setAttribute("sandbox","allow-scripts allow-forms allow-popups allow-modals");fr.setAttribute("title",s.title||"A section of yours");fr.srcdoc=String(s.body||"");c.appendChild(fr);}
+    if(s.kind==="html"){var fr=D.createElement("iframe");fr.setAttribute("sandbox","allow-scripts allow-forms allow-popups allow-modals");fr.setAttribute("title",s.title||"A section of yours");fr.srcdoc=W358(String(s.body||""));c.appendChild(fr);}
     else{var d=mk("div","ws-md");try{d.innerHTML=typeof chatMd==="function"?chatMd(String(s.body||"")):"";}catch(e){d.textContent=String(s.body||"");}if(!d.innerHTML)d.textContent=String(s.body||"");c.appendChild(d);}
     /* at the top: under the page's title and its line, where it has them (Home has neither: there, first on the page) */
     var title=pg.querySelector(":scope > .page-title"),lede=title&&title.nextElementSibling&&title.nextElementSibling.classList.contains("lede")?title.nextElementSibling:null;

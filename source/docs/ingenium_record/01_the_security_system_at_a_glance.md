@@ -1,6 +1,6 @@
 # Ingenium record 01 · The security system at a glance
 
-Part of the record, written from Ingenium 7.54's sources and brought up to 7.68 (22 November 2026).
+Part of the record, written from Ingenium 7.54's sources and brought up to 7.69 (22 November 2026).
 
 ## 1. What is protected, and from whom
 
@@ -13,12 +13,14 @@ Part of the record, written from Ingenium 7.54's sources and brought up to 7.68 
 * **Ingenium itself, on her phones and tablets** (7.64): the iPhone, iPad and Fire apps check their copy against her signature at every start too; Sign this release signs both copies, Save the signature saves one file for every device, and Sign a copy you give signs the full or gift edition she gives (record 06, section 13).
 * **Her apps' code, from being read or copied easily** (7.67): every package Fabrica makes carries the app's code shrunk and the names inside it scrambled, and the pages it carries inside too, before it is signed; her sources in Fabrica stay as she wrote them, and Ingenium itself is never scrambled (record 06, section 14).
 * **Her code, readable to her** (7.68): her sources in Fabrica stay as she wrote them, a scrambled copy of one of her apps that comes back to her opens as written from Fabrica, and her reading key is made for the release that scrambles every copy of Ingenium and opens it for her as written (record 06, section 15).
+* **Ingenium, from the apps she runs in its preview** (7.69): each runs in a sandboxed frame with no origin of its own and never reaches Ingenium's stores; the stage kit gives it stores of its own, and what it keeps is kept for it, sealed, and handed back only to it (record 06, section 16).
 * **An app meant for her alone** (7.63): turned on in its Package details, every package of it opens only where she opened it once with her owner key, or for someone she gave a permission to use it (record 06, section 12).
 * **Ingenium itself, from being changed by anyone else**: the Mac and Windows apps check the page against her signature at every start, and a changed copy does not open (record 06, section 9).
 * **What the device shares, from anyone who opens the practice studio**: it opens without a password, so it reads the device's models, protection and pairing but can change none of them (record 04, section 9).
 
 ## 2. What it does not protect against (said plainly)
 
+* The keys an app in the preview made (7.69): kept as the browser keeps keys, usable on this device and never readable as bytes, but not sealed with the sign-in; what the app keeps besides is sealed (record 06, section 16).
 * Anyone at the device while it is open and signed in. Lock now, Sign out, the lock after time away and the lock when the computer sleeps close that window of time.
 * Anyone who can sign in to her computer as her, if she turned on the computer's own sign-in as a way back in (said when it is turned on).
 * Anyone who holds her password, her ten words, or her recovery key file with the device.
@@ -65,6 +67,7 @@ Each profile has its own record and its own data key. The Cloud has its own key,
 | Opens only with your owner key (the door at the head of each package's page) | `build/modules/r354.js` | 06 |
 | Ingenium itself, signed and checked | `build/modules/r348.js`, `build/desktop/app_self_758.py`, `tools/stamp_build.py`, `build/release.py` (`self_stamp`) | 06 |
 | The practice studio | `build/modules/r350.js`, its part in `build/boot/profiles_boot.js` | 04 |
+| What an app in the preview keeps (the stage kit) | `build/modules/r358.js`, `build/stagekit/` | 06 |
 | Purple words that can be pressed, underlined | `build/modules/r343.js` | 07 |
 | See the password as it is typed (every password field) | `build/modules/r351.js` | 02 |
 | The editions | `build/editions.py` | 06 |

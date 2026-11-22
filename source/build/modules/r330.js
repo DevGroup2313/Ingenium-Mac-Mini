@@ -131,7 +131,7 @@ function measure(r){if(typeof IngShip==="undefined"||!IngShip.onePage)return Pro
     fr.setAttribute("sandbox","allow-scripts");fr.setAttribute("aria-hidden","true");fr.tabIndex=-1;fr.title="A quiet window for a check";fr.style.cssText="position:fixed;left:-12000px;top:0;width:1280px;height:800px;border:0;opacity:0;pointer-events:none";
     function on(e){var d=e.data;if(!d||d.ingWays!==nonce||e.source!==fr.contentWindow)return;finish(d.res);}
     function finish(x){if(done)return;done=true;W.removeEventListener("message",on);try{fr.remove();}catch(e){}res(x||{error:"the app did not answer within ten seconds"});}
-    W.addEventListener("message",on);fr.srcdoc=html;D.body.appendChild(fr);setTimeout(function(){finish(null);},10000);});});}
+    W.addEventListener("message",on);fr.srcdoc=W.IngStageKit?IngStageKit.wrap(html,{}):html;D.body.appendChild(fr);setTimeout(function(){finish(null);},10000);});});}
 var WAYS=new Map();
 function ways(r,again){var key=r.id+"|"+r.head;if(!again&&WAYS.has(key))return WAYS.get(key);
   var job=(again?Promise.resolve(null):IngRepo.notes(r.id,r.head).then(function(n){return n&&n.ways&&n.ways.v===1?n.ways:null;},function(){return null;})).then(function(had){if(had)return had;

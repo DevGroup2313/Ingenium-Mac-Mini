@@ -1,0 +1,13 @@
+{
+ "_about": "Ingenium's stage kit (7.69): kit.js and inject.js bundled with fake-indexeddb by make_kit.js. build_page.py checks it against the fingerprint below and carries it in the page, where modules/r358.js puts it first in every page Ingenium runs in a sandboxed frame.",
+ "name": "stage_kit",
+ "library": "fake-indexeddb",
+ "library_version": "6.2.8",
+ "library_licence": "Apache-2.0",
+ "library_source": "https://registry.npmjs.org/fake-indexeddb/-/fake-indexeddb-6.2.8.tgz",
+ "library_tarball_sha1": "79593572cf4dc670128d439a937956716bfd546d",
+ "bundler": "esbuild 0.28.2",
+ "file": "stage_kit.min.js",
+ "bytes": 83979,
+ "sha256": "18a79dd775cd1b5914cb972ab25b3e40cd87cbcc87d8054065932f4a3d0e8556"
+}
