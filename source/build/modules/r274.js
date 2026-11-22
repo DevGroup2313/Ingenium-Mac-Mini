@@ -214,20 +214,22 @@ function find(){var a=shell(),n=nat();if(FIND.busy)return FIND.busy;
   FIND.busy=p;return p;}
 
 /* ---------- pairing once ---------- */
-function pair(addr,code,known){var b=base(addr),c=codeOf(code),h0=null,p0=null;
+/* 7.70 (r360): ask (her Accept on the computer stands for the code; "use"), or accept the computer's offer ("offer"), sealed always */
+function pair(addr,code,known,ask){var b=base(addr),c=ask?"":codeOf(code),h0=null,p0=null;
   if(!b)return Promise.reject(new Error("Type the address that the computer shows."));
-  if(c.replace(/-/g,"").length<8)return Promise.reject(new Error("Type the eight-letter code that the computer shows."));
+  if(!ask&&c.replace(/-/g,"").length<8)return Promise.reject(new Error("Type the eight-letter code that the computer shows."));
   return hello(b,8).catch(function(e){throw new Error(why(e,b));}).then(function(h){if(!h||h.app!=="Ingenium")throw new Error("Something answered at that address, but it is not Ingenium.");h0=h;
-      if(!h.pair)return null;
-      return W.netFetch(b+"/ingenium/pair",{method:"POST",headers:{"Authorization":"Bearer "+c,"Content-Type":"application/json","X-Ingenium-Device":devHeader()},
-        body:JSON.stringify({id:me().id,kind:me().kind,name:me().name}),timeout:15}).then(function(r){if(!r.ok)return errOf(r);return r.json();});})
+      if(ask&&!(h.ask&&h.seal))throw new Error((h.computer||"That computer")+" cannot be asked without its code: update Ingenium on it, or type its code.");
+      if(!h.pair&&!ask)return null;
+      return W.netFetch(b+(ask?"/ingenium/ask":"/ingenium/pair"),{method:"POST",headers:{"Authorization":"Bearer "+c,"Content-Type":"application/json","X-Ingenium-Device":devHeader()},
+        body:JSON.stringify(ask?{id:me().id,kind:me().kind,name:me().name,mode:ask}:{id:me().id,kind:me().kind,name:me().name}),timeout:ask?330:15}).then(function(r){if(!r.ok)return errOf(r);return r.json();});})
     .then(function(p){p0=p;if(h0.lends===false){if(h0.runs)return [];throw new Error((h0.computer||"That computer")+" is not lending its models now. Switch on Lend my models to my devices there, or Run Fabrica's jobs for my devices.");}return models(b,c);})
     .then(function(list){if(!list.length&&!h0.runs)throw new Error("Paired, but that computer has no models yet. Install one on it first.");
       var id=(p0&&p0.id)||h0.id||("addr:"+hostOf(b)),comp=byId(id)||(known&&byId(known))||null;
       if(!comp){comp={id:id};comps().push(comp);}
       if(comp.id!==id)comp.id=id;
       comp.name=String((p0&&p0.computer)||h0.computer||comp.name||"Your computer").slice(0,60);comp.kind=ICON[(p0&&p0.kind)||h0.kind]?((p0&&p0.kind)||h0.kind):(comp.kind||"laptop");
-      comp.code=c;comp.base=b;comp.runs=h0.runs?1:0;   /* 7.31: it runs Fabrica's jobs for her devices */
+      comp.code=c||"ASKD-SEAL";comp.base=b;comp.runs=h0.runs?1:0;   /* 7.70: asked, sealed: no code (its requests go sealed, without one) */   /* 7.31: it runs Fabrica's jobs for her devices */
       comp.addrs=merge([b],comp.addrs,((p0&&p0.addresses)||h0.addresses||[]).map(base));comp.pair=h0.pair?1:0;
       comp.models=list.map(function(m){return m.name;}).slice(0,60);comp.info=infoOf(list);if(!comp.model||comp.models.indexOf(comp.model)<0)comp.model=bestOf(list);
       delete comp.removed;comp.at=Date.now();OK[comp.id]=Date.now();setSt(comp.id,"ok");save();return comp;},function(e){throw new Error(e&&e.status?why(e,b):String(e&&e.message||e));});}
@@ -316,7 +318,7 @@ function ago(t){var s=Math.max(0,(Date.now()/1000)-(+t||0));if(!t)return "";if(s
   if(d0.toDateString()===d1.toDateString())return "today";var y=new Date(Date.now()-86400000);if(y.toDateString()===d1.toDateString())return "yesterday";return Math.round(s/86400)+" days ago";}
 
 /* the computer that lends (a computer app only) */
-function lenderCol(col){var a=shell();if(!(a&&typeof a.share_status==="function"))return;var st=LS;
+function lenderCol(col){var a=shell();if(!(a&&typeof a.share_status==="function"))return;var st=LS;try{if(st&&st.id)col.setAttribute("data-lender",st.id);}catch(e){}   /* 7.70 (r361): its colour */
   var head=mk("div","ld-head");head.append(coin(st&&st.kind||"laptop"),mk("h3",null,(st&&st.computer)||"This computer"));col.append(mk("div","ld-eye"),head);col.firstChild.innerHTML="<b>Lends its models</b>This computer";
   col.appendChild(sw("ldShare","Lend my models to my devices",st&&st.on?"On. This computer stays awake while it lends (its screen may turn off), and it lends again by itself when Ingenium opens.":"Off. Switch it on, and your other devices on this Wi-Fi find this computer by themselves.",!!(st&&st.on),function(on){
     var i=$("ldShare");if(i)i.setAttribute("aria-checked",on?"true":"false");Promise.resolve().then(function(){return a.share_set(on);}).then(function(s){LS=s;paint();toast(on?"This computer lends its models now.":"This computer stopped lending.");},function(e){toast("It could not change: "+(e&&e.message||e));});}));
@@ -336,8 +338,11 @@ function lenderCol(col){var a=shell();if(!(a&&typeof a.share_status==="function"
   var u=mk("div","ld-plate mr-c3 mr-pop");u.appendChild(mk("div","ld-lbl",st.on?"Devices using its models":"Devices that reach this computer"));var ul=mk("div","ld-users");var devs=st.devices||[];
   if(!devs.length)ul.appendChild(mk("div","mr-empty","None yet. A device that pairs shows here by its name, and you can remove it."));
   devs.forEach(function(d){var row=mk("div","ld-user mr-pop"),tx=mk("div");tx.append(mk("b",null,d.name||KIND_WORD[d.kind]||"A device"),mk("small",null,[KIND_WORD[d.kind]||"",ago(d.last)].filter(Boolean).join(" · ")));
-    row.append(coin(ICON[d.kind]?d.kind:"browser",true),tx);if(W.IngSealing)W.IngSealing.mark(row,d);/* 7.37: sealed, or Pair once more (r319) */if(typeof a.share_device_remove==="function")row.appendChild(key("Remove","",function(){Promise.resolve().then(function(){return a.share_device_remove(d.id);}).then(function(s){LS=s;paint();toast((d.name||"That device")+" is removed. It needs the code again to use this computer's models.");});},"Remove "+(d.name||"this device")));
-    ul.appendChild(row);});u.appendChild(ul);col.appendChild(u);
+    row.append(coin(ICON[d.kind]?d.kind:"browser",true),tx);if(W.IngSealing)W.IngSealing.mark(row,d);/* 7.37: sealed, or Pair once more (r319) */
+    if(W.IngAsk&&typeof IngAsk.devRow==="function")try{IngAsk.devRow(row,d,key);}catch(e){}   /* 7.70 (r360): Offer my models */if(typeof a.share_device_remove==="function")row.appendChild(key("Remove","",function(){Promise.resolve().then(function(){return a.share_device_remove(d.id);}).then(function(s){LS=s;paint();toast((d.name||"That device")+" is removed. It needs the code again to use this computer's models.");});},"Remove "+(d.name||"this device")));
+    ul.appendChild(row);});u.appendChild(ul);
+  if(st.on&&W.IngAsk&&typeof IngAsk.lenderKeys==="function")try{IngAsk.lenderKeys(u,key);}catch(e){}   /* 7.70 (r360): Offer my models to a device nearby */
+  col.appendChild(u);
   /* 6.9.3's settings (r205): memory for lent models, graphics, which models suit this computer, before lending from a laptop */
   var lb=$("lkLend");if(lb){var dl=mk("details","ld-fix mr-c3 mr-pop");dl.appendChild(mk("summary",null,"How this computer lends"));var hold=mk("div","ld-old");hold.appendChild(lb);dl.appendChild(hold);col.appendChild(dl);}}
 
@@ -357,7 +362,7 @@ function doPair(id,addr,code,known){if(UI.busy[id])return;UI.busy[id]=1;delete U
     function(e){delete UI.busy[id];UI.err[id]=String(e&&e.message||e);paint();});}
 function borrowerCol(col){var d=me(),head=mk("div","ld-head");head.append(coin(d.kind),mk("h3",null,d.name||"This device"));col.append(mk("div","ld-eye"),head);col.firstChild.innerHTML="<b>Uses its computers' models</b>This "+(KIND_WORD[d.kind]||"device");
   var act=active();
-  comps().forEach(function(comp){var s=(ST[comp.id]||{}).s||"",box=mk("div","ld-comp mr-c3 mr-pop");box.setAttribute("data-lean",".5");var h=mk("div","ld-comp-h"),tx=mk("div");
+  comps().forEach(function(comp){var s=(ST[comp.id]||{}).s||"",box=mk("div","ld-comp mr-c3 mr-pop");box.setAttribute("data-lean",".5");box.setAttribute("data-comp",comp.id);   /* 7.70 (r361): its colour */var h=mk("div","ld-comp-h"),tx=mk("div");
     tx.append(mk("b",null,comp.name),mk("small",null,plural((comp.models||[]).length,"model","models")+" · "+(KIND_WORD[comp.kind]||"computer")));h.append(coin(comp.kind,true),tx,key("Forget","",function(){forget(comp);},"Forget "+comp.name));box.appendChild(h);
     var r=mk("div","ld-row");r.appendChild(chip(comp));if(W.IngSealing)W.IngSealing.markComp(r,comp,function(){doPair(comp.id,comp.base,comp.code,comp.id);});/* 7.37 (r319) */if(s==="away"||s==="off")r.appendChild(key("Look again","",function(){check(comp,{find:true,loud:true});}));box.appendChild(r);
     if(s==="code")box.appendChild(codeRow(comp.id,"Type the code "+comp.name+" shows (Settings, Your devices). You type it once.",function(v){doPair(comp.id,comp.base,v,comp.id);}));
@@ -373,7 +378,10 @@ function borrowerCol(col){var d=me(),head=mk("div","ld-head");head.append(coin(d
     if(!fl.length)add.appendChild(mk("div","mr-empty",FIND.err==="LOCALNET"?why({message:"LOCALNET"},""):FIND.err==="NONET"?"This device does not seem to be on a Wi-Fi network.":
       (nat()&&/iPhone|iPad/.test(me().name)?"No computer lending its models was found. If iOS asked whether Ingenium may find devices on your local network, choose Allow, then look again. On the computer, switch on Lend my models to my devices.":"No computer lending its models was found on this Wi-Fi. On the computer, switch on Lend my models to my devices, keep Ingenium open, then look again.")));
     fl.forEach(function(x){var id="f:"+(x.id||x.address),f=mk("button","ld-found mr-c3 mr-pop");f.type="button";var t=mk("div");t.append(mk("b",null,x.computer||x.address),mk("small",null,plural(x.models||0,"model","models")+" to lend · at "+String(x.address).replace(/:17860$/,"")));
-      f.append(coin(ICON[x.kind]?x.kind:"laptop",true),t,mk("span","ld-chip",UI.code[id]!=null?"Type its code":"Press to pair"));f.addEventListener("click",function(){if(UI.code[id]==null){UI.code[id]="";paint();setTimeout(function(){var i=$("ldCode-"+id.replace(/[^A-Za-z0-9_-]/g,"_"));if(i)i.focus();},60);}});add.appendChild(f);
+      var A7=W.IngAsk&&typeof IngAsk.found==="function";   /* 7.70 (r360): pressed, it asks, and her Accept there stands for the code */
+      f.append(coin(ICON[x.kind]?x.kind:"laptop",true),t,mk("span","ld-chip",UI.code[id]!=null?"Type its code":(A7?"Press to ask":"Press to pair")));f.addEventListener("click",function(){
+        if(A7&&UI.code[id]==null){IngAsk.found(x,function(){UI.code[id]="";paint();setTimeout(function(){var i=$("ldCode-"+id.replace(/[^A-Za-z0-9_-]/g,"_"));if(i)i.focus();},60);},function(){FIND.list=null;paint();});return;}
+        if(UI.code[id]==null){UI.code[id]="";paint();setTimeout(function(){var i=$("ldCode-"+id.replace(/[^A-Za-z0-9_-]/g,"_"));if(i)i.focus();},60);}});add.appendChild(f);
       if(UI.code[id]!=null)add.appendChild(codeRow(id,"Type the code "+(x.computer||"the computer")+" shows. You type it once: this "+(KIND_WORD[me().kind]||"device")+" remembers it.",function(v){doPair(id,x.address,v,null);}));});}
   if(UI.adding){var w=mk("div","ld-code mr-c3 mr-pop");var lab=mk("label",null,"The address your computer shows (Settings, Your devices), then its code");var wl=mk("div","ld-well"),inp=mk("input");inp.id="ldAddr";lab.htmlFor="ldAddr";
     inp.placeholder="for example 192.168.1.23 or Mac-mini.local";inp.autocomplete="off";inp.spellcheck=false;inp.setAttribute("autocapitalize","off");inp.value=UI.addr;inp.addEventListener("input",function(){UI.addr=inp.value;});
@@ -434,7 +442,7 @@ function boot(){me();learnMe();adopt();var c=card();if(c){paint();
     if(shell()&&typeof shell().share_status==="function"&&!LP){lenderRefresh();LP=setInterval(function(){var pg=$("page-settings");if(pg&&pg.classList.contains("active")&&card()&&card().offsetParent)lenderRefresh();},10000);}}
   var a=active();if(a)check(a,{find:true});comps().forEach(function(x){if(x!==a)check(x,{find:false});});watchMenu();}
 (function wait(n){if(W.__ingReady===true&&card()){boot();return;}if(n<240)setTimeout(function(){wait(n+1);},500);else if(card())boot();})(0);
-W.IngLend={request:request,state:function(){return {me:me(),computers:comps().map(function(x){return {id:x.id,name:x.name,kind:x.kind,base:x.base,addrs:(x.addrs||[]).slice(),models:(x.models||[]).slice(),model:x.model,runs:x.runs?1:0,status:(ST[x.id]||{}).s||""};}),
+W.IngLend={request:request,found:function(){return (FIND.list||[]).slice();},find:find,me:function(){return me();},repaint:function(){paint();},ask:function(addr,mode,known){return pair(addr,"",known,mode==="offer"?"offer":"use");},hello:function(addr){var b=base(addr);return b?hello(b,6):Promise.reject(new Error("no address"));},state:function(){return {me:me(),computers:comps().map(function(x){return {id:x.id,name:x.name,kind:x.kind,base:x.base,addrs:(x.addrs||[]).slice(),models:(x.models||[]).slice(),model:x.model,runs:x.runs?1:0,status:(ST[x.id]||{}).s||""};}),
     active:(active()||{}).id||null,found:FIND.list,lender:LS};},pair:pair,use:function(id,m){use(byId(id),m);},useDevice:useDevice,check:function(id,o){return check(byId(id),o||{find:true});},find:find,paint:paint,refresh:lenderRefresh,forget:function(id){forget(byId(id));}};
 try{window.__ingParts["p274"]="running";}catch(_){}
 })();

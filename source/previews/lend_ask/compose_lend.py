@@ -1,0 +1,107 @@
+"""Asking and offering with Accept (modules/r360.js), each computer's colour, the who-answers glow and the memory meter (modules/r361.js),
+as pictures of the running app: one file per picture, at full size, each with its violet number, its title and one sentence above it (her
+rule: "Pictures one by one, at full size"). Atelier is the computer that lends; Reading Tablet and Pocket Phone are devices (invented names).
+The violet ring marks what is new where a picture shows more than the new part.
+    python3 previews/lend_ask/compose_lend.py <folder of capture_lend.js pictures> <folder of glow frames> <out folder>"""
+import os, sys
+from PIL import Image, ImageDraw, ImageFont
+
+SRC, GLOW, OUT = sys.argv[1], sys.argv[2], sys.argv[3]
+os.makedirs(OUT, exist_ok=True)
+F = lambda n, b=False: ImageFont.truetype("/usr/share/fonts/opentype/inter/Inter-%s.otf" % ("SemiBold" if b else "Medium"), n)
+STEPS = [
+    ("02-device-asking", "A device asks to use a computer's models",
+     "Reading Tablet finds Atelier nearby and asks, with no code. It shows four words and waits for Atelier to answer."),
+    ("01-computer-asked", "The computer sees the request",
+     "Atelier shows who asks and what for, with Accept and Decline. First check that the four words match the device's: the link is then sealed end to end."),
+    ("03-computer-accepted", "Accept, on the computer",
+     "Atelier's models can now be used by Reading Tablet. Go to Mentes opens the page where its use is tracked."),
+    ("04-device-accepted", "Accept, on the device",
+     "Reading Tablet is told at once that Atelier accepted, and can use its models."),
+    ("05-computer-declined", "Decline, on the computer",
+     "When Atelier declines a request, it is told so in a few words."),
+    ("06-device-declined", "Decline, on the device",
+     "The device that asked is told that Atelier declined. The pairing code still works too, as a second way."),
+    ("07-computer-offer-key", "The computer offers its models",
+     "A new key under the devices that use Atelier's models: it offers them to a device nearby."),
+    ("08-device-offered", "The device sees the offer",
+     "Pocket Phone shows who offers and what for, with Accept and Decline. Accept leads to the same four words."),
+    ("10-device-offer-accepted", "Accept the offer, on the device",
+     "Pocket Phone is told that Atelier's models are now available to use."),
+    ("11-computer-offer-accepted", "Accept the offer, on the computer",
+     "Atelier is told that its models are now lent to Pocket Phone, and where to track its use."),
+    ("09-computer-offer-declined", "Decline the offer",
+     "Atelier is told that Pocket Phone declined. Pocket Phone is told that it declined Atelier's request."),
+    ("12-device-colour", "Each computer's colour, and Colour to change it",
+     "Each computer gets its own colour by itself. Colour, under its name, opens eight colours to choose from instead."),
+    ("glow-out", "The who-answers key, on the computer that lends",
+     "While a device uses its models, the key glows faintly in the computer's colour, pulsing outward. Four moments of one 2.4 second pulse."),
+    ("glow-in", "The who-answers key, on the device that borrows",
+     "While it uses another computer's models, the key glows in that computer's colour: the same pulse, at the same size, moving inward."),
+    ("15-mentes-meter", "Mentes: Lending now",
+     "Only while this computer lends: the memory in use, live, like a microphone's level meter, its recent peak held a moment. Each device's use is below it, with the computer's colour."),
+    ("16-mentes-meter-night", "Lending now by night", "The same, in the night colours."),
+]
+bg, ink, ink2, violet, edge = (244, 241, 248), (34, 26, 46), (90, 82, 104), (106, 63, 181), (220, 214, 230)
+M = 64
+
+
+def wrap(dr, text, font, width):
+    out, line = [], ""
+    for w in text.split():
+        t = (line + " " + w).strip()
+        if dr.textlength(t, font=font) > width and line:
+            out.append(line); line = w
+        else:
+            line = t
+    if line:
+        out.append(line)
+    return out
+
+
+def strip(mode):
+    """The four frames of one pulse side by side, each with its moment under it."""
+    fr = [Image.open(os.path.join(GLOW, "%s_%d.png" % (mode, i))).convert("RGB") for i in range(4)]
+    import json
+    times = json.load(open(os.path.join(GLOW, "%s_times.json" % mode)))
+    w, h, gap = fr[0].size[0], fr[0].size[1], 48
+    im = Image.new("RGB", (4 * w + 3 * gap, h + 70), (239, 234, 246))
+    dr = ImageDraw.Draw(im)
+    for i, f in enumerate(fr):
+        im.paste(f, (i * (w + gap), 0))
+        t = "%.2f s" % times[i]; tw = dr.textlength(t, font=F(30))
+        dr.text((i * (w + gap) + (w - tw) / 2, h + 20), t, font=F(30), fill=ink2)
+    return im
+
+
+for n, (key, title, text) in enumerate(STEPS, 1):
+    if key.startswith("glow-"):
+        try:
+            im = strip(key.split("-")[1])
+        except FileNotFoundError:
+            print("missing", key); continue
+    else:
+        f = os.path.join(SRC, key + ".png")
+        if not os.path.exists(f):
+            print("missing", key); continue
+        im = Image.open(f).convert("RGB")
+    W = max(im.size[0] + 2 * M, 1600)
+    dr0 = ImageDraw.Draw(Image.new("RGB", (10, 10)))
+    tl = wrap(dr0, title, F(44, True), W - 2 * M - 84)
+    lines = wrap(dr0, text, F(36), W - 2 * M)
+    th = 56 * len(tl)
+    head = M + max(64, th) + 22 + 50 * len(lines) + 34
+    out = Image.new("RGB", (W, head + im.size[1] + M), bg)
+    dr = ImageDraw.Draw(out)
+    dr.ellipse((M, M, M + 60, M + 60), fill=violet)
+    num = str(n); tw = dr.textlength(num, font=F(34, True))
+    dr.text((M + 30 - tw / 2, M + 9), num, font=F(34, True), fill=(255, 255, 255))
+    for i, l in enumerate(tl):
+        dr.text((M + 84, M + 6 + 56 * i), l, font=F(44, True), fill=ink)
+    for i, l in enumerate(lines):
+        dr.text((M, M + max(64, th) + 22 + 50 * i), l, font=F(36), fill=ink2)
+    x = (W - im.size[0]) // 2
+    out.paste(im, (x, head))
+    dr.rectangle((x - 2, head - 2, x + im.size[0] + 1, head + im.size[1] + 1), outline=edge, width=2)
+    p = os.path.join(OUT, "Lending_%02d_%s.png" % (n, (key.split("-", 1)[1] if key[0].isdigit() else key).replace("-", "_")))
+    out.save(p, optimize=True); print(p, out.size)

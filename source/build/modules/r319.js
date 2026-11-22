@@ -103,7 +103,7 @@ function result(status,text,ctype,hdrs){return {ok:status>=200&&status<300,statu
   text:function(){return Promise.resolve(text);},json:function(){try{return Promise.resolve(JSON.parse(text));}catch(e){return Promise.reject(new Error("The answer was not readable data."));}},
   headers:{get:function(n){return (hdrs||{})[String(n).toLowerCase()]||null;}}};}
 function pathOf(url){try{var u=new URL(url);return u.pathname+u.search;}catch(e){return "/";}}
-var SKIP=/^\/(ingenium\/hello|ingenium\/pair2|ingenium\/sealed|apps\/)/;
+var SKIP=/^\/(ingenium\/hello|ingenium\/pair2|ingenium\/sealed|ingenium\/ask|apps\/)/;
 function sealedFetch(rec,url,o){var s=S(),dev=me().id||"",rid=b64e(rnd(12)).replace(/[^A-Za-z0-9]/g,"").slice(0,16)||String(Date.now());
   var hdr={},k;for(k in (o.headers||{}))if(!/^authorization$/i.test(k))hdr[k]=o.headers[k];
   var bodyStr=o.body==null?"":String(o.body);
@@ -131,16 +131,19 @@ function sealedPair(url,o){var b=originOf(url),hello=null,can=!!S();
     if(!h||!h.seal)return raw0(url,o);       /* a computer that does not seal yet: pairing as before */
     var body={};try{body=JSON.parse(String(o.body||"{}"));}catch(e){}
     return (can?mine():Promise.resolve(null)).then(function(my){if(my)body.pub=my.pub;
-      return raw0(b+"/ingenium/pair2",{method:"POST",headers:o.headers,body:JSON.stringify(body),timeout:15}).then(function(r){
+      if(o.__ask)body.mode=o.__ask;   /* 7.70 (r360): an ask, or an offer accepted, without the code */
+      return raw0(b+(o.__ask?"/ingenium/ask":"/ingenium/pair2"),{method:"POST",headers:o.headers,body:JSON.stringify(body),timeout:15}).then(function(r){
         if(!r.ok)return r;return r.json().then(function(j){return waitFor(b,o,h,j,my);});});});});}
 function waitFor(b,o,h,j,my){var name=h.computer||j.computer||"your computer",cancelled=false,sheet=null,ws=null;
   var p=my?words(b64d(my.pub),b64d(j.pub)):Promise.resolve(null);
-  return p.then(function(w){ws=w;sheet=deviceSheet(name,w,function(){cancelled=true;});
+  return p.then(function(w){ws=w;var stop=function(){cancelled=true;};
+    /* 7.70 (r360): her pop-ups for each step, where r360 is in this copy */
+    sheet=(W.IngAsk&&typeof IngAsk.device==="function"&&IngAsk.device(name,w,stop,{veil:veil,words:wordsHtml,esc:esc,ask:o.__ask||"",shield:SHIELD}))||deviceSheet(name,w,stop);
     var t0=Date.now();
     function poll(){if(cancelled)return Promise.resolve(result(499,JSON.stringify({error:{message:"Pairing was stopped on this device."}}),"application/json"));
       if(Date.now()-t0>300000){sheet.say("no","No answer from "+name+" in five minutes, so nothing was paired. Pair again when you are at both.");return Promise.resolve(result(408,JSON.stringify({error:{message:"No answer from "+name+" in five minutes."}}),"application/json"));}
       return new Promise(function(r){setTimeout(r,1500);}).then(function(){if(cancelled)return poll();
-        return raw0(b+"/ingenium/pair2/state?rid="+encodeURIComponent(j.rid),{headers:o.headers,timeout:10}).then(function(r){return r.json().then(function(s){return {r:r,s:s};});},function(){return {s:{state:"wait"}};});})
+        return raw0(b+(o.__ask?"/ingenium/ask/state":"/ingenium/pair2/state")+"?rid="+encodeURIComponent(j.rid),{headers:o.headers,timeout:10}).then(function(r){return r.json().then(function(s){return {r:r,s:s};});},function(){return {s:{state:"wait"}};});})
         .then(function(x){var s=x.s||{};if(s.state==="wait")return poll();
           if(s.state==="ok"){if(!my){sheet.say("plain","Paired with "+name+", unsealed: this device cannot seal, so the code alone guards what passes between them.");return result(200,JSON.stringify(s),"application/json");}
             return derive(my.kp,b64d(my.pub),b64d(j.pub)).then(function(key){var origins=[b].concat((s.addresses||[]).map(originOf)).filter(function(v,i,a){return v&&a.indexOf(v)===i;});
@@ -154,6 +157,8 @@ var nn=function(url,o){o=o||{};var u=String(url||""),pth=pathOf(u),meth=(o.metho
   if(!S()&&!/\/ingenium\/pair$/.test(pth.split("?")[0]))return raw0(url,o);
   return ready().then(function(){
     if(meth==="POST"&&/^\/ingenium\/pair$/.test(pth.split("?")[0]))return sealedPair(u,o);
+    if(meth==="POST"&&/^\/ingenium\/ask$/.test(pth.split("?")[0])){var oa={},kk,bd={};for(kk in o)oa[kk]=o[kk];try{bd=JSON.parse(String(o.body||"{}"));}catch(e){}
+      oa.__ask=bd.mode==="offer"?"offer":"use";return sealedPair(u,oa);}   /* 7.70 (r360): asking without the code */
     if(SKIP.test(pth))return raw0(url,o);
     var rec=recFor(u);if(!rec||rec.stale)return raw0(url,o);
     return sealedFetch(rec,u,o);});};
@@ -173,7 +178,11 @@ function deviceSheet(name,w,onCancel){var x=veil("sealPair"),sh=x.sh;sh.setAttri
 
 /* ---------- the computer's sheet: a device asks; she compares the words ---------- */
 var ASK={shown:"",busy:false,timer:0},CST=null;
-function askSheet(a){var api=shell();if(!api)return;ASK.shown=a.rid;var x=veil("sealAsk"),sh=x.sh,plain=!(a.words&&a.words.length),nm=a.name||"A device";sh.setAttribute("aria-label",nm+" asks to pair");
+function askSheet(a){var api=shell();if(!api)return;ASK.shown=a.rid;
+  /* 7.70 (r360): her pop-ups for each step, where r360 is in this copy */
+  if(W.IngAsk&&typeof IngAsk.computer==="function"&&IngAsk.computer(a,{api:api,veil:veil,words:wordsHtml,esc:esc,toast:toast,shield:SHIELD,
+      busy:function(v){if(v===undefined)return ASK.busy;ASK.busy=!!v;},done:function(){ASK.shown="";try{if(typeof W.lkPaint==="function")W.lkPaint();}catch(e){}poll(true);}}))return;
+  var x=veil("sealAsk"),sh=x.sh,plain=!(a.words&&a.words.length),nm=a.name||"A device";sh.setAttribute("aria-label",nm+" asks to pair");
   sh.innerHTML='<div class="sl-tagline"><span class="sl-eye">Your devices</span><span class="sl-chip sky">Waiting for you</span></div><h2>'+esc(nm)+' asks to pair</h2>'
     +(plain?'<p>It cannot seal what it sends (its Ingenium is older, or it does not allow it). Allowed, what passes between them is guarded by the code alone, as before 7.37.</p>'
       :'<p>Check that '+esc(nm)+' shows these same four words, in this order.</p>'+wordsHtml(a.words))+'<div class="sl-row" id="sealAskKeys"></div>';
