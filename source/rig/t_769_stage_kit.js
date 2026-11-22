@@ -72,7 +72,8 @@ const serve = (port) => new Promise((res) => { const s = http.createServer((q, r
   const start = async () => {
     await p.goto(URL_, { waitUntil: 'domcontentloaded', timeout: 600000 }); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 600000 });
     await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); try { tourEnd(); } catch (e) {} });
-    await sleep(800); await p.evaluate(() => { const t = document.getElementById('tgTick'); if (t && !t.checked) t.click(); const k = [...document.querySelectorAll('.tg-veil button')].find((x) => x.offsetParent && !x.disabled); if (k) k.click(); });
+    // the full, gift and demo editions open with their terms: tick, then I agree (the first key in the veil is its In short tab)
+    await sleep(800); await p.evaluate(() => { const t = document.getElementById('tgTick'); if (t && !t.checked) t.click(); const g = [...document.querySelectorAll('button')].find((x) => /^I agree$/.test(x.textContent.trim()) && x.offsetParent && !x.disabled); if (g) g.click(); });
     await p.evaluate(() => { window.__kitOps = []; addEventListener('message', (e) => { const f = document.getElementById('csFrame'); if (f && e.source === f.contentWindow && e.data && e.data.__ingKit) window.__kitOps.push(e.data.op + (e.data.name ? ' ' + e.data.name : '')); }); });
   };
   const show = async (html, name, key) => { await p.evaluate(([h, n, k]) => { go('chat'); csShow({ kind: 'file', html: h, name: n, storeKey: k }, { user: true }); }, [html, name, key]); await sleep(600); };

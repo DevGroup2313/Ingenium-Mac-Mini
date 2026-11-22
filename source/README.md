@@ -395,6 +395,50 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.69 (22 November 2026): every app opens in the preview; Clear the preview; her standard for side menus.
+Approved on its pictures (source/previews/stage_preview) with her choice of Design A for More: "I approve of the previews and I choose this
+look for the light redesign of the Live Preview panel's more menu, please commit and push them everywhere and continue working on my
+requests"; then "I want you to give the sticky notes' side menu panel the same redesign look as the Live Preview panel, it should be made
+standard and added to my Ingenia files."
+- Every app opens in the preview (`build/modules/r358.js`, `build/stagekit/`). Her report: Lakay never opened in the Live Preview, stopping
+  at its door ("IDBFactory.open() called in an invalid security context"), while Clavis did. The cause, traced: the preview runs a page in
+  a sandboxed frame with no origin of its own (so it never reaches Ingenium's stores), where the browser refuses it IndexedDB, cookies,
+  Cache Storage, the service worker, the storage manager and locks; Ingenium stood in for local storage alone (R82). Lakay keeps its books
+  in IndexedDB; Clavis in local storage. Also found: a link to a part of the page (href="#...") resolved against Ingenium's own address
+  and loaded Ingenium inside the frame, history entries for one were refused, a form naming nowhere loaded Ingenium too, and a file the
+  page saved never downloaded. The stage kit (kit.js and inject.js, bundled by make_kit.js with fake-indexeddb 6.2.8, Apache-2.0, its
+  licence beside it and in THIRD_PARTY_NOTICES.txt as entry 16; esbuild 0.28.2 bundles it, by hand, and is not carried) runs first in every
+  page Ingenium runs in a sandboxed frame (the preview, its large pages, Build's preview, a window of its own, Fabrica's quiet windows,
+  the Workshop's pages) and stands in for each store; links, history and forms stay in the page; a saved file goes through saveFileNative.
+  In the preview beside Chat and Code, what a page keeps in its database and cookies is kept for it: its text as a sealed long text named
+  in state.stageKits (by r179's key), the keys it made (CryptoKey, which cannot be written as text: Lakay's practice store has one) in
+  IndexedDB ingenium_stage_keys; handed back before the page opens anything, each time it runs; asked for before it runs again. The page's
+  charset now comes first after its doctype, so a page given as a file of its own reads as UTF-8. The Storage page names the new store.
+  The record: record 06 section 16, records 05, 01, 00, 09 and 10.
+- Clear the preview (`build/modules/r359.js`), in More just above Close: the page leaves the preview and stops running (what it kept stays
+  kept), the panel says it is clear, and it stays clear in that conversation, across a return and a new start, until she opens a page or a
+  reply writes a new one. More's rows in her Design A (quiet rows in one raised card, rising under the pointer), every row in view (the
+  chat menus' 340-pixel limit had hidden Close behind a scroll once the new row came). Her standard for a panel's side menu from now on:
+  a sticky note's menu wears it too, and any new menu takes it with .ing-side-menu; record 07 section 6 says it.
+- A note's paper swatches by night, raised as by day (her words: "I don't want the colour swatches to be flat on dark mode, I want them
+  to have the same 3d popped out look and animation on dark mode that they do on light mode"). The cause: the night dress (tintDots, in
+  the base page) wrote each swatch's night paper and a flat rim inline, as important, which no style could raise and no pointer could
+  lift. build_page.py's edit now has it write the paper under a light falling from above and leave the shadows, the lift and the press
+  to the styles (r359's night rules, and the base's).
+- Tests on the test page: t_769_stage_kit 22/22. On the release page, each time the server's copy checked first against the page's
+  SHA-256: first on 02ed8de3fea41ddd (95,161,998 bytes): t_769_stage_kit 22/22, t_768_readable 15/15 (run again here), t_767_scramble
+  33/33 (--apps, --cd), t_760_app_sign 24/24, t_762_sign_check 25/25, t_763_owner_door 24/24, t_626_guide 27/27, t_755_record 10/10,
+  t_680_old_webview 12/12, t_765_clavis 27/27; t_736_security 14/14, alone (rig/t_736_security.js brought up to date: its check of
+  Your apps' code scrambled said Not yet, which it has not been since 7.67, when it was built and on from the start). t_627_editions
+  then caught What is new naming Lakay in the editions that carry nothing of hers; its line was reworded, and the page built again:
+  42fb968d714d041f, 95,162,239 bytes, the release page, differing from the first by that line alone. On it: t_769_stage_kit 22/22
+  (twice: the second time with the test's corrected terms step, below), t_626_guide 27/27, t_755_record 10/10, t_763_owner_door 24/24.
+  The editions (full 276d17573015193b, 43,746,529 bytes; gift 865c264c0b36ccc8 and demo 8feb4cf765e44569, 42,054,197 bytes each; none
+  names Lakay): t_627_editions 29/29, t_745_owner_free 21/21, t_745_to_full 15/15, t_746_no_apps full 22/22, gift 19/19, demo 19/19
+  and the master page as a guest 22/22, t_763_owner_door full 2/2 and gift 2/2, t_767_scramble full 4/4, gift 3/3, demo 3/3,
+  t_768_readable gift 2/2, t_626_guide gift 27/27, t_769_stage_kit gift 22/22. The last needed a fix in the test, not the page: the
+  editions open with their terms, and the test pressed the first key in them (the In short tab) instead of I agree.
+
 Ingenium 7.68 (22 November 2026): read it as written, part one; Clavis 109 carried.
 Two parts, each approved on its pictures with the same words, "I approve of the previews, please commit and push it everywhere and
 continue working on my requests".
