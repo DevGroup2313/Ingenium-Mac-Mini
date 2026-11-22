@@ -56,10 +56,11 @@ const serve = (port) => new Promise((res) => { const s = http.createServer((q, r
   await sleep(1200);
   await p.evaluate(() => { const k = [...document.querySelectorAll('#fbPkg button')].find((x) => x.textContent.trim() === 'Package details'); k.click(); }); await sleep(800);
   const rows = await p.evaluate(() => [...document.querySelectorAll('.r349-row')].map((r) => ({ t: r.querySelector('b').textContent, on: r.getAttribute('aria-checked') })));
-  ok(rows.length === 2 && rows[0].t === 'Signed with your owner key' && rows[1].t === 'Opens only with your owner key' && rows[1].on === 'false', 'Package details: the switch under Signed with your owner key, off', rows);
+  // 7.67: Scrambled code (modules/r356.js, rig/t_767_scramble.js) comes third, after these two
+  ok((rows.length === 2 || (rows.length === 3 && rows[2].t === 'Scrambled code')) && rows[0].t === 'Signed with your owner key' && rows[1].t === 'Opens only with your owner key' && rows[1].on === 'false', 'Package details: the switch under Signed with your owner key, off', rows);
   // turned on with the signature off: it turns the signature on too
   await p.evaluate(() => { const r = [...document.querySelectorAll('.r349-row')]; r[0].click(); r[1].click(); }); await sleep(300);
-  const both = await p.evaluate(() => [...document.querySelectorAll('.r349-row')].map((r) => r.getAttribute('aria-checked')));
+  const both = await p.evaluate(() => [...document.querySelectorAll('.r349-row')].slice(0, 2).map((r) => r.getAttribute('aria-checked')));
   ok(both.join() === 'true,true', 'turned on, it keeps the signature on', both);
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Keep these' && x.offsetParent); k.click(); }); await sleep(600);
   const pref = await p.evaluate((id) => fbHubHost.FBS().ship[id], id);

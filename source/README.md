@@ -395,6 +395,59 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.67 (22 November 2026): your apps' code scrambled.
+The Security room's promise (modules/r318.js, approved on the live preview of 18 November 2026): "The shipped code shrunk and its names
+scrambled: much slower to read or copy, never impossible. Your sources stay as you wrote them." Her choice (21 November 2026), of the three
+protections approved and not yet built (record 06, section 7): "Scrambled code", then "Keep going with the scramble code please." Shown to
+her as eight pictures one by one at full size (`previews/scramble`: the scripts; the pictures stay out of the repository), and her word
+(22 November 2026): "I approve of the previews, please commit and push it everywhere and continue working on my requests." Her approval
+came before the pictures reached her, so she was asked again once she had them, and answered "Yes, release 7.67". Built in session
+016zEHoDq4VN5kppHeMu331S as 7.65 at first; another session released 7.65 and 7.66 (Clavis) on this branch meanwhile, merged here, so it
+is 7.67.
+- `build/modules/r356.js` (out of held.json): every package Fabrica makes carries the app's code shrunk and the names inside it scrambled
+  (window.IngScramble). What leaves Ingenium only: `IngShip.onePage` with a target (the one page, the download, the APK, the IPA, the Mac
+  and Windows apps, the build kits) or a `ship` mark (r114's release attachments, r178's web app page, r316's app sent to her devices);
+  Run, a version opened apart and Fabrica's measures stay as written. Each script of the page (no src, of no other type) goes through
+  Terser in a worker (the page itself if a worker cannot be made): no compression of its logic, the names inside each function and a
+  module's own names scrambled, comments gone but a licence or copyright note and a build marker (one word in capitals) kept, strings in
+  their own quotes (`quote_style: 3`), so a version written in the code (Carpe Diem's CD_BUILD, Inkwell's BUILD) reads as before. The
+  names the parts of a page share, and those its markup calls, stay as written. The pages an app carries packed inside (base64, gzipped or
+  not: Carpe Diem its own copy and The Forge's, The Forge the Desk's five apps) are opened, scrambled the same way and packed again as
+  they were, three levels deep; data of any other kind stays as it is.
+- The safety net: before anything is made, the scrambled copy runs in Fabrica's quiet window beside hers, and so does each page it
+  carries; an error hers does not show, or a version read differently, and the package carries her code as written, and Ingenium says so
+  in the app's own words of the error. A script Terser cannot read is left as written, and said. A copy made once serves the next packages
+  of the same version.
+- `build/modules/r349.js`: asks r356 before the door (r354) and the signature, and on the paths that make a package unsigned, so the
+  signature is over the code as shipped. `r112.js`: Package details' Scrambled code (on unless she turns it off; Ingenium's own row fixed
+  off), the Ship tile's Scrambled chip and the package line. `r114.js`, `r178.js`, `r316.js`: their ship marks. `r318.js`: the room's
+  state and well (On; Off in a copy without Fabrica, naming nothing it does not have).
+- `build/terser/`: Terser 5.51.2 (published 27 August 2026), the npm package's own `dist/bundle.min.js` unchanged (tarball sha1
+  555912425a7f2ff7737425c3718fa76c7069f6ef), its licence (BSD-2-Clause) and `terser.json` (its SHA-256 and size). `build_page.py` checks it
+  and writes it deflated in base64 after r356, only where there is a Fabrica (master and full); it parses as ES2020 and uses nothing
+  Chrome 83 lacks, so the Fire tablet runs it. THIRD_PARTY_NOTICES.txt in the four repositories: 15, Terser.
+- What is new (r222): two lines where there is a Fabrica, one where there is none.
+- The record in Ingenium's folder: record 06 section 14 (new), sections 7 and 8; records 00, 01 (its two lines that still said the phones
+  and tablets did not check Ingenium itself, true since 7.64), 09 and 10.
+- rig: `t_767_scramble.js` (33 checks on the 7.67 release page with `--apps --cd`; 4 on the full edition, 3 on the gift and demo): Package details' switch, off and on again; the room; a package unsigned and signed (the
+  signature over the scrambled page), and with the door of an app for its owner alone (the door as r354 wrote it); names scrambled and the
+  shared ones kept; licence and marker comments kept; quotes kept, the version read the same; a module script; a data block untouched;
+  the scrambled page showing what hers shows; Run and a version opened apart as written; the Ship card's chip; two pages packed inside
+  (base64, gzipped) scrambled and packed again; a copy that shows an error hers does not, made as written and said; a script Terser cannot
+  read, left as written and said; Ingenium itself never scrambled; the release, send and web marks; the web app's page; and with
+  `--apps` her five built-in apps scrambled in the page and opened beside hers. With `gift`: no scrambler, no switch, Off, no Fabrica named.
+
+    node rig/t_767_scramble.js <ingenium page file> [--apps <builtin folder>] [--cd]
+
+- Measured (the 7.67 test page, this computer, a worker): Lakay 1 script in 1 s; Clavis 10 scripts and 1 page it carries in 1 s; Inkwell
+  12 scripts in 2 s; The Forge 213 scripts and the five Desk apps it carries in 6 s (code 9,880 KB to 8,859 KB); Carpe Diem 443 scripts and
+  the two pages it carries (its own copy and The Forge's) in 13 s (27,472 KB to 25,103 KB). Each opened beside her copy: no error hers does
+  not show, the same title. Carpe Diem's packed Forge carries the Desk apps as notes with no code (it keeps them itself), so they stay.
+- The master page: 94,996,938 bytes (about 90.6 MiB), 313,061 bytes more than 7.66's (Terser deflated, and r356). On the release page
+  (40edb53baa789a95): t_767_scramble 33/33 (with `--apps --cd`), t_760_app_sign 24/24, t_762_sign_check 25/25, t_763_owner_door 24/24
+  (its Package details check now takes Scrambled code as a third row), t_626_guide 27/27, t_755_record 10/10, t_680_old_webview 12/12,
+  t_765_clavis 27/27.
+
 Ingenium 7.66 (22 November 2026): Clavis 106 carried; its page names its build number, and Fabrica's test of Clavis passes.
 Her words (22 November 2026): "I want you to add the build number to Clavis so that there are no issues with Fabrica's tests."
 - Clavis 105 (Clavis-Mac, Clavis-Window and Clavis-IOS-Android, branch claude/tender-fermat-3f415n, on top of build 104): its
