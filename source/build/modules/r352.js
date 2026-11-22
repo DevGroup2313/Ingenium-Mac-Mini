@@ -88,7 +88,7 @@ function leftError(label){var e=new Error("Left out, as you chose: "+label+" is 
 if(typeof W.libKeep==="function"){var oKeep=W.libKeep;
   W.libKeep=function(key,meta,u8,text){var self=this,args=arguments;if(!u8||!u8.length)return oKeep.apply(self,args);
     var label=String((meta&&(meta.title||meta.name))||key).replace(/\.html?$/i,"");
-    return cameIn(u8,label).then(function(x){if(!x.go){LEFT.push(label);throw leftError(label);}
+    return A.cameIn(u8,label).then(function(x){if(!x.go){LEFT.push(label);throw leftError(label);}   /* 7.68: the shared check (r357 adds Read it as written to it) */
       /* 7.68 (modules/r357.js): a scrambled copy of one of her apps whose version her Fabrica holds is kept as written */
       var aw=x.asWritten;if(aw){u8=new TextEncoder().encode(aw.html);text=aw.html;try{if(typeof W.ingToast==="function")W.ingToast(label+" is a scrambled copy of your own app: kept as written, from Fabrica (version "+aw.commit.slice(0,7)+").");}catch(e){}}
       return Promise.resolve(oKeep.call(self,key,Object.assign({},meta,{sig:aw&&x.s2?x.s2:x.s}),u8,text)).then(function(r){

@@ -47,7 +47,9 @@ const serve = (port) => new Promise((res) => { const s = http.createServer((q, r
   await p.goto(URL_, { waitUntil: 'domcontentloaded', timeout: 600000 }); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 600000 });
   await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Enter' && x.offsetParent); if (k) k.click(); try { tourEnd(); } catch (e) {} });
   await sleep(800); await p.evaluate(() => { const t = document.getElementById('tgTick'); if (t && !t.checked) t.click(); const k = [...document.querySelectorAll('.tg-veil button')].find((x) => x.offsetParent && !x.disabled); if (k) k.click(); });
-  const toastText = () => p.evaluate(() => (document.getElementById('ingToast') || {}).textContent || '');
+  // every toast, kept in order (another part of Ingenium may speak after the one the test waits for)
+  await p.evaluate(() => { window.__toasts = []; const o = window.ingToast; window.ingToast = function (m) { try { window.__toasts.push(String(m)); } catch (e) {} return o.apply(this, arguments); }; });
+  const toastText = () => p.evaluate(() => (window.__toasts || []).join(' | '));
   const room = async () => { await p.evaluate(() => { go('settings'); IngRooms.open('settings', 'security', true); IngSecurity.view('self'); }); await sleep(1800);
     return p.evaluate(() => { const w = document.getElementById('r357Well'); return w ? { text: w.textContent, keys: [...w.querySelectorAll('[data-rk]')].map((k) => k.getAttribute('data-rk')), chip: (w.querySelector('.sc-chip') || {}).textContent } : null; }); };
   if (ED !== 'master') {
@@ -137,7 +139,7 @@ const serve = (port) => new Promise((res) => { const s = http.createServer((q, r
   ok(brought === 'chosen' && after === before && sel === id && /is a scrambled copy of Tide Clock, version [0-9a-f]{7}: your Fabrica holds it as written, and it is open here/.test(t5),
     "Fabrica's Bring one in: the app opens, as written, and nothing is brought in", { brought, before, after, sel, id, t5 });
   const lib = await p.evaluate(async (html) => { await libKeep('tide-clock-copy', { title: 'Tide Clock' }, new TextEncoder().encode(html), html); await new Promise((r) => setTimeout(r, 400));
-    const t = await libText('tide-clock-copy'); return { plain: /harbourOffsetMinutes/.test(t || ''), mark: /ingenium-source/.test(t || ''), toast: (document.getElementById('ingToast') || {}).textContent || '' }; }, pkg.html);
+    const t = await libText('tide-clock-copy'); return { plain: /harbourOffsetMinutes/.test(t || ''), mark: /ingenium-source/.test(t || ''), toast: (window.__toasts || []).join(' | ') }; }, pkg.html);
   ok(lib.plain && !lib.mark && /Tide Clock is a scrambled copy of your own app: kept as written, from Fabrica \(version [0-9a-f]{7}\)/.test(lib.toast), "Lector's app library keeps it as written, and says so", lib);
   const other = pkg.html.replace(pkg.commit, pkg.commit.slice(0, 39) + (pkg.commit.slice(39) === '0' ? '1' : '0'));
   const no = await p.evaluate((html) => IngAppSign.cameIn(new TextEncoder().encode(html), 'Tide Clock').then((x) => ({ go: x.go, aw: !!x.asWritten })), other);
