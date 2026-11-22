@@ -19,9 +19,9 @@ STEPS = [
     ("04-device-accepted", "Accept, on the device",
      "Reading Tablet is told at once that Atelier accepted, and can use its models."),
     ("05-computer-declined", "Decline, on the computer",
-     "When Atelier declines a request, it is told so in a few words."),
+     "Pocket Phone asks too, and Atelier declines. Its pop-up says so in a few words."),
     ("06-device-declined", "Decline, on the device",
-     "The device that asked is told that Atelier declined. The pairing code still works too, as a second way."),
+     "Pocket Phone is told that Atelier declined. The pairing code still works too, as a second way."),
     ("07-computer-offer-key", "The computer offers its models",
      "A new key under the devices that use Atelier's models: it offers them to a device nearby."),
     ("08-device-offered", "The device sees the offer",
@@ -39,7 +39,7 @@ STEPS = [
     ("glow-in", "The who-answers key, on the device that borrows",
      "While it uses another computer's models, the key glows in that computer's colour: the same pulse, at the same size, moving inward."),
     ("15-mentes-meter", "Mentes: Lending now",
-     "Only while this computer lends: the memory in use, live, like a microphone's level meter, its recent peak held a moment. Each device's use is below it, with the computer's colour."),
+     "Only while this computer lends: the memory in use, live, like a microphone's level meter: when it falls, its highest mark stays lit a moment. Each device's use is below it, in the computer's colour."),
     ("16-mentes-meter-night", "Lending now by night", "The same, in the night colours."),
 ]
 bg, ink, ink2, violet, edge = (244, 241, 248), (34, 26, 46), (90, 82, 104), (106, 63, 181), (220, 214, 230)
