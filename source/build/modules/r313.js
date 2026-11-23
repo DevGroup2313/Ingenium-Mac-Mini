@@ -375,7 +375,7 @@ function replay(){var p=pg();if(!p)return;var now=Date.now();[].forEach.call(p.q
   var f=s.__stFrom,to=vars(s);s.__stFrom=null;s.__stReplay=true;s.classList.add("st-now");setAll(s,f);void s.offsetWidth;
   requestAnimationFrame(function(){s.classList.remove("st-now");void s.offsetWidth;setAll(s,to);s.__stReplay=false;});});}
 var SWAP=false;try{new MutationObserver(function(){var on=D.documentElement.classList.contains("ing-swap");if(SWAP&&!on)replay();SWAP=on;}).observe(D.documentElement,{attributes:true,attributeFilter:["class"]});}catch(e){}
-function strips(){var p=pg();if(!p)return;[].forEach.call(p.querySelectorAll(".st-pills, .seg"),function(s){if(s.classList.contains("bk-seg")||s.closest("#memRoomCard"))return;
+function strips(){var p=pg();if(!p)return;[].forEach.call(p.querySelectorAll(".st-pills, .seg"),function(s){if(s.classList.contains("bk-seg")||s.closest("#memRoomCard")||s.closest(".nat-groups"))return;   /* 7.71: the nature sounds in their groups keep raised keys (r295, r363) */
   if(!s.__st313){s.__st313=1;s.classList.add("st-slide");
     try{new MutationObserver(function(){place(s);}).observe(s,{attributes:true,subtree:true,attributeFilter:["class","aria-checked","aria-pressed"]});}catch(e){}}
   place(s);});}

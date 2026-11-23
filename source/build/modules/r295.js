@@ -16,6 +16,11 @@
 .nat-block .nat-seg .seg-btn{display:inline-flex;align-items:center;gap:6px}
 .nat-block .nat-seg .seg-btn svg{width:15px;height:15px;flex:0 0 auto}
 .nat-block .nat-seg .seg-btn.nat-wait{opacity:.8}
+/* 7.71: the places in small groups (modules/r363.js) */
+.nat-block .nat-groups{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1}
+.nat-block .nat-stack{display:block}
+.nat-block .nat-stack > .dp-label{display:block;margin:0 0 8px}
+.nat-block .nat-grp .nat-gl{margin:2px 0 5px;font:700 10.5px/1.2 var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3,#6c6579)}
 .pres-menu.nat-menu{min-width:270px}
 .nat-menu .pres-row .nat-ico{width:22px;height:22px;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;border-radius:7px;color:var(--accent,#6a3fb5);background:var(--accent-soft,rgba(106,63,181,.10))}
 .nat-menu .pres-row .nat-ico svg{width:15px;height:15px}
@@ -147,7 +152,9 @@ var Nature=(function(){var ac=null,mst=null,tb=null,mode="off",src={},buf={},vol
     else{plunk(t,pan,0.85);}}
   function touch(name,i){try{if(W.IngSound&&typeof IngSound.allowed==="function"&&!IngSound.allowed())return;}catch(x){}var c=ctx();if(!c)return;voice(c,tb,c.currentTime+0.01,name,i==null?0:(i-2)*0.22);}
   return {start:function(k){play(k||"stream");},stop:stop,mode:function(){return mode;},on:function(){return mode!=="off";},touch:touch,volume:function(v){vol=v;if(ac&&mst&&mode!=="off")mst.gain.setTargetAtTime(v,ac.currentTime,0.3);},
-    hush:function(){},drop:function(s,i){touch("ring",i);},voice:voice};})();
+    hush:function(){},drop:function(s,i){touch("ring",i);},voice:voice,
+    /* 7.71: the kit, so another part can make more places with it (modules/r363.js), and a way to add a place's maker */
+    kit:{mk:mk,rnd:rnd,biq:biq,pinkGen:pinkGen,brownGen:brownGen,verb:verb,finish:finish,burst:burst,tone:tone},make:function(k,fn){if(!MAKE[k])MAKE[k]=fn;},render:function(k,cb){if(!ctx())return cb(null);get(k,cb);}};})();
 Nature.volume(PREF.vol);
 var PLACES=[["off","Quiet","No sound"],["stream","Stream","Small bubbles over a soft, low body of water"],["rain","Rain","Soft rain, near and far"],["waterfall","Waterfall","Falling water, deep and steady"],
   ["waves","Waves","Waves coming in on a beach"],["birds","Birds","Birdsong in the morning"],["night","Night","A summer night: crickets, and a frog now and then"],["wind","Wind","Wind in the trees"]];
@@ -160,14 +167,28 @@ function mk(t,c,txt){var e=D.createElement(t);if(c)e.className=c;if(txt!=null)e.
 function nameOf(k){for(var i=0;i<PLACES.length;i++)if(PLACES[i][0]===k)return PLACES[i][1];return "Sounds";}
 /* ---------- 7.08: in the Display panel and in Settings, beside Ingenium's own sounds (the top bar keeps no key for them) ---------- */
 var key=null,menu=null;
+/* 7.71: more places, given by another part (modules/r363.js): their names, words, marks, makers and groups; nothing changes without it */
+var GROUPS=null,GROUP={};
+function extend(o){if(!o)return;var list=typeof o.places==="function"?o.places(Nature.kit):(o.places||[]);
+  list.forEach(function(p){if(!p||!p.k||PLACES.some(function(x){return x[0]===p.k;}))return;PLACES.push([p.k,p.name,p.desc]);if(p.group)GROUP[p.k]=p.group;if(typeof p.make==="function")Nature.make(p.k,p.make);});
+  Object.keys(o.icons||{}).forEach(function(k){if(!ICO[k])ICO[k]=o.icons[k];});
+  Object.keys(o.assign||{}).forEach(function(k){if(!GROUP[k])GROUP[k]=o.assign[k];});
+  if(o.groups&&o.groups.length)GROUPS=o.groups.slice();
+  [].forEach.call(D.querySelectorAll("[data-nat]"),function(b){if(b.parentNode)b.parentNode.removeChild(b);});mount();paintBoxes();}
 /* the same words as Ingenium's own sounds (modules/r176.js) */
 function volWord(v){var p=Math.round(v*100);return p<=0?"Silent":p<15?"Quiet":p<35?"Gentle":p<65?"Clear":"Full";}
 function paintKey(){paintBoxes();}
 function natBlock(where){var dp=where==="dp",w=mk("div","nat-block");w.setAttribute("data-nat",where);
   var row=mk("div",dp?"dp-row":"snd-row"),lab=mk(dp?"div":"span",dp?"dp-label":"snd-lab","Nature sounds");lab.id=where+"NatL";row.appendChild(lab);
   var seg=mk("div","seg nat-seg");seg.setAttribute("role","radiogroup");seg.setAttribute("aria-labelledby",lab.id);
-  PLACES.forEach(function(P){var b=mk("button","seg-btn nat-pl");b.type="button";b.setAttribute("role","radio");b.setAttribute("data-nat-k",P[0]);b.setAttribute("aria-checked","false");b.setAttribute("aria-pressed","false");b.title=P[1]+": "+P[2];
-    b.innerHTML=svg(P[0])+"<span>"+P[1]+"</span>";b.addEventListener("click",function(){choose(P[0]);});seg.appendChild(b);});
+  function btn(P){var b=mk("button","seg-btn nat-pl");b.type="button";b.setAttribute("role","radio");b.setAttribute("data-nat-k",P[0]);b.setAttribute("aria-checked","false");b.setAttribute("aria-pressed","false");b.title=P[1]+": "+P[2];
+    b.innerHTML=svg(P[0])+"<span>"+P[1]+"</span>";b.addEventListener("click",function(){choose(P[0]);});return b;}
+  /* 7.71: with more places (modules/r363.js), they stand in small groups, Quiet first */
+  if(GROUPS){seg.className="nat-groups";if(dp)row.classList.add("nat-stack");var q=mk("div","nat-grp nat-q"),qs=mk("div","seg nat-seg");PLACES.filter(function(P){return P[0]==="off";}).forEach(function(P){qs.appendChild(btn(P));});q.appendChild(qs);seg.appendChild(q);
+    GROUPS.forEach(function(G){var ps=PLACES.filter(function(P){return P[0]!=="off"&&GROUP[P[0]]===G[0];});if(!ps.length)return;var g=mk("div","nat-grp"),gl=mk("div","nat-gl",G[1]),gs=mk("div","seg nat-seg");
+      ps.forEach(function(P){gs.appendChild(btn(P));});g.appendChild(gl);g.appendChild(gs);seg.appendChild(g);});
+    var rest=PLACES.filter(function(P){return P[0]!=="off"&&!GROUP[P[0]];});if(rest.length){var g2=mk("div","nat-grp"),gs2=mk("div","seg nat-seg");rest.forEach(function(P){gs2.appendChild(btn(P));});g2.appendChild(gs2);seg.appendChild(g2);}}
+  else PLACES.forEach(function(P){seg.appendChild(btn(P));});
   row.appendChild(seg);w.appendChild(row);
   var vr=mk("div",dp?"dp-row":"snd-row"),vl=mk("label",dp?"dp-label":"snd-lab","Their volume");vl.setAttribute("for",where+"NatVol");vr.appendChild(vl);
   var vb=mk("div","snd-vol"),rg=mk("input");rg.type="range";rg.id=where+"NatVol";rg.min="0";rg.max="100";rg.step="1";rg.value=String(Math.round(PREF.vol*100));rg.setAttribute("data-nat-vol","");rg.setAttribute("aria-label","Volume of the nature sounds");
@@ -200,7 +221,9 @@ function start(){place();var T=0;try{new MutationObserver(function(){if(T)return
       if((a&&!a.querySelector('[data-nat="dp"]'))||(c&&!c.querySelector('[data-nat="set"]')))mount();},120);}).observe(D.body,{childList:true,subtree:true});}catch(e){}}
 if(D.readyState==="loading")D.addEventListener("DOMContentLoaded",start);else start();
 W.IngNature={start:function(k){choose(k||"stream");},stop:function(){choose("off");},mode:function(){return Nature.mode();},on:function(){return Nature.on();},touch:Nature.touch,
-  volume:function(v){if(v==null)return PREF.vol;PREF.vol=Math.max(0,Math.min(1,+v||0));Nature.volume(PREF.vol);keep();},open:open,close:close,places:function(){return PLACES.map(function(p){return p[0];});},last:function(){return PREF.last;}};
+  volume:function(v){if(v==null)return PREF.vol;PREF.vol=Math.max(0,Math.min(1,+v||0));Nature.volume(PREF.vol);keep();},open:open,close:close,places:function(){return PLACES.map(function(p){return p[0];});},last:function(){return PREF.last;},extend:extend,
+  /* 7.71: a place made into a buffer, for the tests and the previews of what she hears */
+  _render:function(k,cb){Nature.render(k,cb);}};
 try{window.__ingParts["p295"]="running";}catch(_){}
 })();
 </script>
