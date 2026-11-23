@@ -32,23 +32,23 @@
  "lakay": {
   "key": "lakay",
   "title": "Lakay",
-  "version": "17",
+  "version": "26",
   "build": "",
-  "date": "2026-11-14",
+  "date": "2026-11-21",
   "color": "#5f67cc",
-  "size": 1557498,
-  "sha256": "c4e2305704ea8f50de10f49d9f822ab34c36f00d0eae5f17bf7b40cbfa47d19e",
+  "size": 2290756,
+  "sha256": "e8936a37a768e485edf08fbff70c6b3505c5cf6fbffd1047efd1063b1b2b8615",
   "name": "Lakay.html"
  },
  "clavis": {
   "key": "clavis",
   "title": "Clavis",
-  "version": "109",
-  "build": "daaa40add2",
+  "version": "111",
+  "build": "f25065515e",
   "date": "2026-11-22",
   "color": "#b8862f",
-  "size": 5421623,
-  "sha256": "01d092c4ea91b467f9566ec18ca1e3e24bfa3c253b13fdfe86d6aa2130b08d37",
+  "size": 5458514,
+  "sha256": "feb5e05feeab343894aa74126110d631e516974fd5d1ed5244ff6e2a42472604",
   "name": "clavis.html"
  }
 }

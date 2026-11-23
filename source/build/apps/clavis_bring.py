@@ -51,8 +51,24 @@ with open(bi_path, "w", encoding="utf-8") as fh:
     fh.write(json.dumps(bi, indent=1) + "\n")
 
 # its seal: the four layers at their depths, and the whole seal laid flat
+# 7.71 (23 November 2026): from Clavis 110 its logo is the astrolabe (her words, 22 November 2026: "I choose the astrolabe 3D design for
+# the logo of the Clavis app"), drawn in four layers that Clavis stands in depth (src/seal_options.js, the instrument: the throne and the
+# dial at 0, the rete at 10, the key laid across as the rule at 20, the pin at 28 pixels, on the same 108-pixel seal as before, so a share
+# of the width) and laid flat by tools/logo_art.js (art/logo/layers/<part>-<dress>.png, 512 pixels; art/logo/1024/astrolabe-<dress>.png).
+# Each layer is carried as WebP at 320 pixels. A Clavis before 110 (no art/logo) keeps its seal of four layers, as 7.65 carried it.
+logo = os.path.join(repo, "art", "logo")
+ASTRO = os.path.isdir(os.path.join(logo, "layers"))
 art = os.path.join(repo, "art", "seal")
 DEPTH = {"plate": 0.0, "rays": round(6 / 108, 3), "key": round(26 / 108, 3), "star": round(40 / 108, 3)}
+if ASTRO:
+    DEPTH = {"plate": 0.0, "rete": round(10 / 108, 3), "rule": round(20 / 108, 3), "pin": round(28 / 108, 3)}
+
+
+def webp(path, px=320):
+    im = Image.open(path).convert("RGBA").resize((px, px), Image.LANCZOS)
+    out = io.BytesIO()
+    im.save(out, "WEBP", quality=92, method=6)
+    return "data:image/webp;base64," + base64.b64encode(out.getvalue()).decode("ascii")
 
 
 def uri(path, mime):
@@ -68,10 +84,15 @@ def flat(path):
 
 mark = {"layers": {}, "seal": {}}
 for dress, key in (("day", "clavis"), ("night", "clavisN")):
+    if ASTRO:
+        mark["layers"][key] = [{"src": webp(os.path.join(logo, "layers", "%s-%s.png" % (part, dress))), "z": DEPTH[part]}
+                               for part in ("plate", "rete", "rule", "pin")]
+        mark["seal"][dress] = flat(os.path.join(logo, "1024", "astrolabe-%s.png" % dress))
+        continue
     mark["layers"][key] = [{"src": uri(os.path.join(art, "%s-%s.webp" % (part, dress)), "image/webp"), "z": DEPTH[part]}
                            for part in ("plate", "rays", "key", "star")]
     mark["seal"][dress] = flat(os.path.join(art, "1024", "seal-%s.png" % dress))
 with open(os.path.join(bi_dir, "clavis_mark.json"), "w", encoding="utf-8") as fh:
     fh.write(json.dumps(mark, separators=(",", ":")) + "\n")
-print("Clavis %s (build %s, %s): its page %d bytes (%d compressed), its seal in %d layers by day and by night" % (
-    bi["clavis"]["version"], build, date, len(raw), len(buf.getvalue()), len(mark["layers"]["clavis"])))
+print("Clavis %s (build %s, %s): its page %d bytes (%d compressed), its %s in %d layers by day and by night" % (
+    bi["clavis"]["version"], build, date, len(raw), len(buf.getvalue()), "astrolabe" if ASTRO else "seal", len(mark["layers"]["clavis"])))

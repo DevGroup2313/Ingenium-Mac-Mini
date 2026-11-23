@@ -15,7 +15,8 @@
 //   5. the device that cannot seal is told to type the code; asking while the Mac does not lend is refused plainly
 //   6. usage: the Mac counts each device's requests to its models (share_usage); its memory now (share_memory)
 //   7. the glow: the device using the Mac's models pulses inward in the Mac's colour; the Mac, lending while a device used it, outward,
-//      in the same colour; a colour chosen on the device changes its glow; Mentes on the Mac shows the meter with the memory in use
+//      in the same colour; a colour chosen on the device changes its glow; Mentes on the Mac: the Lending key at the end of its tabs (her
+//      Design B, 7.71), folded; pressed, its panel with the meter and each device's use; pressing elsewhere folds it
 //   8. every new sheet lifts under the pointer; no page errors
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path'); const cp = require('child_process');
 const [APP, OUT] = process.argv.slice(2); fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true });
@@ -153,12 +154,22 @@ const waitSel = (pg, sel, ms) => pg.waitForSelector(sel, { timeout: ms || 30000 
   const gq2 = await q.evaluate(() => (document.getElementById('chatModelBtn') || document.getElementById('activeModelPill')).style.getPropertyValue('--ak-c'));
   ok(gq2 && gq2 !== macColor, 'a colour chosen on the device changes its glow', { before: macColor, after: gq2 });
   await p.evaluate(() => go('models')); await sleep(2500);
-  const mc = await p.evaluate(() => { const c = document.getElementById('akMeterCard'); return c ? { hidden: c.hidden, segs: c.querySelectorAll('.ak-seg').length, on: c.querySelectorAll('.ak-seg.on').length, read: (document.getElementById('akRead') || {}).textContent, uses: c.querySelectorAll('.ak-use').length } : null; });
-  ok(mc && !mc.hidden && mc.segs === 32 && mc.on > 0 && / of .* GB in use/.test(mc.read || '') && mc.uses >= 1, 'Mentes on the Mac: the meter shows the memory in use, lit like a level meter, and each device\'s use', mc);
+  // 7.71, her Design B: a key at the end of Mentes' tabs, folded; pressed, a small panel with the meter and each device's use
+  const kb = await p.evaluate(() => { const w = document.getElementById('akLend'), k = document.getElementById('akLendKey'), c = document.getElementById('akMeterCard'), bar = document.querySelector('#page-models [id^="rmBar-"]');
+    return w && k && c ? { inBar: !!(bar && bar.contains(w)), last: w === w.parentNode.lastElementChild, shown: !w.hidden && !!k.offsetParent, folded: c.hidden, exp: k.getAttribute('aria-expanded'), lit: k.querySelectorAll('.akB-lv i.on').length, gb: k.querySelector('small').textContent } : null; });
+  ok(kb && kb.inBar && kb.last && kb.shown && kb.folded && kb.exp === 'false' && kb.lit > 0 && /GB$/.test(kb.gb), "Mentes on the Mac: the Lending key at the end of Mentes' tabs, folded, its level lit and the memory in use on it", kb);
+  // the offer taken by a device nearby (4b) told the Mac in a sheet of its own: closed first, as she would
+  await p.evaluate(() => { const v = document.getElementById('akDone'); if (v) { const k = [...v.querySelectorAll('button')].find((x) => /^Close$/.test(x.textContent.trim())); if (k) k.click(); else v.remove(); } }); await sleep(600);
+  await p.click('#akLendKey'); await sleep(900);
+  const mc = await p.evaluate(() => { const c = document.getElementById('akMeterCard'); return c ? { hidden: c.hidden, exp: document.getElementById('akLendKey').getAttribute('aria-expanded'), segs: c.querySelectorAll('.ak-seg').length, on: c.querySelectorAll('.ak-seg.on').length, read: (document.getElementById('akRead') || {}).textContent, uses: c.querySelectorAll('.ak-use').length } : null; });
+  ok(mc && !mc.hidden && mc.exp === 'true' && mc.segs === 32 && mc.on > 0 && / of .* GB in use/.test(mc.read || '') && mc.uses >= 1, 'pressed, its panel shows the memory in use, lit like a level meter, and each device\'s use', mc);
   await p.screenshot({ path: OUT + '/mac_mentes.png' });
+  await p.mouse.click(30, 700); await sleep(500);
+  const folded = await p.evaluate(() => document.getElementById('akMeterCard').hidden);
+  ok(folded === true, 'pressing elsewhere folds it again', folded);
   await api(A.port, 'share_set', [false]); await sleep(4800);
-  const mc2 = await p.evaluate(() => { const c = document.getElementById('akMeterCard'); return c ? c.hidden : 'none'; });
-  ok(mc2 === true || mc2 === 'none', 'the meter goes when the Mac stops lending', mc2);
+  const mc2 = await p.evaluate(() => { const w = document.getElementById('akLend'); return w ? w.hidden : 'none'; });
+  ok(mc2 === true || mc2 === 'none', 'the key goes when the Mac stops lending', mc2);
 
   /* 8 */
   ok(errs.length === 0, 'no page errors', errs);

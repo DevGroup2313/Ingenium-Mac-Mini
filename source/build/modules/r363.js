@@ -1,5 +1,5 @@
 <script>try{(window.__ingParts=window.__ingParts||{})["p363"]="started";}catch(_){}
-/* ============ R363 · MORE NATURE SOUNDS (Ingenium 7.71, 23 November 2026; held until her word on what she hears) ============
+/* ============ R363 · MORE NATURE SOUNDS (Ingenium 7.71, 23 November 2026; released on her word on what she heard and saw) ============
    Her words (23 November 2026): "I want to expand the nature sounds system in Ingenium, I want more nature sounds added into the app. I
    want more day sounds like morning birds chirping, waterfalls, also light rain, heavy rain with thunder, and so much more, these sounds
    help calm my nervous system and are very soothing while I work, I want more choices added to Ingenium please."
@@ -14,7 +14,8 @@
      Night: Pond at dusk (peepers, tree frogs and a bullfrog at a pond as evening falls);
      Wind and fire: Campfire (a fire crackling softly).
    The places are shown in five small groups (Water, Rain, Day, Night, Wind and fire) wherever they are chosen: the Display panel and
-   Settings, Sound. Ingenium never starts one by itself, as before. */
+   Settings, Sound. Ingenium never starts one by itself, as before. Her word on hearing them (23 November 2026): "I love all of the nature
+   sounds". */
 (function(){"use strict";
 var W=window;if(W.__r363)return;W.__r363=1;
 /* ---------- the places, made with r295's kit (K): mk, rnd, biq, pinkGen, brownGen, verb, finish, burst, tone ---------- */

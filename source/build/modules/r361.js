@@ -13,6 +13,8 @@
      computer's card in Your devices, and on the lending computer's own column, opens the eight raised swatches to choose another.
    - Mentes, while this computer lends: a level meter of the memory in use, its segments lit like a microphone tester's (soft green, then
      amber, then rose near the top), with the peak held a moment; the figures; and each device's use of the models (today, in all, last).
+     7.71, her Design B: in a small key at the end of Mentes' tabs (its little level moving with the memory in use), which opens a small
+     panel over the page; the card across the page is gone.
    The computer's side: build/desktop/app_ask_770.py (share_memory, measured each time it is asked; share_usage). */
 @keyframes akPulse{0%{box-shadow:var(--ak-base,0 0 0 transparent),0 0 0 0 rgba(var(--ak-c),.55)}70%{box-shadow:var(--ak-base,0 0 0 transparent),0 0 0 7px rgba(var(--ak-c),0)}100%{box-shadow:var(--ak-base,0 0 0 transparent),0 0 0 7px rgba(var(--ak-c),0)}}
 .ak-glow{animation:akPulse 2.4s cubic-bezier(.3,.7,.4,1) infinite}
@@ -35,31 +37,53 @@ body[data-motion="minimal"] .ak-glow{animation:none;box-shadow:var(--ak-base,0 0
 .ak-dot[aria-pressed="true"]{box-shadow:0 0 0 2px var(--accent,#6a3fb5),inset 0 1.5px 1px rgba(255,255,255,.55),0 2px 0 rgba(40,20,70,.2)}
 body[data-theme="night"] .ak-dot{box-shadow:inset 0 1.5px 1px rgba(255,255,255,.35),inset 0 -2px 3px rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.6),0 4px 8px rgba(0,0,0,.45)}
 body[data-motion="minimal"] .ak-dot:hover,body[data-motion="minimal"] .ak-ckey:hover{transform:none}
-/* Mentes: the meter */
-#akMeterCard{border-radius:22px;padding:18px 20px;box-shadow:var(--p3-card-sh,0 2px 3px rgba(40,20,70,.08),0 12px 26px rgba(40,20,70,.1));transition:transform .45s cubic-bezier(.34,1.3,.64,1),box-shadow .3s}
-#akMeterCard:hover{transform:translateY(-2px);box-shadow:var(--p3-card-hi,0 3px 5px rgba(40,20,70,.1),0 18px 34px rgba(40,20,70,.13))}
-#akMeterCard .ak-top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
-#akMeterCard .ak-top h2{margin:0}
-#akMeterCard .ak-read{margin-left:auto;font:600 13px/1.3 var(--sans);color:var(--ink-2)}
-#akMeterCard .ak-read b{font:600 22px/1 var(--serif,Georgia,serif);color:var(--ink-1)}
-.ak-meter{position:relative;display:grid;grid-template-columns:repeat(32,1fr);gap:4px;margin:14px 0 8px;padding:10px;border-radius:14px;
+/* Mentes: Lending now. 7.71, her choice of two designs (23 November 2026: "I choose Design B for the Lending now design"; her words before:
+   "I think that the "Lending Now" card is too bulky and completly detracts from the look of the Mentes page, I want it to be foldable"):
+   nothing on the page itself, a small key at the end of Mentes' tabs, its little level moving with the memory in use; pressed, a small
+   panel over the page with the meter and each device's use; pressing elsewhere, or Escape, folds it again. */
+.akB{position:relative;margin-left:auto;align-self:center;display:inline-flex}
+.akB[hidden]{display:none}
+.akB-key{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 12px 0 11px;border:0;border-radius:14px;cursor:pointer;font:600 13px/1 var(--sans);color:var(--ink-1,#221a2e);
+  background:linear-gradient(var(--mr-keyA,#fff),var(--mr-keyB,#f4f0fa));box-shadow:var(--mr-sh-key,0 1px 1px rgba(40,20,70,.12),0 3px 6px rgba(40,20,70,.1));transition:transform .3s cubic-bezier(.34,1.5,.64,1),box-shadow .2s}
+.akB-key:hover{transform:translateY(-2px);box-shadow:var(--mr-sh-keyhi,0 2px 2px rgba(40,20,70,.12),0 7px 14px rgba(40,20,70,.14))}
+.akB-key:active{transform:translateY(1px)}
+.akB-key:focus-visible{outline:2px solid var(--accent,#6a3fb5);outline-offset:3px}
+.akB-key[aria-expanded="true"]{box-shadow:0 0 0 2px rgba(var(--ak-c),.45),var(--mr-sh-key,0 1px 1px rgba(40,20,70,.12),0 3px 6px rgba(40,20,70,.1))}
+.akB-dot{width:9px;height:9px;border-radius:50%;background:rgb(var(--ak-c));box-shadow:0 0 0 3px rgba(var(--ak-c),.18)}
+.akB-lv{display:flex;align-items:flex-end;gap:2px;height:18px}
+.akB-lv i{display:block;width:3.5px;border-radius:2px;background:rgba(34,26,46,.14)}
+.akB-lv i.on{background:rgb(var(--ak-s))}
+.akB-key small{font-weight:600;color:var(--ink-3,#6c6579)}
+#akMeterCard{position:absolute;right:0;top:calc(100% + 10px);width:440px;max-width:calc(100vw - 40px);z-index:30;padding:16px 16px 14px;border-radius:20px;text-align:left;
+  background:linear-gradient(var(--card-hi,#fff),var(--card-lo,#fbf9fe));box-shadow:0 2px 4px rgba(40,20,70,.1),0 18px 40px rgba(40,20,70,.18);animation:akPop .28s cubic-bezier(.34,1.3,.64,1)}
+#akMeterCard[hidden]{display:none}
+@keyframes akPop{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+#akMeterCard h3{margin:0;font:500 18px/1.2 var(--serif,Georgia,serif);color:var(--ink-1)}
+#akMeterCard .ak-read{margin:3px 0 10px;font:600 12.5px/1.3 var(--sans);color:var(--ink-3)}
+#akMeterCard .ak-read b{font:600 17px/1 var(--serif,Georgia,serif);color:var(--ink-1)}
+body[data-theme="night"] #akMeterCard{background:linear-gradient(var(--card-hi,#2a2236),var(--card-lo,#241d2f));box-shadow:0 2px 4px rgba(0,0,0,.45),0 18px 40px rgba(0,0,0,.5)}
+body[data-theme="night"] .akB-lv i{background:rgba(255,255,255,.12)}
+body[data-motion="minimal"] .akB-key:hover,body[data-motion="minimal"] .akB-key:active{transform:none}
+body[data-motion="minimal"] #akMeterCard{animation:none}
+@media (prefers-reduced-motion:reduce){#akMeterCard{animation:none}.akB-key:hover{transform:none}}
+.ak-meter{position:relative;display:grid;grid-template-columns:repeat(32,1fr);gap:3px;margin:0 0 6px;padding:7px;border-radius:14px;
   background:linear-gradient(180deg,rgba(34,26,46,.06),rgba(34,26,46,.02));box-shadow:inset 0 2px 4px rgba(40,20,70,.14),inset 0 -1px 0 rgba(255,255,255,.7)}
 body[data-theme="night"] .ak-meter{background:rgba(0,0,0,.25);box-shadow:inset 0 2px 5px rgba(0,0,0,.55),inset 0 -1px 0 rgba(255,255,255,.05)}
-.ak-seg{height:26px;border-radius:5px;background:rgba(34,26,46,.08);box-shadow:inset 0 1px 1px rgba(255,255,255,.5),inset 0 -1px 1px rgba(40,20,70,.08);transition:box-shadow .12s}
+.ak-seg{height:14px;border-radius:3.5px;background:rgba(34,26,46,.08);box-shadow:inset 0 1px 1px rgba(255,255,255,.5),inset 0 -1px 1px rgba(40,20,70,.08);transition:box-shadow .12s}
 body[data-theme="night"] .ak-seg{background:rgba(255,255,255,.05);box-shadow:inset 0 1px 1px rgba(255,255,255,.06)}
 .ak-seg.on{background:linear-gradient(180deg,rgba(var(--ak-s),.95),rgba(var(--ak-s),.75));box-shadow:inset 0 1px 1px rgba(255,255,255,.6),0 0 8px rgba(var(--ak-s),.45)}
 .ak-seg.peak,body[data-theme="night"] .ak-seg.peak{background:linear-gradient(180deg,rgba(var(--ak-s),.95),rgba(var(--ak-s),.82));box-shadow:inset 0 1px 1px rgba(255,255,255,.45),0 0 11px rgba(var(--ak-s),.65)}
 body[data-theme="night"] .ak-seg.on{background:linear-gradient(180deg,rgba(var(--ak-s),.9),rgba(var(--ak-s),.65));box-shadow:inset 0 1px 1px rgba(255,255,255,.3),0 0 9px rgba(var(--ak-s),.4)}
 .ak-scale{display:flex;justify-content:space-between;font:600 10.5px/1 var(--sans);letter-spacing:.08em;color:var(--ink-3)}
-.ak-uses{display:grid;gap:8px;margin-top:14px}
-.ak-use{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:10px 12px;border-radius:14px;background:linear-gradient(var(--card-hi),var(--card-lo));
+.ak-uses{display:grid;gap:6px;margin-top:10px}
+.ak-use{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:8px 11px;border-radius:12px;background:linear-gradient(var(--card-hi),var(--card-lo));
   box-shadow:0 1px 2px rgba(40,20,70,.08),0 4px 10px rgba(40,20,70,.07);transition:transform .35s cubic-bezier(.34,1.3,.64,1),box-shadow .2s}
 .ak-use:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(40,20,70,.1),0 9px 18px rgba(40,20,70,.11)}
 .ak-use .ak-dot{width:16px;height:16px;cursor:default}
 .ak-use b{font:600 13.5px/1.2 var(--sans);color:var(--ink-1)}
 .ak-use small{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}
 .ak-use .ak-n{font:600 13px/1.2 var(--sans);color:var(--ink-2);text-align:right}
-body[data-motion="minimal"] #akMeterCard:hover,body[data-motion="minimal"] .ak-use:hover{transform:none}
+body[data-motion="minimal"] .ak-use:hover{transform:none}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p361"]="started";}catch(_){}
 (function(){"use strict";
@@ -113,31 +137,45 @@ function memPoll(){var a=shell();clearTimeout(MT);if(!a||typeof a.share_memory!=
 /* ---------- Mentes: the card ---------- */
 var SEGS=32;
 function segColor(i){var f=(i+1)/SEGS;return f<=0.6?"104,176,122":(f<=0.85?"214,160,62":"214,96,110");}
-function card(){var c=$("akMeterCard");if(c)return c;var host=$("page-models");if(!host)return null;
-  c=mk("div","card");c.id="akMeterCard";c.setAttribute("aria-live","off");c.setAttribute("data-rm-skip","1");   /* above every room of Mentes, not filed into one (r173) */
-  var top=mk("div","ak-top"),h=mk("h2","sec","Lending now");top.appendChild(h);var rd=mk("div","ak-read");rd.id="akRead";top.appendChild(rd);c.appendChild(top);
-  c.appendChild(mk("p","small muted","The memory in use on this computer while your devices use its models, live."));
-  var m=mk("div","ak-meter");m.id="akMeter";m.setAttribute("role","meter");m.setAttribute("aria-label","Memory in use");m.setAttribute("aria-valuemin","0");
-  for(var i=0;i<SEGS;i++){var s=mk("div","ak-seg");s.style.setProperty("--ak-s",segColor(i));m.appendChild(s);}c.appendChild(m);
-  var sc=mk("div","ak-scale");sc.id="akScale";c.appendChild(sc);
-  var u=mk("div","ak-uses");u.id="akUses";c.appendChild(u);
-  var bar=host.querySelector('[id^="rmBar-"]'),first=$("lineupCard");
-  if(bar&&bar.parentNode===host)host.insertBefore(c,bar.nextSibling);else if(first&&first.parentNode===host)host.insertBefore(c,first);else host.insertBefore(c,host.firstChild);return c;}
+var LV=8;
+function card(){var c=$("akMeterCard"),host=$("page-models");if(!host)return null;
+  var bar=host.querySelector('[id^="rmBar-"]');if(!bar)return c;var row=bar.querySelector('[role="tablist"]')||bar;
+  var w=$("akLend");
+  if(!w){w=mk("span","akB");w.id="akLend";
+    var k=mk("button","akB-key");k.type="button";k.id="akLendKey";k.setAttribute("aria-expanded","false");k.setAttribute("aria-controls","akMeterCard");k.title="Lending now: the memory in use on this computer, and each device's use";
+    k.append(mk("span","akB-dot"));var lv=mk("span","akB-lv");lv.setAttribute("aria-hidden","true");for(var q=0;q<LV;q++){var b=mk("i");b.style.setProperty("--ak-s",lvColor(q));b.style.height=(25+q*75/(LV-1))+"%";lv.appendChild(b);}
+    k.append(lv,mk("span",null,"Lending"),mk("small"));w.appendChild(k);
+    c=mk("div");c.id="akMeterCard";c.hidden=true;c.setAttribute("role","dialog");c.setAttribute("aria-label","Lending now");c.setAttribute("aria-live","off");c.setAttribute("data-rm-skip","1");
+    c.appendChild(mk("h3",null,"Lending now"));var rd=mk("div","ak-read");rd.id="akRead";c.appendChild(rd);
+    var m=mk("div","ak-meter");m.id="akMeter";m.setAttribute("role","meter");m.setAttribute("aria-label","Memory in use");m.setAttribute("aria-valuemin","0");
+    for(var i=0;i<SEGS;i++){var s=mk("div","ak-seg");s.style.setProperty("--ak-s",segColor(i));m.appendChild(s);}c.appendChild(m);
+    var sc=mk("div","ak-scale");sc.id="akScale";c.appendChild(sc);var u=mk("div","ak-uses");u.id="akUses";c.appendChild(u);w.appendChild(c);
+    k.addEventListener("click",function(){fold(!c.hidden);});
+    k.addEventListener("keydown",function(e){if(e.key==="Escape"&&!c.hidden){e.preventDefault();fold(true);}});
+    c.addEventListener("keydown",function(e){if(e.key==="Escape"){e.preventDefault();fold(true);try{k.focus();}catch(x){}}});}
+  /* Mentes' tabs are drawn again now and then (r173): the key goes back to the end of their row */
+  if(w.parentNode!==row||w!==row.lastElementChild)row.appendChild(w);
+  w.style.setProperty("--ak-c",colorOf(LEND.id||"this"));return $("akMeterCard");}
+function lvColor(i){var f=(i+1)/LV;return f<=0.6?"104,176,122":(f<=0.85?"214,160,62":"214,96,110");}
+function fold(shut){var c=$("akMeterCard"),k=$("akLendKey");if(!c||!k)return;c.hidden=!!shut;k.setAttribute("aria-expanded",shut?"false":"true");if(!shut){var u=$("akUses");if(u)u.__sig="";paintMeter();paintCard();}}
+D.addEventListener("pointerdown",function(e){var w=$("akLend"),c=$("akMeterCard");if(!w||!c||c.hidden)return;if(!w.contains(e.target))fold(true);},true);
 function gb(v){return (Math.round(v*10)/10).toFixed(1)+" GB";}
 function paintMeter(){var c=$("akMeterCard");if(!c||!MEM)return;var tot=MEM.total||1,used=Math.min(tot,MEM.used||0),f=used/tot,n=Math.round(f*SEGS),now=Date.now();
   if(n>=PEAK.v||now-PEAK.at>1500){PEAK.v=n;PEAK.at=now;}
   var segs=$("akMeter").children;for(var i=0;i<SEGS;i++){segs[i].classList.toggle("on",i<n);segs[i].classList.toggle("peak",i===PEAK.v-1&&PEAK.v>n);}
   var m=$("akMeter");m.setAttribute("aria-valuemax",String(tot));m.setAttribute("aria-valuenow",String(used));m.setAttribute("aria-valuetext",gb(used)+" of "+gb(tot)+" in use");
-  var rd=$("akRead");rd.innerHTML="";var b=mk("b",null,gb(used));rd.append(b,D.createTextNode(" of "+gb(tot)+" in use"+(MEM.busy?" · answering "+MEM.busy+(MEM.busy===1?" request":" requests"):"")));
-  var sc=$("akScale");if(!sc.childNodes.length)["0","",""+Math.round(tot/2)+" GB","",gb(tot)].forEach(function(t){sc.appendChild(mk("span",null,t));});}
+  var rd=$("akRead");rd.innerHTML="";var b=mk("b",null,gb(used));rd.append(b,D.createTextNode(" of "+gb(tot)+" in use on this computer"+(MEM.busy?" · answering "+MEM.busy+(MEM.busy===1?" request":" requests"):"")));
+  var sc=$("akScale");if(!sc.childNodes.length)["0","",""+Math.round(tot/2)+" GB","",gb(tot)].forEach(function(t){sc.appendChild(mk("span",null,t));});
+  var k=$("akLendKey");if(k){var nl=Math.round(f*LV),bs=k.querySelector(".akB-lv").children;for(var q=0;q<LV;q++)bs[q].classList.toggle("on",q<Math.max(nl,used>0?1:0));
+    var sm=k.querySelector("small"),t2=gb(used);if(sm.textContent!==t2)sm.textContent=t2;k.setAttribute("aria-label","Lending now: "+gb(used)+" of "+gb(tot)+" in use. Press to see each device's use");}}
 function ago(t){if(!t)return "not yet";var s=Date.now()/1000-t;if(s<90)return "just now";if(s<3600)return Math.round(s/60)+" minutes ago";if(s<86400)return Math.round(s/3600)+" hours ago";return Math.round(s/86400)+" days ago";}
-function paintCard(){var show=LEND.on&&!!shell();var c=show?card():$("akMeterCard");if(!c)return;c.hidden=!show;if(!show)return;
+function paintCard(){var show=LEND.on&&!!shell();var c=show?card():$("akMeterCard"),w=$("akLend");if(w)w.hidden=!show;if(!show&&c&&!c.hidden)fold(true);if(!c||!show)return;
   var u=$("akUses");if(!u)return;var rows=(USE&&USE.devices)||[];var sig=JSON.stringify(rows.map(function(r){return [r.id,r.today,r.all,r.last,r.model,r.name];}))+LEND.id;
   if(u.__sig===sig)return;u.__sig=sig;u.innerHTML="";
   if(!rows.length){u.appendChild(mk("div","mr-empty small muted","No device has used this computer’s models yet."));return;}
   rows.slice(0,12).forEach(function(r){var row=mk("div","ak-use"),d=mk("span","ak-dot");d.style.setProperty("--ak-c",colorOf(LEND.id));var t=mk("div");t.append(mk("b",null,r.name||"A device"),mk("small",null,[r.model||"",ago(r.last)].filter(Boolean).join(" · ")));
     row.append(d,t,mk("div","ak-n",r.today+" today · "+r.all+" in all"));u.appendChild(row);});}
-W.IngLendMeter={show:function(){var c=card();if(c){c.hidden=!LEND.on;try{c.scrollIntoView({block:"start",behavior:"smooth"});}catch(e){}}},colorOf:colorOf,palette:PALETTE,choose:choose,
+W.IngLendMeter={show:function(){try{if(typeof W.go==="function")W.go("models");}catch(e){}setTimeout(function(){var c=card();if(c&&LEND.on){fold(false);var k=$("akLendKey");try{k.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){}}},350);},fold:fold,colorOf:colorOf,palette:PALETTE,choose:choose,
   _paint:paintGlow,_decorate:decorate,_state:LEND};
 /* the keys are drawn again by their own parts every second or two: the glow follows them, never fighting them */
 setTimeout(function wait(){if(W.__ingReady!==true){setTimeout(wait,1200);return;}
