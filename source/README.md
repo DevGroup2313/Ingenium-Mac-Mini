@@ -395,6 +395,49 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.71 (23 November 2026): ten more nature sounds; Lending now as a key; Clavis in Ingenia; Clavis 111 and Lakay 26 carried.
+Approved on its pictures and on hearing the sounds (source/previews/sounds_clavis, lending_card and nature_sounds; the pictures and the
+sound files stay out of the repository): "I approve of the previews and I choose Design B for the Lending now design, please commit and
+push it everywhere and continue working on my requests. I love all of the nature sounds and Clavis Folders addons but I want the latest
+Clavis app added to Ingenium, the same for the Lakay app."
+- Ten more nature sounds (`build/modules/r363.js`; r295 gains `IngNature.extend`, its kit and its groups, and does nothing more without
+  r363; r313 leaves the groups' keys raised in Settings). Her words: "I want more day sounds like morning birds chirping, waterfalls, also
+  light rain, heavy rain with thunder, and so much more". Brook, Cascade, Light rain, Rainy window, Thunderstorm, Morning birds, Forest,
+  Meadow, Pond at dusk and Campfire, each made on the device the first time it is chosen with r295's own kit (its filters, noises, tones,
+  bursts, echo, seamless loop and even loudness), nothing fetched or stored, at the same calm level as the stream (made in 0.5 to 2.5
+  seconds each in Chromium here). In the Display panel and Settings, Sound, the places stand in five groups: Water, Rain, Day, Night,
+  Wind and fire. Rendered for her to hear by previews/nature_sounds/render_sounds.js (each loop twice).
+- Lending now, her Design B (`build/modules/r361.js`). Her words: "I think that the "Lending Now" card is too bulky and completly
+  detracts from the look of the Mentes page, I want it to be foldable and redesigned". The card across the page is gone: a small key at
+  the end of Mentes' tabs, its little level moving with the memory in use; pressed, a small panel with the meter and each device's use;
+  pressing elsewhere, or Escape, folds it. IngLendMeter.show() (Go to the Mentes page, in the lending pop-ups) opens it.
+- Clavis in Ingenia (`build/modules/r362.js`). Her report: Clavis was missing from the Ingenia page, its Your apps section and the rest
+  of the app. The cause, traced: Ingenia makes a folder for an app only at its set-up (the apps her profile names), when a build library
+  is brought in (r258, one for each app it holds notes for) and by hand; her folders were made before 7.65, so Clavis, carried from 7.65,
+  never had one, and its conversations waited under Not sorted yet. Now, in the master edition and her own profile only, each app
+  Ingenium carries for her has its folder, made once (state.folders.carried, so a folder she lets go is not made again), and the
+  conversations that clearly name it move into it, as when she makes a folder by hand. The app library, Lector, Fabrica, Adamas, Code
+  and Home had it already.
+- Clavis 111 carried (Build f25065515e, its page feb5e05feeab3438, 5,458,514 bytes; from Clavis-Mac's claude/tender-fermat-3f415n at
+  8741e52, approved in its own session: "I approve of the previews, please commit and push it everywhere"), in place of 109, wearing its
+  astrolabe as its logo in Ingenium too: `build/apps/clavis_bring.py` now reads the astrolabe's four layers (the throne and dial, the
+  rete, the rule, the pin; art/logo/layers, at Clavis's own depths: 0, 10, 20 and 28 pixels on its 108-pixel seal) and lays it flat
+  from art/logo/1024. Lakay 26 carried (its page e8936a37a768e485, 2,290,756 bytes; from Lakay-Windows at 4dc9267, the newest of its
+  three repositories; Lakay-Mac and Lakay-Apps hold 25) in place of 17, by `build/apps/update_builtin.py`; its mark is unchanged. Record
+  08 section 7 checked again against both: no sign-in or sealing in Clavis 111; Lakay 26 keeps its books, Master Key, people, Sign out
+  and practice store.
+- Tests on the test page: t_770_ask 29/29 (Design B: the key at the end of the tabs, folded; pressed, its panel; pressing elsewhere
+  folds it), t_771_carried_folders 10/10 (new), t_769_stage_kit 22/22 (with Lakay 26 opening to its door and practice store in the
+  preview). On the release page, the server's copy checked first against its SHA-256 (f43e2b315505505b, 95,404,088 bytes): t_770_ask
+  29/29 (its computer app the Mac mini repository's ingenium_app.py), t_771_carried_folders 10/10, t_769_stage_kit 22/22, t_768_readable
+  15/15, t_767_scramble 33/33 (--apps, --cd), t_760_app_sign 24/24, t_762_sign_check 25/25, t_763_owner_door 24/24, t_626_guide 27/27,
+  t_755_record 10/10, t_680_old_webview 12/12, t_765_clavis 27/27 (with Clavis 111); t_736_security 14/14, alone.
+  The editions (full 26b445c2ab7ac6b7, 43,807,918 bytes; gift d7f98c5241e69ae5 and demo 794b22136fcfbc70, 42,115,586 bytes each; each
+  carries r361 to r363, none names an app of hers): t_627_editions 29/29, t_745_owner_free 21/21, t_745_to_full 15/15, t_746_no_apps
+  full 22/22, gift 19/19, demo 19/19 and the master page as a guest 22/22, t_763_owner_door full 2/2 and gift 2/2, t_767_scramble full
+  4/4, gift 3/3, demo 3/3, t_768_readable gift 2/2, t_769_stage_kit gift 22/22, t_770_ask gift 29/29, t_771_carried_folders with the
+  gift edition 12/12 (it makes no folder and carries none), t_626_guide gift 27/27.
+
 Ingenium 7.70 (22 November 2026): asking and offering with Accept; whose models answer, in colour; Lending now in Mentes.
 Approved on its sixteen pictures (source/previews/lend_ask; the pictures stay out of the repository), sent to her one by one after the
 7.69 release: "I approve of the previews, please commit and push it everywhere and continue working on my requests."
