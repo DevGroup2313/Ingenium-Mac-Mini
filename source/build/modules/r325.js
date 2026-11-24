@@ -56,7 +56,12 @@ function placeOne(P){var s=D.getElementById("page-"+P.pg);if(!s)return;var b=D.g
   if(f.title){var t=f.title;if(b&&b.parentNode===t)return;if(!b)b=make(P);t.classList.add("mk3-title");t.appendChild(b);return;}
   if(b&&b.parentNode===f.row&&b.previousElementSibling===f.after)return;if(!b)b=make(P);
   if(f.after&&f.after.parentNode===f.row)f.row.insertBefore(b,f.after.nextSibling);else f.row.appendChild(b);}
-function all(){PLACES.forEach(function(P){try{placeOne(P);}catch(e){}});}
+/* 7.76, her words (24 November 2026): "Please also remove the little controls buttons that was added all over the app for the models on the
+   Lector, Vocatio, Ingenia, Fabrica, Adamas and etc, please remove the superfluous buttons and only keep the ones that truly belongs on the
+   page and helps it instead of just clutter on the page"; and, the same evening, every model setting to live in one Engine panel, for the
+   whole app. So the round keys are no longer put on Vocatio, Fabrica, Lector or Ingenia, and any already there are taken off; Reply,
+   Memory and Effort stay in Chat's own Controls and in Settings, Models and AI, until the Engine panel holds them. */
+function all(){PLACES.forEach(function(P){try{var b=D.getElementById(P.id);if(b&&b.parentNode){if(b.parentNode.classList&&b.parentNode.classList.contains("mk3-title"))b.parentNode.classList.remove("mk3-title");b.remove();}}catch(e){}});}
 function wrapGo(){var og=W.go;if(typeof og!=="function"||og.__r325)return;var ng=function(){var r=og.apply(this,arguments);setTimeout(all,60);setTimeout(all,900);return r;};
   try{Object.keys(og).forEach(function(k){ng[k]=og[k];});}catch(e){}ng.__r325=1;W.go=ng;}
 (function wait(n){if(W.__ingReady===true&&W.IngGenKey){wrapGo();all();setTimeout(all,2500);

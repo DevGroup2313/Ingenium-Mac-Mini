@@ -432,6 +432,11 @@ Her message of 24 November 2026 (the evening), its first stage, in her order. Ea
 - What's new (`r372.js`, new). Her words: "The cards on the "What's new" card ... are currently rigid and motionless on hover ... I also
   want the right logo design to be added to the "What's new" panel instead of the stand-in design". Each version's card lifts under the
   pointer, its chip and words answering; the panel's head shows Ingenium's own seal (the top bar's) in place of the gold sparkle.
+- The round model keys taken off the pages (`r325.js`). Her words: "Please also remove the little controls buttons that was added all over
+  the app for the models on the Lector, Vocatio, Ingenia, Fabrica, Adamas and etc ... only keep the ones that truly belongs on the page".
+  The round key (Reply, Memory and Effort for the page's model, 7.41) is no longer put beside Vocatio's Learn, Fabrica's Bring one in,
+  Lector's Add your apps or Ingenia's Bring in your work (Adamas had none). Those settings stay in Chat's own Controls and in Settings,
+  Models and AI, until the Engine panel holds them for the whole app.
 - Her question on names, Conversations or Sessions, is answered in the chat with a recommendation; nothing is renamed until she chooses.
 
 Ingenium 7.75 (24 November 2026): Vocatio reads quickly and visibly; no model left thinking until Stop; Adamas keeps its holder
