@@ -297,7 +297,15 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
     var A=adamasStrip();
     if(A){var u=(((ANG*2.2+phase+extra)%(Math.PI/4)+Math.PI/4)%(Math.PI/4))/(Math.PI/4)*24,k=Math.floor(u)%24,f=u-Math.floor(u),w=sz*2.25,h=w*A.fh/A.fw,x0=x-w/2,y0=yy-h*0.58;
       g.drawImage(A.img,k*A.fw,0,A.fw,A.fh,x0,y0,w,h);g.globalAlpha=ga0*f;g.drawImage(A.img,((k+1)%24)*A.fw,0,A.fw,A.fh,x0,y0,w,h);g.globalAlpha=ga0;
-      if(sp<1){var gl=g.createRadialGradient(x,yy-h*0.08,0,x,yy-h*0.08,w*0.7);gl.addColorStop(0,"rgba(255,255,255,"+(0.75*(1-sp)).toFixed(3)+")");gl.addColorStop(1,"rgba(255,255,255,0)");g.fillStyle=gl;g.beginPath();g.arc(x,yy-h*0.08,w*0.7,0,Math.PI*2);g.fill();}
+      /* 7.76: pressed, a small crisp glint crosses the stone's facets as it spins (her words, 24 November 2026: "I want you to remove the
+         white shadow that covers the little diamond on top of Fabrica's tree on Night mode whenever I click on the little diamond. I can't
+         even see any animation, its just covered in a white smoke-like haze"). Until 7.75 a soft white glow, three quarters opaque and
+         wider than the stone, lay over it for the whole spin. */
+      if(sp<1&&!still()){var ga=Math.sin(Math.min(1,sp*1.5)*Math.PI);if(ga>0.02){var nt=night(),cx=x-w*0.17+w*0.3*sp,cy=yy-h*0.32+h*0.1*sp,L=w*(0.1+0.08*ga);
+        g.save();g.globalAlpha=ga0*ga*(nt?0.8:0.9);g.lineCap="round";g.strokeStyle=nt?"#ece2ff":"#ffffff";g.lineWidth=Math.max(0.7,w*0.022);
+        g.beginPath();g.moveTo(cx-L,cy);g.lineTo(cx+L,cy);g.moveTo(cx,cy-L*1.15);g.lineTo(cx,cy+L*1.15);g.stroke();
+        var dot=g.createRadialGradient(cx,cy,0,cx,cy,L*0.32);dot.addColorStop(0,nt?"rgba(236,226,255,.95)":"rgba(255,255,255,.95)");dot.addColorStop(1,nt?"rgba(236,226,255,0)":"rgba(255,255,255,0)");
+        g.fillStyle=dot;g.beginPath();g.arc(cx,cy,L*0.32,0,Math.PI*2);g.fill();g.restore();}}
       GH.push([x,yy,sz,phase]);GEMS.push([x,y,size,phase]);return;}
     size=sz;y=yy;var fr=gemFrames(night());if(!fr){GH.push([x,yy,sz,phase]);return;}GH.push([x,yy,sz,phase]);var gu=(((ANG*2.2+phase)%(Math.PI/4)+Math.PI/4)%(Math.PI/4))/(Math.PI/32),k=Math.floor(gu)%8,gf=gu-Math.floor(gu),ga=g.globalAlpha;
     g.drawImage(fr[k],x-size,y-size*0.95,size*2,size*2);g.globalAlpha=ga*gf;g.drawImage(fr[(k+1)%8],x-size,y-size*0.95,size*2,size*2);g.globalAlpha=ga;GEMS.push([x,y,size,phase]);}

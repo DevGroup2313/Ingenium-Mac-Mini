@@ -395,6 +395,45 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.76 (24 November 2026): the list of conversations always has its key; your chosen model stays yours; Fabrica's little
+diamond seen as it spins; sticky notes keep room below the line; What's new answers the pointer, under Ingenium's own logo.
+
+Her message of 24 November 2026 (the evening), its first stage, in her order. Each was read in the code first.
+- The list of conversations always has its key (`r369.js`, new). Her words: "I can't seem to find the conversations control button that
+  allows the user to start a new conversation and also have the option to rename the conversation and also see the full list of
+  previous conversations ... entirely missing from the both chat pages inside of the Full edition". The key (☰, at the top left of Chat
+  and Code) was hidden whenever the list was set to stand open beside the chat (state.cc.side, true unless the list was once closed) on
+  a window wider than 820 points; since 6.69 (r102) the list on Chat and Code always opens over the chat, from that key, closed until
+  then. So on a fresh desk (her full edition, any new profile) the list was closed and its key hidden. Her master copy showed it only
+  because she had once closed the list there; it was the same in every edition. Now the key always shows where the list opens over the
+  chat. Test: rig/t_776_conv_key.js (Chat and Code, a fresh desk and a list closed before, 1,440 and 700 points; 7.75 fails 2).
+- Your chosen model stays yours (`r373.js`, new). Her words: "the chosen model there always takes precedence and replaces any new model
+  that I load from the Home page, the chat pages and the Mentes page, it always reverts to the chosen model from the Lector page". Lector,
+  Vocatio, Ingenia and Fabrica write with the model chosen in Lector's Read and written by; the one helper that loads a model for them
+  (ingEnsureLoaded) first made it the whole app's choice (setActive), before every part of a reading. Now it loads the model a page needs
+  without touching her choice: the top bar, Home and the chat keep hers, and the chat loads it again when she next writes. Her next words
+  ("Instead of each page getting its own models controls, I think it should all be folded into and added to the Engine button and give it
+  its own panel ... and it operates for the entire app") are the next stage, shown first as a live preview. Test:
+  rig/t_776_keep_choice.js (with a stand-in engine; 7.75 fails 2 of 6).
+- Fabrica's little diamond, pressed (`r294.js`). Her words: "remove the white shadow that covers the little diamond on top of Fabrica's tree
+  on Night mode whenever I click on the little diamond. I can't even see any animation, its just covered in a white smoke-like haze". A
+  soft white glow, three quarters opaque and wider than the stone, lay over it for the whole spin. Now a small crisp glint crosses its
+  facets as it spins, pale lavender by night; the stone stays in view. Seen in frames of the spin at night, before and after.
+- A sticky note keeps room below the line (`r370.js`, new). Her words: "Right now it only goes down by one line and leaves barely enough
+  room ... I want it to auto-scroll slightly and leave the page at half a page or something". In a note that keeps its size (resized by
+  her, or grown long), the line being written sat at the very foot, a pixel or two cut off. Now, when it comes within about three lines
+  of the foot, the note scrolls gently so it stands a little above the middle, with room kept under the last line; the note keeps its
+  size; a new note that still grows line by line grows as before; the scroll bar stays hidden. Test: rig/t_776_note_room.js (7.75 fails
+  2 of 8).
+- The two import keys under the list of conversations (`r371.js`, new). Her words: "Please format the "Bring chats from another
+  assistant" and the "Paste a conversation" buttons from the Conversations panel to match the rest of the app." They were bare words
+  across the panel with a purple tint under the pointer; now each is a raised key sized to its words, lifting with a spring, no purple
+  shading, by day and by night.
+- What's new (`r372.js`, new). Her words: "The cards on the "What's new" card ... are currently rigid and motionless on hover ... I also
+  want the right logo design to be added to the "What's new" panel instead of the stand-in design". Each version's card lifts under the
+  pointer, its chip and words answering; the panel's head shows Ingenium's own seal (the top bar's) in place of the gold sparkle.
+- Her question on names, Conversations or Sessions, is answered in the chat with a recommendation; nothing is renamed until she chooses.
+
 Ingenium 7.75 (24 November 2026): Vocatio reads quickly and visibly; no model left thinking until Stop; Adamas keeps its holder
 through the tour; Lector's documents on real pages; Ingenium fills a large screen.
 

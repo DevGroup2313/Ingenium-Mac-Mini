@@ -234,6 +234,12 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.76", "The list of conversations always has its key at the top left of Chat and Code, from a fresh start too: a new conversation, renaming, and every conversation are one press away."],
+  ["7.76", "A model a page loads for its own work no longer replaces the model you chose: the top bar, Home and the chat keep yours, and the chat loads it again when you next write."],
+  ["7.76", "Fabrica's little diamond, pressed, spins with a small glint across its facets; by night no white haze hides it any more.", "fabrica"],
+  ["7.76", "A sticky note that keeps its size keeps room below the line you are writing: near its foot, the line moves up a little above the middle."],
+  ["7.76", "Under the list of conversations, Bring chats from another assistant and Paste a conversation are raised keys, like the others."],
+  ["7.76", "What's new: each version's card lifts under the pointer, and Ingenium's own logo heads the panel."],
   ["7.75", "Vocatio reads quickly and shows its work: before the first word, how far the model has read and the time left; each reading takes the parts of your profile that bear on it, or all of it step by step, as you choose, always to hand in the working panel.", "career"],
   ["7.75", "A model asked not to think that thinks anyway is no longer left thinking until you press Stop: it is held to a short reasoning, or stopped as soon as it goes round in circles, and answers from it."],
   ["7.75", "Adamas: the stone keeps its holder and its sharpness after the guided tour passes through, and the tour's card stands beside the stone, never on it."],
