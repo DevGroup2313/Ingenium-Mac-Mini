@@ -1910,6 +1910,21 @@ if _kb:
         _new = _kb.group(1) + str(len(_raw)) + _kb.group(3) + _b64.b64encode(_gz.compress(_raw, compresslevel=9, mtime=0)).decode("ascii") + _kb.group(5)
         out = out[:_kb.start()] + _new + out[_kb.end():]
         print("the kit store: no signing key (%s left out)" % ", ".join(_gone))
+# ---- 7.75 (24 November 2026): the computer app's engine says how far it has read, and Lector and Vocatio show it (modules/r188.js).
+#      Her words: "I spent that time looking at a blank screen ... being told that the model was reading the profile and posting, but
+#      nothing else except for the time was actually being updated". The engine (llama.cpp's server) reports its progress through a
+#      long prompt when asked (return_progress, which the lending code, desktop/app_lend_693.py, has asked for since 6.93): each report
+#      (total, cache, processed) is handed to the job's onRead, and lxAsk hands it to LX.onRead, as it hands the reasoning to LX.onThink. ----
+edit('stream:true,stream_options:{include_usage:true},',
+     'stream:true,stream_options:{include_usage:true},return_progress:true,',
+     "7.75 the computer app's engine reports how far it has read")
+edit('var c=ch.choices&&ch.choices[0],dl=c&&c.delta;',
+     'var pp=ch.prompt_progress||(ch.choices&&ch.choices[0]&&ch.choices[0].prompt_progress);if(pp&&job.onRead){try{job.onRead({total:+pp.total||0,cache:+pp.cache||0,done:+pp.processed||0});}catch(_){}}\n      var c=ch.choices&&ch.choices[0],dl=c&&c.delta;',
+     "7.75 each report of how far it has read goes to the job's onRead")
+edit('onThink:function(t){try{if(t&&typeof LX.onThink==="function")LX.onThink(t);}catch(_e){}}})',
+     'onThink:function(t){try{if(t&&typeof LX.onThink==="function")LX.onThink(t);}catch(_e){}},onRead:function(p){try{if(typeof LX.onRead==="function")LX.onRead(p);}catch(_e){}}})',
+     "7.75 lxAsk hands on how far the engine has read")
+
 mods = sorted(glob.glob(os.path.join(HERE, "modules", "*.js")))
 mods = [m for m in mods if os.path.basename(m) not in editions.skip_modules(ED)]  # 6.2: what an edition leaves out
 # R331 (7.44): in the master page, the modules the full edition leaves out (the owner's own: the Author Studio, Troubleshoot, her

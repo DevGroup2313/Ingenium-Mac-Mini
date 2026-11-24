@@ -395,6 +395,51 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.75 (24 November 2026): Vocatio reads quickly and visibly; no model left thinking until Stop; Adamas keeps its holder
+through the tour.
+
+Her message of 24 November 2026 (the second one), its first stage, in her order.
+- Vocatio, fast and visible (`build/modules/r188.js`; `build/build_page.py` 7.75). Her words: "Last night I spent over 64 minutes
+  waiting for a reading on Vocatio ... I spent that time looking at a blank screen ... I have no way of knowing if any models are
+  working at all". Read in the code first: since 6.44 ("I don't want any caps inside of Ingenium's pages") a reading sent as much as
+  the model's memory holds (three characters a token: about 387,000 characters for Granite 4.2 8B), so her whole profile went every
+  time, and a model on the Mac mini read it all before its first word, the panel showing only the seconds. Asked how it should read,
+  she answered: "I want a combination of Options A and B, depending on the task at hand but I always want the option." Now:
+  - Relevant first: the profile's entries, documents, apps' readings and reading notes are ordered by the words they share with the
+    task (the posting, the plan, the goal), and as much is sent as this device reads in about a minute; the speed is measured on each
+    reading (the characters sent against the time to the first word) and kept for each model and computer (state.vcRates).
+  - Step by step, everything: the whole profile is read in parts of a minute's reading each, the model listing from each part the facts
+    that bear on the task, copied exactly; the answer is written from those notes. Each part shows as it is read, with its notes.
+  - A posting read against the profile is step by step by default; every other task relevant first. The choice is in the working
+    panel (How it reads), remembered for each task; changing it while a run works starts that run again the new way.
+  - Before the first word: the computer app's engine is asked for its progress through the prompt (return_progress, as the lending
+    code has asked since 6.93), and each report reaches the panel through lxAsk (LX.onRead): how much it has read and the time left,
+    with a meter; your Mac mini's own reports, when it lends its model, reach it too (lkStatus); where no report comes, the time left
+    is estimated from the measured speed, and the meter says it is an estimate.
+- No model left thinking until Stop (`r241.js`; `r188.js`; `r365.js`). Her words: "Vocatio has to contantly stop the model from its own
+  loop when it is finally thinking and force it to finally write its response ... I want that fixed properly this time". Read in the
+  code first: the watcher that stops a model's thinking at a length, or when it goes round in circles (6.46), watched only requests that
+  asked to think; Lector's, Vocatio's and Ingenia's ask not to, so a model that thinks anyway (some do, whatever the request says) was
+  never watched. Now those are watched too: thinking is held to about 1,200 tokens, or stopped at once when it circles, and the model
+  answers from its notes; if it thinks again there past about 300 tokens it is stopped and its answer kept, or Ingenium says plainly that
+  the model would not answer and what to do. A model on another computer or behind a connection is held the same way in Vocatio, and
+  r365 does not wait for a reply ended so.
+- Adamas through the guided tour (`r292.js`; `r367.js`, new). Her words: "The diamond is blurred in the background, and the holder is
+  missing from view in the Guided Tour section of the Adamas page. The tour card is also placed directly on the diamond". Read in the
+  code first: the still stone is drawn from its colours' pictures (softer than the scene) with no holder and no sky; it was chosen for
+  good when a mark (ing.diamond.trying, meant for an app that stopped while the scene was tried) was left on the device, and the tour
+  shows Adamas only for a moment, so a page left before three frames were drawn left the mark, and the still stone, drawing no frames,
+  never cleared it. Now the mark stands only while the scene is being tried on screen; a device that has drawn the moving stone before
+  gets one fresh try after an old mark; a first measurement too slow for the scene is taken again before the still stone. The tour's
+  card, where it would cover the stone, stands beside it, narrowed to the room there, or above or below it on a narrow window; a card
+  she has dragged stays where she put it. I could not see her Mac's screen: this is the cause found in the code that fits all three
+  things she described.
+- Tests: rig/t_775_vocatio_speed.js (400 invented entries and a 131,072-token memory: part by part, progress before the first word,
+  the speed kept, Relevant first sized to a minute and ordered, the switch restarting the run, the watcher on unasked thinking);
+  rig/t_775_adamas_tour.js (the mark after a short visit, the fresh try, a device that really stops, the card beside the stone; the 7.74
+  page fails three of its seven). The older Vocatio tests give the same results before and after (t_624_stop, t_629_limits, t_646_think,
+  t_658_mentor, t_61_ask; t_644_edge's two failures were there in 7.74 too).
+
 Ingenium 7.74 (24 November 2026): the Desk's five mini apps back in the full edition.
 
 Her message of 24 November 2026, its third stage. Asked whether the mini apps should come back to the full edition, she answered

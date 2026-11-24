@@ -234,6 +234,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.75", "Vocatio reads quickly and shows its work: before the first word, how far the model has read and the time left; each reading takes the parts of your profile that bear on it, or all of it step by step, as you choose, always to hand in the working panel.", "career"],
+  ["7.75", "A model asked not to think that thinks anyway is no longer left thinking until you press Stop: it is held to a short reasoning, or stopped as soon as it goes round in circles, and answers from it. This holds in Lector, Vocatio and Ingenia."],
+  ["7.75", "Adamas: the stone keeps its holder and its sharpness after the guided tour passes through, and the tour's card stands beside the stone, never on it."],
   ["7.74", "Tabula, Abacus, Imago, Scriba and Fontes are back in the full edition, whole: their keys in the side bar, their pages, and their tiles on Home.", "desk"],
   ["7.74", "Nothing changes in this edition: 7.74 brings parts of Ingenium this edition does not carry.", "nofabrica"],
   ["7.73", "Lector's Read and written by lists the models on each of your paired computers too, under the computer's name. Choosing one connects to it, and one plain line says which model reads and writes, and where.", "lector"],

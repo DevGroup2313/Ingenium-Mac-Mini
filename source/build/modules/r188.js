@@ -209,6 +209,23 @@ body[data-motion="minimal"] #cs .c-improve,body[data-calm="1"] #cs .c-improve{an
 #cs .c-gaps{margin:6px 0 10px 18px;padding:0}#cs .c-gaps li{margin:5px 0;font-size:13px;line-height:1.5}#cs .c-gaps li span{display:block;color:var(--c-ink2)}
 #cs .c-think{margin:10px 0 6px;border:1px solid var(--c-hair);border-radius:10px;padding:6px 10px;background:linear-gradient(var(--c-a),var(--c-b))}#cs .c-think summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--c-ink1)}
 #cs .c-think-b{white-space:pre-wrap;font:12.5px/1.55 var(--c-sans,inherit);color:var(--c-ink2);max-height:260px;overflow:auto;margin-top:6px}
+/* 7.75: how it reads (two raised keys; the chosen one sits pressed into the panel), and how far it has read (a recessed track, its fill raised) */
+#cs .c-way{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 16px 10px}
+#cs .c-way-l{font-size:12px;letter-spacing:.04em;color:var(--c-ink3);margin-right:2px}
+#cs .c-way-k{font:600 12.5px/1 var(--c-sans,inherit);padding:8px 13px;border-radius:999px;border:1px solid var(--c-hair);color:var(--c-ink2);cursor:pointer;
+  background:linear-gradient(180deg,var(--c-a),var(--c-b));box-shadow:var(--pop,0 1px 0 rgba(40,22,68,.1),0 3px 8px rgba(40,22,68,.08));transition:transform .18s cubic-bezier(.34,1.4,.64,1),box-shadow .18s}
+#cs .c-way-k:hover{transform:translateY(-2px);box-shadow:var(--pop-hi,var(--pop));color:var(--c-ink1)}
+#cs .c-way-k:active{transform:translateY(1px);transition-duration:.06s}
+#cs .c-way-k[aria-checked="true"]{color:var(--c-acc);background:var(--c-wellbg);box-shadow:inset 0 1.5px 3px rgba(40,22,68,.16),inset 0 0 0 1px rgba(40,22,68,.05);transform:none}
+#cs .c-way-k:focus-visible{outline:2.5px solid var(--c-ring);outline-offset:2px}
+#cs .c-meter{position:relative;height:9px;margin:0 16px 10px;border-radius:999px;background:var(--c-wellbg);box-shadow:inset 0 1.5px 3px rgba(40,22,68,.18),inset 0 0 0 1px rgba(40,22,68,.05);overflow:hidden}
+#cs .c-meter>i{position:absolute;left:0;top:0;bottom:0;width:2%;border-radius:999px;background:linear-gradient(180deg,#8a63d0,#5d37a1);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 1px 2px rgba(40,22,68,.25);transition:width .9s ease}
+#cs .c-meter.est>i{background:repeating-linear-gradient(120deg,#8a63d0 0 10px,#7a52c4 10px 20px);background-size:40px 100%;animation:cMeterRun 1.6s linear infinite}
+@keyframes cMeterRun{to{background-position:40px 0}}
+#cs .c-notes{white-space:pre-wrap;font-size:12.8px;line-height:1.55;max-height:300px;overflow:auto;margin:0 0 10px;padding:10px 12px;border-radius:10px;background:var(--c-wellbg);box-shadow:var(--c-well);color:var(--c-ink2);scrollbar-width:none}
+#cs .c-notes::-webkit-scrollbar{display:none}
+body[data-motion="minimal"] #cs .c-meter.est>i,body[data-motion="minimal"] #cs .c-way-k{animation:none;transition:none}
+@media (prefers-reduced-motion:reduce){#cs .c-meter.est>i{animation:none}}
 #cs .c-live-state{font-size:13px;color:var(--c-ink2);margin:0 16px 6px}#cs .c-sofar{margin:0 16px}#cs .c-old{color:var(--c-warn)}#cs .c-st[data-st="partly"]{color:var(--c-warn);background:var(--c-warns)}#cs .c-st[data-st="none"]{color:var(--c-bad);background:var(--c-bads)}
 /* practise, and her own draft */
 #cs .c-fb{font-size:13.5px;line-height:1.55;padding:11px 13px;border-radius:10px;background:var(--c-accs);border:1px solid var(--c-hair);color:var(--c-ink1);display:flex;flex-direction:column;gap:4px}
@@ -555,13 +572,73 @@ function whereLine(){var o=plan();if(o&&o.cloud)return lxCloudLeaves()?"through 
    anywhere else inside of Ingenium that does not harm the app and leave it vulnerable." The studio reads as much as the model's own memory
    holds (it kept to 90,000 characters, and 30,000 for a model on this device); what is larger than the memory is still shortened, or a
    refusal for size asks again in smaller parts */
-function room(){var o=plan(),m=o&&o.chosen,ctx=8192;try{if(m||(o&&o.cloud))ctx=lxCtx(m)||ctx;}catch(e){}return Math.max(9000,(ctx-1800)*3);}
+function memRoom(){var o=plan(),m=o&&o.chosen,ctx=8192;try{if(m||(o&&o.cloud))ctx=lxCtx(m)||ctx;}catch(e){}return Math.max(9000,(ctx-1800)*3);}
+/* 7.75 (her words, 24 November 2026: "Last night I spent over 64 minutes waiting for a reading on Vocatio ... I spent that time looking at
+   a blank screen ... I have no way of knowing if any models are working at all on the Vocatio page"). Read in the code first: since 6.44
+   ("I don't want any caps inside of Ingenium's pages") a reading sent as much as the model's whole memory holds (about 387,000 characters
+   for Granite 4.2 8B), so her whole profile, CV, documents and apps' readings went every time, and a model on the Mac mini had to read
+   all of it before its first word; nothing was shown meanwhile but the seconds. Asked how Vocatio should read, she chose both ways, by
+   the task, always with the choice ("I want a combination of Options A and B, depending on the task at hand but I always want the
+   option"):
+   - Relevant first: the entries, documents and readings that bear most on the task come first, and as much is read as this device
+     reads in about a minute (its speed is measured on each reading: the characters sent against the time to the first word);
+   - Step by step, everything: nothing is left out; the profile is read part by part (each part a minute's reading), the model noting
+     from each what bears on the task, and the answer is written from those notes; each part shows as it is read.
+   Reading a posting against the profile is step by step by default; every other task relevant first. The choice is in the working
+   panel, for each task, remembered; changing it while a run works starts that run again the new way. While the model reads, the panel
+   shows how far it has read (the computer app's engine reports it after each batch) and the time left; a model that thinks though
+   asked not to is held to a short reasoning and answers from it (r241, and here for a model on another computer or a connection). */
+var TARGET=60;
+function rateKey(){var o=plan();if(!o)return "none";if(o.cloud)return "cloud";if(o.link){try{return "link:"+(state.cloud.lendId||"")+":"+(state.cloud.model||"");}catch(e){return "link";}}return "dev:"+(o.chosen?o.chosen.id:"");}
+function rateOf(){var k=rateKey(),R=state.vcRates||{};if(R[k]>0)return R[k];var o=plan();if(o&&o.cloud)return 1500;if(o&&o.link)return 400;
+  var desk=false;try{desk=typeof DeskAdapter!=="undefined"&&Engine.adapter===DeskAdapter;}catch(e){}return desk?250:45;}
+function rateSet(tokPerSec){if(!(tokPerSec>0))return;var k=rateKey(),R=state.vcRates||(state.vcRates={}),old=R[k];R[k]=Math.round(old>0?old*0.5+tokPerSec*0.5:tokPerSec);save();}
+function speedRoom(){return Math.max(16000,Math.round(rateOf()*TARGET*3.2));}
+function room(){var r=memRoom();if(NOTES)return Math.min(r,Math.max(speedRoom(),Math.round(NOTES.text.length*1.3)+12000));return Math.min(r,speedRoom());}
+var READWAYS={quick:"Relevant first",all:"Step by step, everything"};
+function readWayKey(what){return String(what||"").replace(/[^A-Za-z ]+/g,"").replace(/\s+/g," ").trim().slice(0,40);}
+function readWayDefault(what){return /^Reading it against your profile/.test(String(what||""))?"all":"quick";}
+function readWayOf(what){var p=CS().profile.prefs||{},m=p.ways||{};return READWAYS[m[readWayKey(what)]]?m[readWayKey(what)]:readWayDefault(what);}
+function readWaySet(what,w){var P=CS().profile;if(!P.prefs)P.prefs={};if(!P.prefs.ways||typeof P.prefs.ways!=="object")P.prefs.ways={};P.prefs.ways[readWayKey(what)]=w;save();}
 var RUN={busy:false,stop:false,what:"",live:"",think:"",opp:null,t0:0};
-function ask(build,max,temp){var o=plan(),scale=1,tries=0,waits=0,req={modelId:o&&o.chosen?o.chosen.id:null};RUN.req=req;
+function ask(build,max,temp){var dry=null,about="";CAPT={G:null,block:"",full:0,kept:0};ABOUT="";NOTES=null;
+  try{dry=build(1);}catch(e){dry=null;}var G=CAPT.G,blk=CAPT.block;CAPT=null;
+  try{var um=(dry||[]).filter(function(m){return m.role==="user";}).map(function(m){return typeof m.content==="string"?m.content:"";}).join("\n");about=blk?um.split(blk).join(" "):um;}catch(e){about="";}
+  ABOUT=(String(RUN.what||"")+"\n"+about).slice(0,8000);RUN.way=readWayOf(RUN.what);RUN.parts=null;
+  var pre=(RUN.way==="all"&&G)?partByPart(G,about):Promise.resolve(null);
+  return pre.then(function(notes){NOTES=notes?{G:G,text:notes}:null;RUN.parts=RUN.parts?Object.assign(RUN.parts,{writing:true}):null;
+      CAPT={G:null,block:"",full:0,kept:0};var m0=null;try{m0=build(1);}catch(e){}if(CAPT&&CAPT.full&&!NOTES)RUN.kept={kept:CAPT.kept,full:CAPT.full};CAPT=null;
+      return ask1(build,max,temp);})
+    .then(function(t){NOTES=null;ABOUT="";return t;},function(e){NOTES=null;ABOUT="";throw e;});}
+/* step by step, everything: each part of the profile a minute's reading, the model noting what bears on the task */
+function partByPart(G,about){var full=profileBlock0(G,1e9),S=Math.floor(speedRoom()*0.8);if(full.length<=S)return Promise.resolve(null);
+  var chunks=[],rest=full;while(rest.length){if(rest.length<=S){chunks.push(rest);break;}var c=rest.slice(0,S),p=Math.max(c.lastIndexOf("\n\n"),c.lastIndexOf("\n- "));if(p<S*0.5)p=c.lastIndexOf("\n");if(p<S*0.3)p=S;chunks.push(rest.slice(0,p));rest=rest.slice(p);}
+  var task=String(about||"").replace(/\s+\n/g,"\n").slice(0,2600),notes=[];RUN.parts={i:0,n:chunks.length,notes:notes};
+  return chunks.reduce(function(pr,ch,i){return pr.then(function(){if(RUN.stop)throw new Error("stopped");RUN.parts.i=i+1;paintLive();
+      return ask1(function(){return [{role:"system",content:"You read one part of a person's profile for a task, on their own device, in "+english()+". List every fact in this part that bears on the task: posts, studies, dates, skills, results, publications, apps and their features, copied exactly as written (names, titles, dates and numbers unchanged). Write only what this part shows. Do not judge, advise or write the task's answer. Begin at once with the first fact; no preamble, no reasoning. If nothing in this part bears on the task, write NONE."},
+        {role:"user",content:"THE TASK (what the facts are for):\n"+task+"\n\nPART "+(i+1)+" OF "+chunks.length+" OF MY PROFILE:\n"+ch}];},800,0.1)
+      .then(function(t){t=String(t||"").trim();if(t&&!/^NONE\.?$/i.test(t))notes.push("From part "+(i+1)+":\n"+t);paintLive();});});},Promise.resolve())
+    .then(function(){return notes.length?notes.join("\n\n"):"(nothing in the profile bears on this task)";});}
+function viaNet(){var o=plan();return !!(o&&(o.link||o.cloud));}
+/* 7.75: your Mac mini, lending its model, says how far it has read too (its status lines, desktop/app_lend_693.py; modules/r205.js shows
+   them in the chat): they reach LX.onRead as the engine's own reports do */
+function hookLk(){var o=W.lkStatus;if(typeof o!=="function"||o.__r188)return;var n=function(s){try{if(s&&s.state==="reading"&&W.LX&&typeof LX.onRead==="function"){var tot=+s.total||0;LX.onRead(tot?{total:tot,cache:0,done:+s.processed||0}:{total:100,cache:0,done:+s.percent||0});}}catch(e){}return o.apply(this,arguments);};
+  n.__r188=1;W.lkStatus=n;}
+function ask1(build,max,temp){var o=plan(),scale=1,tries=0,waits=0,req={modelId:o&&o.chosen?o.chosen.id:null},extra="",recut=false;RUN.req=req;
   function mine(){return RUN.req===req;}
-  return new Promise(function(res,rej){(function go1(){if(!mine())return;if(RUN.stop||req.__stopped){rej(new Error("stopped"));return;}var msgs=build(scale);RUN.live="";RUN.think="";paintLive();
-    try{if(W.LX)LX.onThink=function(t){if(!t||!mine())return;RUN.think+=t;paintLive();};}catch(e){}
-    lxAsk(req,msgs,max,temp,function(t){if(!mine()||req.__stopped)return;RUN.live=t;paintLive();}).then(function(t){if(!mine())return;try{if(W.LX)LX.onThink=null;}catch(e){}if(RUN.stop||req.__stopped)rej(new Error("stopped"));else res(String(t||""));},function(e){if(!mine())return;try{if(W.LX)LX.onThink=null;}catch(x){}var m=String(e&&e.message||e);
+  return new Promise(function(res,rej){(function go1(){if(!mine())return;if(RUN.stop||req.__stopped){rej(new Error("stopped"));return;}var msgs=build(scale);
+    if(extra){msgs=msgs.slice();for(var i=msgs.length-1;i>=0;i--){if(msgs[i].role==="user"){msgs[i]=Object.assign({},msgs[i],{content:String(msgs[i].content)+extra});break;}}}
+    var sent=msgs.reduce(function(n,m){return n+String(m.content||"").length;},0);
+    RUN.live="";RUN.think="";RUN.read=null;RUN.tSent=Date.now();RUN.tFirst=0;RUN.sent=sent;paintLive();var cutNow=false;
+    function first(){if(!RUN.tFirst){RUN.tFirst=Date.now();var secs=(RUN.tFirst-RUN.tSent)/1000;if(sent>4000&&secs>0.5&&!(RUN.read&&RUN.read.cache>RUN.read.total*0.5))rateSet(sent/3.2/secs);}}
+    try{if(W.LX){LX.onThink=function(t){if(!t||!mine())return;first();RUN.think+=t;paintLive();
+        /* a model on another computer, or a connection, that thinks though asked not to: held to a short reasoning, then it answers from it */
+        if(!cutNow&&!recut&&viaNet()&&!RUN.live&&(RUN.think.length>4200||(typeof W.ingThinkLooping==="function"&&W.ingThinkLooping(RUN.think)))){cutNow=true;req.__cutNow=true;
+          try{if(typeof cloudAbort==="function")cloudAbort();}catch(e){}try{if(LX.cloudAb&&LX.cloudAb.abort)LX.cloudAb.abort();}catch(e){}}};
+      LX.onRead=function(p){if(!mine()||!p)return;RUN.read={total:+p.total||0,cache:+p.cache||0,done:+p.done||+p.processed||0,t:Date.now()};paintLive();};hookLk();}}catch(e){}
+    function after(){req.__cutNow=false;if(cutNow&&!recut){recut=true;var notes=RUN.think.length>6000?RUN.think.slice(0,2000)+"\n[…]\n"+RUN.think.slice(-3500):RUN.think;
+        extra="\n\n(Your notes from thinking about this so far:\n"+notes.trim()+"\n\nDo not think again and do not go back over these notes. Answer now, directly and completely.)";setTimeout(go1,200);return true;}return false;}
+    lxAsk(req,msgs,max,temp,function(t){if(!mine()||req.__stopped)return;first();RUN.live=t;paintLive();}).then(function(t){if(!mine())return;if(after())return;try{if(W.LX){LX.onThink=null;LX.onRead=null;}}catch(e){}if(RUN.stop||req.__stopped)rej(new Error("stopped"));else res(String(t||""));},function(e){if(!mine())return;if(after())return;try{if(W.LX){LX.onThink=null;LX.onRead=null;}}catch(x){}var m=String(e&&e.message||e);
       if(RUN.stop||req.__stopped){rej(new Error("stopped"));return;}
       if(m==="busy"&&waits++<200){RUN.live="Waiting for the model to finish what it is doing…";paintLive();setTimeout(go1,1500);return;}
       var big=false;try{big=lxIsCtxError(e);}catch(x){}if(big&&scale>0.3){scale*=0.7;setTimeout(go1,300);return;}
@@ -569,9 +646,13 @@ function ask(build,max,temp){var o=plan(),scale=1,tries=0,waits=0,req={modelId:o
 function busyNow(){if(RUN.busy){say("The studio is writing. Wait for it, or press Stop.");return true;}
   try{if(W.LX&&LX.busy){say("Lector is using the model. Wait for it, or pause it in Lector.");return true;}}catch(e){}return false;}
 function needModel(){if(modelReady())return false;say("No model is ready on this device yet. Get one on the Models page: the studio writes with the model Lector uses."+(typeof lxCxReady==="function"&&lxCxReady()?" Or choose your connected model, "+lxCloudName()+", on the studio's first page.":""));return true;}
-function begin(opp,what){RUN.req=null;RUN.busy=true;RUN.stop=false;EXAM.last=null;RUN.what=what;RUN.live="";RUN.think="";RUN.t0=Date.now();RUN.opp=opp?opp.id:null;CS().ui.show="work";render();startTick();}
+function begin(opp,what){RUN.req=null;RUN.busy=true;RUN.stop=false;EXAM.last=null;RUN.what=what;RUN.live="";RUN.think="";RUN.t0=Date.now();RUN.opp=opp?opp.id:null;
+  RUN.read=null;RUN.parts=null;RUN.kept=null;RUN.again=LASTPRESS&&Date.now()-LASTPRESS.at<3000?LASTPRESS:null;CS().ui.show="work";render();startTick();}
 var TICK=0;function startTick(){if(TICK)return;TICK=setInterval(function(){if(!RUN.busy){clearInterval(TICK);TICK=0;return;}paintLive();},1000);}
-function end(){RUN.busy=false;RUN.what="";RUN.live="";RUN.think="";RUN.opp=null;render();}
+function end(){RUN.busy=false;RUN.what="";RUN.live="";RUN.think="";RUN.opp=null;RUN.read=null;RUN.parts=null;render();
+  var re=RUN.restart;RUN.restart=null;if(re){setTimeout(function(){try{LASTPRESS={fn:re.fn,b:re.b,at:Date.now()};re.fn(re.b);}catch(e){}},300);}}
+/* 7.75: the other way, for this task from now on; a run working now starts again that way */
+function switchReadWay(w){var what=RUN.what;if(!what)return;readWaySet(what,w);if(RUN.busy&&RUN.again&&RUN.way!==w){RUN.restart=RUN.again;stopNow();}else paintLive();}
 /* 6.24: Stop stops. The engines answer a stop by handing back what was written so far, as if the reply had ended, so the layers around
    the ask (Ultra's check, the guard against repetition) went on to ask again; and a connection's request was never cancelled. Now Stop
    marks the studio's own request as stopped (lxAsk then refuses it at once, however many layers ask again: build_page.py 6.24, so
@@ -616,7 +697,19 @@ function gatherProfile0(o){var P=CS().profile,M=lectorMe(),runs=appsWanted();
         return {name:x.name,text:keys.map(function(k){return "("+k+") "+x.an[k];}).join("\n")};}).filter(function(x){return x.text;}),writing:(r[4]||[]).filter(Boolean),letters:(r[5]||[]).filter(Boolean),sources:[]};
       if(!o.cite||!P.use.fontes||P.isMe===false||typeof fontesItems!=="function")return G;var items=[];try{items=fontesItems().slice(0,30);}catch(e){}
       G.sources=items.map(function(c,i){var t="";try{t=fontesPlain(c);}catch(e){t=String(c.title||"");}return {n:i+1,text:t};});return G;});}
-function profileBlock(G,R){var parts=[],nm=myName(),wt=wantsText();if(wt)parts.push(wt);
+var CAPT=null,NOTES=null,ABOUT="";
+var RSTOP=/^(the|and|for|with|that|this|from|your|you|are|was|were|have|has|had|will|would|which|their|they|them|into|about|over|such|also|more|most|other|than|then|what|when|where|whose|who|how|all|any|each|our|its|not|but|can|may|must|should|one|two|work|working|role|roles|post|posts)$/;
+function words(t){var o={};String(t||"").toLowerCase().replace(/[^a-z0-9\u00c0-\u024f]+/g," ").split(" ").forEach(function(w){if(w.length>3&&!RSTOP.test(w))o[w]=1;});return o;}
+function bears(t,A){var n=0,W0=words(t);for(var k in W0)if(A[k])n++;return n;}
+/* the most relevant first, in order of what each shares with the task; the rest after, as they were */
+function byRelevance(list,textOf){if(!ABOUT||list.length<2)return list;var A=words(ABOUT);
+  return list.map(function(x,i){return {x:x,i:i,n:bears(textOf(x),A)};}).sort(function(a,b){return (b.n-a.n)||(a.i-b.i);}).map(function(o){return o.x;});}
+function itemsByRelevance(t){t=String(t||"");if(!ABOUT)return t;var L=t.split(/\n(?=- )/);return byRelevance(L,function(x){return x;}).join("\n");}
+function profileBlock(G,R){if(NOTES&&NOTES.G===G){var nb=[],wt0=wantsText(),nm0=myName();if(wt0)nb.push(wt0);
+    nb.push("THE PROFILE, READ PART BY PART (every fact below was copied from my profile, CV, documents and apps' readings; nothing else is a fact about me):"+(nm0?"\nName: "+nm0:"")+"\n\n"+cut(NOTES.text,Math.floor(R*0.95)));
+    return nb.join("\n\n");}
+  var out=profileBlock0(G,R);if(CAPT){CAPT.G=G;CAPT.block=out;try{CAPT.full=profileBlock0(G,1e9).length;CAPT.kept=out.length;}catch(e){}}return out;}
+function profileBlock0(G,R){var parts=[],nm=myName(),wt=wantsText();if(wt)parts.push(wt);G=Object.assign({},G,{items:itemsByRelevance(G.items),files:byRelevance(G.files||[],function(f){return f.name+" "+f.text;}),apps:byRelevance(G.apps||[],function(a){return a.name+" "+a.text;}),reading:byRelevance(G.reading||[],function(a){return a.title+" "+a.text;})});
   var away=leaves(),away_=function(t){return noContact(noPay(t));};parts.push("THE PROFILE (the only source of facts about me):"+(nm?"\nName: "+nm:"")+(G.items?"\n\n"+cut(G.items,Math.floor(R*0.34)):""));
   if(G.cv)parts.push("MY CV:\n"+cut(away?away_(cvNoRefs(G.cv)):G.cv,Math.floor(R*0.24)));
   if(G.linkedin)parts.push("MY LINKEDIN PROFILE (its headline and summary):\n"+cut(away?away_(G.linkedin):G.linkedin,Math.floor(R*0.05)));
@@ -1328,7 +1421,8 @@ var ICON={today:'<circle cx="12" cy="12" r="3.6"/><path d="M12 3.5v2.2M12 18.3v2
   learn:'<path d="M3.5 6.2c2.9-1.3 5.8-1.3 8.5.3 2.7-1.6 5.6-1.6 8.5-.3v12.6c-2.9-1.3-5.8-1.3-8.5.3-2.7-1.6-5.6-1.6-8.5-.3z"/><path d="M12 6.5v12.6"/>',
   people:'<circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9.5" r="2.5"/><path d="M15.6 14.3c2.4-.3 4.3 1.2 4.9 4.2"/>'};
 function ico(k){return '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'+(ICON[k]||"")+'</svg>';}
-function cbtn(cls,txt,fn,title){var b=h("button","c-btn"+(cls?" "+cls:""));b.type="button";b.textContent=txt;if(title)b.title=title;b.addEventListener("click",function(e){e.preventDefault();fn(b,e);});return b;}
+function cbtn(cls,txt,fn,title){var b=h("button","c-btn"+(cls?" "+cls:""));b.type="button";b.textContent=txt;if(title)b.title=title;b.addEventListener("click",function(e){e.preventDefault();LASTPRESS={fn:fn,b:b,at:Date.now()};fn(b,e);});return b;}
+var LASTPRESS=null;
 function chip(txt,cls){return h("span","c-chip"+(cls?" "+cls:""),esc(txt));}
 function seg(opts,val,fn,label){var s=h("div","c-seg");s.setAttribute("role","group");if(label)s.setAttribute("aria-label",label);
   opts.forEach(function(o){var b=h("button");b.type="button";b.textContent=o[1];b.setAttribute("aria-pressed",o[0]===val?"true":"false");b.addEventListener("click",function(){fn(o[0]);});s.appendChild(b);});return s;}
@@ -1442,6 +1536,12 @@ function draftFor(c){if(busyNow()||needModel())return;var S=CS(),P=S.profile;beg
 function jump(){var host=$("csHost");if(host)host.__jump=true;}
 function two(L,R,par){L.el.classList.add("c-list");R.el.classList.add("c-work");par.appendChild(L.el);par.appendChild(R.el);}
 function livePanel(){var P=panel("csLivePn",RUN.what||"Working",{cls:"c-live-pn"});var p=h("p","c-note");p.id="csWhat";p.textContent=RUN.what;P.body.appendChild(p);
+  /* 7.75: how it reads, always to hand; and how far it has read */
+  var wy=h("div","c-way");wy.id="csWay";wy.setAttribute("role","radiogroup");wy.setAttribute("aria-label","How it reads");wy.appendChild(h("span","c-way-l",esc("How it reads")));
+  ["quick","all"].forEach(function(k){var b=h("button","c-way-k");b.type="button";b.setAttribute("role","radio");b.setAttribute("data-way",k);b.textContent=READWAYS[k];
+    b.title=k==="quick"?"The parts of your profile that bear most on this, as much as this device reads in about a minute":"All of your profile, part by part, each part shown as it is read; then the answer from what was found";
+    b.addEventListener("click",function(){switchReadWay(k);});wy.appendChild(b);});P.body.appendChild(wy);
+  var mt=h("div","c-meter");mt.id="csMeter";mt.appendChild(h("i"));P.body.appendChild(mt);
   var st=h("p","c-live-state");st.id="csLiveState";st.setAttribute("aria-live","polite");P.body.appendChild(st);
   var th=h("details","c-think");th.id="csThink";th.open=true;th.appendChild(h("summary",null,esc("How the model is reasoning")));var tb=h("div","c-think-b");tb.id="csThinkB";th.appendChild(tb);P.body.appendChild(th);
   var sofar=h("div","c-sofar");sofar.id="csSoFar";P.body.appendChild(sofar);
@@ -1449,16 +1549,28 @@ function livePanel(){var P=panel("csLivePn",RUN.what||"Working",{cls:"c-live-pn"
   var pl=plan();P.foot.appendChild(h("span","c-note c-grow",esc(pl&&pl.link?"Written with "+(modelName()||"your model")+", "+whereLine()+".":"Written with "+(modelName()||"your model")+" on this device. Nothing leaves it.")));
   var sk=cbtn("pri","Stop",stopNow);sk.id="csStopKey";P.foot.appendChild(sk);setTimeout(paintLive,0);return P;}
 /* 6.22: what is shown while it works: the time, the model's own reasoning when it gives it, and each criterion as it is judged */
+function secsWord(s){s=Math.max(0,Math.round(s));return s<60?s+" second"+(s===1?"":"s"):Math.floor(s/60)+" min "+(s%60)+" s";}
+/* 7.75: before the first word, how far the model has read: the engine's own count where it gives one, else this device's measured speed */
+function readFrac(){var R=RUN.read,now=Date.now();if(R&&R.total>R.cache){var f=Math.max(0,Math.min(1,(R.done-R.cache)/(R.total-R.cache)));var el=(now-(RUN.tSent||now))/1000,left=f>0.04?el*(1-f)/f:null;return {f:f,left:left,real:true};}
+  if(!RUN.tSent)return null;var est=(RUN.sent||0)/3.2/rateOf(),el2=(now-RUN.tSent)/1000;return {f:Math.min(0.95,est>0?el2/est:0),left:Math.max(0,est-el2),real:false};}
+function keptLine(){var K=RUN.kept;if(!K||!K.full||K.kept>=K.full*0.98)return "";return " It reads the parts of your profile that bear most on this ("+Math.round(K.kept/1000)+",000 of "+Math.round(K.full/1000)+",000 characters); Step by step, everything reads all of it.";}
 function liveStateText(){var s=Math.max(0,Math.round((Date.now()-(RUN.t0||Date.now()))/1000)),t=s<60?s+" seconds":Math.floor(s/60)+" min "+(s%60)+" s";
-  if(!RUN.live&&!RUN.think)return "The model is reading the posting and your profile before its first word ("+t+" so far). A model on this device can take a minute or more here; a connected one is quicker.";
+  var pp=RUN.parts&&!RUN.parts.writing?"Step by step: reading part "+RUN.parts.i+" of "+RUN.parts.n+" of your profile, noting what bears on this ("+RUN.parts.notes.length+" with notes so far). ":"";
+  if(!RUN.live&&!RUN.think){var F=readFrac();if(!F)return pp+"Starting ("+t+").";
+    if(F.real)return pp+"The model has read "+Math.round(F.f*100)+" % of what it was given"+(F.left!=null?", about "+secsWord(F.left)+" to go":"")+" ("+t+" in all)."+(pp?"":keptLine());
+    return pp+"The model is reading what it was given: about "+secsWord(F.left)+" to go at this device's speed ("+t+" in all)."+(pp?"":keptLine());}
   if(RUN.think&&!RUN.live)return "The model is reasoning ("+t+" so far). Its reasoning is shown below as it comes.";
   var n=(String(RUN.live).match(/^\s*(?:[-*•]\s*)?(?:\*\*)?CRITERION(?:\*\*)?:/gim)||[]).length;return n?n+" criteri"+(n===1?"on":"a")+" judged so far ("+t+")."+(RUN.think?" Its reasoning is above.":""):"Writing ("+t+" so far).";}
 function paintLive(){var w=$("csWhat");if(w)w.textContent=RUN.what;var st=$("csLiveState");if(st)st.textContent=liveStateText();
+  var wy=$("csWay");if(wy){var cur=RUN.way||readWayOf(RUN.what);[].forEach.call(wy.querySelectorAll(".c-way-k"),function(b){b.setAttribute("aria-checked",String(b.getAttribute("data-way")===cur));});}
+  var mt=$("csMeter");if(mt){var F=(!RUN.live&&!RUN.think)?readFrac():null,P0=RUN.parts&&!RUN.parts.writing?RUN.parts:null,f=P0?((P0.i-1)+(F?F.f:0))/P0.n:(F?F.f:1);
+    mt.style.display=(!RUN.live&&!RUN.think)||P0?"":"none";var bar=mt.firstChild;if(bar)bar.style.width=Math.round(Math.max(0.02,Math.min(1,f))*100)+"%";mt.classList.toggle("est",!!(F&&!F.real));}
   var tb=$("csThinkB"),th=$("csThink");if(tb&&th){th.style.display=RUN.think?"":"none";if(tb.textContent!==RUN.think){tb.textContent=RUN.think;tb.scrollTop=tb.scrollHeight;}}
   var sf=$("csSoFar"),l=$("csLive"),r=null;if(sf&&RUN.live&&/CRITERION/i.test(RUN.live)){try{r=parseRead(RUN.live);}catch(e){r=null;}}
   if(sf){sf.innerHTML="";if(r&&r.crit.length){var t=h("table","c-tab c-tab-live");t.innerHTML="<thead><tr><th>Criterion</th><th>Judged</th><th>From your record</th></tr></thead>";var tbd=h("tbody");
       r.crit.forEach(function(x){var tr=h("tr");tr.innerHTML="<td>"+esc(x.text)+"<small>"+(x.ess?"Essential":"Desirable")+"</small></td><td>"+stChip(x)+"</td><td>"+(x.src?"<b>"+esc(x.src)+"</b> ":"")+esc(x.ev||"")+"</td>";tbd.appendChild(tr);});
       t.appendChild(tbd);sf.appendChild(t);}}
+  if(sf&&!(r&&r.crit.length)&&RUN.parts&&RUN.parts.notes.length&&!RUN.live){var nd=h("div","c-notes");nd.textContent=RUN.parts.notes.join("\n\n");sf.appendChild(nd);nd.scrollTop=nd.scrollHeight;}
   if(l){l.style.display=r&&r.crit.length?"none":"";l.textContent=RUN.live||"…";l.scrollTop=l.scrollHeight;}}
 function stChip(x){var lab={met:"Shown",transfer:"Transfers",partly:"Partly shown",none:"Not shown"}[x.st]||"Not shown";
   var g=(x.st==="partly"||x.st==="none")&&x.gap?"<span class=\"c-gap\" data-g=\""+x.gap+"\">"+{learn:"Learnable",ask:"Ask me",hard:"Required"}[x.gap]+"</span>":"";

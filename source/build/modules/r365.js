@@ -67,7 +67,7 @@ function transient(e){if(!e)return false;var m=String(e.message||e),s=+(e.status
   if(s===401||s===403||s===404||s===400||s===413||s===422)return false;
   if(s>=500||s===408||s===429)return true;
   return /fetch|network|load failed|timed? ?out|timeout|connection|reset|refused|unreachable|did not answer|no answer|aborted|socket|ECONN|EPIPE|502|503|504|gateway|unavailable|offline/i.test(m);}
-function stopped(run){try{return !!((run&&run.__stopped)||(W.LX&&LX.stop));}catch(e){return false;}}
+function stopped(run){try{return !!((run&&(run.__stopped||run.__cutNow))||(W.LX&&LX.stop));}catch(e){return false;}}  /* 7.75: __cutNow, Vocatio ending a reply that thought too long (r188), is not waited for */
 function wrap(){var O=W.lxAsk;if(typeof O!=="function"||O.__r365)return;
   var n=function(run,msgs,maxTok,temp,onPiece){var self=this,a=arguments;if(!linked())return O.apply(self,a);
     var t0=Date.now(),tries=0;

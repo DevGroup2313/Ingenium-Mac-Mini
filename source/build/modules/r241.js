@@ -47,8 +47,15 @@ function looping(t){t=String(t||"");if(t.length<500)return false;if((t.match(LOO
 function stopLine(why){return "[Ingenium stopped the thinking here"+(why==="loop"?", as it had begun going over the same ground,":", at the length set beside Thinking,")+" and the model answers now.]";}
 W.ingThinkLooping=looping;   /* for the tests */
 /* Engine.generate goes through here (build_page.py 6.46): a reply that thinks is watched; anything else passes as it was */
-W.ingThinkBudget=function(adapter,job){var p=(job&&job.params)||{},B=budgetChars(job,adapter);
-  if(!p.thinking||!adapter||typeof adapter.abort!=="function")return adapter.generate(job);if(!(B>0))B=Infinity;   /* No limit: still watched for circles */
+/* 7.75 (her words, 24 November 2026: "Right now, Vocatio has to contantly stop the model from its own loop when it is finally thinking
+   and force it to finally write its response ... I want that fixed properly this time"): a request that asks for no thinking (Lector's,
+   Vocatio's, Folders') went straight to the engine, unwatched, so a model that thinks anyway (some do, whatever the request says) thought
+   until she pressed Stop. Now it is watched too: its thinking is held to about 1,200 tokens and stopped at once if it goes round in
+   circles; the model then answers from its notes, and if it thinks again there, past about 300 tokens, it is stopped and its answer so
+   far is kept, or Ingenium says plainly that the model would not answer and names what to do. Nothing waits on Stop. */
+var UNASKED=1200,AGAIN=300;
+W.ingThinkBudget=function(adapter,job){var p=(job&&job.params)||{},unasked=!p.thinking,B=unasked?UNASKED*3.5:budgetChars(job,adapter);
+  if(!adapter||typeof adapter.abort!=="function")return adapter.generate(job);if(!(B>0))B=Infinity;   /* No limit: still watched for circles */
   var thought="",raw="",tagOpen=false,channel=false,answered=false,cut=false,why="";
   var oT=job.onToken||function(){},oK=job.onThink||null;
   function check(){if(cut||answered)return;if(thought.length>B)why="limit";else if(looping(thought))why="loop";else return;cut=true;try{adapter.abort();}catch(e){}}
@@ -65,8 +72,14 @@ W.ingThinkBudget=function(adapter,job){var p=(job&&job.params)||{},B=budgetChars
     var msgs=(job.messages||[]).slice(),li=-1;for(var i=msgs.length-1;i>=0;i--){if(msgs[i]&&msgs[i].role==="user"){li=i;break;}}
     var add="\n\n(Your notes from thinking about this so far:\n"+notes.trim()+"\n\nDo not think again and do not go back over these notes. Answer now, directly and completely.)";
     if(li>=0){var m=Object.assign({},msgs[li]);m.content=typeof m.content==="string"?m.content+add:(m.content||[]).concat([{type:"text",text:add}]);msgs[li]=m;}
-    var job2=Object.assign({},job,{messages:msgs,params:Object.assign({},p,{thinking:false}),onThink:null,onToken:oT});
-    return Promise.resolve(adapter.generate(job2)).then(function(r2){return {text:((r1&&r1.text)||"")+close+((r2&&r2.text)||""),stats:(r2&&r2.stats)||(r1&&r1.stats)||{},thinkCut:why};});});};
+    /* 7.75: the answer from the notes is watched too: a model that thinks again past AGAIN tokens is stopped there */
+    var t2="",raw2="",cut2=false,ans2=false;function check2(){if(cut2||ans2)return;if(t2.length>AGAIN*3.5||looping(t2)){cut2=true;try{adapter.abort();}catch(e){}}}
+    var job2=Object.assign({},job,{messages:msgs,params:Object.assign({},p,{thinking:false}),onThink:function(t){if(t){t2+=t;check2();}},
+      onToken:function(t){raw2+=t;var s2=raw2.replace(/^\s+/,"");if(/^<think>/i.test(s2)&&!/<\/think>/i.test(s2)){t2=s2.slice(7);check2();return;}
+        if(String(t||"").trim())ans2=true;oT(t);}});
+    return Promise.resolve(adapter.generate(job2)).then(function(r2){var a2=(r2&&r2.text)||"";a2=a2.replace(/^\s*<think>[\s\S]*?(<\/think>|$)/i,"");
+      if(cut2&&!a2.trim()&&unasked)throw new Error("The model went on thinking and gave no answer, twice. Choose another model for this (Mentes, or Lector's Read and written by), or use your Mac mini's.");
+      return {text:((r1&&r1.text)||"")+close+a2,stats:(r2&&r2.stats)||(r1&&r1.stats)||{},thinkCut:why};});});};
 
 /* ---------- 2. only when it helps: a short, simple message is answered at once ---------- */
 function lastMine(){try{var ms=curMsgs();for(var i=ms.length-1;i>=0;i--)if(ms[i].role==="me")return ms[i];}catch(e){}return null;}

@@ -719,7 +719,7 @@ var Diamond=(function(){
     var gT=GPU.st==="probe"?performance.now():0;
     gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
     if(GPU.st==="probe"){try{gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,PX1);}catch(e){}GPU.n++;if(GPU.n>1)GPU.ms+=performance.now()-gT;if(GPU.n>=3){decide();if(GPU.st==="still")return;}}
-    else if(GPU.good<3&&++GPU.good===3)trying(false);
+    else if(GPU.good<3&&++GPU.good===3){trying(false);try{localStorage.setItem("ing.gpu.diamond.ok",GPU.st);localStorage.removeItem("ing.diamond.retried");}catch(e){}}
     sparkle(tt,M,DC,nt);if(BG.ok){if(st||BG.n%2===0)bgDraw(tt,nt);BG.n++;}if(!st||busy)later(gap);}
   /* 7.40: the graphics card measured first, and a still stone where it cannot keep up. Her words (18 November 2026): "the Adamas page has
      consistently crashed the app everytime that I have tried to go on the page" (her HP laptops, one with weaker graphics). Measured on
@@ -732,7 +732,19 @@ var Diamond=(function(){
      it is not drawn. localStorage "ing.gpu.diamond": "full" or "still" chooses by hand (the tests use it). */
   var GPU={st:"",n:0,ms:0,est:0,good:0,why:""},PX1=new Uint8Array(4),PQ=0.35;
   function trying(on){try{if(on)localStorage.setItem("ing.diamond.trying","1");else localStorage.removeItem("ing.diamond.trying");}catch(e){}}
+  /* 7.75 (her words, 24 November 2026: "The diamond is blurred in the background, and the holder is missing from view in the Guided Tour
+     section of the Adamas page ... it ruins the entire 3D visuals of the tour page"). Read in the code: the still stone is drawn from
+     its colours' pictures (softer than the scene), with no holder and no sky; and it was chosen for good whenever the mark above was
+     left on the device. The mark was meant for an app that stopped while the scene was being tried; but the guided tour shows Adamas
+     only for a moment, and a page left before three frames were drawn left the mark too, so every later visit showed the still stone,
+     and as the still stone draws no frames, the mark was never taken away. Now the mark is taken away whenever the scene is not being
+     drawn (the page hidden or scrolled away, the window in the background, the app closed as usual); a device that has drawn the moving
+     stone well before is given one fresh try instead of the still stone; and a measurement too slow for the scene is taken again, once,
+     a moment later (the tour's card and a page that has just opened can slow the first frames) before the stone is shown still. */
+  function seenOk(){try{return !!localStorage.getItem("ing.gpu.diamond.ok");}catch(e){return false;}}
+  var REPROBED=false;
   function decide(){var full=GPU.ms/Math.max(1,GPU.n-1)/(PQ*PQ);GPU.est=Math.round(full);
+    if(full>900&&!REPROBED){REPROBED=true;GPU.n=0;GPU.ms=0;return;}   /* 7.75: once more, a moment later, before the stone is shown still */
     if(full<=55){q=1;GPU.st="full";}else if(full<=220){q=Math.max(0.6,Math.min(1,Math.sqrt(55/full)));GPU.st="lite";SLOW=Math.max(SLOW,1.25);}
     else if(full<=900){q=0.5;GPU.st="low";SLOW=2;}else{goStill("slow");return;}size();}
   function goStill(why){GPU.st="still";GPU.why=why;ok=false;if(raf===-1){clearTimeout(TMO);TMO=0;}else if(raf)cancelAnimationFrame(raf);raf=0;trying(false);
@@ -750,6 +762,8 @@ var Diamond=(function(){
        a device that falls behind still lowers it, as before */size();ok=init();if(!ok){host.setAttribute("data-nogl","1");return;}
     (function(){var force="",crashed=false;try{force=localStorage.getItem("ing.gpu.diamond")||"";crashed=localStorage.getItem("ing.diamond.trying")==="1";}catch(e){}
       cv.addEventListener("webglcontextlost",function(e){e.preventDefault();goStill("lost");});
+      /* 7.75: a device that has drawn the moving stone well is given one fresh try after a mark it may have left by leaving early */
+      if(crashed&&force!=="still"&&seenOk()){var re="";try{re=localStorage.getItem("ing.diamond.retried")||"";localStorage.setItem("ing.diamond.retried","1");}catch(e){}if(!re)crashed=false;}
       if(force==="still"||(crashed&&force!=="full")){GPU.st="still";ok=false;setTimeout(function(){goStill(crashed?"stopped":"chosen");},0);return;}
       if(force==="full"){GPU.st="full";return;}
       GPU.st="probe";q=PQ;size();trying(true);})();try{bgInit(host.closest?host.closest(".skh"):null);}catch(e){BG.ok=false;}
@@ -774,8 +788,11 @@ var Diamond=(function(){
     host.addEventListener("pointerdown",function(e){var t=(performance.now()-t0)/1000;touchAt(e);if(!over){var hp=hitPart(at(e));if(!hp)return;holdPress(hp.k,t,hp.x,hp.z);host.setAttribute("data-part",hp.k);try{if(W.IngSound)IngSound.play("paper");}catch(x){}kick();return;}press=t;if(!still()){DDN=t;if(LIGHT&&t-PL.s>PER*0.3){pulse(t);NEXT=Math.max(NEXT,t+16+Math.random()*12);}}try{if(W.IngSound&&IngSound.play)IngSound.play("paper");}catch(x){}kick();});
     host.addEventListener("pointerup",function(e){if(DDN!=null){var tu=(performance.now()-t0)/1000;DDN=null;DKB=tu;startDFl(tu);kick();}touchOff(e);});
     host.addEventListener("pointercancel",function(e){if(e.pointerType&&e.pointerType!=="mouse"&&DDN!=null){DDN=null;DKB=(performance.now()-t0)/1000;}touchOff(e);});
-    try{new IntersectionObserver(function(es){var e=es[es.length-1];var hh=e.boundingClientRect.height,sn=e.isIntersecting&&!(hh>0&&e.intersectionRect.height<hh*0.3);vis=sn;if(vis)kick();},{threshold:[0,0.1,0.2,0.3,0.4,0.5,1],rootMargin:"-48px 0px 0px 0px"}).observe(host);}catch(e){}/* 7.27: the scene draws while three tenths of it are in view below the top bar (modules/r310.js) */
-    D.addEventListener("visibilitychange",function(){shown=!D.hidden;if(shown)kick();});kick();}
+    /* 7.75: the mark stands only while the scene is being tried on screen */
+    function markNow(){if(GPU.st!=="probe")return;trying(!!(vis&&shown));}
+    W.addEventListener("pagehide",function(){if(GPU.st==="probe")trying(false);});
+    try{new IntersectionObserver(function(es){var e=es[es.length-1];var hh=e.boundingClientRect.height,sn=e.isIntersecting&&!(hh>0&&e.intersectionRect.height<hh*0.3);vis=sn;markNow();if(vis)kick();},{threshold:[0,0.1,0.2,0.3,0.4,0.5,1],rootMargin:"-48px 0px 0px 0px"}).observe(host);}catch(e){}/* 7.27: the scene draws while three tenths of it are in view below the top bar (modules/r310.js) */
+    D.addEventListener("visibilitychange",function(){shown=!D.hidden;markNow();if(shown)kick();});kick();}
   return {gpu:function(){return {st:GPU.st,est:GPU.est,why:GPU.why,q:q,slow:SLOW,n:GPU.n,ms:Math.round(GPU.ms),ok:ok,vis:vis,shown:shown};},stillDraw:function(){stillDraw();},mount:mount,kick:kick,theme:kick,tint:tint,family:family,fam:function(){return FAM?JSON.parse(JSON.stringify(FAM)):null;},tinted:function(){return {stone:CU4.slice(),band:EN4.slice()};},fire:function(){},q:function(){return q;},variant:function(v){if(v==="auto"){AUTO=true;VAR=byHour();}else{AUTO=false;var i=LOOKS.indexOf(v);VAR=i<0?0:i;}var t=(performance.now()-t0)/1000;if(!still()&&LIGHT)pulse(t);kick();},light:function(on){LIGHT=!!on;if(LIGHT)NEXT=(performance.now()-t0)/1000+1.2;else PL.s=-99;kick();},look:function(){return LOOKS[VAR<0?byHour():VAR];},auto:function(){return AUTO;},dial:function(v){if(v==null)return DIAL?"orrery":"engine";DIAL=v==="orrery"?1:0;kick();},press:function(k,x,z){holdPress(k,(performance.now()-t0)/1000,x,z);kick();},holder:function(){return {ot:HO.ot,bz:HO.bz,ba:HO.ba,tilt:HT2[0],lean:HT2[1]};}};})();
 
 /* ---------- the header, made as Lector's, Vocatio's and Fabrica's are ---------- */
