@@ -395,6 +395,50 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.72 (24 November 2026): Fabrica's diamonds in Adamas's colour; no more blank pages; your ways of working inside How I work;
+the Ollama row; Mentes' Engine, Health, storage and Train overview raised and steady.
+
+Her message of 24 November 2026 (the first of its stages; the rest follow in later releases).
+- Fabrica's small diamonds (`build/modules/r294.js`). Her words: "I want the diamond spinning on top of Fabrica's tree to match Adamas'
+  diamond in colour and animation ... go by the hour and change with the time of day and day and night themes ... animated and clickable
+  like the rest of the tree". Each small diamond (at a branch's end, an arch, a release's collar) now draws Adamas's own stone from its
+  colours (r314's IngDiamondColours.drawn: the main diamond's 24 frames through 45 degrees, in her family), its shade chosen as Adamas
+  chooses it (r292's stillDraw: by night the night shade; by day By the hour, morning 5 to 11, midday 11 to 14, afternoon 14 to 18, then
+  evening, or the shade she set). It turns with the tree; under the pointer it lifts, grows a little and says its colour and shade; pressed,
+  it spins three turns with a glint (not when motion is set to still); the tree looks again each minute for a new hour's shade. The clear
+  crystal of before stays for a copy without Adamas's colours. Found on the way: the diamonds' positions were kept in a second list the
+  pointer never read, so they could not be pressed; a list of their own (GH) is read now. IngTree.gems() for the tests.
+- No more blank pages (`build/modules/r324.js`). Her words: "Sometimes the pages all blank out of view and leave an empty background ...
+  when the screen is left inactive for a while and my mouse movement always bring the page back ... find the issue and fix it at the
+  root". Rest (7.40) paused every animation with one rule, the finished ones too, and comes 30 seconds after the last touch or 1.5 seconds
+  after the window loses focus; each page comes in with an animation from nothing (.section.active, ingPageIn, from opacity 0). Safari's
+  engine, which runs the Mac app, can start a finished animation again when its play state changes, held at its first frame: the page at
+  opacity 0 until a movement ends the rest. Chromium does not, so the fault could not be seen in the tests, and the fix is checked on her
+  Mac. Now an element whose animation has ended is marked (.ing-done, and .ing-done-b, .ing-done-a for its ::before and ::after; the
+  mark goes when an animation starts on it again; the animations already finished are marked as rest begins) and rest never pauses it;
+  and when the window comes back into view, the page is painted once more (html.ing-repaint, one frame).
+- Your ways of working inside How I work (`build/modules/r327.js`). Her words: "I want the "Your ways of working" section to be folded
+  into or added into the "How I work" section and not be two separate areas". It stands inside How I work, on every app (r208's card,
+  Ingenia's How I work tab), above her own words, which have their heading now, In your own words; Ingenia draws that card again whenever
+  it paints, and a watcher of its parent's children puts the rules back each time. Found on the way: the card's raised look was written for
+  a direct child of the page; the same look is given to it inside How I work.
+- The Ollama row (`build/modules/r263.js`). Her words: "the paragraph is compacted into one single column and makes the panel really
+  long to scroll". In the Bring in your work sheet each source is a row of its symbol, its words and its keys; on her Mac Ollama has three
+  keys, and the keys' column took the row. A row with more than one key (.fd-many) now puts its keys on a line of their own beneath its
+  words.
+- Mentes (`build/modules/r364.js`, new; `build/modules/r214.js`). Her words: the Engine tab's "The engines on this computer" section "is
+  really flat, stiff and rigid ... I want that section to match the rest of Ingenium's look and animation ... a slight redesign to match
+  the rest of the tabs on the Mentes page"; the Train tab's overview cards "look compressed in and cramped in and they also keep on
+  popping up and down"; "the "Health" and "Where your models are kept" sections are all flat ... give them the signature lift and 3D
+  popped out animation and refined look of the sticky notes side menu panel". The two engines are raised plates (each with its cog, which
+  turns a little under the pointer; the one running marked Runs now), the three choices raised cards with a dot that fills when chosen,
+  the kinds only the newer engine loads as chips; what the choices do is unchanged. The Train overview's labels (Here, On a computer, Not
+  yet, Not at home) had been laid over their titles by the turret's rule for its own labels (r269 and r199 share the class .tr-tag); they
+  are pills above the titles again, the cards have more room, and each card keeps a strip beneath it while lifted, so a pointer near its
+  foot no longer drops it and lifts it again (the popping). Health's four readings and the places where models are kept are raised tiles
+  (--pop at rest, --pop-hi and a 3-pixel lift under the pointer, a press), their cards lifting a little.
+- rig/t_772_fixes.js (new): 16 checks.
+
 Ingenium 7.71 (23 November 2026): ten more nature sounds; Lending now as a key; Clavis in Ingenia; Clavis 111 and Lakay 26 carried.
 Approved on its pictures and on hearing the sounds (source/previews/sounds_clavis, lending_card and nature_sounds; the pictures and the
 sound files stay out of the repository): "I approve of the previews and I choose Design B for the Lending now design, please commit and

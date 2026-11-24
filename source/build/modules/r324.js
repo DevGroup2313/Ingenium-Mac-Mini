@@ -11,7 +11,16 @@
    Ingenium is not the window in use: every running animation holds where it is, and the scenes stop drawing. The first touch, key, scroll
    or pointer movement brings everything back where it was. Never while a model writes, a file comes down, or Fabrica works: those keep
    their moving signs. Minimal motion is unchanged (still always). */
-body.ing-rest *,body.ing-rest *::before,body.ing-rest *::after{animation-play-state:paused!important}
+/* 7.72 (her words, 24 November 2026: "Sometimes the pages all blank out of view and leave an empty background on Ingenium's pages ... It
+   mostly happens when the screen is left inactive for a while and my mouse movement always bring the page back ... please find the issue
+   and fix it at the root"). The cause, as far as can be told here: rest paused every animation, the finished ones too, and each page
+   comes in with an animation from nothing (.section.active, ingPageIn, from opacity 0); Safari's engine, which runs the Mac app, can
+   start a finished animation again when its play state changes, held at its first frame: the whole page at opacity 0 until the pointer
+   moves and rest ends (Chromium, where the tests run, does not, so it could not be seen there). Now rest pauses only the animations
+   still running: an element whose animation has ended is marked (.ing-done; its ::before and ::after apart) and is never paused; a mark
+   is taken away when an animation starts on it again. And when the window comes back into view the page is painted once more. */
+body.ing-rest *:not(.ing-done),body.ing-rest *:not(.ing-done-b)::before,body.ing-rest *:not(.ing-done-a)::after{animation-play-state:paused!important}
+html.ing-repaint body{outline:1px solid transparent}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p324"]="started";}catch(_){}
 /* R324 · at rest, still: see the note at the top of its styles. window.IngStill {on(), wake(fn), now()} */
@@ -27,7 +36,17 @@ function busy(){try{if(typeof Engine!=="undefined"&&Engine&&(Engine.status==="bu
   try{if(D.querySelector('[aria-busy="true"]'))return true;}catch(e){}
   return false;}
 function away(){return D.hidden||!(D.hasFocus?D.hasFocus():true);}
-function set(on){if(on===ON)return;ON=on;try{D.body.classList.toggle("ing-rest",on);}catch(e){}
+/* finished animations are marked, and never paused at rest (see the note at the top) */
+function cls(e){return e&&e.pseudoElement==="::before"?"ing-done-b":e&&e.pseudoElement==="::after"?"ing-done-a":"ing-done";}
+D.addEventListener("animationend",function(e){var t=e.target;if(t&&t.classList)t.classList.add(cls(e));},true);
+D.addEventListener("animationstart",function(e){var t=e.target;if(t&&t.classList)t.classList.remove(cls(e));},true);
+function markEnded(){try{if(!D.getAnimations)return;D.getAnimations().forEach(function(a){var ef=a.effect,t=ef&&ef.target;if(!t||!t.classList||!a.animationName)return;
+  if(a.playState==="finished")t.classList.add(ef.pseudoElement==="::before"?"ing-done-b":ef.pseudoElement==="::after"?"ing-done-a":"ing-done");});}catch(e){}}
+/* the page painted once more when the window comes back into view (a second safeguard) */
+function repaint(){var h=D.documentElement;if(!h||h.classList.contains("ing-repaint"))return;h.classList.add("ing-repaint");
+  requestAnimationFrame(function(){requestAnimationFrame(function(){h.classList.remove("ing-repaint");});});}
+function set(on){if(on===ON)return;ON=on;if(on)markEnded();try{D.body.classList.toggle("ing-rest",on);}catch(e){}
+  if(!on)repaint();
   if(!on){var w=WAKE;WAKE=[];w.forEach(function(f){try{f();}catch(e){}});try{W.dispatchEvent(new CustomEvent("ing-wake"));}catch(e){}}}
 function check(){T=0;if(ON)return;var idle=performance.now()-LAST;
   if(away()||idle>=AFTER){if(busy()){T=setTimeout(check,2000);return;}set(true);return;}
@@ -35,7 +54,8 @@ function check(){T=0;if(ON)return;var idle=performance.now()-LAST;
 function touched(){LAST=performance.now();if(ON)set(false);if(!T)T=setTimeout(check,AFTER+50);}
 ["pointerdown","pointermove","keydown","wheel","touchstart","input","focusin"].forEach(function(k){D.addEventListener(k,touched,{capture:true,passive:true});});
 D.addEventListener("scroll",touched,{capture:true,passive:true});
-D.addEventListener("visibilitychange",function(){if(D.hidden){clearTimeout(T);T=0;check();}else touched();});
+D.addEventListener("visibilitychange",function(){if(D.hidden){clearTimeout(T);T=0;check();}else{touched();repaint();}});
+W.addEventListener("pageshow",repaint);
 W.addEventListener("blur",function(){clearTimeout(T);T=setTimeout(check,1500);});
 W.addEventListener("focus",touched);
 /* the page sets a busy sign later: rest waits for it to end */
@@ -44,7 +64,7 @@ W.IngStill={version:1,
   on:function(){return ON;},
   /* a scene that stops drawing at rest asks to be woken; each asks once per rest */
   wake:function(fn){if(typeof fn==="function"&&WAKE.indexOf(fn)<0)WAKE.push(fn);},
-  now:function(){set(true);},touched:touched,after:AFTER};
+  now:function(){set(true);},touched:touched,after:AFTER,repaint:repaint,marked:function(){return D.querySelectorAll(".ing-done").length;}};
 })();
 ;try{window.__ingParts["p324"]="running";}catch(_){}
 </script>

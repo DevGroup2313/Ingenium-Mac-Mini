@@ -118,6 +118,26 @@ function demo(){var t=[],now=Date.now();for(var i=0;i<7;i++)t.push({oid:"",short
    bands between the beads in place of the wire, no rising light, the rods' silver in steps of a quarter of a degree, the diamonds
    blended between frames. */
 var SH=null,DEMO=null,GEMS=[];
+/* 7.72, her words (24 November 2026): "I want the diamond spinning on top of Fabrica's tree to match Adamas' diamond in colour and animation.
+   I want the little diamond to match the colour set by Adamas main diamond and also go by the hour and change with the time of day and day
+   and night themes instead of just staying plain clear at all times. I also want it to be animated and clickable like the rest of the
+   tree". So each small diamond draws Adamas's own stone (IngDiamondColours.drawn: the main diamond's 24 frames through 45 degrees, in the
+   family and shade she set in Adamas), its shade chosen as Adamas chooses it: by night the night shade, by day By the hour (morning 5 to
+   11, midday 11 to 14, afternoon 14 to 18, then evening) or the shade she chose. It turns with the tree, lifts under the pointer with its
+   words, and spins with a glint when pressed. The clear crystal of before stays for a copy without Adamas's colours. */
+var GH=[],HG=-1,GSPIN=null,AST={src:"",img:null,fw:0,fh:0};
+function byHour(){var h=new Date().getHours();return h>=5&&h<11?0:(h>=11&&h<14?1:(h>=14&&h<18?2:3));}
+function adamasSrc(){var C=W.IngDiamondColours;if(!C||typeof C.get!=="function"||typeof C.drawn!=="function")return null;
+  try{var d=C.get();if(!d||!d.fam)return null;var sh=d.shade,i=night()?3:(sh==="auto"||!sh?byHour():({pastel:0,medium:1,deep:2})[sh]);if(i==null)i=1;return C.drawn(d.fam,d.own,i)||null;}catch(e){return null;}}
+function adamasStrip(){var src=adamasSrc();if(!src)return AST.img?AST:null;
+  if(AST.src!==src){AST.src=src;var im=new Image();im.decoding="async";im.onload=function(){if(AST.src!==src)return;AST.img=im;AST.fw=im.naturalWidth/24;AST.fh=im.naturalHeight;try{kick();}catch(e){}};im.src=src;}
+  return AST.img&&AST.fw?AST:null;}
+function gemHit(p){var best=-1,bd=1e9;GH.forEach(function(G,i){var d=Math.hypot(G[0]-p.x,G[1]-p.y);if(d<Math.max(10,G[2]*1.1)&&d<bd){bd=d;best=i;}});return best;}
+function gemWords(){var C=W.IngDiamondColours,w="";try{if(C&&typeof C.says==="function")w=String(C.says()||"").split(" · ")[0];}catch(e){}
+  var h=byHour(),when=night()?"the night shade":["the morning shade","the midday shade","the afternoon shade","the evening shade"][h];
+  return "<b>Adamas's diamond</b>"+(w?esc(w)+" · ":"")+"in "+when+". Press it to spin it.";}
+function showGemTip(i){var G=GH[i];if(!G||!tip)return;tip.innerHTML=gemWords();var x=G[0]+G[2]+10,y=G[1]-14;if(x>300)x=G[0]-G[2]-10-200;tip.style.left=Math.max(0,x*0.92)+"px";tip.style.top=Math.max(0,y*0.92)+"px";tip.classList.add("fbt-show");}
+setInterval(function(){try{if(D.hidden||(W.IngStill&&IngStill.on()))return;if(!page||!page.classList.contains("active"))return;var s=adamasSrc();if(s&&s!==AST.src)adamasStrip();}catch(e){}},60000);
 /* the 2D drawing on the tree's canvas */
 function hex(c){var h=function(v){v=Math.round(Math.max(0,Math.min(1,v))*255);return (v<16?"0":"")+v.toString(16);};return "#"+h(c[0])+h(c[1])+h(c[2]);}
 var VCL=(function(){var x=-.5,y=-.62,z=.6,l=Math.sqrt(x*x+y*y+z*z);return [x/l,y/l,z/l];})();
@@ -271,7 +291,15 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
     var g4=[];GR.forEach(function(x){g4.push(x[0],x[1],x[2],x[3]);});gl.uniform4fv(gl.getUniformLocation(pr,"uG[0]"),new Float32Array(g4));gl.uniform1f(gl.getUniformLocation(pr,"uN"),nt?1:0);var uY=gl.getUniformLocation(pr,"uY");
     var out=[];gl.viewport(0,0,N,N);for(var f=0;f<8;f++){gl.uniform1f(uY,f/8*Math.PI/4);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);var cc=D.createElement("canvas");cc.width=cc.height=N;cc.getContext("2d").drawImage(c,0,0);out.push(cc);}
     try{var ext=gl.getExtension("WEBGL_lose_context");if(ext)ext.loseContext();}catch(e){}return GEM[key]=out;}
-  var GEMS=[];function gemAt(g,x,y,size,phase){var fr=gemFrames(night());if(!fr)return;var gu=(((ANG*2.2+phase)%(Math.PI/4)+Math.PI/4)%(Math.PI/4))/(Math.PI/32),k=Math.floor(gu)%8,gf=gu-Math.floor(gu),ga=g.globalAlpha;
+  var GEMS=[];function gemAt(g,x,y,size,phase){var gi=GH.length,now=performance.now(),sp=GSPIN&&GSPIN.k===gi?Math.min(1,(now-GSPIN.t)/1400):1,ga0=g.globalAlpha;
+    if(sp>=1&&GSPIN&&GSPIN.k===gi)GSPIN=null;var over=HG===gi,sz=size*(over?1.16:1)*(sp<1?1+0.22*Math.sin(sp*Math.PI):1),yy=y-(over?1.5:0);
+    var extra=sp<1&&!still()?(1-Math.pow(1-sp,3))*(Math.PI/4)*6:0;if(sp<1)setTimeout(kick,16);
+    var A=adamasStrip();
+    if(A){var u=(((ANG*2.2+phase+extra)%(Math.PI/4)+Math.PI/4)%(Math.PI/4))/(Math.PI/4)*24,k=Math.floor(u)%24,f=u-Math.floor(u),w=sz*2.25,h=w*A.fh/A.fw,x0=x-w/2,y0=yy-h*0.58;
+      g.drawImage(A.img,k*A.fw,0,A.fw,A.fh,x0,y0,w,h);g.globalAlpha=ga0*f;g.drawImage(A.img,((k+1)%24)*A.fw,0,A.fw,A.fh,x0,y0,w,h);g.globalAlpha=ga0;
+      if(sp<1){var gl=g.createRadialGradient(x,yy-h*0.08,0,x,yy-h*0.08,w*0.7);gl.addColorStop(0,"rgba(255,255,255,"+(0.75*(1-sp)).toFixed(3)+")");gl.addColorStop(1,"rgba(255,255,255,0)");g.fillStyle=gl;g.beginPath();g.arc(x,yy-h*0.08,w*0.7,0,Math.PI*2);g.fill();}
+      GH.push([x,yy,sz,phase]);GEMS.push([x,y,size,phase]);return;}
+    size=sz;y=yy;var fr=gemFrames(night());if(!fr){GH.push([x,yy,sz,phase]);return;}GH.push([x,yy,sz,phase]);var gu=(((ANG*2.2+phase)%(Math.PI/4)+Math.PI/4)%(Math.PI/4))/(Math.PI/32),k=Math.floor(gu)%8,gf=gu-Math.floor(gu),ga=g.globalAlpha;
     g.drawImage(fr[k],x-size,y-size*0.95,size*2,size*2);g.globalAlpha=ga*gf;g.drawImage(fr[(k+1)%8],x-size,y-size*0.95,size*2,size*2);g.globalAlpha=ga;GEMS.push([x,y,size,phase]);}
   /* ---------- a silver setting round a bead: a fine bezel and four claws ---------- */
   function setting(g,x,y,R){var nt=night(),gr=g.createLinearGradient(x-R,y-R,x+R,y+R);gr.addColorStop(0,nt?"#f2eefb":"#ffffff");gr.addColorStop(0.5,nt?"#8c86a6":"#c9c4d8");gr.addColorStop(1,nt?"#3c3652":"#7d7695");
@@ -311,7 +339,7 @@ function vcEnamel(nx,ny,nz,base,nt,o){var l=Math.sqrt(nx*nx+ny*ny+nz*nz);nx/=l;n
     g.fillStyle=gr;g.beginPath();g.arc(q.x,q.y,R*0.95,0,TAU);g.fill();g.restore();}
   /* ---------- a frame: back to front, as before ---------- */
   function draw(){if(!cv)return;var d=dpr(),px=Math.round(423.2*d);if(cv.width!==px){cv.width=px;cv.height=px;}var g=cv.getContext("2d");if(!g)return;g.setTransform(d*0.92,0,0,d*0.92,0,0);g.clearRect(0,0,460,460);
-    var nt=night(),T=TREE||DEMO||(DEMO=demo()),S=T._shape||(T._shape=shape(T)),ang=ANG,prims=[];SH=S;BEADS=[];GEMS=[];RISE=rise();
+    var nt=night(),T=TREE||DEMO||(DEMO=demo()),S=T._shape||(T._shape=shape(T)),ang=ANG,prims=[];SH=S;BEADS=[];GEMS=[];GH=[];RISE=rise();
     var halo=g.createRadialGradient(CX,200,10,CX,220,230);halo.addColorStop(0,nt?"rgba(183,156,230,.14)":"rgba(255,255,255,.7)");halo.addColorStop(1,"rgba(255,255,255,0)");g.fillStyle=halo;g.fillRect(0,0,460,460);
     var cy=BASEY+6,rx=136,ry=rx*Math.sin(PITCH)+4;var sh=g.createRadialGradient(CX,cy+30,10,CX,cy+30,rx*1.2);sh.addColorStop(0,nt?"rgba(0,0,0,.55)":"rgba(46,23,100,.22)");sh.addColorStop(1,"rgba(0,0,0,0)");
     g.fillStyle=sh;g.beginPath();g.ellipse(CX,cy+30,rx*1.2,ry*1.5,0,0,TAU);g.fill();g.drawImage(plinthImg(nt),0,0,460,460);
@@ -373,12 +401,14 @@ function words(b){if(b.wait)return "<b>Not kept yet</b>"+(TREE&&TREE.waiting?TRE
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 function showTip(B){if(!B){tip.classList.remove("fbt-show");return;}tip.innerHTML=words(B.b);var x=B.x+B.r+10,y=B.y-14;if(x>300)x=B.x-B.r-10-200;tip.style.left=Math.max(0,x*0.92)+"px";tip.style.top=Math.max(0,y*0.92)+"px";tip.classList.add("fbt-show");}
 function bind(){stage.addEventListener("pointerenter",function(){TARGET=0;kick();});
-  stage.addEventListener("pointerleave",function(){if(DN){KB={b:DN.b,t:performance.now()};DN=null;}TARGET=1;HOVER=null;showTip(null);stage.classList.remove("fbt-on-bead");kick();});
+  stage.addEventListener("pointerleave",function(){if(DN){KB={b:DN.b,t:performance.now()};DN=null;}TARGET=1;HOVER=null;showTip(null);HG=-1;stage.classList.remove("fbt-on-bead");kick();});
   stage.addEventListener("pointerdown",function(e){var p=at(e);DRAG={x:p.x,a:ANG,moved:false,id:e.pointerId};var Bd=hit(p);DN=Bd&&!still()?{b:Bd.b,t:performance.now()}:null;if(DN)kick();try{stage.setPointerCapture(e.pointerId);}catch(_){}stage.classList.add("fbt-drag");});
   stage.addEventListener("pointermove",function(e){var p=at(e);if(DRAG){var dx=p.x-DRAG.x;if(Math.abs(dx)>3)DRAG.moved=true;if(DRAG.moved){ANG=DRAG.a+dx*0.012;HOVER=null;showTip(null);kick();return;}}
-    var B=hit(p),b=B?B.b:null;if(b!==HOVER){HOVER=b;showTip(B);stage.classList.toggle("fbt-on-bead",!!b);kick();}stage.classList.toggle("fbt-on-part",!b&&!!part(p));});
+    var B=hit(p),b=B?B.b:null;if(b!==HOVER){HOVER=b;showTip(B);stage.classList.toggle("fbt-on-bead",!!b);kick();}stage.classList.toggle("fbt-on-part",!b&&!!part(p));
+    var Gi=b?-1:gemHit(p);if(Gi!==HG){HG=Gi;if(Gi>=0)showGemTip(Gi);else if(!b)showTip(null);kick();}if(Gi>=0){stage.classList.add("fbt-on-bead");stage.classList.remove("fbt-on-part");}});
   stage.addEventListener("pointerup",function(e){var d=DRAG;DRAG=null;stage.classList.remove("fbt-drag");try{stage.releasePointerCapture(e.pointerId);}catch(_){}
     var dn=DN;DN=null;if(d&&d.moved){kick();return;}var p=at(e),B=hit(p);try{if(W.IngSound&&IngSound.play)IngSound.play("paper");}catch(_){}
+    if(!B){var Gp=gemHit(p);if(Gp>=0){GSPIN={k:Gp,t:performance.now()};showGemTip(Gp);kick();return;}}
     if(B){PR={b:B.b,t:performance.now(),d:Math.random()<0.5?-1:1};if(!still()){KB={b:B.b,t:performance.now()};startFl(B.b);}kick();press(B.b);return;}if(dn&&!still())KB={b:dn.b,t:performance.now()};var k=part(p);if(k){KN.t=performance.now();KN.k=k;TV+=k==="plinth"?2.6:1.6;kick();}});}
 function press(b){var x=X();if(!x||!TREE||TREE.demo)return;
   /* 6.97: the page stays where it is. Her word (6.95): "please remove the scrolling down the page effect from it and everywhere else.
@@ -440,7 +470,7 @@ try{new MutationObserver(function(){SIG="";refresh();draw();kick();}).observe(D.
 (function(){var inSheet=false;
   D.addEventListener("pointerdown",function(e){var t=e.target;inSheet=!!(t&&t.closest&&t.closest("#page-fabrica.sk-on #fb .f-sheet"));},true);
   D.addEventListener("click",function(e){var t=e.target;if(inSheet&&t&&t.classList&&t.classList.contains("f-sheet-wrap")&&t.closest("#page-fabrica.sk-on")){e.stopPropagation();}inSheet=false;},true);})();
-W.IngTree={on:on,refresh:function(){SIG="";refresh();},state:function(){return {tree:TREE?{trunk:TREE.trunk.length,arches:TREE.arches.length,branches:TREE.branches.length,tags:TREE.tags.length,waiting:TREE.waiting}:null,angle:ANG,beads:BEADS.length,head:!!(HD&&HD.el.isConnected),pressed:PR.b?{ago:Math.round(performance.now()-PR.t),head:!!PR.b.head,kind:PR.b.kind||""}:null,knocked:Math.round(performance.now()-KN.t),knockedPart:KN.k||"",turn:TV};},draw:draw};
+W.IngTree={gems:function(){return {n:GH.length,adamas:!!(AST.img&&AST.fw),src:AST.src?AST.src.slice(0,24):"",hover:HG,spin:!!GSPIN,at:GH.map(function(G){return [Math.round(G[0]),Math.round(G[1]),Math.round(G[2]*10)/10];})};},on:on,refresh:function(){SIG="";refresh();},state:function(){return {tree:TREE?{trunk:TREE.trunk.length,arches:TREE.arches.length,branches:TREE.branches.length,tags:TREE.tags.length,waiting:TREE.waiting}:null,angle:ANG,beads:BEADS.length,head:!!(HD&&HD.el.isConnected),pressed:PR.b?{ago:Math.round(performance.now()-PR.t),head:!!PR.b.head,kind:PR.b.kind||""}:null,knocked:Math.round(performance.now()-KN.t),knockedPart:KN.k||"",turn:TV};},draw:draw};
 try{window.__ingParts["p294"]="running";}catch(_){}
 })();
 </script>

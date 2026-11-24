@@ -280,6 +280,8 @@ body[data-theme="night"] .fd-bsheet{box-shadow:0 1px 0 rgba(0,0,0,.5),0 8px 16px
 .fd-bway > p{grid-column:2;margin:0;font-size:12.5px;line-height:1.5;color:var(--ink-3)}
 .fd-bway > p code{font:12px ui-monospace,"SF Mono",Menlo,Consolas,monospace;background:var(--card,transparent);border:1px solid var(--hairline,rgba(34,26,46,.10));border-radius:6px;padding:1px 5px;white-space:nowrap}
 .fd-bway > .fd-bacts{grid-column:3;grid-row:1 / span 2;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.fd-bway.fd-many > .fd-bacts{grid-column:2 / -1;grid-row:auto;justify-content:flex-start;margin-top:6px}
+.fd-bway.fd-many > .fd-bico{grid-row:1 / span 3}
 .fd-bend{display:flex;justify-content:flex-end;margin-top:12px}
 @keyframes fdbFade{from{opacity:0}to{opacity:1}}
 @keyframes fdbRise{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
@@ -422,6 +424,9 @@ function openBring(){closeBring();var src=body&&body.querySelector(".fd-bring");
     row.appendChild(mk("b",null,esc(t)));if(d)row.appendChild(mk("p",null,d.innerHTML));
     var acts=mk("div","fd-bacts");[].forEach.call(w.querySelectorAll(".fld-acts > *"),function(b,j){var k=mk("button","btn small"+(b.classList.contains("primary")?" primary":""));k.type="button";k.textContent=(b.textContent||"").trim();
       k.addEventListener("click",function(){var cur=wayOf(t),bb=cur?cur.querySelectorAll(".fld-acts > *")[j]:null;closeBring();if(bb)bb.click();});acts.appendChild(k);});
+    /* 7.72 (her words: "The Ollama section on the "Bring in your work" on the Ingenia page is distorted, the paragraph is compacted into one
+       single column"): a row with more than one key, as Ollama's three on her Mac, puts its keys on a line of their own under its words */
+    if(acts.children.length>1)row.classList.add("fd-many");
     row.appendChild(acts);list.appendChild(row);});
   sh.appendChild(list);var end=mk("div","fd-bend"),cl=mk("button","btn small",null);cl.type="button";cl.textContent="Close";cl.addEventListener("click",closeBring);end.appendChild(cl);sh.appendChild(end);
   wrap.appendChild(sh);wrap.addEventListener("click",function(e){if(e.target===wrap)closeBring();});

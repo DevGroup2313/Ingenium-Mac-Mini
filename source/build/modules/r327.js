@@ -68,7 +68,15 @@ body[data-theme="night"] .wy{--wy-well:rgba(183,156,230,.05);--wy-line:rgba(205,
 #page-folders > .wy-ing{margin:0 0 14px;padding:14px 16px;border-radius:16px;border:1px solid var(--wy-line);background:var(--card,#fff);
   box-shadow:0 1px 0 rgba(40,22,68,.06),0 2px 6px rgba(40,22,68,.05),0 12px 30px rgba(40,22,68,.07);transition:transform .2s cubic-bezier(.34,1.35,.64,1),box-shadow .2s}
 #page-folders > .wy-ing:hover{transform:translateY(-1.5px);box-shadow:0 2px 0 rgba(40,22,68,.08),0 8px 16px rgba(40,22,68,.1),0 18px 38px rgba(40,22,68,.12)}
-#page-folders > .wy-ing h2{font:600 21px/1.25 "Home Cormorant","Cormorant Garamond",Cormorant,"Iowan Old Style",Palatino,Georgia,serif}
+/* 7.72: inside How I work, on every app */
+.wy-ing.wy-in-how{margin:0 0 14px;padding:14px 16px;border-radius:16px;border:1px solid var(--wy-line);background:var(--card,#fff);
+  box-shadow:0 1px 0 rgba(40,22,68,.06),0 2px 6px rgba(40,22,68,.05),0 12px 30px rgba(40,22,68,.07);transition:transform .2s cubic-bezier(.34,1.35,.64,1),box-shadow .2s}
+.wy-ing.wy-in-how:hover{transform:translateY(-1.5px);box-shadow:0 2px 0 rgba(40,22,68,.08),0 8px 16px rgba(40,22,68,.1),0 18px 38px rgba(40,22,68,.12)}
+body[data-theme="night"] .wy-ing.wy-in-how{background:#201a2b}
+.wy-ing.wy-in-how{margin:14px 0 18px}
+.wy-own-h{font:600 19px/1.25 "Home Cormorant","Cormorant Garamond",Cormorant,"Iowan Old Style",Palatino,Georgia,serif;color:var(--ink-1,#221a2e);margin:4px 0 8px}
+body[data-theme="night"] .wy-own-h{color:#f6f1fd}
+#page-folders > .wy-ing h2,.wy-ing.wy-in-how h2{font:600 21px/1.25 "Home Cormorant","Cormorant Garamond",Cormorant,"Iowan Old Style",Palatino,Georgia,serif}
 body[data-theme="night"] #page-folders > .wy-ing{background:#201a2b}
 @media (prefers-reduced-motion: reduce){.wy *{transition:none!important;animation:none!important}}
 </style>
@@ -137,10 +145,25 @@ function body(host,inSettings){var w=S();if(!w)return;host.innerHTML="";
     function flip(){w[x[0]]=!w[x[0]];save();}tg.addEventListener("click",function(e){e.stopPropagation();flip();});row.addEventListener("click",flip);row.appendChild(tg);wh.appendChild(row);});
   host.appendChild(wh);
   host.appendChild(mk("p","wy-note","A model may still miss a rule, a small one most of all; say so in the chat and it tries again."+(D.getElementById("page-fabrica")?" Checks that measure them in Fabrica come later.":"")));}   /* the gift and demo copies carry no Fabrica (rig/t_627_editions) */
+/* 7.72 (her words, 24 November 2026): "I want the "Your ways of working" section to be folded into or added into the "How I work" section
+   and not be two separate areas since they serve the same purpose ... THe "Your ways of working" section looks weirdly placed in its
+   current placement." So it stands inside How I work, on every app (r208's card, Ingenia's How I work tab), above her own words, which
+   now have their heading, In your own words. Ingenia draws that card again whenever it paints: the rules are put back each time. */
+function howCard(){var ta=D.getElementById("fldHowAll");if(!ta)return null;return ta.closest(".card")||ta.parentNode;}
+function placeIngenia(){var c=D.getElementById("waysIngenia"),hc=howCard(),ta=D.getElementById("fldHowAll");if(!c||!hc||!ta)return false;
+  /* her words' box may sit in a wrapper of its own (the lined paper): the rules go before that wrapper */
+  var at=ta;while(at&&at.parentNode!==hc)at=at.parentNode;if(!at)return false;
+  var sub=hc.querySelector(":scope > .wy-own-h");if(!sub){sub=mk("h3","wy-own-h","In your own words");}
+  if(c.parentNode!==hc||c.nextElementSibling!==sub||sub.nextElementSibling!==at){hc.insertBefore(c,at);hc.insertBefore(sub,at);}
+  c.classList.add("wy-in-how");c.hidden=false;return true;}
+var WATCH=null;
+function watchIngenia(){var fb=D.getElementById("fldBody");if(!fb||fb.__r327w)return;fb.__r327w=1;var t=0;
+  function again(){t=0;if(!D.getElementById("waysIngenia")){paintIngenia();return;}placeIngenia();}
+  try{WATCH=new MutationObserver(function(){if(!t)t=setTimeout(again,0);});WATCH.observe(fb,{childList:true});}catch(e){}}
 function paintIngenia(){var pg=D.getElementById("page-folders");if(!pg)return;var c=D.getElementById("waysIngenia");
-  if(!c){c=mk("section","wy wy-ing");c.id="waysIngenia";var bar=pg.querySelector(":scope > .fw-homebar"),fb=D.getElementById("fldBody");
-    if(fb&&fb.parentNode===pg)pg.insertBefore(c,fb);else if(bar&&bar.nextSibling)pg.insertBefore(c,bar.nextSibling);else pg.appendChild(c);}
-  body(c,false);}
+  if(!c){c=mk("section","wy wy-ing");c.id="waysIngenia";}
+  if(!placeIngenia()){if(!c.parentNode){c.hidden=true;pg.appendChild(c);}}else c.hidden=false;
+  body(c,false);watchIngenia();}
 function paintSettings(){var w=S(),pg=D.getElementById("page-settings");if(!pg||!w)return;var c=D.getElementById("waysCard");
   if(!w.settings){if(c)c.hidden=true;return;}
   if(!c){c=mk("div","card wy");c.id="waysCard";var host=D.getElementById("personaCard");if(host&&host.parentNode)host.parentNode.insertBefore(c,host.nextSibling);else pg.appendChild(c);}

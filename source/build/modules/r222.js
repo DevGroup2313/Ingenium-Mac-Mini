@@ -234,6 +234,10 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.72", "Fabrica's small diamonds wear Adamas's own stone: its colour, in the shade of the hour by day and its night shade by night. Each lifts under the pointer and spins when pressed.", "fabrica"],
+  ["7.72", "A page no longer goes blank after a while untouched: rest now leaves finished animations alone, and the page is painted again when its window comes back."],
+  ["7.72", "Your ways of working now stand inside How I work, with your own words beneath them. In Bring in your work, a source with several keys, as Ollama, keeps its words across the row."],
+  ["7.72", "Mentes: Health and Where your models are kept are raised and lift under the pointer; the engines on this computer are raised plates with raised choices; the Train overview's labels sit above their titles and the cards hold still."],
   ["7.71", "Nature sounds: ten more places, each made on this device as the others are: Brook and Cascade; Light rain, Rainy window and Thunderstorm; Morning birds, Forest and Meadow; Pond at dusk; and Campfire. In the Display panel and in Settings, Sound, every place now stands in its small group: Water, Rain, Day, Night, Wind and fire."],
   ["7.71", "While this computer lends its models, Mentes shows Lending at the end of its tabs: a small key whose level moves with the memory in use. Pressed, it opens a small panel with the meter and each device's use; pressing elsewhere folds it. The card across the page is gone."],
   ["7.71", "Ingenia has a folder for each app Ingenium carries for you, made once: Clavis had none, as it came after your folders were made, and the conversations that clearly name it move into it, as when you make a folder by hand. A folder you let go is not made again.", "master"],
