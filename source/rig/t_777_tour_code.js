@@ -20,7 +20,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await p.evaluate(i => tourJump(i), idx.type); await sleep(6500);
   const t = await p.evaluate(() => ({ input: (document.getElementById('chatInput') || {}).value || '', page: (document.querySelector('section.section.active') || {}).id, mode: (window.CC || {}).mode, msgs: (curChat() || {}).messages ? curChat().messages.length : -1 }));
   ok(/breathing app/.test(t.input) && t.mode === 'code' && t.msgs === 0, 'in Code, the tour types its request for a small breathing app', t);
-  ok(!/PhD|research proposal|application is due/i.test(JSON.stringify(await p.evaluate(() => ING_TOUR.map(s => [s.t, s.b]))) + await p.evaluate(() => String(window.TOUR_Q || ''))), 'no step and no example speaks of a PhD or an application deadline');
+  // Vocatio's own cards say what the page is for ("applications for jobs, PhD places, fellowships and grants"): that is its
+  // description, not an example; her objection was to the example (the planning prompt), so the examples and every other step are read.
+  ok(!/PhD|research proposal|application is due/i.test(JSON.stringify(await p.evaluate(() => ING_TOUR.filter(s => s.chap !== 'Vocatio').map(s => [s.t, s.b]))) + await p.evaluate(() => String(window.TOUR_Q || '') + String(window.TOUR_A || '') + String(window.TOUR_THINK || ''))), 'no example, and no step outside Vocatio\'s own description, speaks of a PhD or an application deadline');
   // 2. the reply written, the plan ticked, the page written into the tour's app and run beside the conversation
   await p.evaluate(i => tourJump(i), idx.build); await sleep(2200);
   const mid = await p.evaluate(() => { const b = curChat().messages[1]; return { live: !!(b && b.live), done: b && b.plan ? b.plan.tasks.filter(x => x.s === 'done').length : -1 }; });
