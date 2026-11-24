@@ -26,8 +26,9 @@ else
   TAG=_full pair run t_746_no_apps "$EU/ingenium_full.html" "$OUT/na_full"; TAG=_gift run t_746_no_apps "$EU/ingenium_gift.html" "$OUT/na_gift"; wait
   TAG=_demo pair run t_746_no_apps "$EU/ingenium_demo.html" "$OUT/na_demo"; TAG=_guest run t_746_no_apps "$U/ingenium.html" "$OUT/na_guest" guest; wait
   TAG=_full pair run t_763_owner_door "$EU/ingenium_full.html" full; TAG=_gift run t_763_owner_door "$EU/ingenium_gift.html" gift; wait
-  TAG=_full pair run t_767_scramble "$E/ingenium_full.html"; TAG=_gift run t_767_scramble "$E/ingenium_gift.html"; wait
-  TAG=_demo pair run t_767_scramble "$E/ingenium_demo.html"; TAG=_gift run t_768_readable "$E/ingenium_gift.html" gift; wait
+  # t_767_scramble serves on port 8765: one at a time
+  TAG=_full pair run t_767_scramble "$E/ingenium_full.html"; TAG=_gift run t_768_readable "$E/ingenium_gift.html" gift; wait
+  TAG=_gift run t_767_scramble "$E/ingenium_gift.html"; TAG=_demo run t_767_scramble "$E/ingenium_demo.html"
   TAG=_gift pair run t_769_stage_kit "$E/ingenium_gift.html"; TAG=_gift run t_626_guide "$EU/ingenium_gift.html" "$OUT/guide_gift" gift; wait
   TAG=_gift pair run t_771_carried_folders "$U/ingenium.html" "$EU/ingenium_gift.html"; wait
 fi
