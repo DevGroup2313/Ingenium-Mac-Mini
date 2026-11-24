@@ -396,7 +396,7 @@ storage and do not show the card.
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
 Ingenium 7.75 (24 November 2026): Vocatio reads quickly and visibly; no model left thinking until Stop; Adamas keeps its holder
-through the tour.
+through the tour; Lector's documents on real pages; Ingenium fills a large screen.
 
 Her message of 24 November 2026 (the second one), its first stage, in her order.
 - Vocatio, fast and visible (`build/modules/r188.js`; `build/build_page.py` 7.75). Her words: "Last night I spent over 64 minutes
@@ -439,6 +439,39 @@ Her message of 24 November 2026 (the second one), its first stage, in her order.
   rig/t_775_adamas_tour.js (the mark after a short visit, the fresh try, a device that really stops, the card beside the stone; the 7.74
   page fails three of its seven). The older Vocatio tests give the same results before and after (t_624_stop, t_629_limits, t_646_think,
   t_658_mentor, t_61_ask; t_644_edge's two failures were there in 7.74 too).
+- Lector's documents on real pages (`r108.js`). Her words: "I want the documents area to have Tabula's 3D paper UI design ... I want to
+  see the proper pages and separation like in Tabula". Shown first in a live preview, which she approved with four changes: the night
+  sheets "too pale and gray", then "I choose Ingenium's plum look as the approved look for Night mode but I want Tabula's original
+  colour for Night added as a second option", that slate "darker and a cooler shade", the dark band between the pages removed ("give me
+  true 3D pages on both Day and Night mode"), and "Please remove the frame". Now:
+  - The document breaks where its PDF breaks (IngDoc, r183): at each page's end the page closes and a gap of 80 pixels opens to the
+    next sheet; a paragraph, an item or a table is split at the exact line where its page ends, and joined again before each new
+    measure, so it is saved, copied and written whole (a paragraph rewritten while it is written live is never doubled). Saving reads
+    the document's own text, as before, never the sheets.
+  - Each sheet stands alone: lit along its top edge, the paper's thickness at its foot, its shadow cast downwards only; the paper's own
+    shadow and fine inset frame are not drawn on the sheets, so nothing joins the pages and no outline runs round them. By day the
+    sheets are each paper's own, on a desk a shade deeper; by night every document is on Ingenium's plum, or on a cool slate (Tabula's,
+    darker and cooler) chosen with Plum and Slate beside the document's size, shown by night only and kept on this device.
+  - The band had two causes: the paper's frame drawn down the whole document behind the gaps (its "no shadow" rule lost to the night
+    rule), and shadows spreading up and sideways from each sheet that met in the gap.
+  - The saving bar folds away, as Tabula's counter bar does: Hide bar at its right end, in Ingenium's own colours; folded, Show bar
+    stands at the panel's lower right corner and brings it back; kept on this device.
+- Ingenium fills a large screen (`r368.js`, new; `desktop/app_zoom_775.py`, new; `release.py`). Her words: "I have a 34-inch Dell Desktop
+  screen for the Mac mini, so it looks really tiny and weird on the screen, shrunken like that. I want you to fix that and compensate
+  for the larger desk screen". Measured on 7.74 at 3,440 by 1,440: the page stretched to the whole width at a laptop's sizes. A zoom
+  in the page's own styles cannot be used (it enlarges what is measured in the window's units too: a box of 100vw by 100vh measured
+  5,160 by 2,160 at 1.5, so the panes that fill the window would spill past it). The Mac app now zooms its window as a browser does
+  (WKWebView's pageZoom, macOS 11 and later, asked on the app's main thread): the page is laid out for a narrower window and drawn
+  larger, so everything keeps its proportions. Display has a Size row beside Width: Auto, 100%, 110%, 125%, 150%. Auto keeps 100% up
+  to a window about 1,700 pixels wide and grows with a wider one, to 150% at most (150% for the whole of her 34-inch screen); it
+  follows the window as it is resized. Kept on each device. On Windows and in a browser the row is not shown (their own zoom is
+  Control and plus). The window's zoom cannot run here; it is checked with a stand-in for the Mac's bridge, and I have not seen it on
+  her Mac.
+- Tests: rig/t_775_lector_sheets.js (pages by day and by night, every line on a sheet, no band, no frame or outline, the plum and the
+  slate kept, Hide bar, a paragraph written live never doubled); rig/t_775_size.js (Auto at 3,440 pixels, the row, a chosen size kept,
+  a laptop's window left alone, Windows and a browser without the row).
+- The 7.75 edition check found a new message naming her Mac mini (r241, a model that will not stop thinking); it now says "one lent by
+  another of your computers".
 
 Ingenium 7.74 (24 November 2026): the Desk's five mini apps back in the full edition.
 

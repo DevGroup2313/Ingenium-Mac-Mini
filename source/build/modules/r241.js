@@ -78,7 +78,7 @@ W.ingThinkBudget=function(adapter,job){var p=(job&&job.params)||{},unasked=!p.th
       onToken:function(t){raw2+=t;var s2=raw2.replace(/^\s+/,"");if(/^<think>/i.test(s2)&&!/<\/think>/i.test(s2)){t2=s2.slice(7);check2();return;}
         if(String(t||"").trim())ans2=true;oT(t);}});
     return Promise.resolve(adapter.generate(job2)).then(function(r2){var a2=(r2&&r2.text)||"";a2=a2.replace(/^\s*<think>[\s\S]*?(<\/think>|$)/i,"");
-      if(cut2&&!a2.trim()&&unasked)throw new Error("The model went on thinking and gave no answer, twice. Choose another model for this (Mentes, or Lector's Read and written by), or use your Mac mini's.");
+      if(cut2&&!a2.trim()&&unasked)throw new Error("The model went on thinking and gave no answer, twice. Choose another model for this (Mentes, or Lector's Read and written by), or one lent by another of your computers.");
       return {text:((r1&&r1.text)||"")+close+a2,stats:(r2&&r2.stats)||(r1&&r1.stats)||{},thinkCut:why};});});};
 
 /* ---------- 2. only when it helps: a short, simple message is answered at once ---------- */

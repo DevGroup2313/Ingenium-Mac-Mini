@@ -143,7 +143,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_pick_757", "_disk_pick_757", ("mini", "intel", "win")),  # 7.57: Fabrica's stage 3, part two, on a drive
            ("app_self_758", "_self_758", ("mini", "intel", "win")),  # 7.58: Ingenium itself, signed and checked (Security)
            ("app_self2_764", "_self2_764", ("mini", "intel", "win")),  # 7.64: part two, the copy her phones and tablets carry
-           ("app_ask_770", "_ask_start", ("mini", "intel", "win"))]  # 7.70: asking and offering with Accept, each device's use, the memory now
+           ("app_ask_770", "_ask_start", ("mini", "intel", "win")),  # 7.70: asking and offering with Accept, each device's use, the memory now
+           ("app_zoom_775", "_display_zoom", ("mini", "intel", "win"))]  # 7.75: the Mac window zooms its page, to fill a large screen (modules/r368.js)
 
 
 def desktop():

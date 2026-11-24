@@ -215,6 +215,51 @@ function paperCss(forPage,dayOnly){var S=forPage?"#lx7 ":"",out=[];
   out.push(P+","+P+" *{font-kerning:none !important;font-variant-ligatures:none !important;font-synthesis:none !important;font-feature-settings:\"kern\" 0,\"liga\" 0,\"clig\" 0,\"calt\" 0 !important}");
   if(forPage)out.push("#lx7 .l-desk[class*=\"th-\"]{background:var(--p-desk)}",
     /* 6.8.1: where its PDF starts each new page */
+    "#lx7 .l-paper.l-paged{background:transparent !important;background-image:none !important;box-shadow:none !important;position:relative}",
+    "#lx7 .l-paper .l-sheets{position:absolute;left:0;right:0;top:0;bottom:0;z-index:0;pointer-events:none}",
+    "#lx7 .l-paper.l-paged>*:not(.l-sheets){position:relative;z-index:1}",
+    "#lx7 .l-paper .l-gap{display:block;width:100%;pointer-events:none}",
+    "#lx7 .l-pn-f{position:relative}",
+    "#lx7 .l-pn-f.l-folded{display:none !important}",
+    "#lx7 .l-hidebar{position:absolute;right:12px;top:10px;z-index:3;display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;border:1px solid var(--hairline,rgba(34,26,46,.12));cursor:pointer;font:600 12px/1 var(--sans,system-ui);color:var(--ink-2,#4a4358);background:linear-gradient(180deg,var(--card-hi,#fff),var(--card-lo,#f6f3fa));box-shadow:var(--pop,0 1px 0 rgba(40,22,68,.08),0 3px 8px rgba(40,22,68,.1));transition:transform .2s cubic-bezier(.34,1.4,.64,1),box-shadow .2s,color .2s}",
+    "#lx7 .l-hidebar:hover{transform:translateY(-2px);box-shadow:var(--pop-hi,var(--pop));color:var(--ink-1,#221a2e)}",
+    "#lx7 .l-hidebar:active{transform:translateY(1px);transition-duration:.06s}",
+    "#lx7 .l-hidebar:focus-visible,#lx7 .l-showbar:focus-visible{outline:2.5px solid var(--accent,#6a3fb5);outline-offset:2px}",
+    "#lx7 .l-pn-f .l-fmt{padding-right:104px}",
+    "#lx7 .l-showbar{position:absolute;right:14px;bottom:12px;z-index:5;display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:999px;border:1px solid #4b2a86;cursor:pointer;font:600 12.5px/1 var(--sans,system-ui);color:#fff;background:linear-gradient(180deg,#7348be,#5d37a1);box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 1px 0 #3a2070,0 3px 6px rgba(52,24,100,.26),0 10px 20px rgba(52,24,100,.18);transition:transform .2s cubic-bezier(.34,1.4,.64,1),box-shadow .2s}",
+    "#lx7 .l-showbar[hidden]{display:none}",
+    "#lx7 .l-showbar:hover{transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.26),0 2px 0 #3a2070,0 6px 12px rgba(52,24,100,.3),0 16px 28px rgba(52,24,100,.22)}",
+    "#lx7 .l-showbar:active{transform:translateY(1px);transition-duration:.06s}",
+    "body[data-theme='night'] #lx7 .l-hidebar{color:var(--ink-2,#d3c9e3);background:linear-gradient(180deg,#2a2239,#251e33);border-color:rgba(205,184,240,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),inset 0 -2px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.75),0 4px 5px rgba(0,0,0,.5)}",
+    "body[data-theme='night'] #lx7 .l-hidebar:hover{color:#f3eefb}",
+    "body[data-theme='night'] #lx7 .l-showbar{background:linear-gradient(180deg,#7a56c8,#5b3aa1);border-color:#2c1956;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 1px 0 #170b30,0 3px 6px rgba(0,0,0,.45),0 10px 22px rgba(0,0,0,.4)}",
+    "body[data-motion='minimal'] #lx7 .l-hidebar,body[data-motion='minimal'] #lx7 .l-showbar{transition:none}",
+    "#lx7 .l-paper .l-cont{margin-top:0 !important;text-indent:0 !important;padding-top:0 !important}",
+    "#lx7 .l-paper .l-gap+.l-cont::before{content:none !important}",
+    /* each sheet stands alone (her words, 24 November 2026: "There appears to still be a dark band that connects the pages together
+       ... give me true 3D pages on both Day and Night mode"): lit along its top edge, the paper's own thickness at its foot, and a
+       shadow cast downwards only, kept to the gap's upper half; nothing spreads upwards or sideways, so the desk shows clean between */
+    "#lx7 .l-paper .l-sheet{position:absolute;left:0;right:0;border-radius:2px;background-color:var(--p-bg);background-image:var(--p-tex);animation:lSheetIn .3s cubic-bezier(.34,1.3,.64,1) both;"+
+      "box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(40,22,68,.05),0 1px 0 #ebe5f2,0 2px 0 #ddd5e8,0 3px 0 -1px rgba(40,22,68,.14),0 6px 10px -4px rgba(40,22,68,.20),0 16px 24px -12px rgba(40,22,68,.26)}",
+    /* no frame on the pages (her words, 24 November 2026: "Please remove the frame, I don't like how it looks, please take it off"):
+       the fine frame inset in the paper is not drawn on the sheets, and no outline runs round a sheet */
+    "#lx7 .l-paper.l-paged::before{display:none}",
+    "#lx7 .l-paper .l-sheet-n{position:absolute;right:18px;bottom:12px;font:600 10px/1 system-ui,sans-serif;letter-spacing:.08em;color:var(--p-ink2);opacity:.7}",
+    /* by day, each desk a shade deeper than its paper, so the white sheets stand out */
+    "#lx7 .l-desk.th-ingenium,#lx7 .l-desk.th-neutral{background:#e7e0ef}",
+    "#lx7 .l-desk.th-cd{background:#e3e8ed}","#lx7 .l-desk.th-forge{background:#dfe3e8}","#lx7 .l-desk.th-inkwell{background:#e8dfca}","#lx7 .l-desk.th-family{background:#ece3d0}",
+    /* by night, Ingenium's plum (her choice, 24 November 2026: "I choose Ingenium's plum look as the approved look for Night mode"),
+       for every document: the sheet on a plum desk */
+    "body[data-theme='night'] #lx7 .l-paper .l-sheet{background:linear-gradient(180deg,#2e2543 0%,#2a213a 40%,#261e35 100%);box-shadow:inset 0 1px 0 rgba(236,224,255,.14),inset 0 -1px 0 rgba(0,0,0,.28),0 1px 0 #1f182c,0 2px 0 #140f1d,0 3px 0 -1px rgba(0,0,0,.5),0 6px 10px -4px rgba(0,0,0,.6),0 16px 24px -12px rgba(0,0,0,.7)}",
+    "body[data-theme='night'] #lx7 .l-desk[class*='th-']{background:#17111f}",
+    /* or the second option: Tabula's slate, darker and cooler ("The dark grey sheets need to be darker and a cooler shade or something
+       more complementary to the plum shade of Ingenium"), a deep blue slate */
+    "html[data-lx-npaper='slate'] body[data-theme='night'] #lx7 .l-paper .l-sheet{background:linear-gradient(180deg,#262c39 0%,#222835 40%,#1e2430 100%);box-shadow:inset 0 1px 0 rgba(214,226,255,.12),inset 0 -1px 0 rgba(0,0,0,.3),0 1px 0 #191e28,0 2px 0 #10141b,0 3px 0 -1px rgba(0,0,0,.55),0 6px 10px -4px rgba(0,0,0,.65),0 16px 24px -12px rgba(0,0,0,.75)}",
+    "html[data-lx-npaper='slate'] body[data-theme='night'] #lx7 .l-desk[class*='th-']{background:#11141b}",
+    /* the two keys that choose, beside the document's size; shown by night only */
+    "#lx7 .l-zoom.l-npaper{margin-left:6px}","body:not([data-theme='night']) #lx7 .l-npaper{display:none}",
+    "#lx7 .l-npaper button{font-size:12px;padding:0 11px}",
+    "@keyframes lSheetIn{0%{opacity:.001;transform:translateY(10px) scale(.985)}60%{opacity:1}100%{transform:none;opacity:1}}",
     "#lx7 .l-paper .l-pbrk{position:absolute;left:0;right:0;height:0;border-top:1px dashed var(--p-line);pointer-events:none;z-index:1}",
     "#lx7 .l-paper .l-pbrk span{position:absolute;right:16px;top:-9px;padding:0 6px;background-color:var(--p-bg);font:600 10px/16px "+SANS+";letter-spacing:.08em;text-transform:uppercase;color:var(--p-ink2)}");
   else out.push("body{margin:0;background:var(--p-desk)}",".l-paper{width:auto;max-width:720px;margin:28px auto;padding:56px 64px 64px}",
@@ -401,7 +446,9 @@ function build(){var host=$("lxHost");if(!host)return null;var pg=$("page-lector
     '<section class="l-pn" id="l7Doc" aria-label="The document"><div class="l-pn-h"><h2>The document</h2><span class="l-chip" id="l7DocChip"></span><button type="button" class="l-btn sm l-askdoc" id="l7AskDoc" title="Ask Lector to change this document">Ask Lector</button><button class="l-fold" type="button" data-f="doc" aria-expanded="true" title="Fold the document away; press again to open it"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button></div>'+
      '<div class="l-drow"><div class="l-dtabs" id="l7Dtabs" role="tablist" aria-label="Documents"></div>'+
      /* 6.1: the document's size: smaller, fit to the panel, larger */
-     '<div class="l-zoom" id="l7Zoom" role="group" aria-label="The document\'s size"><button type="button" data-z="-" aria-label="Smaller" title="Smaller">−</button><button type="button" data-z="fit" aria-pressed="true" title="Fit the page to the panel">Fit</button><button type="button" data-z="+" aria-label="Larger" title="Larger">+</button><span class="pc" aria-live="polite"></span></div></div>'+
+     '<div class="l-zoom" id="l7Zoom" role="group" aria-label="The document\'s size"><button type="button" data-z="-" aria-label="Smaller" title="Smaller">−</button><button type="button" data-z="fit" aria-pressed="true" title="Fit the page to the panel">Fit</button><button type="button" data-z="+" aria-label="Larger" title="Larger">+</button><span class="pc" aria-live="polite"></span></div>'+
+     /* 7.75: the pages by night, in Ingenium's plum or in a cool slate */
+     '<div class="l-zoom l-npaper" id="l7NPaper" role="group" aria-label="The pages by night"><button type="button" data-np="plum" title="By night, the pages in Ingenium\'s plum">Plum</button><button type="button" data-np="slate" title="By night, the pages in a cool slate">Slate</button></div></div>'+
      '<div class="l-outline" id="l7Outline" aria-label="Sections"></div><div class="l-desk" id="l7Desk" tabindex="0" role="region" aria-label="The document, as it will be saved"></div>'+
 
      '<div class="l-pn-f"><div class="l-fmt"><span>Save as</span><div class="l-seg" id="l7Fmt"><span class="l-thumb"></span><button type="button" data-v="docx">Word</button><button type="button" data-v="pdf">PDF</button><button type="button" data-v="html">Web page</button><button type="button" data-v="md">Markdown</button></div></div>'+
@@ -1324,15 +1371,64 @@ function paintAsk(){var box=$("l7Ask");if(!box)return;var kind=R7.doc||"analysis
    (r183: whole lines, whole table rows and pictures, a heading kept with what follows, on A4 with margins of an inch), so the
    paper shown is the document saved, page by page. Drawn again, a moment after the paper changes. */
 var marksT=0;
+/* 7.75: real pages, on Tabula's weighted sheets (her words, 24 November 2026: "I want the documents area to have Tabula's 3D paper UI
+   design and formatting ... I want to see the proper pages and separation like in Tabula"). The breaks are the PDF's own (IngDoc,
+   r183); at each, the page ends and a gap opens to the next sheet; each sheet is drawn behind its page with Tabula's shadows. */
+var SHEETS=true,GAPPX=80;
+/* the saving bar hides as Tabula's counter bar does (her pictures, 24 November 2026): "⌄ Hide bar" at its right end; hidden, a dark
+   "⌃ Show bar" stands at the panel's lower right corner and brings it back; kept so on this device */
+function footFold(){var fm0=document.getElementById("l7Fmt"),f=fm0&&fm0.closest(".l-pn-f");if(!f||f.__fold)return;f.__fold=1;
+  [].forEach.call(document.querySelectorAll("#lx7 .l-showbar"),function(t){t.remove();});
+  var k=document.createElement("button");k.type="button";k.className="l-hidebar";k.innerHTML='<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Hide bar</span>';k.title="Hide the saving bar";k.setAttribute("aria-label","Hide the saving bar");
+  var tab=document.createElement("button");tab.type="button";tab.className="l-showbar";tab.innerHTML='<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M4 10l4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Show bar</span>';tab.title="Show the saving bar";tab.setAttribute("aria-label","Show the saving bar");
+  function set(on,quiet){f.classList.toggle("l-folded",on);tab.hidden=!on;if(!quiet){try{localStorage.setItem("ing.lx.footFold",on?"1":"0");}catch(e){}}k.setAttribute("aria-expanded",String(!on));tab.setAttribute("aria-expanded",String(!on));}
+  k.onclick=function(e){if(e){e.preventDefault();e.stopPropagation();}set(true);try{tab.focus();}catch(x){}};tab.onclick=function(){set(false);try{k.focus();}catch(x){}};
+  f.appendChild(k);var host=f.parentNode;if(getComputedStyle(host).position==="static")host.style.position="relative";host.appendChild(tab);
+  var on=false;try{on=localStorage.getItem("ing.lx.footFold")==="1";}catch(e){}set(on,true);}
+function sheetsClear(pp){[].forEach.call(pp.querySelectorAll(".l-pbrk,.l-gap,.l-sheets"),function(x){x.remove();});
+  /* the parts split at a page's end are joined again, as they were written */
+  var cs=[].slice.call(pp.querySelectorAll(".l-cont")).reverse();cs.forEach(function(c){var hd=c.__head;if(hd&&hd.parentNode&&(c.tagName==="TABLE"||hd.innerHTML===c.__was)){if(c.tagName==="TABLE"){var tb=hd.tBodies[0]||hd;[].slice.call(c.rows).forEach(function(r){tb.appendChild(r);});}else{while(c.firstChild)hd.appendChild(c.firstChild);try{hd.normalize();}catch(e){}}}c.remove();});
+  pp.classList.remove("l-paged");}
+/* the first line at or below y (the paper's own units, below its padding): its text node and the character it starts with */
+function lineAt(pp,y,pt,k,r){var tw=document.createTreeWalker(pp,4,null),n,rg=document.createRange();
+  while((n=tw.nextNode())){if(!/\S/.test(n.nodeValue))continue;var el=n.parentElement;if(!el||el.closest(".l-sheets,.l-gap"))continue;
+    rg.selectNodeContents(n);var rs=rg.getClientRects();if(!rs.length)continue;var last=rs[rs.length-1];if((last.bottom-r.top)/k-pt<y+1)continue;
+    var lo=0,hi=n.nodeValue.length;while(lo<hi){var mid=(lo+hi)>>1;rg.setStart(n,mid);rg.setEnd(n,Math.min(mid+1,n.nodeValue.length));var q=rg.getBoundingClientRect();if((q.top-r.top)/k-pt>=y-1)hi=mid;else lo=mid+1;}
+    return {node:n,off:lo};}
+  return null;}
+var BLK="p,li,h1,h2,h3,h4,h5,h6,blockquote,pre,dd,dt,figure,figcaption";
+/* where the next page begins: the block it starts, split there when the page ends inside it (a paragraph, an item, a table's rows) */
+function startAt(pp,y,pt,k,r){var L=lineAt(pp,y,pt,k,r);if(!L)return null;var el=L.node.parentElement,tr=el.closest("tr"),blk=el.closest(BLK);
+  if(tr&&pp.contains(tr)){var tb=tr.closest("table");if(!tb)return null;if(tr===tb.rows[0])return tb;var nt=tb.cloneNode(false);nt.removeAttribute("id");nt.classList.add("l-cont");nt.__head=tb;var body=document.createElement("tbody");nt.appendChild(body);
+    var rows=[].slice.call(tb.rows),ix=rows.indexOf(tr);rows.slice(ix).forEach(function(x){body.appendChild(x);});tb.parentNode.insertBefore(nt,tb.nextSibling);return nt;}
+  if(!blk||!pp.contains(blk)){var b=el;while(b.parentElement&&b.parentElement!==pp)b=b.parentElement;return b;}
+  var rg=document.createRange();rg.setStart(blk,0);rg.setEnd(L.node,L.off);if(!/\S/.test(rg.toString()))return blk;   /* the page starts with the block itself */
+  var tail=document.createRange();tail.setStart(L.node,L.off);tail.setEnd(blk,blk.childNodes.length);var frag=tail.extractContents();
+  var c=blk.cloneNode(false);["id","data-h","data-live"].forEach(function(a){c.removeAttribute(a);});c.classList.add("l-cont");c.__head=blk;c.appendChild(frag);blk.parentNode.insertBefore(c,blk.nextSibling);
+  c.__was=blk.innerHTML;   /* a head rewritten since (the line being written live) holds its whole text again: its old tail is dropped, not joined */
+  if(blk.tagName==="LI"){c.style.listStyleType="none";}return c;}
 function paperMarks(){marksT=0;var desk=$("l7Desk"),pp=desk&&desk.querySelector(".l-paper");if(!pp||!window.IngDoc||!IngDoc.atomsOf)return;
-  [].forEach.call(pp.querySelectorAll(".l-pbrk"),function(x){x.remove();});var r=pp.getBoundingClientRect();if(!r.width)return;
-  var cs=getComputedStyle(pp),pt=parseFloat(cs.paddingTop)||0,k=r.width/640,area=(IngDoc.PH-IngDoc.MT-IngDoc.MB)/IngDoc.PX;
+  sheetsClear(pp);var r=pp.getBoundingClientRect();if(!r.width)return;
+  var cs=getComputedStyle(pp),pt=parseFloat(cs.paddingTop)||0,pb=parseFloat(cs.paddingBottom)||0,k=r.width/640,area=(IngDoc.PH-IngDoc.MT-IngDoc.MB)/IngDoc.PX;
   var at=IngDoc.atomsOf(document,pp,"").map(function(a){return {t:(a.t+pt*(1-k))/k,b:(a.b+pt*(1-k))/k,h:a.h};}),st=IngDoc.breaksOf(at,area);
+  if(SHEETS){var pageH=pt+area+pb,starts=[0],shift=0;pp.classList.add("l-paged");
+    var shift=0;st.slice(1).forEach(function(y,i){r=pp.getBoundingClientRect();var el=startAt(pp,y+shift,pt,k,r);if(!el)return;var q=el.getBoundingClientRect(),top=(q.top-r.top)/k-pt;   /* where it stands now, the gaps above included */
+      var want=(i+1)*(pageH+GAPPX),g=document.createElement("div");g.className="l-gap";g.setAttribute("aria-hidden","true");g.style.height=Math.max(0,want-top)+"px";
+      el.parentNode.insertBefore(g,el);shift+=Math.max(0,want-top);starts.push(want);});
+    var lay=document.createElement("div");lay.className="l-sheets";lay.setAttribute("aria-hidden","true");var end=(pp.getBoundingClientRect().height)/k;
+    starts.forEach(function(t,i){var sh=document.createElement("div");sh.className="l-sheet";sh.style.top=t+"px";var bottom=i<starts.length-1?t+pageH:Math.max(t+pageH,end);sh.style.height=(bottom-t)+"px";
+      var n=document.createElement("span");n.className="l-sheet-n";n.textContent=String(i+1);sh.appendChild(n);lay.appendChild(sh);});
+    pp.insertBefore(lay,pp.firstChild);try{if(desk.__mo)desk.__mo.takeRecords();}catch(e){}
+    /* measured again when the paper's height changes (its faces and its crest load after the first measure) */
+    pp.__h=pp.offsetHeight;if(!pp.__ro&&typeof ResizeObserver!=="undefined"){pp.__ro=new ResizeObserver(function(){if(pp.__h&&Math.abs(pp.offsetHeight-pp.__h)>2)marksSoon();});pp.__ro.observe(pp);}
+    if(!paperMarks.__fonts&&document.fonts&&document.fonts.ready){paperMarks.__fonts=1;document.fonts.ready.then(function(){marksSoon();});}
+    return;}
   st.slice(1).forEach(function(y,i){var prev=at.filter(function(a){return a.b<=y+0.5;}).pop(),mid=prev?(prev.b+y)/2:y-4,m=document.createElement("div");
     m.className="l-pbrk";m.setAttribute("aria-hidden","true");m.style.top=(pt+mid)+"px";var t=document.createElement("span");t.textContent="Page "+(i+2);m.appendChild(t);pp.appendChild(m);});}
 function marksSoon(){if(marksT)return;marksT=setTimeout(paperMarks,R7.live?700:120);}
 function watchMarks(){var desk=$("l7Desk");if(!desk||desk.__mo||typeof MutationObserver==="undefined")return;
-  desk.__mo=new MutationObserver(function(ms){if(ms.every(function(m){return [].every.call(m.addedNodes,function(n){return n.classList&&n.classList.contains("l-pbrk");})&&[].every.call(m.removedNodes,function(n){return n.classList&&n.classList.contains("l-pbrk");});}))return;marksSoon();});
+  desk.__mo=new MutationObserver(function(ms){function own(n){return n.classList&&(n.classList.contains("l-pbrk")||n.classList.contains("l-gap")||n.classList.contains("l-sheets"));}
+    if(ms.every(function(m){return [].every.call(m.addedNodes,own)&&[].every.call(m.removedNodes,own);}))return;marksSoon();});
   desk.__mo.observe(desk,{childList:true,subtree:true,characterData:true});}
 try{window.IngLectorPaper={page:function(k,md,o){return paperPage(k,md,o||{});},opts:paperOpts,marks:paperMarks};}catch(e){}
 (function(){var pd=paintDoc;paintDoc=function(){var r=pd.apply(this,arguments);try{watchMarks();marksSoon();}catch(e){}try{paintAsk();}catch(e){try{console.warn("Lector: the request box could not be drawn",e);}catch(_){}}return r;};})();
@@ -1370,7 +1466,14 @@ function applyZoom(){var desk=$("l7Desk");if(!desk)return;var p=zoomPref(),z=cur
   var mi=box.querySelector('[data-z="-"]'),pl=box.querySelector('[data-z="+"]');if(mi)mi.disabled=z<=ZSTEPS[0]+.001;if(pl)pl.disabled=z>=ZSTEPS[ZSTEPS.length-1]-.001;}
 function stepZoom(dir){var z=curZoom(),nz;if(dir>0)nz=ZSTEPS.filter(function(s){return s>z+.004;})[0]||ZSTEPS[ZSTEPS.length-1];
   else{var lo=ZSTEPS.filter(function(s){return s<z-.004;});nz=lo.length?lo[lo.length-1]:ZSTEPS[0];}setZoomPref(nz);}
-function wireZoom(){var box=$("l7Zoom");if(!box||box.__w)return;box.__w=1;
+/* 7.75: the pages by night, kept on this device: Ingenium's plum (the default) or a cool slate */
+function npaper(){var v="plum";try{v=localStorage.getItem("ing.lx.nightPaper")==="slate"?"slate":"plum";}catch(e){}return v;}
+function npaperPaint(){var v=npaper();try{if(v==="slate")document.documentElement.setAttribute("data-lx-npaper","slate");else document.documentElement.removeAttribute("data-lx-npaper");}catch(e){}
+  var box=$("l7NPaper");if(box)[].forEach.call(box.querySelectorAll("button"),function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-np")===v));});}
+function wireNPaper(){var box=$("l7NPaper");npaperPaint();if(!box||box.__w)return;box.__w=1;
+  [].forEach.call(box.querySelectorAll("button"),function(b){b.onclick=function(){try{localStorage.setItem("ing.lx.nightPaper",b.getAttribute("data-np"));}catch(e){}npaperPaint();};});}
+try{npaperPaint();}catch(e){}
+function wireZoom(){try{wireNPaper();}catch(e){}var box=$("l7Zoom");if(!box||box.__w)return;box.__w=1;
   [].forEach.call(box.querySelectorAll("button"),function(b){b.onclick=function(){var v=b.getAttribute("data-z");if(v==="fit")setZoomPref(zoomPref()==="fit"?1:"fit");else stepZoom(v==="+"?1:-1);};});
   applyZoom();}
 function fit(){var root=$("lx7");if(!root||!root.offsetParent)return;var r=root.getBoundingClientRect(),se=document.scrollingElement||document.documentElement,top=r.top+(se?se.scrollTop:0);
@@ -1420,6 +1523,7 @@ function wireFrame(){var U=L7().ui;wireFolds();wireZoom();
   [].forEach.call($("l7Tabs").querySelectorAll("button"),function(b){b.onclick=function(){setPanel(b.getAttribute("data-p"));};});
   var fmt=$("l7Fmt");[].forEach.call(fmt.querySelectorAll("button"),function(b){b.setAttribute("aria-pressed",(L7().brief.fmt||"docx")===b.getAttribute("data-v")?"true":"false");
     b.onclick=function(){L7().brief.fmt=b.getAttribute("data-v");[].forEach.call(fmt.querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});segThumbs(fmt.parentNode);saveSoon();};});
+  footFold();
   $("l7Save").onclick=save;$("l7Copy").onclick=function(){curDoc().then(function(d){if(d)lxCopy(d.md);else ingToast("There is nothing to copy yet.");});};
   /* 7.52: Open in Tabula only where the Desk is (her master, in her own profile); elsewhere Tabula is not part of the copy, so no key */
   if($("l7Open")){if((typeof ING_HAS!=="function")||ING_HAS("desk"))$("l7Open").onclick=openInTabula;else $("l7Open").remove();}
