@@ -18,7 +18,10 @@
    here as in the other editions, r147 draws Home's instruments alone, Lector and Vocatio draw no Open in Tabula; and here the Desk's
    sentences are said as the other editions say them (build/editions.py, _no_desk), and the keys that send something to those apps, and
    the Guide's tip on them, are taken away. Ingenium's own reference database (Fontes, the chat's My sources) and its model house
-   (Scriba) stay: they are not the apps of those names. */
+   (Scriba) stay: they are not the apps of those names.
+   7.74 (her answer, 24 November 2026: "Back in the Full edition"): the full edition carries the Desk again, so this profile has it too;
+   the Desk's sentences below (DESKSAY) and the keys that send to its apps are changed only where ING_HAS("desk") says no, which on her
+   master copy it no longer does. Her own apps' names are still taken out here, as before. */
 (function r336(){"use strict";
 var W=window,D=document;
 if(!W.__ingGuest)return;
@@ -45,8 +48,9 @@ var SAY=[
   ["the master logo of the Offline Project, each app's logo on a document","each app's logo on a document"],
   ["Your apps, Ingenium itself, an app in Fabrica, or a page from this device","Your apps, an app in Fabrica, or a page from this device"],
   ["Your apps, Ingenium itself, an app in Fabrica, or a sample.","Your apps, an app in Fabrica, or a sample."],
-  ["Opens your apps, Ingenium itself, an app in Fabrica, or a file.","Opens your apps, an app in Fabrica, or a file."],
-  /* 7.52: the Desk's sentences, as every other edition says them (build/editions.py, _no_desk) */
+  ["Opens your apps, Ingenium itself, an app in Fabrica, or a file.","Opens your apps, an app in Fabrica, or a file."]];
+/* 7.52: the Desk's sentences, as the editions without it say them (build/editions.py, _no_desk); 7.74: only where the Desk is not */
+var DESKSAY=[
   ["Sort it later: to a note, to Tabula, into steps, to the chat, to a reminder, or done.","Sort it later: to a note, into steps, to the chat, to a reminder, or done."],
   ["goes where it belongs: to a note, to Tabula, into steps, to the chat, to a reminder, or done.","goes where it belongs: to a note, into steps, to the chat, to a reminder, or done."],
   ["pin one to the page, search the rest, and send any of them into Tabula when a thought is ready to become writing.","pin one to the page, and search the rest."],
@@ -61,7 +65,8 @@ var ANY=/Carpe Diem|The Forge|the Forge|Inkwell|Offline Project|Ingenium itself|
 /* never what the person writes or reads of their own */
 var MINE="textarea,input,select,[contenteditable],.msg,.md,pre,code,iframe,script,style";
 var ATTRS=["title","aria-label","placeholder","alt"];
-function say(v){var t=v;for(var i=0;i<SAY.length;i++)if(t.indexOf(SAY[i][0])>=0)t=t.split(SAY[i][0]).join(SAY[i][1]);return t;}
+function say(v){var t=v,L=deskless()?SAY.concat(DESKSAY):SAY;
+  for(var i=0;i<L.length;i++)if(t.indexOf(L[i][0])>=0)t=t.split(L[i][0]).join(L[i][1]);return t;}
 function own(e){try{return !!(e&&e.closest&&e.closest(MINE));}catch(x){return true;}}
 function text(n){var v=n.nodeValue;if(!v||!ANY.test(v))return;var p=n.parentElement;if(!p||own(p))return;var t=say(v);if(t!==v)n.nodeValue=t;}
 function attrs(e){if(own(e))return;for(var i=0;i<ATTRS.length;i++){var v=e.getAttribute(ATTRS[i]);if(v&&ANY.test(v)){var t=say(v);if(t!==v)e.setAttribute(ATTRS[i],t);}}}

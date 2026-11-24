@@ -33,9 +33,11 @@ their skills and information or any of my profile information".
   full    keeps Lector, the Career Studio and Fabrica; no Name card, no owner's key (the owner's key is the master's
           alone: modules/r162.js), no Author Studio; and now none of the owner's other apps by name either: the gift edition's
           _blank() applies to it too, and Lector and the app library know no app by name (7.46). From 7.49 (20 November 2026) it carries
-          none of the five apps of the Desk either, nor names them (_no_desk), at her word: "Yes for the mini app question".
-ING_HAS(part) in the page answers "author", "rename", "ownerkey" and, from 7.49, "desk" (the master only), "fabrica", "lector" and
-"career" (the master and full editions).
+          none of the five apps of the Desk either, nor names them (_no_desk), at her word: "Yes for the mini app question". From
+          7.74 (24 November 2026) it carries them again, whole, at her answer "Back in the Full edition" (carries_desk); the gift and
+          demo editions still carry none of them, and her own apps stay the master's alone.
+ING_HAS(part) in the page answers "author", "rename" and "ownerkey" (the master only), "fabrica", "desk", "lector" and "career"
+(the master and full editions; "desk" the master's alone from 7.49 to 7.73).
 
 Every edition keeps the copyright line and the licence. Each change here must find its text exactly as many times as it
 says, so a change to the page that moves one stops the build instead of leaving it undone."""
@@ -112,8 +114,13 @@ def carries_desk(ed):
     app"; asked whether the mini apps were the Desk's five apps, which the full edition carried as she asked on 5 November, and whether
     they should stay or go, she answered "Yes for the mini app question" (20 November 2026). So the full edition carries none of them
     either, nor names them; another person's profile on her master copy, which runs as the full edition, shows none of them
-    (modules r231 and r336, which act there, and r147, r108 and r188, which ask ING_HAS("desk"))."""
-    return ed == "master"
+    (modules r231 and r336, which act there, and r147, r108 and r188, which ask ING_HAS("desk")).
+    7.74 (24 November 2026): asked whether the mini apps should come back to the full edition, she answered "Back in the Full edition".
+    So the full edition carries the five apps again, whole, with their keys, pages, Home tiles and words (as it did from 6.27 to 7.48),
+    and another person's profile on her master copy, which runs as the full edition, has them too (r336 keeps the Desk's sentences
+    there; r231, r147, r108 and r188 ask ING_HAS("desk"), which says yes there now). The gift and demo editions carry none of them
+    (_no_desk), and her own apps stay the master's alone. Clepsydra and Schedae, the instruments, were in every edition throughout."""
+    return ed in ("master", "full")
 
 
 def has_fabrica(ed):
@@ -763,7 +770,7 @@ def edits(ed):
         E += _blank(ed)
     if ed == "full":
         E += _full_apps()
-    if not carries_desk(ed):  # 7.49: the five apps of the Desk are the master's alone (the gift and demo editions' since 6.27)
+    if not carries_desk(ed):  # the gift and demo editions carry none of the Desk's five apps (6.27); the full edition did not from 7.49 to 7.73
         E += _no_desk(ed)
     if not has_fabrica(ed):  # 6.27: the public editions
         E += _public(ed)

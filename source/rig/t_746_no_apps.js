@@ -13,7 +13,9 @@
 //      included) brings none of her apps into any list
 //   3. a page the person adds is listed, whatever app it is ("unless I upload them on there"), where the edition has an app library
 //   4. 7.52 (her answer, 20 November 2026: "Yes for the mini app question"): none of the Desk's five apps (Tabula, Abacus, Imago, Scriba,
-//      Fontes): no key, no Home tile, no route, no key that sends to one, no word naming one; in her own profile, all of them
+//      Fontes): no key, no Home tile, no route, no key that sends to one, no word naming one; in her own profile, all of them.
+//      7.74 (her answer, 24 November 2026: "Back in the Full edition"): the full edition, and so another person's profile on her master,
+//      has all of them again; the gift and demo editions none
 // Invented apps only (Tide Clock); no one's data.
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path');
 const [URL_, OUT, MODE] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true });
@@ -103,7 +105,9 @@ const HERS = /Carpe Diem|The Forge|\bthe Forge\b|Inkwell|Lakay|Clavis|Offline Pr
       ok(added.apps.some((n) => /Carpe Diem/.test(n)), '   and a page of one of her apps, added by the person, is listed as any other app ("unless I upload them on there")', added.apps);
       ok(added.offer.some((x) => /^Tide Clock \(In your app library\)$/.test(x)), '   Folders, Your apps offers what was added here', added.offer);
     } else if (!OWNER) console.log('NOTE this edition has no app library (the gift and demo editions): nothing to add');
-    // ---------------------------------------------------------------- 4. the Desk's five apps (7.52, her answer: "Yes for the mini app question")
+    // ---------------------------------------------------------------- 4. the Desk's five apps (7.52, her answer: "Yes for the mini app question";
+    // 7.74, her answer: "Back in the Full edition": the full edition carries them, and another person's profile on her master is the full edition)
+    const EDN = await p.evaluate(() => typeof ING_EDITION === 'string' ? ING_EDITION : '?'), DESKED = OWNER || EDN === 'full';
     const d = await p.evaluate(async () => {
       const DESK = ['tabula', 'abacus', 'slides', 'scriba', 'fontes'], r = { said: {} };
       const NAMES = /\b(Tabula|Abacus|Imago)\b|Scriba for recordings|Scriba \(recordings|Scriba's own speech models|\(Scriba's,|Fontes for sources|Fontes \(sources\) are/;
@@ -124,6 +128,8 @@ const HERS = /Carpe Diem|The Forge|\bthe Forge\b|Inkwell|Lakay|Clavis|Offline Pr
       return r; });
     if (OWNER) {
       ok(d.keys.indexOf('tabula') >= 0 && d.keys.indexOf('abacus') >= 0 && d.tiles.length === 5 && d.head === 'Your apps' && d.tip, 'control: in her own profile the Desk is all there: its keys in the side bar, the five apps on Home under Your apps, the Guide\'s tip on them', { keys: d.keys, tiles: d.tiles, head: d.head, tip: d.tip });
+    } else if (DESKED) {
+      ok(d.keys.indexOf('tabula') >= 0 && d.keys.indexOf('abacus') >= 0 && d.tiles.length === 5 && d.head === 'Your apps' && d.tip, '4. the Desk (7.74, "Back in the Full edition"): ' + EDN + ' edition' + (GUEST ? ', another person\'s profile on her master' : '') + ': all there: its keys in the side bar, the five apps on Home under Your apps, the Guide\'s tip on them', { keys: d.keys, tiles: d.tiles, head: d.head, tip: d.tip });
     } else {
       ok(d.keys.length === 0 && d.group.length === 0, '4. the Desk (7.52): no key to any of its five apps in the side bar, and no Apps group', { keys: d.keys, group: d.group });
       ok(d.tiles.length === 0 && d.head === 'Your instruments', '   Home shows the instruments alone, under Your instruments', { tiles: d.tiles, head: d.head });

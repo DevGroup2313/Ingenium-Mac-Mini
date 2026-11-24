@@ -395,6 +395,24 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.74 (24 November 2026): the Desk's five mini apps back in the full edition.
+
+Her message of 24 November 2026, its third stage. Asked whether the mini apps should come back to the full edition, she answered
+"Back in the Full edition".
+- The full edition carries Tabula, Abacus, Imago, Scriba and Fontes again, whole, as it did from 6.27 to 7.48: their keys under the
+  side bar's Apps group, their pages, their tiles on Home under Your apps, Lector's and Vocatio's Open in Tabula, and the words about
+  them (`build/editions.py`: carries_desk is true for "full", so _no_desk no longer applies to it; `build/build_page.py`: ING_HAS("desk")
+  answers yes in the master and full editions). Clepsydra and Schedae, the instruments, were in every edition throughout. The full
+  page grows by about 2.6 MB.
+- Another person's profile on her master copy runs as the full edition, so it has them too: r336 says the Desk's sentences as the
+  editions without the Desk say them only where ING_HAS("desk") says no (DESKSAY), and r147, r108, r188 and r231 ask ING_HAS("desk").
+- The gift and demo editions still carry none of them, and her own apps stay the master's alone.
+- What is new: a line for the full edition (shown where the Desk is), and, for the gift and demo editions, "Nothing changes in this
+  edition", so their What is new key names the version they are (in 7.73 it named 7.72, every 7.73 line being Lector's).
+- Tests: rig/t_627_editions.js (the full edition's side bar with the five apps, under an Apps group, their routes to their pages; its
+  words may name them), rig/t_746_no_apps.js section 4 (the full edition and another person's profile on her master have the Desk;
+  the gift and demo editions none).
+
 Ingenium 7.73 (24 November 2026): Lector reads with your computer's model and keeps reading; text copied from Lector's PDFs keeps its
 spaces.
 

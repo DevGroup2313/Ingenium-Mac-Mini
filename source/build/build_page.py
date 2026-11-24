@@ -1335,11 +1335,13 @@ edit("""Every model in Ingenium starts each chat with Ingenium's own instruction
 #      cards of Settings ask it). Her words: "The Ingenium edition that will be made available to the public and participants and even
 #      friends and family will only have the Home, Chat, Code, Folders, Focus, Models, Blend, Build, No apps, and the Guide and Settings
 #      page without the Author Studio and its functions. The Lector, Career and Fabrica page as well as the Author Studio and the rename
-#      Ingenium and Author key function are only reserved for my master edition and the "Full" edition with some limitations". ----
+#      Ingenium and Author key function are only reserved for my master edition and the "Full" edition with some limitations".
+#      7.49 made "desk" the master's alone; 7.74 (24 November 2026) gives it back to the full edition, at her answer "Back in the Full
+#      edition" (build/editions.py, carries_desk). ----
 edit('var ING_EDITION="master";\n',
      'var ING_EDITION="master";\nvar ING_HAS=function(p){var e=ING_EDITION;if(p==="author"||p==="rename"||p==="ownerkey")return e==="master";'
-     'if(p==="desk")return e==="master";if(p==="fabrica"||p==="lector"||p==="career")return e==="master"||e==="full";return true;};\n',
-     "6.27 what each edition carries (7.49: the five apps of the Desk, the master's alone)")
+     'if(p==="fabrica"||p==="desk"||p==="lector"||p==="career")return e==="master"||e==="full";return true;};\n',
+     "6.27 what each edition carries (7.74: the five apps of the Desk in the master and full editions again)")
 
 # ---- R331 (Ingenium 7.44, 19 November 2026): local profiles (boot/profiles_boot.js, modules/r331.js, desktop/app_profiles_744.py). Her
 #      words, on the live preview she approved ("I approve of the preview ... Just add it to the damn app and let's move on. Put the drop down

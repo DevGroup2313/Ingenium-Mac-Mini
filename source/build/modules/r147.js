@@ -340,7 +340,8 @@ var APPS=[
   {k:"schedae",t:"Schedae",d:"Loose notes",c:"#6a3fb5",fn:"openSchedae"},{k:"clepsydra",t:"Clepsydra",d:"Short sprints",c:"#b88a3a",fn:"openClepsydra"}];
 /* 7.52 (her answer, 20 November 2026: "Yes for the mini app question"): the five apps of the Desk only where the Desk is, her master
    in her own profile. Another person's profile on her master copy runs as the full edition, which carries none of them (build/editions.py
-   takes them out of the other editions' pages; there this does nothing more) */
+   takes them out of the other editions' pages; there this does nothing more). 7.74 ("Back in the Full edition"): the full edition, and
+   so that profile, carries them again; ING_HAS("desk") says so, and only the gift and demo editions draw the instruments alone */
 var DESK=(typeof ING_HAS!=="function")||ING_HAS("desk");if(!DESK)APPS=APPS.filter(function(A){return !A.go;});
 var R={};
 function build(){

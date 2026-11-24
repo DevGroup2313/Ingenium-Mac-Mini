@@ -234,6 +234,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.74", "Tabula, Abacus, Imago, Scriba and Fontes are back in the full edition, whole: their keys in the side bar, their pages, and their tiles on Home.", "desk"],
+  ["7.74", "Nothing changes in this edition: 7.74 brings parts of Ingenium this edition does not carry.", "nofabrica"],
   ["7.73", "Lector's Read and written by lists the models on each of your paired computers too, under the computer's name. Choosing one connects to it, and one plain line says which model reads and writes, and where.", "lector"],
   ["7.73", "A reading through another of your computers no longer stops when that computer is slow to answer: Lector waits, looks for it again, and goes on, for up to fifteen minutes, saying what it waits for.", "lector"],
   ["7.73", "Text copied from Lector's PDFs keeps its spaces, at the ends of lines too, and the page numbers are marked as the page's own furniture. The pages look exactly as before.", "lector"],
