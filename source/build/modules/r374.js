@@ -267,7 +267,9 @@ function place(){if(!P)return;var k=pill(),r=k?k.getBoundingClientRect():{left:i
 function open(){if(P){paint();return;}build();paint();var k=pill();if(k)k.setAttribute("aria-expanded","true");
   setTimeout(function(){D.addEventListener("pointerdown",outside,true);},0);}
 function close(){if(!P)return;P.remove();P=null;var k=pill();if(k)k.setAttribute("aria-expanded","false");D.removeEventListener("pointerdown",outside,true);}
-function outside(e){if(!P)return;var t=e.target;if(P.contains(t))return;var k=pill();if(k&&k.contains(t))return;close();}
+function outside(e){if(!P)return;var t=e.target;if(P.contains(t))return;var k=pill();if(k&&k.contains(t))return;
+  /* 7.78: the guided tour's card points at the panel while it is open (r376): pressing or moving that card leaves it open */
+  if(t&&t.closest&&t.closest("#ingTour"))return;close();}
 D.addEventListener("keydown",function(e){if(e.key==="Escape"&&P)close();});
 W.addEventListener("resize",function(){place();});
 /* the Engine key opens the panel (until 7.76 it opened Mentes) */

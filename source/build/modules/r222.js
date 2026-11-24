@@ -281,6 +281,10 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.78", "The guided tour shows Adamas writing a small page that splits a bill, running it as it grows, and changing it at a request in plain words."],
+  ["7.78", "The guided tour shows Concordia at work: one model drafts a notice, a second improves it, and the refined answer comes last."],
+  ["7.78", "The guided tour shows Lector reading a small app and writing a guide for its users on real pages.", "lector"],
+  ["7.78", "The guided tour opens the Engine panel; the top bar's card and its help now say that the Engine key opens it."],
   ["7.77", "The Engine key in the top bar opens the engine's panel: the one model every page writes with, chosen from this device or your other computers, with Load, Unload, and its Reply, Memory and Effort."],
   ["7.77", "The guided tour shows Chat making a week's meal plan with its shopping list, and Code building a small breathing app that runs beside the conversation."],
   ["7.77", "Lector's pages keep every line on a sheet, whatever loads after the document is drawn.", "lector"],

@@ -395,6 +395,27 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.78 (24 November 2026): the guided tour shows a task done on Adamas, Concordia and Lector, and opens the Engine panel.
+
+Her request (24 November 2026): "I want live demonstrations added to the Guided Tour to showcase all of Ingenium's pages ... specifically
+curated to showcase each page being used to complete a specific task". 7.77 gave Chat and Code theirs; this release gives the next pages
+theirs (`r376.js`, new). Each is played through the page's own drawing, and each leaves nothing behind when the tour ends.
+- Adamas: a small page that splits a bill is written into the editor line by line, and the preview runs it as it grows (three people,
+  a bill of 64.80 and a tip of 12.5 per cent: 24.30 each). Then a request in plain words, a switch that rounds each share up, is answered
+  as a model's request is: its steps (read, changed at the lines named, ran) and its reply, and the page and its preview change (25.00
+  each). Her own page comes back when the tour ends; while the tour types, Run as I type is held off so a half-written script never runs.
+  Where Adamas holds a large app or one opened from Fabrica, the tour leaves it alone.
+- Concordia: Pass and refine, watched. The question is written once; the first model drafts a notice for a shared building's hallway,
+  the second improves the draft, and the refined answer comes last with what was changed. Drawn by Concordia's own answer view, labelled
+  as the tour's example, and never kept among her blends; her own question comes back.
+- Lector: a small breathing app is read in two parts, a note kept on each, and a guide for its users is written onto Lector's paper
+  section by section, every fact read from the code, then measured into sheets. No byline of hers is put on it.
+- The Engine panel: the top bar's card said the Engine key opens Mentes; since 7.77 it opens the panel, and the card now says so. A card
+  of its own opens the panel and points in turn to its state, its models, and Load and Unload; the tour changes nothing there. The
+  hover help says the same (`r144.js`). Pressing or moving the tour's card leaves the panel open (`r374.js`).
+- On these cards the tour's card stands at the lower left where the page's middle is what is shown; a card she moves stays where she
+  puts it. Test: rig/t_778_tour_pages.js (24 checks). The other pages (Ingenia, Vocatio, Fabrica) come next.
+
 Ingenium 7.77 (24 November 2026): the Engine panel, one model for all of Ingenium; the guided tour builds a real app in Code and a
 real meal plan in Chat; Lector's pages keep every line on a sheet.
 

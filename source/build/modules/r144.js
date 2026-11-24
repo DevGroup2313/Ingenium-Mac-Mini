@@ -581,7 +581,7 @@ var WHAT=[
   ["#brandSealBtn","The logo","Opens the introduction again, the door you saw when Ingenium opened."],
   ["#topChevron","Fold the controls","Folds the keys in the top bar away for a quieter screen, or brings them back. The Help key stays."],
   ["#statusPill","Your status","Says whether you are at the desk, on a break or away. Press it to change it, link it to Clepsydra or see the time report."],
-  ["#enginePill","The engine","Shows whether the engine that runs models on this device is ready. Press it to open Models.","The engine is the program that runs a model; it needs no internet."],
+  ["#enginePill","The engine","Shows whether the engine that runs models on this device is ready. Press it to open the Engine panel: the one model every page writes with, Load and Unload, and the model's Reply, Memory and Effort.","The engine is the program that runs a model; it needs no internet."],
   ["#activeModelPill","Who answers","Names who answers right now: a model on this device, or a service you connected (Claude, OpenAI, Gemini, Ollama). Press it to switch from any page, or to connect a service."],
   ["#clockPill","The time","The time of day. Press it to open Focus."],
   ["#refreshBtn","Refresh","Starts Ingenium again if it glitches or stops answering. Your work is saved first.",null,"F5 or Ctrl+R; Command+R on a Mac."],
