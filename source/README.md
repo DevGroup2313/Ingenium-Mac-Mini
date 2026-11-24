@@ -420,6 +420,11 @@ Her message of 24 November 2026 (the evening), its second stage.
   a circle that grows as one breathes in for four seconds and shrinks for six. The app and its session are removed when the tour ends;
   a tour ending on Code goes back to her own session, or Home (until 7.76 Code opened an empty New session of its own). Test:
   rig/t_777_tour_code.js. The other pages' demonstrations come next, in her order.
+- Code's list is of sessions, Chat's of conversations (`r375.js`, new). Her question: "rename the "Conversations" inside of the app to
+  "Sessions" instead, or perhaps you could offer me some recommendations"; my recommendation, Conversations for Chat and Sessions for
+  Code (Code already names a new one "New session" and has a Session column); her answer: "I approve of your recommendations for the
+  naming question". On Code the list, its search, its hide key, the ☰ key's hint, the menu's heading and the name asked when renaming
+  say sessions; Chat is unchanged. Test: rig/t_777_sessions.js (5 checks).
 - Lector's pages keep every line on a sheet (`r108.js`). The 7.76 checks found, now and then on a busy machine, three lines at each page's
   end standing in the gap (rig/t_775_lector_sheets.js): the paper shifted a little after it was measured without its height changing
   enough to be measured again. Now the measure is checked a few times in the seconds after it and whenever a font finishes loading (the
