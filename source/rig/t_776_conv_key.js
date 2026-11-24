@@ -4,7 +4,7 @@
 // inside of the Full edition".
 //   node rig/t_776_conv_key.js <Ingenium page url> [<another edition's url> ...]
 const pw = require('/opt/node-tools/node_modules/playwright');
-const URLS = process.argv.slice(2).filter(a => /^https?://.test(a));   // the release checks add an out folder: only the pages are taken
+const URLS = process.argv.slice(2).filter(a => /^https?:\/\//.test(a));   // the release checks add an out folder: only the pages are taken
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + JSON.stringify(d).slice(0, 600))); c ? pass++ : fail++; };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
