@@ -1420,12 +1420,24 @@ function paperMarks(){marksT=0;var desk=$("l7Desk"),pp=desk&&desk.querySelector(
       var n=document.createElement("span");n.className="l-sheet-n";n.textContent=String(i+1);sh.appendChild(n);lay.appendChild(sh);});
     pp.insertBefore(lay,pp.firstChild);try{if(desk.__mo)desk.__mo.takeRecords();}catch(e){}
     /* measured again when the paper's height changes (its faces and its crest load after the first measure) */
-    pp.__h=pp.offsetHeight;if(!pp.__ro&&typeof ResizeObserver!=="undefined"){pp.__ro=new ResizeObserver(function(){if(pp.__h&&Math.abs(pp.offsetHeight-pp.__h)>2)marksSoon();});pp.__ro.observe(pp);}
+    pp.__h=pp.offsetHeight;if(!pp.__ro&&typeof ResizeObserver!=="undefined"){pp.__ro=new ResizeObserver(function(){if(pp.__h&&Math.abs(pp.offsetHeight-pp.__h)>0.5)marksSoon();});pp.__ro.observe(pp);}
+    /* 7.77: the paper can shift a little after it was measured (a face or a picture arriving) without its height changing enough to be
+       noticed, and lines then stood in the gap between sheets (seen by rig/t_775_lector_sheets.js, now and then, on a busy machine).
+       So the measure is checked again a few times in the seconds after it and whenever a font finishes loading: the line before each
+       gap must end on its sheet, and the block after it begin on the next; if not, the pages are measured again. */
+    checkSoon(pp,pageH);
     if(!paperMarks.__fonts&&document.fonts&&document.fonts.ready){paperMarks.__fonts=1;document.fonts.ready.then(function(){marksSoon();});}
     return;}
   st.slice(1).forEach(function(y,i){var prev=at.filter(function(a){return a.b<=y+0.5;}).pop(),mid=prev?(prev.b+y)/2:y-4,m=document.createElement("div");
     m.className="l-pbrk";m.setAttribute("aria-hidden","true");m.style.top=(pt+mid)+"px";var t=document.createElement("span");t.textContent="Page "+(i+2);m.appendChild(t);pp.appendChild(m);});}
 function marksSoon(){if(marksT)return;marksT=setTimeout(paperMarks,R7.live?700:120);}
+function pagesHold(pp,pageH){var r=pp.getBoundingClientRect();if(!r.width)return true;var k=r.width/640,gs=pp.querySelectorAll(".l-gap"),sh=pp.querySelectorAll(".l-sheet");
+  for(var i=0;i<gs.length;i++){var g=gs[i],a=sh[i],b2=sh[i+1];if(!a||!b2)return false;var ar=a.getBoundingClientRect(),br=b2.getBoundingClientRect(),prev=g.previousElementSibling,next=g.nextElementSibling;
+    if(prev&&!prev.classList.contains("l-sheets")){var rg=document.createRange();rg.selectNodeContents(prev);var rs=rg.getClientRects(),last=rs.length?rs[rs.length-1]:prev.getBoundingClientRect();if(last.height>0&&last.bottom>ar.bottom+2*k)return false;}
+    if(next){var nr=next.getBoundingClientRect();if(nr.height>0&&nr.top<br.top-2*k)return false;}}
+  return true;}
+var CHECK=[];function checkSoon(pp,pageH){CHECK.forEach(clearTimeout);CHECK=[400,1200,3000,6000].map(function(ms){return setTimeout(function(){try{if(pp.isConnected&&pp.classList.contains("l-paged")&&!pagesHold(pp,pageH))marksSoon();}catch(e){}},ms);});}
+try{if(document.fonts&&document.fonts.addEventListener)document.fonts.addEventListener("loadingdone",function(){try{var d=$("l7Desk"),pp=d&&d.querySelector(".l-paper.l-paged");if(pp)marksSoon();}catch(e){}});}catch(e){}
 function watchMarks(){var desk=$("l7Desk");if(!desk||desk.__mo||typeof MutationObserver==="undefined")return;
   desk.__mo=new MutationObserver(function(ms){function own(n){return n.classList&&(n.classList.contains("l-pbrk")||n.classList.contains("l-gap")||n.classList.contains("l-sheets"));}
     if(ms.every(function(m){return [].every.call(m.addedNodes,own)&&[].every.call(m.removedNodes,own);}))return;marksSoon();});

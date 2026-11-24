@@ -395,6 +395,36 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.77 (24 November 2026): the Engine panel, one model for all of Ingenium; the guided tour builds a real app in Code and a
+real meal plan in Chat; Lector's pages keep every line on a sheet.
+
+Her message of 24 November 2026 (the evening), its second stage.
+- The Engine panel (`r374.js`, new). Her words: "I should be able to click on the "Engine" button from the top bar and be able to select
+  to unload the model and other options for the models inside of the app ... this does not feel like a true ecosystem"; then "Instead of
+  each page getting its own models controls, I think it should all be folded into and added to the Engine button and give it its own
+  panel when you click on it and it operates for the entire app". Shown first as a live preview, rebuilt at her word ("The Engine panel
+  looks basic and does not match Ingenium's display design"), then approved with three changes (the page names flat, lifting as a sticky
+  note does; the Running card answering the pointer, its plate raised; the title fixed while only the body scrolls): "I approve of the
+  previews, please commit and push it everywhere". The Engine key in the top bar opens it (until 7.76 it opened Mentes). In it: the
+  engine's state, with an analogue gauge of the model's file against this device's memory; the pages that write with the model; the
+  models ready on this device and those her computers lend; Load and Unload; and Reply, Memory and Effort for the model, through the one
+  record (r249, r321). Choosing a model makes it the model of the whole app: Lector, Vocatio, Ingenia and Fabrica, which took Lector's own
+  choice (IngLector.plan), now take it, and Lector's Read and written by gives way to one line that names the model and opens the panel.
+  Mentes keeps adding, removing and checking models. Test: rig/t_777_engine.js (14 checks, with a stand-in engine).
+- The guided tour's Chat and Code (`build_page.py` R192, `r222.js`). Her words: "it asks for guidance with planning for PhD applications
+  which feels way too close to home ... I want the demonstration prompt to be replaced with another live demonstration prompt that
+  actually demonstrates using Ingenium's chat pages to actually build an app or something else". Chat's example is now a week's meal
+  plan on a small budget, as a table, with its shopping list, the thinking weighing what the meals share. Code's demonstration types a
+  request for a small breathing app, then plays the reply through Code's own way: its plan ticked as it is written, the page written into
+  an app of the tour's own by the reply's edit (edProcess, as a model's reply is), kept as a version, and run beside the conversation:
+  a circle that grows as one breathes in for four seconds and shrinks for six. The app and its session are removed when the tour ends;
+  a tour ending on Code goes back to her own session, or Home (until 7.76 Code opened an empty New session of its own). Test:
+  rig/t_777_tour_code.js. The other pages' demonstrations come next, in her order.
+- Lector's pages keep every line on a sheet (`r108.js`). The 7.76 checks found, now and then on a busy machine, three lines at each page's
+  end standing in the gap (rig/t_775_lector_sheets.js): the paper shifted a little after it was measured without its height changing
+  enough to be measured again. Now the measure is checked a few times in the seconds after it and whenever a font finishes loading (the
+  line before each gap must end on its sheet, the block after it begin on the next), and any change of height is measured again.
+
 Ingenium 7.76 (24 November 2026): the list of conversations always has its key; your chosen model stays yours; Fabrica's little
 diamond seen as it spins; sticky notes keep room below the line; What's new answers the pointer, under Ingenium's own logo.
 

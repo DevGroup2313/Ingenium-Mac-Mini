@@ -37,48 +37,95 @@ function deskEngine(){try{var a=typeof W.deskApi==="function"?W.deskApi():null;r
 var ALL=["new","some","expert"];
 
 /* ================= 1. a Code session of the tour's own, for its demonstrations ================= */
-var CODE_ID="c-tour-code",kept=null;
-var CODE_Q="Add a dark mode to my app, with a key that switches it.";
-var CODE_A="I will add a dark colour scheme and a key that switches it. The plan is in the column on the right: each task is ticked as it is done, and the app is run and checked at the end.";
-function freshPlan(){return {tasks:[{t:"Read the page and its styles",s:"done"},{t:"Add a dark colour scheme",s:"doing"},{t:"Add a key that switches it",s:"todo"},{t:"Run the app and check both looks",s:"todo"}],at:Date.now()};}
+/* 7.77: the tour builds a real small app before her eyes (her words, 24 November 2026: "I want the demonstration prompt to be replaced
+   with another live demonstration prompt that actually demonstrates using Ingenium's chat pages to actually build an app or something
+   else"). Until 7.76 Code's demonstration ticked off an example plan ("Add a dark mode to my app") in a session with no app. Now the tour
+   asks for a small breathing app, types the request, and plays the model's reply through Code's own way: the plan ticked as the reply is
+   written, the page written into an app of the tour's own by the reply's edit (the same edit a model sends: Code's edProcess), and the
+   app run beside the conversation. The app, its session and their files are removed when the tour ends; her own session, app and
+   columns are put back as they were. */
+var CODE_ID="c-tour-code",PROJ_ID="p-tour-breath",kept=null;
+var CODE_Q="Build me a small breathing app: a circle that grows as I breathe in for four seconds and shrinks as I breathe out for six, with the words in the middle and a key to start and pause.";
+var APP=['<!doctype html>','<html lang="en">','<head>','<meta charset="utf-8">','<meta name="viewport" content="width=device-width, initial-scale=1">','<title>Breathe</title>','<style>',
+  'body{margin:0;min-height:100vh;display:grid;place-items:center;background:linear-gradient(180deg,#f4f0f8,#e9e2f2);font-family:Georgia,serif;color:#3b2a5c}',
+  '.wrap{display:grid;justify-items:center;gap:28px}',
+  '.ring{width:240px;height:240px;border-radius:50%;display:grid;place-items:center}',
+  '.circle{width:120px;height:120px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#ffffff,#c9b6ee 55%,#8d66d6);box-shadow:0 10px 30px rgba(93,55,161,.35);transform:scale(1);transition:transform 4s ease-in-out}',
+  '.circle span{font-size:17px;letter-spacing:.06em;color:#3b2a5c}',
+  'button{font:600 15px/1 system-ui,sans-serif;padding:11px 22px;border-radius:999px;border:1px solid #4b2a86;color:#fff;cursor:pointer;background:linear-gradient(180deg,#7348be,#5d37a1);box-shadow:0 3px 6px rgba(52,24,100,.26)}',
+  'button:hover{transform:translateY(-2px)}',
+  '</style>','</head>','<body>','<div class="wrap">','  <div class="ring"><div class="circle" id="c"><span id="w">Ready</span></div></div>','  <button id="go" type="button">Start</button>','</div>','<script>',
+  'var c=document.getElementById("c"),w=document.getElementById("w"),go=document.getElementById("go"),on=false,t=0;',
+  'function breatheIn(){if(!on)return;w.textContent="Breathe in";c.style.transitionDuration="4s";c.style.transform="scale(1.9)";t=setTimeout(breatheOut,4000);}',
+  'function breatheOut(){if(!on)return;w.textContent="Breathe out";c.style.transitionDuration="6s";c.style.transform="scale(1)";t=setTimeout(breatheIn,6000);}',
+  'go.onclick=function(){on=!on;go.textContent=on?"Pause":"Start";if(on)breatheIn();else{clearTimeout(t);w.textContent="Paused";}};',
+  '/* shown at once, so the first breath can be seen */',
+  'setTimeout(function(){go.click();},600);',
+  '<\/script>','</body>','</html>'].join("\n");
+var CODE_INTRO="I will build it as one page: the circle and its words, the timing of each breath, and the key. The plan is in the column on the right, each task ticked as it is done; when the page is written, it runs beside us.";
+var CODE_END="It is ready. Breathe with the circle: in as it grows, for four seconds; out as it shrinks, for six. Pause stops it where it is.";
+function codeText(){return CODE_INTRO+'\n\n<edit file="index.html">\n<<<<<<< FIND\n=======\n'+APP+'\n>>>>>>> REPLACE\n</edit>\n\n'+CODE_END;}
+function freshPlan(){return {tasks:[{t:"Draw the circle and its words",s:"doing"},{t:"Time each breath: in for four seconds, out for six",s:"todo"},{t:"Add the key to start and pause",s:"todo"},{t:"Run the app and check it",s:"todo"}],at:Date.now()};}
+function lively(){try{return typeof tourLively==="function"?tourLively():true;}catch(e){return true;}}
 function keep(){if(kept)return;var cs={};try{cs=ccState();}catch(e){}
-  kept={code:cs.activeCode||null,panel:cs.panel?JSON.parse(JSON.stringify(cs.panel)):null,
+  kept={code:cs.activeCode||null,project:cs.project||null,panel:cs.panel?JSON.parse(JSON.stringify(cs.panel)):null,
     P:W.IngR215&&IngR215.PANEL?{plan:!!IngR215.PANEL.plan,session:!!IngR215.PANEL.session}:null};
   try{if(tourSaved.chat===undefined)tourSaved.chat=state.activeChat||null;}catch(e){}}
-function codeChat(){state.chats=state.chats||[];keep();
+function tourProject(){state.projects=state.projects||[];var pr=state.projects.filter(function(p){return p.id===PROJ_ID;})[0];
+  if(!pr){pr={id:PROJ_ID,name:"A breathing app (from the tour)",instructions:"",files:[],app:true,main:"index.html",made:Date.now(),versions:[],__tour:true};state.projects.push(pr);}
+  return pr;}
+/* the tour's app starts empty each time it is built before her eyes */
+function emptyProject(pr){(pr.files||[]).forEach(function(f){try{if(f.ref)IngBig.del(f.ref);}catch(e){}});pr.files=[];pr.versions=[];}
+function finished(){var now=Date.now(),pl=freshPlan();pl.tasks.forEach(function(t){t.s="done";});return [{role:"me",text:CODE_Q,at:now},{role:"bot",text:codeText(),at:now,done:now,plan:pl}];}
+function codeChat(mode){state.chats=state.chats||[];keep();var pr=tourProject();
   var c=state.chats.filter(function(x){return x.id===CODE_ID;})[0];
-  if(!c){c={id:CODE_ID,title:"Example from the tour",messages:[],kind:"code",__tourCode:true};state.chats.push(c);}
-  if(!c.messages.length){var now=Date.now();c.messages=[{role:"me",text:CODE_Q,at:now},{role:"bot",text:CODE_A,at:now,done:now,plan:freshPlan()}];}
-  try{ccState().activeCode=c.id;}catch(e){}
+  if(!c){c={id:CODE_ID,title:"A breathing app (from the tour)",messages:[],kind:"code",projectId:pr.id,__tourCode:true};state.chats.push(c);}
+  if(mode==="empty"){c.messages=[];emptyProject(pr);}
+  else if(!c.messages.length||(c.messages[1]&&c.messages[1].live&&mode!=="keep")){c.messages=finished();}
+  try{ccState().activeCode=c.id;ccState().project=pr.id;}catch(e){}
   goPage("code");
-  try{if(state.activeChat!==c.id){state.activeChat=c.id;renderChat();ccPaintSide();ccPaintHead();}}catch(e){}
+  try{state.activeChat=c.id;renderChat();ccPaintSide();ccPaintHead();}catch(e){}
   return c;}
 function codeBot(c){var ms=(c&&c.messages)||[];for(var i=ms.length-1;i>=0;i--)if(ms[i].role==="bot")return ms[i];return null;}
 function column(which){try{if(W.IngR215&&IngR215.panel)IngR215.panel(which,true);}catch(e){}}
 function codeGo(open){return function(){codeChat();(open||[]).forEach(column);};}
-function dropCode(){var had=(state.chats||[]).some(function(c){return c.__tourCode;});if(had)state.chats=state.chats.filter(function(c){return !c.__tourCode;});return had;}
+function dropCode(){var had=(state.chats||[]).some(function(c){return c.__tourCode;});if(had)state.chats=state.chats.filter(function(c){return !c.__tourCode;});
+  var prs=(state.projects||[]).filter(function(p){return p.__tour;});if(prs.length){prs.forEach(emptyProject);state.projects=state.projects.filter(function(p){return !p.__tour;});had=true;}
+  return had;}
 function putBack(){if(!kept)return;try{var cs=ccState(),k=kept;
     cs.activeCode=k.code&&(state.chats||[]).some(function(c){return c.id===k.code;})?k.code:null;
+    if(k.project&&(state.projects||[]).some(function(p){return p.id===k.project;}))cs.project=k.project;else delete cs.project;
     if(k.panel)cs.panel=k.panel;else delete cs.panel;
     if(W.IngR215&&IngR215.PANEL&&k.P){IngR215.PANEL.plan=k.P.plan;IngR215.PANEL.session=k.P.session;}}catch(e){}kept=null;}
 (function wrapClear(){var o=W.tourDemoClear;if(typeof o!=="function"||o.__r222)return;
   var n=function(){var wasCode=false;try{wasCode=!!(W.CC&&CC.mode==="code");}catch(e){}
-    var had=dropCode(),r=o.apply(this,arguments);putBack();
+    var prev=kept&&kept.code,had=dropCode(),r=o.apply(this,arguments);putBack();
     if(had){try{saveState();}catch(e){}}
-    try{if(wasCode&&!ccIsCode(curChat()))goPage("code");else{renderChat();if(W.IngR215)IngR215.paintPanel();}}catch(e){}
+    /* 7.77: back to the Code session she had open before the tour; with none, Home (until 7.76 Code was opened again, and opened an
+       empty New session of its own) */
+    try{if(wasCode&&!ccIsCode(curChat())){if(prev&&(state.chats||[]).some(function(c){return c.id===prev;})){state.activeChat=prev;goPage("code");}else goPage("home");}
+      else{renderChat();if(W.IngR215)IngR215.paintPanel();}}catch(e){}
     try{ccPaintSide();}catch(e){}
     return r;};
   n.__r222=1;W.tourDemoClear=tourDemoClear=n;})();
-/* the demonstration: the example plan, ticked off one task at a time */
-function demoPlan(){var c=codeChat(),bot=codeBot(c);if(!bot)return;bot.plan=freshPlan();column("plan");
+/* the demonstrations: the request typed, then the reply written, the plan ticked, and the app run beside the conversation */
+function demoType(){codeChat("empty");var inp=$("chatInput");if(!inp)return;try{if(tourSaved.input===undefined)tourSaved.input=inp.value;}catch(e){}
+  inp.value="";var k=0,live=lively();
+  var iv=setInterval(function(){if(k>=CODE_Q.length){clearInterval(iv);return;}inp.value+=CODE_Q.charAt(k++);},live?30:1);
+  try{tourTimers.push(iv);}catch(e){}}
+function demoPlan(){var c=codeChat("empty");var inp=$("chatInput");if(inp)inp.value="";column("plan");
+  var now=Date.now(),bot={role:"bot",text:"",live:true,at:now,plan:freshPlan()};c.messages=[{role:"me",text:CODE_Q,at:now},bot];
   try{renderChat();IngR215.planChanged(bot);}catch(e){}
-  var step=2,live=typeof tourLively==="function"?tourLively():true;
-  var iv=setInterval(function(){var T=bot.plan.tasks;
-    if(step>=T.length){T[T.length-1].s="done";clearInterval(iv);}else{T[step-1].s="done";T[step].s="doing";step++;}
-    bot.plan.at=Date.now();try{renderChat();IngR215.planChanged(bot);}catch(e){}},live?1100:10);
+  var full=codeText(),i=0,live=lively(),step=0,marks=[0.3,0.62,0.9];
+  var iv=setInterval(function(){i=Math.min(full.length,i+(live?Math.max(18,Math.round(full.length/90)):full.length));bot.text=full.slice(0,i);var T=bot.plan.tasks;
+    while(step<marks.length&&i>=full.length*marks[step]){T[step].s="done";T[step+1].s="doing";step++;bot.plan.at=Date.now();try{IngR215.planChanged(bot);}catch(e){}}
+    if(i>=full.length){clearInterval(iv);delete bot.live;bot.done=Date.now();T[T.length-1].s="done";bot.plan.at=Date.now();
+      /* Code's own hook reads the reply's edit: the page is written into the tour's app, kept as a version, and run beside the conversation */
+      try{saveState();}catch(e){}try{renderChat();IngR215.planChanged(bot);}catch(e){}return;}
+    try{renderChat();}catch(e){}},live?60:1);
   try{tourTimers.push(iv);}catch(e){}}
 (function wrapDemo(){var o=W.tourDemoRun;if(typeof o!=="function"||o.__r222)return;
-  var n=function(name){if(name==="r222Plan"){try{demoPlan();}catch(e){}return;}return o.apply(this,arguments);};n.__r222=1;W.tourDemoRun=tourDemoRun=n;})();
+  var n=function(name){if(name==="r222Plan"){try{demoPlan();}catch(e){}return;}if(name==="r222Type"){try{demoType();}catch(e){}return;}return o.apply(this,arguments);};n.__r222=1;W.tourDemoRun=tourDemoRun=n;})();
 
 /* ================= 2. the new steps ================= */
 var S={
@@ -90,13 +137,13 @@ var S={
     t:"🔌 Connectors",
     b:"The + key, then Connectors: tools from outside services that the model can use while it answers. A tool that only reads runs when the model asks for it; a tool that changes something asks you first. Each use is a step under the reply.",
     tip:"Add one in Settings, Connectors, by its address. With none added, nothing changes."},
-  code1:{r222:1,chap:"Code",sub:"Building an app",go:codeGo(),ring:"#chatInput",
+  code1:{r222:1,chap:"Code",sub:"Building an app",go:function(){codeChat("empty");},ring:"#chatInput",demo:"r222Type",
     t:"🧩 Code: building an app with the model",
-    b:"Code is where you build an app with the model and watch it run beside the conversation. Choose an app (a new one, a file or a folder of yours, or one of your GitHub repositories) and describe a change: the model reads the code and changes it, and the app runs beside the conversation. Every change is kept as a version you can undo.",
+    b:"Code is where you build an app with the model and watch it run beside the conversation. Choose an app (a new one, a file or a folder of yours, or one of your GitHub repositories) and describe what you want. Watch: the tour is asking for a small breathing app now.",
     tip:"One change at a time works best: look at the app after each."},
-  code2:{r222:1,chap:"Code",sub:"The plan",go:codeGo(["plan"]),ring:'#ccPanel [data-sec="plan"]',demo:"r222Plan",
-    t:"☑️ The plan, ticked off",
-    b:"For a task of more than two steps, the model keeps a plan, and the Plan column shows it as a checklist: each task is ticked as it is done. The tour is ticking an example plan now.",
+  code2:{r222:1,chap:"Code",sub:"The plan",go:function(){codeChat("empty");column("plan");},ring:'#ccPanel [data-sec="plan"]',demo:"r222Plan",
+    t:"☑️ The app, written and running",
+    b:"The model writes the app and keeps a plan beside it: each task is ticked as it is done. When the page is written, it runs beside the conversation: breathe with the circle. Every change is kept as a version you can undo; the tour's app is removed when the tour ends.",
     tip:"With Ultracode on, every task has a plan."},
   code3:{r222:1,chap:"Code",sub:"The session",go:codeGo(["plan","session"]),ring:"#ccPanel",
     t:"🗂️ The Session column",
@@ -234,6 +281,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.77", "The Engine key in the top bar opens the engine's panel: the one model every page writes with, chosen from this device or your other computers, with Load, Unload, and its Reply, Memory and Effort."],
+  ["7.77", "The guided tour shows Chat making a week's meal plan with its shopping list, and Code building a small breathing app that runs beside the conversation."],
+  ["7.77", "Lector's pages keep every line on a sheet, whatever loads after the document is drawn.", "lector"],
   ["7.76", "The list of conversations always has its key at the top left of Chat and Code, from a fresh start too: a new conversation, renaming, and every conversation are one press away."],
   ["7.76", "A model a page loads for its own work no longer replaces the model you chose: the top bar, Home and the chat keep yours, and the chat loads it again when you next write."],
   ["7.76", "Fabrica's little diamond, pressed, spins with a small glint across its facets; by night no white haze hides it any more.", "fabrica"],
