@@ -260,11 +260,20 @@ function pdfOf(M,G){var objs=[],jobs=[],used={},imgs=[],pageObjs=[],N=G.ranges.l
     ops.push("[] 0 d 0 J");
     M.imgs.forEach(function(im){if(im.y>y1+1||im.y+im.h<y0-1)return;var nm=im.nm||(im.nm=image(im.px));xo[nm]=1;
       ops.push("q "+num(im.w*PX)+" 0 0 "+num(im.h*PX)+" "+num(X(im.x))+" "+num(Y(im.y+im.h))+" cm /"+nm+" Do Q");});
-    var ul=[];
-    M.segs.forEach(function(s){if(s.y<y0-0.5||s.y>=y1-0.5)return;
+    /* 7.73: real spaces in the text (her paste: words joined at line ends when copied from the PDF). Each word is drawn on its own,
+       at its own place, so a reader had to guess the spaces from the gaps, and some readers, copying, joined the last word of a line to
+       the first of the next. Now a space is written after each word that the next words on the page follow with a gap, or on another
+       line, or not at all (the page's end): inside the word's own text, after its letters, so it is never seen and nothing moves; a
+       word split by a change of style (no gap) gets none */
+    var ul=[],sp={},pv=-1;
+    M.segs.forEach(function(s,i){if(s.y<y0-0.5||s.y>=y1-0.5||!s.face)return;
+      if(pv>=0){var q=M.segs[pv];if(Math.abs(q.base-s.base)>0.5||s.x-(q.x+q.w)>0.12*Math.min(q.size,s.size))sp[pv]=1;}pv=i;});
+    if(pv>=0)sp[pv]=1;
+    function space(s){try{if(/\s$/.test(s.t||"")||!cmap(s.face).get(32))return "";var g=glyphs(s.face," ");return g&&g.g.length?g.g.map(hex4).join(""):"";}catch(x){return "";}}
+    M.segs.forEach(function(s,i){if(s.y<y0-0.5||s.y>=y1-0.5)return;
       if(!s.face){if(s.px){var nm=s.nm||(s.nm=image(s.px));xo[nm]=1;ops.push("q "+num(s.px.w/4*PX)+" 0 0 "+num(s.px.h/4*PX)+" "+num(X(s.x))+" "+num(Y(s.y+s.px.h/4))+" cm /"+nm+" Do Q");}}
       else{var G2=glyphs(s.face,s.t),nat=G2.w*s.size+G2.g.length*s.ls,tz=nat>0&&Math.abs(nat-s.w)>0.35?100*s.w/nat:100;
-        ops.push("BT /F"+s.face.id+" "+num(s.size*PX)+" Tf "+num(s.ls*PX)+" Tc "+num(tz)+" Tz "+rgbOp(s.c,"rg")+" 1 0 0 1 "+num(X(s.x))+" "+num(Y(s.base))+" Tm <"+G2.g.map(hex4).join("")+"> Tj ET");}
+        ops.push("BT /F"+s.face.id+" "+num(s.size*PX)+" Tf "+num(s.ls*PX)+" Tc "+num(tz)+" Tz "+rgbOp(s.c,"rg")+" 1 0 0 1 "+num(X(s.x))+" "+num(Y(s.base))+" Tm <"+G2.g.map(hex4).join("")+(sp[i]?space(s):"")+"> Tj ET");}
       if(s.ul||s.href){var last=ul[ul.length-1];
         if(last&&last.ul===s.ul&&last.href===s.href&&Math.abs(last.base-s.base)<0.6)last.x2=s.x+s.w;
         else ul.push({ul:s.ul,href:s.href,x:s.x,x2:s.x+s.w,base:s.base,y:s.y,h:s.h,size:s.size,c:s.ulc||s.c,prim:s.prim||s.face});}});
@@ -273,7 +282,9 @@ function pdfOf(M,G){var objs=[],jobs=[],used={},imgs=[],pageObjs=[],N=G.ranges.l
       if(u.href&&/^(https?:|mailto:)/i.test(u.href))links.push([X(u.x),Y(u.y+u.h),X(u.x2),Y(u.y),u.href]);});
     ops.push("Q");
     if(G.foot&&N>1){var f=G.foot,t=String(p+1),g3=glyphs(f.face,t),w=g3.w*f.size;
-      ops.push("BT /F"+f.face.id+" "+num(f.size*PX)+" Tf 0 Tc 100 Tz "+rgbOp(f.c,"rg")+" 1 0 0 1 "+num((G.pw/PX-w)/2*PX)+" "+num((f.bottom+f.lh-f.base)*PX)+" Tm <"+g3.g.map(hex4).join("")+"> Tj ET");}
+      /* 7.73: the page number marked as the page's own furniture (an artifact), which readers that honour the mark leave out of copied text;
+         a space after it, so a reader that keeps it does not join it to the next page's first word */
+      ops.push("/Artifact <</Type /Pagination /Subtype /Footer>> BDC BT /F"+f.face.id+" "+num(f.size*PX)+" Tf 0 Tc 100 Tz "+rgbOp(f.c,"rg")+" 1 0 0 1 "+num((G.pw/PX-w)/2*PX)+" "+num((f.bottom+f.lh-f.base)*PX)+" Tm <"+g3.g.map(hex4).join("")+space({face:f.face,t:t})+"> Tj ET EMC");}
     pageObjs.push({ops:ops.join("\n"),xo:Object.keys(xo),links:links});});
   var fontRef={};
   Object.keys(used).forEach(function(id){var f=FACES[id],m=info(f),sc=1000/m.upm,gids=Object.keys(used[id]).map(Number).sort(function(a,b){return a-b;});

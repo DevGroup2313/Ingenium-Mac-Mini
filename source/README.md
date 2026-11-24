@@ -395,6 +395,39 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.73 (24 November 2026): Lector reads with your computer's model and keeps reading; text copied from Lector's PDFs keeps its
+spaces.
+
+Her message of 24 November 2026, its second stage.
+- Read and written by (`build/modules/r365.js`, new). Her words: "The "Read and written by" section is really confusing when I am
+  sharing a model, it only insists on showing me a limited list of models on my device and does not let me choose the stronger model
+  from the Mac mini ... I have no way of knowing which model is being used to do the reading". Read in the code first: Lector reads with
+  this device's models, or, when the chat is connected to one of her computers, with that computer's model (the base page's lxAsk and
+  supUsesLink); r108's list named only this device's models. Now the list keeps this device's models under On this device and adds each
+  paired computer's under its name (On Mac mini); choosing one connects to it as Your devices does (IngLend.use, sealed as always), and
+  Lector and the chat use it from then on; choosing a model on this device leaves the computer (IngLend.useDevice). One line above the
+  list says which model reads and writes, and where (a green dot when the computer answers, amber when it is away).
+- Lending refined, for readings (`r365.js`). Her words: "everytime I start the reading on Lector it gets stopped and it never goes
+  through. I want the connections to be stable and consistent". Read in the code first: r108's ask tried a failed request twice more, two
+  seconds apart, so a computer that paused for a few seconds ended the reading. Now, while Lector reads through a computer, a request
+  that finds no answer, a dropped connection, or a busy or failing server (5xx, 408, 429) is tried again after 2 seconds, then a little
+  longer each time up to 30, for up to 15 minutes; before each try Lector looks for the computer again (IngLend.check with find); after
+  three tries, when her order of computers lets the first that answers serve (r328, IngServe.auto), another of her computers that answers
+  takes over, and she is told. The reading panel says what it waits for. A refusal (a wrong code, 401 or 403; a model the computer does
+  not have, 404; a request too large, 413) still stops at once with its words, and Stop stops at once.
+- Lector's PDFs, their text (`r183.js`). Her pasted text (Limits and next steps) showed words joined where a line ended and a stray page
+  number. Read in the code first: each word is drawn on its own, at its own place, with no space in the file, so a reader copying the
+  text had to guess every space from the gaps, and some joined a line's last word to the next line's first. Now a real space follows
+  each word that a gap, a line's end or the page's end follows, inside the word's own text after its letters, so nothing is seen or
+  moves (the pages render pixel for pixel as in 7.72; a file grows by about one part in a hundred); a word split by a change of style
+  gets none. The page number is marked as the page's furniture (an Artifact of the Pagination type), which readers that honour the mark
+  leave out of copied text, with a space after it. Whether a given reader honours the mark is that reader's choice; Preview on her Mac
+  was not tested here.
+- Tests: rig/t_773_lector_lend.js (two stand-in computers, rig/lend681_mock.py: the list, the line, a request through the Mac mini, the
+  Mac mini away for five seconds and the request finishing, a refusal stopping, back to this device); rig/t_773_pdf_text.js with
+  rig/pdf_plain.py (the words a plain copy finds are the words pdftotext lays out, one for one; no line end joined; each page number
+  marked; the 7.72 writer fails all three). rig/release_checks.sh: t_626_guide and t_763_owner_door now name the edition they check.
+
 Ingenium 7.72 (24 November 2026): Fabrica's diamonds in Adamas's colour; no more blank pages; your ways of working inside How I work;
 the Ollama row; Mentes' Engine, Health, storage and Train overview raised and steady.
 

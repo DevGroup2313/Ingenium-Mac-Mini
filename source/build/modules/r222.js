@@ -234,6 +234,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.73", "Lector's Read and written by lists the models on each of your paired computers too, under the computer's name. Choosing one connects to it, and one plain line says which model reads and writes, and where.", "lector"],
+  ["7.73", "A reading through your Mac mini no longer stops when the computer is slow to answer: Lector waits, looks for it again, and goes on, for up to fifteen minutes, saying what it waits for.", "lector"],
+  ["7.73", "Text copied from Lector's PDFs keeps its spaces, at the ends of lines too, and the page numbers are marked as the page's own furniture. The pages look exactly as before.", "lector"],
   ["7.72", "Fabrica's small diamonds wear Adamas's own stone: its colour, in the shade of the hour by day and its night shade by night. Each lifts under the pointer and spins when pressed.", "fabrica"],
   ["7.72", "A page no longer goes blank after a while untouched: rest now leaves finished animations alone, and the page is painted again when its window comes back."],
   ["7.72", "Your ways of working now stand inside How I work, with your own words beneath them. In Bring in your work, a source with several keys, as Ollama, keeps its words across the row."],
