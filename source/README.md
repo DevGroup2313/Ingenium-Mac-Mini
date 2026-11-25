@@ -395,6 +395,37 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.85 (25 November 2026): Vocatio reads her profile once.
+
+- Recommendation 1 of 24 November, before her Cambridge deadline of 8 December, approved with the live preview (25 November 2026: "I
+  approve of the previews").
+- Found (`r188.js`): a reading either cut the profile to fit, the parts that bear on the task first, or, Step by step, everything, read the
+  whole of it in parts afresh for every task (partByPart).
+- Now (`r384.js`, new; its hooks in `r188.js`): Vocatio reads the profile once, part by part (each entry, the CV in sections, the LinkedIn
+  summary, each document, each app as Lector read it), with partByPart's own instruction less the task, and keeps the facts each part
+  gives, each naming the part it came from. A fact whose numbers or names are not in its part is left out, and the panel says how many.
+  A part already read is not read again: when an entry changes, only that entry is. While the digest covers the whole profile, a reading
+  starts from it, the facts most relevant to the task first, much shorter than the profile itself; Step by step, everything stays as it
+  was. In Your profile, a part of its own, Read once: where it stands, the facts with where each comes from (each lifting under the
+  pointer), and Read it now, or Read the changed parts again.
+  Test: rig/t_785_digest.js (10 checks; a stand-in model that adds a prize never won, which is left out).
+
+Also in Ingenium 7.85 (built together at her word, 25 November 2026: "I don't want to wait forever"; no 7.84 was built): Vocatio's Practise, deepened: her voice, a clock, the criteria, her best answers.
+
+- Recommendation 10 of 24 November, before her Cambridge deadline of 8 December, approved with the live preview (25 November 2026): "I
+  approve of the previews but I want the "Your submission pack" cards to also have the animated effect and lift of hover and I want the
+  same effect for the "Against the posting's criteria" section as well".
+- Found (`r188.js`, stepPractise): Interview questions had the question, a two-minute mock run on the Clepsydra, a written answer and Look at
+  it with me (the model's Meets it, What works, What is missing); no voice, no clock beside the answer, no reading against each criterion,
+  and nothing kept beyond the last answer.
+- Now (`r383.js`, new; its hook in `r188.js`): Answer aloud, through Scriba's own ears (r254's capture copied as it stands, the sound kept on
+  this device and written down by Scriba's in-house model), with a level that moves as she speaks, what she said added to her answer; an
+  analogue clock of one, two or three minutes that starts as she speaks; Read it against the criteria, one model reading that gives each
+  criterion of the posting's reading as met, partly or not yet, with the sentence of her answer it rests on, quoted, and one thing to add,
+  each line lifting under the pointer as she asked (a sentence the model quotes that is not in her answer is dropped, and cannot count as
+  met); and Keep as a best answer, three for each question, with the time taken and how many criteria they meet.
+  Test: rig/t_784_practise.js (10 checks; Chromium's stand-in microphone, a stand-in for Scriba's model and a stand-in model).
+
 Ingenium 7.83 (25 November 2026): Troubleshoot in the full edition; Vocatio's submission pack, and its dates in Vesta.
 
 - Her words (24 November 2026): "I want the Full edition of Ingenium to have the Author Studio with limited access or functions that will

@@ -281,6 +281,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.85", "Nothing changes in this edition: 7.85 brings a part of Ingenium this edition does not carry.", "nofabrica"],
+  ["7.85", "Vocatio reads your profile once, part by part, and keeps the facts each part gives with where each came from; readings start from them, and only a part you change is read again. In Your profile, Read once.", "career"],
+  ["7.85", "Vocatio's Practise: answer aloud with Scriba's own ears, on this device, with a clock beside the question; each answer read against the posting's criteria, with the sentence it rests on; and your best answers kept.", "career"],
   ["7.83", "Vocatio's submission pack, first in What you send: what the posting asks you to send, each with its limit, its file name and where it stands, a final check, and the pack exported as the PDFs the portal expects. Vesta's Today lists the closing dates and the follow-ups due.", "career"],
   ["7.83", "Nothing changes in this edition: 7.83 brings parts of Ingenium this edition does not carry.", "nofabrica"],
   ["7.82", "Nothing changes in this edition: 7.82 brings parts of Ingenium this edition does not carry.", "nofabrica"],

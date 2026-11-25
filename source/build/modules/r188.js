@@ -708,6 +708,9 @@ function itemsByRelevance(t){t=String(t||"");if(!ABOUT)return t;var L=t.split(/\
 function profileBlock(G,R){if(NOTES&&NOTES.G===G){var nb=[],wt0=wantsText(),nm0=myName();if(wt0)nb.push(wt0);
     nb.push("THE PROFILE, READ PART BY PART (every fact below was copied from my profile, CV, documents and apps' readings; nothing else is a fact about me):"+(nm0?"\nName: "+nm0:"")+"\n\n"+cut(NOTES.text,Math.floor(R*0.95)));
     return nb.join("\n\n");}
+  /* 7.85: her profile, read once (r384): the facts most relevant to the task first, each naming where it comes from */
+  if(W.IngDigest){var db=null;try{db=IngDigest.block(G,R,{wants:wantsText(),name:myName(),byRelevance:byRelevance,away:leaves()?function(t){return noContact(noPay(t));}:null});}catch(e){db=null;}
+    if(db){if(CAPT){CAPT.G=G;CAPT.block=db;CAPT.full=db.length;CAPT.kept=db.length;}return db;}}
   var out=profileBlock0(G,R);if(CAPT){CAPT.G=G;CAPT.block=out;try{CAPT.full=profileBlock0(G,1e9).length;CAPT.kept=out.length;}catch(e){}}return out;}
 function profileBlock0(G,R){var parts=[],nm=myName(),wt=wantsText();if(wt)parts.push(wt);G=Object.assign({},G,{items:itemsByRelevance(G.items),files:byRelevance(G.files||[],function(f){return f.name+" "+f.text;}),apps:byRelevance(G.apps||[],function(a){return a.name+" "+a.text;}),reading:byRelevance(G.reading||[],function(a){return a.title+" "+a.text;})});
   var away=leaves(),away_=function(t){return noContact(noPay(t));};parts.push("THE PROFILE (the only source of facts about me):"+(nm?"\nName: "+nm:"")+(G.items?"\n\n"+cut(G.items,Math.floor(R*0.34)):""));
@@ -1861,7 +1864,10 @@ function stepPractise(o,P){var r=o.read&&o.read.r;
   var q=o.practice.qs.filter(function(x){return x.id===o.qsel;})[0]||o.practice.qs[0];
   o.practice.qs.forEach(function(x,i){nav.appendChild(item((i+1)+". "+x.q,x.fb?"Looked at":x.answer?"Answered":"",x===q,function(){o.qsel=x.id;save();render();}));});
   pane.appendChild(h("h3","c-h3",esc(q.q)));mockBox(o,q,pane);var tq=h("textarea","c-ta c-grow");tq.setAttribute("aria-label","Your answer");tq.placeholder="Your answer, as you would say it.";tq.value=q.answer||"";pane.appendChild(tq);if(q.fb)pane.appendChild(fbBox(q.fb));
-  P.foot.appendChild(cbtn("","New questions",function(){questions(o);}));P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("pri","Look at it with me",function(){look(o,q.id,q.q,tq.value,true);}));}
+  P.foot.appendChild(cbtn("","New questions",function(){questions(o);}));P.foot.appendChild(h("span","c-grow"));P.foot.appendChild(cbtn("pri","Look at it with me",function(){look(o,q.id,q.q,tq.value,true);}));
+  /* 7.84: Practise, deepened (r383): her voice through Scriba, a clock, the answer against the criteria, her best answers */
+  try{if(W.IngPractise)IngPractise.paint(o,q,{pane:pane,ta:tq,foot:P.foot},practiseApi());}catch(e){try{console.warn("Vocatio: practise",e);}catch(_){}}}
+function practiseApi(){return {ask:ask,sys:sys,save:save,render:render,begin:begin,end:end,failed:failed,busyNow:busyNow,needModel:needModel,button:function(c,t,f){return cbtn(c,t,f);}};}
 function stepTrack(o,P){var box=h("div","c-col c-fill"),g=h("div","c-grid3"),st=select(STAGES,o.stage),du=input("date",o.due||"");
   st.addEventListener("change",function(){o.stage=st.value;if(st.value==="interview"&&!o.interview)o.interview={};save();render();});du.addEventListener("change",function(){o.due=du.value;save();render();});
   g.appendChild(field("Where it stands",st));g.appendChild(field("Closing date",du));var n=daysLeft(o),big=h("div","c-days");big.innerHTML=n==null?"<b>—</b><span>No closing date set</span>":n<0?"<b>Closed</b><span>"+esc(dayStr(o.due))+"</span>":"<b>"+n+"</b><span>day"+(n===1?"":"s")+" left</span>";g.appendChild(big);box.appendChild(g);
@@ -2168,11 +2174,11 @@ function paintProfile(par){var S=CS(),P=S.profile,M=lectorMe(),part=S.ui.ppart||
   var L=panel("csList","Your profile");
   [["about","About you",[P.name||myName()||"Your name",P.contact].filter(Boolean).join(" · ")||"Your name and how to reach you"],["looking","What you are looking for",filled?filled+" of 5 said":"Not said yet"],
    ["sources","What the studio may use",srcN?srcN+" source"+(srcN===1?"":"s")+": "+[M.cv?"your CV":"",P.linkedin?"LinkedIn":"",P.files.length?P.files.length+" document"+(P.files.length===1?"":"s"):""].filter(Boolean).join(", "):"Your CV, LinkedIn, your documents"],
-   ["entries","Your entries",n?n+" entr"+(n===1?"y":"ies"):"None yet"]].concat(sg?[["found","Found in your sources",sg+" to keep or drop"]]:[]).concat([["people","Profiles",ROOT().people.length+" kept · open, add or remove one"]]).forEach(function(x){
+   ["entries","Your entries",n?n+" entr"+(n===1?"y":"ies"):"None yet"]].concat(W.IngDigest?[["read","Read once",IngDigest.line()]]:[]).concat(sg?[["found","Found in your sources",sg+" to keep or drop"]]:[]).concat([["people","Profiles",ROOT().people.length+" kept · open, add or remove one"]]).forEach(function(x){
     L.body.appendChild(item(x[1],x[2],part===x[0],function(){S.ui.ppart=x[0];S.ui.editing=null;show("work");save();jump();render();},x[0]==="found"?"c-new":""));});
   L.foot.appendChild(h("span","c-note",esc(P.at?"Last changed "+dayStr(P.at):"Kept on this device only")));
   if(RUN.busy){two(L,livePanel(),par);return;}
-  var R=({about:profAbout,looking:profLooking,sources:profSources,entries:profEntries,found:profFound,people:profPeople}[part]||profAbout)();
+  var R=({about:profAbout,looking:profLooking,sources:profSources,entries:profEntries,found:profFound,people:profPeople,/* 7.85 */read:function(){return W.IngDigest?IngDigest.panel(digestApi()):profAbout();}}[part]||profAbout)();
   R.head.insertBefore(cbtn("quiet c-back","‹ Your profile",function(){show("list");save();render();}),R.head.firstChild);two(L,R,par);}
 function profAbout(){var P=CS().profile,R=panel("csWork","About you"),g=h("div","c-col c-pad");
   var nm=input("text",P.name,myName()||"Your name"),ct=input("text",P.contact,"Email · telephone · town"),sp=select([["british","British English"],["american","American English"]],P.prefs.spelling);
@@ -2719,6 +2725,10 @@ function exportFiles(o,dir,opt){dir=dir?String(dir).replace(/\/?$/,"/"):"";opt=o
 function exportOpp(o){if(typeof makeZip!=="function"||typeof saveFileNative!=="function"){say("This copy of the page cannot make the folder.");return Promise.resolve(null);}say("Making the folder of files…");
   return exportFiles(o,safeName(o.title||"application")+"/").then(function(files){return Promise.resolve(saveFileNative(safeName(o.title||"application")+".zip","application/zip",makeZip(files))).then(function(){say(files.length+" files, in one zip folder.");return files;});},function(e){say("It could not be made: "+(e&&e.message||e));return null;});}
 /* 7.83: what the submission pack (r382) needs of Vocatio, and its folder: each document as the PDF the portal will receive, named as it expects, and its Word file */
+/* 7.85: what reading her profile once (r384) needs of Vocatio */
+function digestApi(){return {panel:panel,button:function(c,t,f){return cbtn(c,t,f);},gather:function(){return gatherProfile0({});},ask1:ask1,english:english,save:save,render:render,
+  begin:begin,end:end,failed:failed,busyNow:busyNow,needModel:needModel,progress:function(i,n,src){RUN.what="Reading your profile once: part "+i+" of "+n+" ("+src+")";try{paintLive();}catch(e){}},
+  model:function(){var o=plan();return o&&o.chosen?(o.chosen.customName||o.chosen.name||""):"";},openEntries:function(){var S=CS();S.ui.ppart="entries";S.ui.editing=null;save();render();}};}
 function packApi(){return {postText:postText,limitFor:limitFor,wordCount:wordCount,loadText:loadText,docs:DOCS,save:save,render:render,profile:function(){return CS().profile;},
   button:function(cls,t,fn){return cbtn(cls,t,fn);},exportPack:exportPack};}
 function exportPack(o,list,readme){if(typeof makeZip!=="function"||typeof saveFileNative!=="function"){say("This copy of the page cannot make the folder.");return Promise.resolve(null);}
