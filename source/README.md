@@ -395,6 +395,51 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.82 (25 November 2026): Lector writes each document for its reader, cleanly, from her approved drafts; Ingenia's logos are
+buttons; Fabrica's little diamond stays in view when pressed.
+
+- Her words (24 November 2026): "they are all written the exact same way and with the same overwhelming information, with no clarity
+  for their audience"; "I want the documents to be written in the first person but still keep the formal register and be adjusted for
+  each audience instead of sending the same document under different titles"; "The model even leaves its own reasoning within the
+  documents; it is unacceptable"; "only the build numbers and dated information are rewritten and updated on the new documents, and new
+  features and functions are added, but the documents don't have to be rewritten from scratch unless it is needed"; "no grammatical
+  errors or false or invented citations and sources".
+- Found (`r108.js`, and her 7.71 samples): every document was held to one voice, a doctoral application's, and the examiner's pass was a
+  doctoral examiner's for a job too; the clean-up took out only a complete thinking block, so a model's working written as plain prose
+  stayed (her Notes and analysis, "How it was made", and her Appendix, "Development history", both began "The notes contain information
+  about how Ingenium was made. I need to extract evidence of the process"); nothing removed a citation that was none of her sources; and
+  Lector wrote each document afresh, never from the drafts she keeps in the recipe.
+- Now (`r108.js`):
+  - The reader: a programme keeps the doctoral standard; a post is written for the person hiring (plain, professional, the result before
+    the method) and examined as that reader would; her portfolio is written for a reader with no training in software. Every document:
+    the first person, the formal register, plain words with any technical term explained, short paragraphs and sentences.
+  - No leaked reasoning: a thinking block whole, cut off or without its opening tag; a preamble ("Here is the revised section:"); a code
+    fence; notes after the text ("Note:", "Changes made:", a word count); and any paragraph that is the model's working ("I need to
+    extract...", "The facts mention...", "the user wants...") are taken out, while her own first-person sentences stay. A section that
+    comes back as nothing but working is asked for once more; if it fails again it is marked for her in square brackets. The reading's
+    own analysis is cleaned the same way when Lector reads it back, so its working cannot reach any document.
+  - No invented citations: a numbered citation that is not one of her sources, or an author and year that are none of hers, is taken
+    out, and the thinking panel says how many; plain dates and the apps' own names are left alone.
+  - Her approved drafts: the latest draft of the same kind that she keeps in the recipe and that names every app being written about is
+    given to the writer and the examiner, section by section, with the instruction to keep her words, order and paragraphs wherever they
+    are still true and to change only what the measured facts make untrue (builds, versions, dates, figures), adding what is new briefly
+    in her voice. The thinking panel names the draft it started from.
+  Test: rig/t_782_lector_recipe.js (a stand-in model with a small model's faults, her 7.71 sample among them).
+  Also found while testing: two functions in r108 bore one name (lineAt), so the code view of a reading never drew the app's own line
+  numbers and stopped with an error ("createTreeWalker: parameter 1 is not of type 'Node'"); the code view's is now srcLine.
+- Ingenia's app logos are buttons, pressed as Ingenium's own logo is (`r378.js`). Her words (25 November 2026): "The apps logos on the
+  Ingenia folders page are animated but are still not clickable. I was very clear about wanting them to be made into clickable buttons the
+  same way Ingenium's engine logo button is." Found: pressed, a logo only shrank by three in a hundred, with no knock, no sound and no
+  release, and the open folder's logo was marked as a picture. Now, as the top bar's logo (r104): pressed, it sinks and its cast spreads;
+  let go, it knocks back up and its layers draw together and part again to their depths; the open folder's logo is a button (the pointer's
+  hand, the keyboard's Enter and Space, a name for a screen reader) with Ingenium's key sound.
+- Fabrica's little diamond stays in view when pressed (`r294.js`). Her words (25 November 2026): "I can't see the animation of the diamond
+  after clicking on it because the mouse tip is in the shape of a little white hand and entirely covers the little diamond and obscures it
+  from view". Found: over the stone the pointer became the pointing hand, and pressed it became the grabbing hand (for turning the tree),
+  both over the stone. Now over the stone the pointer is a small open ring with the stone in its centre (lavender by night); pressing it
+  shows no grabbing hand unless the tree is dragged; and while it spins the pointer steps aside, coming back when the spin ends.
+  Test: rig/t_782_press.js (14 checks).
+
 Ingenium 7.81 (25 November 2026): one colour for each model, everywhere, and hers to change.
 
 - Her words (25 November 2026): "I want the models colour bubbles to remain consistent throughout the app and actually have a system and

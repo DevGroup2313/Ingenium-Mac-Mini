@@ -281,6 +281,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.82", "On Ingenia, every app's logo is a button: pressed, it sinks; let go, it knocks back up and its layers settle, as Ingenium's own logo does.", "master"],
+  ["7.82", "Fabrica's little diamond stays in view when you press it: over it the pointer is a small ring, and while it spins the pointer steps aside.", "fabrica"],
+  ["7.82", "Lector writes each document for its reader: a programme, a post or your portfolio. Its thinking, its notes and any citation that is none of your sources are taken out, and it starts from the drafts you keep in the recipe, changing only what is no longer true.", "lector"],
   ["7.81", "Each model now has one colour everywhere: its family's colour, shaded by its size. Press its bubble on the models page or in the Engine panel to give it a colour of your own."],
   ["7.80", "The guided tour shows an AI of your own built step by step on the models page; every page of the tour now shows a task done."],
   ["7.79", "On Ingenia, every app's logo is now the same 3D logo as on Lector and Fabrica: it sways, tilts to follow the pointer, lifts, and sinks when pressed.", "master"],

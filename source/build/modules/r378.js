@@ -17,20 +17,35 @@
 #page-folders .ig-ls-tilt{position:absolute;inset:0;display:block;transform-style:preserve-3d;transform:rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--lift)) scale(var(--sc));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
 #page-folders .ig-ls-idle{position:absolute;inset:0;display:block;transform-style:preserve-3d;animation:igSway 7s ease-in-out infinite}
 @keyframes igSway{0%,100%{transform:rotateY(-18deg) rotateX(5deg)}50%{transform:rotateY(18deg) rotateX(-5deg)}}
-#page-folders .ig-ls-l{position:absolute;inset:0;width:100%;height:100%;display:block;max-width:none;pointer-events:none;backface-visibility:hidden;transform:translateZ(calc(var(--S,56px) * var(--z))) scale(calc(1 - var(--z) / 4))}
+#page-folders .ig-ls-l{position:absolute;inset:0;width:100%;height:100%;display:block;max-width:none;pointer-events:none;backface-visibility:hidden;transform:translateZ(calc(var(--S,56px) * var(--z) * var(--igz,1))) scale(calc(1 - var(--z) / 4))}
 #page-folders .ig-ls-l.side{transform:translateZ(calc(var(--S,56px) * -.03)) translateY(2.5%) scale(1.0075)}
 #page-folders .ig-ls-cast{position:absolute;left:14%;right:14%;bottom:-9%;height:14%;border-radius:50%;display:block;background:radial-gradient(closest-side,rgba(42,20,80,.26),rgba(42,20,80,0));filter:blur(1.5px);transform:translateZ(calc(var(--S,56px) * -.08))}
 body[data-theme="night"] #page-folders .ig-ls-cast{background:radial-gradient(closest-side,rgba(0,0,0,.5),rgba(0,0,0,0))}
 #page-folders .ig-ls.flat .ig-ls-l{transform:none}
 #page-folders .ig-ls.hov{--lift:calc(var(--S,56px) * -.06);--sc:1.04}
 #page-folders .ig-ls.hov .ig-ls-idle{animation-play-state:paused}
-#page-folders .ig-ls.down{--lift:calc(var(--S,56px) * .02);--sc:.97}
+/* 7.82, her words (25 November 2026): "The apps logos on the Ingenia folders page are animated but are still not clickable. I was very
+   clear about wanting them to be made into clickable buttons the same way Ingenium's engine logo button is." Ingenium's own logo in the top
+   bar (r104) sinks when pressed, its cast spreading beneath it, then knocks back up as it is let go, its layers seating as it rises. Each
+   app's logo now does the same, in the same timings: pressed, it sinks deeper; let go, it knocks, and its layers draw together and part
+   again to their depths; the open folder's logo is a button, with Ingenium's key sound, from the mouse, a touch or the keyboard. */
+@property --igz{syntax:"<number>";inherits:true;initial-value:1}
+#page-folders .ig-ls{cursor:pointer;--igz:1}
+#page-folders .ig-ls.down{--lift:calc(var(--S,56px) * .05);--sc:.94}
+#page-folders .ig-ls.down .ig-ls-cast{opacity:1;transform:translateZ(calc(var(--S,56px) * -.08)) scale(1.06)}
+#page-folders .ig-ls.knock .ig-ls-tilt{animation:igKnock .55s cubic-bezier(.3,.7,.3,1)}
+#page-folders .ig-ls.knock{animation:igSeat .9s cubic-bezier(.2,.9,.25,1)}
+@keyframes igKnock{0%{translate:0 calc(var(--S,56px) * .03)}45%{translate:0 calc(var(--S,56px) * -.035)}75%{translate:0 calc(var(--S,56px) * .008)}100%{translate:0 0}}
+@keyframes igSeat{0%{--igz:.3}55%{--igz:1.3}100%{--igz:1}}
+body[data-motion="minimal"] #page-folders .ig-ls.knock,body[data-motion="minimal"] #page-folders .ig-ls.knock .ig-ls-tilt{animation:none}
+@media (prefers-reduced-motion:reduce){#page-folders .ig-ls.knock,#page-folders .ig-ls.knock .ig-ls-tilt{animation:none}}
 #page-folders .ig-ls.down .ig-ls-tilt{transition-duration:.08s}
 #page-folders .ig-key{cursor:pointer;border-radius:50%;outline:none}
 #page-folders .ig-key:focus-visible{outline:2.5px solid var(--accent,#6a3fb5);outline-offset:4px}
 body[data-motion="minimal"] #page-folders .ig-ls-idle{animation:none}
 body[data-motion="minimal"] #page-folders .ig-ls-tilt{transform:none !important}
 @media (prefers-reduced-motion:reduce){#page-folders .ig-ls-idle{animation:none}#page-folders .ig-ls-tilt{transition:none}}
+#page-folders .ig-ls.down .ig-ls-tilt{transition-duration:.08s}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p378"]="started";}catch(_){}
 /* R378 · Ingenia's app logos, as Lector's and Fabrica's: see the note at the top of its styles. window.IngFolderLogos: {paint(), made()} */
@@ -60,7 +75,7 @@ function paint(){var pg=page();if(!pg||busy)return 0;var L=W.LX7_LAYERS||{},n=0;
       var want=(night()&&L[k+"N"]?k+"N":k)+(mine(k)?":own":"");if(e.classList.contains("ig-ls")&&e.getAttribute("data-ig")===want)return;
       var nw=make(k,sizeOf(e));if(e.classList.contains("ig-ls"))nw.style.setProperty("--S",e.style.getPropertyValue("--S"));
       /* the open folder's own logo is a key of its own: it answers the pointer and the keyboard */
-      if(e.closest(".fd-oh")){nw.classList.add("ig-key");nw.setAttribute("role","img");nw.removeAttribute("aria-hidden");nw.setAttribute("aria-label",(nameOf(k)||"The app")+"'s logo");nw.tabIndex=0;}
+      if(e.closest(".fd-oh")){nw.classList.add("ig-key");nw.setAttribute("role","button");nw.removeAttribute("aria-hidden");nw.setAttribute("aria-label",(nameOf(k)||"The app")+"'s logo");nw.title=(nameOf(k)||"The app")+"'s logo: press it";nw.tabIndex=0;}
       e.replaceWith(nw);n++;});}catch(x){try{console.warn("Ingenia logos:",x);}catch(_){}}
   busy=false;return n;}
 /* the pointer, as on Fabrica: the logo of the folder, tab, card or head under it tilts to follow it and lifts; pressed, it sinks */
@@ -74,8 +89,12 @@ function wire(){var pg=page();if(!pg||pg.__r378)return;pg.__r378=1;
     ls.style.setProperty("--ry",(clamp(px,-.8,.8)*30).toFixed(1)+"deg");ls.style.setProperty("--rx",(-clamp(py,-.8,.8)*24).toFixed(1)+"deg");},{passive:true});
   pg.addEventListener("pointerleave",function(){off(null);});
   pg.addEventListener("pointerdown",function(e){var ls=lsOf(e);if(ls)ls.classList.add("down");},{passive:true});
-  ["pointerup","pointercancel"].forEach(function(t){pg.addEventListener(t,function(){[].forEach.call(pg.querySelectorAll(".ig-ls.down"),function(x){x.classList.remove("down");});},{passive:true});});
-  pg.addEventListener("keydown",function(e){var k=e.target;if(!(k&&k.classList&&k.classList.contains("ig-key")))return;if(e.key==="Enter"||e.key===" "){e.preventDefault();k.classList.add("down");setTimeout(function(){k.classList.remove("down");},180);}});}
+  pg.addEventListener("pointerup",function(){[].forEach.call(pg.querySelectorAll(".ig-ls.down"),function(x){x.classList.remove("down");knock(x);});},{passive:true});
+  pg.addEventListener("pointercancel",function(){[].forEach.call(pg.querySelectorAll(".ig-ls.down"),function(x){x.classList.remove("down");});},{passive:true});
+  pg.addEventListener("keydown",function(e){var k=e.target;if(!(k&&k.classList&&k.classList.contains("ig-key")))return;if(e.key==="Enter"||e.key===" "){e.preventDefault();if(e.repeat)return;k.classList.add("down");setTimeout(function(){k.classList.remove("down");knock(k);},140);}});}
+function still(){try{return D.body.getAttribute("data-motion")==="minimal"||matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){return false;}}
+function knock(x){try{if(x.classList.contains("ig-key")&&W.IngSound&&IngSound.play)IngSound.play("keys");}catch(e){}if(still())return;
+  x.classList.remove("knock");void x.offsetWidth;x.classList.add("knock");clearTimeout(x.__kn);x.__kn=setTimeout(function(){x.classList.remove("knock");},950);}
 /* Ingenia draws its pages again as she works (r208, r263, r300): each time, its logos are made again here */
 var T=0;function soon(){if(T)return;T=setTimeout(function(){T=0;wire();paint();},40);}
 function watch(){var pg=page();if(!pg||pg.__r378w)return false;pg.__r378w=1;
