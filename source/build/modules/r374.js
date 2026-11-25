@@ -170,7 +170,9 @@ function house(m){var H=[["velox","Velox"],["scriba","Scriba"],["magister","Magi
   for(var i=0;i<H.length;i++){try{var r=lineupRec(lineupKeyFor(H[i][0]));if(r&&r.id===m.id)return H[i][1];}catch(e){}}return "";}
 function recId(){try{var r=lineupRec(lineupKeyFor("magister"));return r&&r.fileState==="ready"?r.id:null;}catch(e){return null;}}
 function fit(m){try{return fitVerdict(m);}catch(e){return {level:"unknown"};}}
-function orb(m){var lv=fit(m).level;return lv==="ok"?["#4fc38a","#1f7a50"]:(lv==="heavy"?["#e57373","#a33a3a"]:["#f0c24e","#a67412"]);}
+/* 7.81: a model's orb is its own colour (r380, one colour for each model everywhere); its fit is said in words under its name */
+function shade(hex,k){var m=/^#([0-9a-f]{6})$/i.exec(hex||"");if(!m)return hex;var n=parseInt(m[1],16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;return "rgb("+Math.round(r*k)+","+Math.round(g*k)+","+Math.round(b*k)+")";}
+function orb(m){if(W.IngModelColour){var c=IngModelColour.of(m);return [c,shade(c,.62)];}var lv=fit(m).level;return lv==="ok"?["#4fc38a","#1f7a50"]:(lv==="heavy"?["#e57373","#a33a3a"]:["#f0c24e","#a67412"]);}
 function chosen(){try{return byId(state.activeModelId);}catch(e){return null;}}
 function loaded(){try{return Engine.modelId?byId(Engine.modelId):null;}catch(e){return null;}}
 function st(){try{return Engine.status||"";}catch(e){return "";}}
@@ -216,8 +218,8 @@ function stateCard(){var c=mk("div","ie-st");c.id="ieState";c.appendChild(gauge(
   c.addEventListener("pointermove",function(e){var q=c.getBoundingClientRect(),x=(e.clientX-q.left)/q.width-.5,y=(e.clientY-q.top)/q.height-.5;c.classList.add("tracking");c.style.setProperty("--ry",(x*6).toFixed(2)+"deg");c.style.setProperty("--rx",(-y*6).toFixed(2)+"deg");});
   c.addEventListener("pointerleave",function(){c.classList.remove("tracking");c.style.setProperty("--ry","0deg");c.style.setProperty("--rx","0deg");});
   return c;}
-function row(name,sub,colors,houseName,plate,checked,onpick){var b=mk("button","mt");b.type="button";b.setAttribute("role","radio");b.setAttribute("aria-checked",String(!!checked));
-  b.innerHTML='<span class="orb" style="--o:'+colors[0]+';--o2:'+colors[1]+'"></span><span class="nm">'+esc(name)+(houseName?'<span class="house">'+esc(houseName)+'</span>':'')+'<small>'+esc(sub)+'</small></span>'+(plate||'');
+function row(name,sub,colors,houseName,plate,checked,onpick,mid,run){var b=mk("button","mt");b.type="button";b.setAttribute("role","radio");b.setAttribute("aria-checked",String(!!checked));
+  b.innerHTML='<span class="orb'+(run?' run':'')+'"'+(mid?' data-mid="'+esc(mid)+'" title="Press to change its colour"':'')+' style="--o:'+colors[0]+';--o2:'+colors[1]+';--mc:'+colors[0]+'"></span><span class="nm">'+esc(name)+(houseName?'<span class="house">'+esc(houseName)+'</span>':'')+'<small>'+esc(sub)+'</small></span>'+(plate||'');
   b.onclick=function(){click();onpick();};return b;}
 function choose(m){try{if(linked()&&W.IngLend&&IngLend.useDevice)IngLend.useDevice();}catch(e){}
   try{setActive(m.id,{fromUser:true});}catch(e){}
@@ -234,7 +236,7 @@ function paint(){if(!P)return;var b=$("ieBody"),keep=b.scrollTop;b.innerHTML="";
   if(!ms.length)list.appendChild(mk("p","ie-none","No model is ready on this device yet. Mentes brings one in."));
   ms.forEach(function(m){var f=fit(m),sub=(gb(m)?gb(m).toFixed(1)+" GB · ":"")+(f.level==="ok"?"fits this device":f.level==="heavy"?"likely too heavy here":"fit not known here");
     var pl=(s==="loading"&&ch&&ch.id===m.id)?'<span class="plate ld">Loading</span>':((l&&l.id===m.id&&!L)?'<span class="plate ok">In use</span>':(m.id===rec?'<span class="plate rec">Ingenium\'s choice</span>':''));
-    list.appendChild(row(m.customName||m.name,sub,orb(m),house(m),pl,!L&&ch&&ch.id===m.id,function(){choose(m);}));});
+    list.appendChild(row(m.customName||m.name,sub,orb(m),house(m),pl,!L&&ch&&ch.id===m.id,function(){choose(m);},m.id,!!(l&&l.id===m.id&&!L)));});
   b.appendChild(list);
   comps().forEach(function(c){var g=mk("div","ie-grp");g.innerHTML=svg("M4 5h16v10H4zM2 19h20")+esc("Lent by "+c.name+(c.status&&c.status!=="ok"?" (not answering now)":"")+", over your Wi-Fi");b.appendChild(g);
     var li=mk("div","ie-list");(c.models||[]).forEach(function(md){var on=!!(L&&L.id===c.id&&L.model===md);

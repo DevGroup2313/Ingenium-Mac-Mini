@@ -395,6 +395,21 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.81 (25 November 2026): one colour for each model, everywhere, and hers to change.
+
+- Her words (25 November 2026): "I want the models colour bubbles to remain consistent throughout the app and actually have a system and
+  still keep the full option to customise and change them as I please within the app"; on the preview: "I approve of the previews ... For
+  the models colours, I agree with your recommendations." Found: the top bar, the side list and Mentes's list coloured a model by whether
+  it fits this device (green, amber, red), while Chat's menu, Concordia and Mentes's lenses used its own colour (given in the order the
+  models were added), and the Engine panel coloured its orbs by fit. Now (`r380.js`, new; `r374.js`): a model's bubble is its own colour in
+  every place, by day and by night: its family's colour (Qwen sapphire, LFM aquamarine, Gemma garnet, Llama antique gold, Phi jade, Mistral
+  amber, DeepSeek indigo, SmolLM olive, Granite slate, a model trained in Mentes amethyst, any other rose quartz), shaded by its size and a
+  step apart for a thinking model, a little brighter by night. Its fit is a plate beside it on Mentes and words in the Engine panel; the
+  model running wears a soft halo in its own colour. Pressing a bubble on Mentes or in the Engine panel opens a chooser: sixteen jewel
+  colours, any colour, or its family's colour again; her choice is kept for that model everywhere, over restarts and updates, and a colour
+  picked in a model's Edit sheet counts as hers too. Her answer to the present colours: every model took its family's colour once.
+  Test: rig/t_781_model_colours.js (14 checks).
+
 Ingenium 7.80 (25 November 2026): the guided tour shows an AI of her own built on the models page; every page of the tour now shows a
 task done, and the whole tour is checked from its first card to its last.
 
