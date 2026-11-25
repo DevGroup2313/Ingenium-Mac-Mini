@@ -395,6 +395,29 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.79 (25 November 2026): Ingenia's app logos are Lector's and Fabrica's 3D logos; Clavis's face is see-through; the guided
+tour shows a task done on Ingenia, Fabrica and Vocatio.
+
+Her messages of 25 November 2026.
+- Ingenia's app logos (`r378.js`, new). Her words: "I want you to make the apps' logos animated and 3D on their folder pages inside of
+  the Ingenia page. I want their logo icons to not be a still image"; then, of the previews that missed it: "I just want the apps logos
+  to be animated buttons and have the same 3D look and effect on the Ingenia page that they have on the Fabrica and Lector page." So
+  nothing new is drawn: every app logo on Ingenia (the open folder's head, the folders in the drawer, their tabs, the index cards) is made
+  as Fabrica makes its logos (r112's sealEl and its styles), from the seals in layers Lector carries (LX7_LAYERS): each layer at its own
+  depth, the seal's edge and its cast shadow; it sways at rest, tilts to follow the pointer and lifts, and sinks when pressed; by night,
+  the night layers. A logo she gave an app herself stays hers and moves the same way. Test: rig/t_779_ingenia_logos.js.
+- Clavis's face, see-through (`apps/clavis_clear_face.py`, run once on `apps/builtin/clavis_mark.json`). Her words: "The Clavis logo is
+  transluscent on the inside, it does not have any coloured fillins"; "I want this logo made see through inside of Ingenium, do not
+  overcomplicate it." Ingenium's copy filled the face inside the gold ring (ivory by day, near-black by night). Inside the ring the face's
+  own colour is now taken out, by day and by night, in the seal's plate layer and in its flat picture; the gold ring and its numbers, the
+  engraved circles, the rays, the key and the star stay. So Clavis is see-through wherever Ingenium shows it: Ingenia, Lector, Fabrica.
+- The guided tour, stage 3 (`r377.js`, new): following the small breathing app from one page to the next. Ingenia gives it a folder with
+  its conversation and brings it up to date (played, with no model asked); Fabrica keeps it as a real repository in two versions, each
+  with its build number and a self-test, and runs its own Test, every check passing; Vocatio keeps an example posting, its title, who
+  offers it and its closing date read from the text, with no model asked to read it. Everything of the tour's is removed when it ends,
+  and what was hers (the folder she had open, the app chosen in Fabrica, the room open in Vocatio) is put back. Test:
+  rig/t_779_tour_more.js.
+
 Ingenium 7.78 (24 November 2026): the guided tour shows a task done on Adamas, Concordia and Lector, and opens the Engine panel.
 
 Her request (24 November 2026): "I want live demonstrations added to the Guided Tour to showcase all of Ingenium's pages ... specifically
