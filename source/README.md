@@ -395,6 +395,15 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.93 (25 November 2026): scheduled backups into a folder she chooses.
+
+- Stage 2 of the approved recommendations: "Automatic backups on a schedule, daily or weekly, keeping the last few". `r395.js` (new),
+  under the backup's card on a computer: the folder she chooses, every day, every Sunday or by hand, keep the last 3, 7 or 14, and Back up
+  now; the backup is the whole file Back up makes, made while she is not typing, written in pieces. `desktop/app_backup_793.py` (new, in
+  release.py's list): backup_choose_place, backup_write (a piece to <name>.part, renamed once whole), backup_files and backup_remove,
+  each touching only files named "Ingenium backup <date>.zip" (or .ingenium) in her folder. Tests: rig/t_793_schedule.js (5 checks),
+  rig/t_793_backup_place.py (9 checks, on the Mac mini's, Mac Intel's and Windows' ingenium_app.py).
+
 Ingenium 7.92 (25 November 2026): Ingenium Cloud keeps what two devices both changed, for her to choose.
 
 - Stage 2 of the approved recommendations. Found: what Cloud brings in merges as a backup's Merge does (r143 mergeVal: the newer copy
