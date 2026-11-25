@@ -281,6 +281,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.94", "Memoria: Memory, Ingenium Cloud and Back up and move now have a page of their own, in the side bar after Ingenia. It opens on the constellation mind, with four rooms below: What it knows, From your chats, Ingenium Cloud, and Back up and move. Settings keeps a card for each that opens it."],
+  ["7.94", "Vocatio no longer says the model is busy and could not finish while the model is still writing. It waits for as long as the model works, says what is using it, and goes on by itself; Ingenia's and Memory's background steps no longer take the model between two parts of a reading."],
   ["7.93", "Scheduled backups on your computers: a whole backup every day or every Sunday into a folder you choose, keeping the last few; or Back up now."],
   ["7.92", "Ingenium Cloud: when the same conversation or an app's notes changed on two devices, your version is kept aside and shown beside the one brought in, so you choose which to keep."],
   ["7.91", "Memory opens on its mind: the constellation of what Ingenium knows is now Memory's header, first and full height, and shows only under Memory. What Ingenium knows sits under Memory too, so a star you press opens its facts in view; restore points and scheduled backups sit under Back up and move."],

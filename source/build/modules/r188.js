@@ -640,7 +640,10 @@ function ask1(build,max,temp){var o=plan(),scale=1,tries=0,waits=0,req={modelId:
         extra="\n\n(Your notes from thinking about this so far:\n"+notes.trim()+"\n\nDo not think again and do not go back over these notes. Answer now, directly and completely.)";setTimeout(go1,200);return true;}return false;}
     lxAsk(req,msgs,max,temp,function(t){if(!mine()||req.__stopped)return;first();RUN.live=t;paintLive();}).then(function(t){if(!mine())return;if(after())return;try{if(W.LX){LX.onThink=null;LX.onRead=null;}}catch(e){}if(RUN.stop||req.__stopped)rej(new Error("stopped"));else res(String(t||""));},function(e){if(!mine())return;if(after())return;try{if(W.LX){LX.onThink=null;LX.onRead=null;}}catch(x){}var m=String(e&&e.message||e);
       if(RUN.stop||req.__stopped){rej(new Error("stopped"));return;}
-      if(m==="busy"&&waits++<200){RUN.live="Waiting for the model to finish what it is doing…";paintLive();setTimeout(go1,1500);return;}
+      /* 7.94 (r397): the model busy, here or on the computer that lends it: wait as long as it is working, saying for whom, and go on by
+         itself when it is free (before: five minutes at most, then "It could not be finished: busy" while the model went on writing) */
+      if(m==="busy"||/\bbusy\b/i.test(m)){var who="";try{who=W.ingModelInUse?W.ingModelInUse(0,"Vocatio"):"";}catch(x){}var t=Date.now();if(!req.__w0)req.__w0=t;if(who||m!=="busy")req.__wl=t;
+        if(t-(req.__wl||req.__w0)<600000&&t-req.__w0<3600000){RUN.live=who&&who!=="a reply"?"Waiting for the model: "+who+" is using it. This goes on by itself when it is free.":"Waiting for the model to finish what it is writing. This goes on by itself when it is free.";paintLive();setTimeout(go1,3000);return;}}
       var big=false;try{big=lxIsCtxError(e);}catch(x){}if(big&&scale>0.3){scale*=0.7;setTimeout(go1,300);return;}
       if(++tries<=1){setTimeout(go1,1500);return;}rej(e);});})();});}
 function busyNow(){if(RUN.busy){say("The studio is writing. Wait for it, or press Stop.");return true;}
@@ -663,7 +666,9 @@ function stopNow(){MSTOP=true;/* 6.58: and Your mentor's steps after this one */
   try{if(W.LX&&LX.cloudAb){if(typeof cloudAbort==="function")cloudAbort();if(LX.cloudAb&&LX.cloudAb.abort)LX.cloudAb.abort();}}catch(e){}
   RUN.what="Stopping…";paintLive();var k=$("csStopKey");if(k){k.disabled=true;k.textContent="Stopping…";}
   setTimeout(function(){if(RUN.busy&&RUN.stop){end();say("Stopped. Nothing from this run was kept.");}},2500);}
-function failed(e){var m=String(e&&e.message||e);end();if(m!=="stopped")say("It could not be finished: "+m);}
+function failed(e){var m=String(e&&e.message||e);end();if(m==="stopped")return;
+  if(m==="busy"||/\bbusy\b/i.test(m)){say("The model stayed busy with other work for a long time, so this was not finished. Press it again when the model is free.");return;}  /* 7.94 (r397) */
+  say("It could not be finished: "+m);}
 
 /* what the model is told, every time: the profile is the only source of facts about her, and nothing is invented */
 function banned(){try{return (LXR().banned||[]).join(", ");}catch(e){return "";}}

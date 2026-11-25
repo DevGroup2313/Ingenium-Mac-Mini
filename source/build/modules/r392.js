@@ -106,7 +106,9 @@ function hitAt(x,y){for(var i=hits.length-1;i>=0;i--){var h=hits[i];if(Math.hypo
 function chips(){var A=apps(),K=W.IngKnow?IngKnow.store():{facts:[]},kept=(K.facts||[]).filter(function(f){return f.st==="kept";}).length,wt=(K.facts||[]).filter(function(f){return f.st==="waiting";}).length;
   var c=host&&host.querySelector(".kh-chips");if(!c)return;c.innerHTML="";var a=D.createElement("span");a.className="kn-chip";a.textContent=A.length+" app"+(A.length===1?"":"s")+" · "+kept+" fact"+(kept===1?"":"s");c.appendChild(a);var b=D.createElement("span");b.className="kn-chip"+(wt?" warn":"");b.textContent=wt?wt+" wait for you":"Nothing waits";c.appendChild(b);}
 function anchor(){return D.getElementById("memRoomCard")||D.getElementById("knRoom");}  /* 7.91: first in Memory, above its own card */
-function mount(){var room=anchor();if(!room||!room.parentNode)return false;host=D.getElementById("knHead");
+function slot(){return D.getElementById("mmHeadSlot");}  /* Memoria's head (r396), where there is one */
+function placed(){var s=slot();return s?host.parentNode===s:host.nextSibling===anchor();}
+function mount(){var room=anchor(),sl=slot();if(!sl&&(!room||!room.parentNode))return false;host=D.getElementById("knHead");
   if(!host){host=D.createElement("section");host.id="knHead";host.setAttribute("aria-label","What Ingenium knows, as a constellation");
     host.innerHTML='<div class="kh-fade"></div><div class="kh-words"><div class="kh-eye">Memory</div><h2>What Ingenium knows</h2><p>Your apps are the brightest stars of the mind, each in its own colour; the lines of light between them are what links them. Press a star to read what Ingenium knows about it.</p><div class="kn-chips kh-chips"></div><div class="kh-keys"></div></div><div class="kh-say">Drag to turn it; press a star</div>';
     var keys=host.querySelector(".kh-keys");[["Waiting for you",function(){var w=D.querySelector("#knRoom .kn-row.wait");if(w)w.scrollIntoView({block:"center",behavior:"smooth"});},true],["Find a fact",function(){var f=D.getElementById("knFind");if(f){f.scrollIntoView({block:"center",behavior:"smooth"});setTimeout(function(){try{f.focus({preventScroll:true});}catch(e){}},400);}}]].forEach(function(k){var b=D.createElement("button");b.type="button";b.className="btn small"+(k[2]?" primary":"");b.textContent=k[0];b.onclick=k[1];keys.appendChild(b);});
@@ -119,10 +121,10 @@ function mount(){var room=anchor();if(!room||!room.parentNode)return false;host=
     try{new IntersectionObserver(function(es){vis=es[0].isIntersecting&&es[0].intersectionRatio>0.3;if(vis)wake();},{threshold:[0,0.3,0.6,1]}).observe(host);}catch(e){vis=true;}
     D.addEventListener("visibilitychange",function(){if(!D.hidden&&vis)wake();});
     try{new MutationObserver(function(){draw(performance.now());}).observe(D.body,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}}
-  if(host.nextSibling!==room)room.parentNode.insertBefore(host,room);
+  if(sl){if(host.parentNode!==sl)sl.appendChild(host);}else if(host.nextSibling!==room)room.parentNode.insertBefore(host,room);
   if(!P){P=cloud(900,1.3);AIR=sparkles(60);for(var i=0;i<P.length;i++){var best=[];for(var j=0;j<P.length;j++){if(i===j)continue;var a=P[i].p,b=P[j].p;best.push([(a[0]-b[0])*(a[0]-b[0])+(a[1]-b[1])*(a[1]-b[1])+(a[2]-b[2])*(a[2]-b[2]),j]);}best.sort(function(x,y){return x[0]-y[0];});for(var q=0;q<2;q++)if(i<best[q][1]&&best[q][0]<0.03)PAIRS.push([i,best[q][1]]);}}
   model=build();chips();size();draw(performance.now());wake();return true;}
-(function start(){var n=0;(function w(){if(W.__ingReady===true){setInterval(function(){try{var r=anchor();if(r&&(!host||host.nextSibling!==r||!host.isConnected))mount();else if(host&&host.isConnected){var m2=build(),sg=m2?m2.nodes.map(function(n){return n.name+":"+n.wait;}).join("|")+"#"+m2.links.length:"";if(sg!==SIG){SIG=sg;model=m2;chips();if(!raf)draw(performance.now());}}}catch(e){}},2000);return;}if(++n<400)setTimeout(w,500);})();})();
+(function start(){var n=0;(function w(){if(W.__ingReady===true){setInterval(function(){try{var r=slot()||anchor();if(r&&(!host||!host.isConnected||!placed()))mount();else if(host&&host.isConnected){var m2=build(),sg=m2?m2.nodes.map(function(n){return n.name+":"+n.wait;}).join("|")+"#"+m2.links.length:"";if(sg!==SIG){SIG=sg;model=m2;chips();if(!raf)draw(performance.now());}}}catch(e){}},2000);return;}if(++n<400)setTimeout(w,500);})();})();
 W.IngMindHead={mount:mount,model:function(){return model;},live:live,wake:wake,frames:function(){return lastDraw;}};
 })();
 ;try{window.__ingParts["p392"]="running";}catch(_){}

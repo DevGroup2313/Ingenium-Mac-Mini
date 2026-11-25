@@ -376,6 +376,7 @@ function convoOf(fresh){var lines=fresh.map(function(x){var t=String(x.text).rep
   for(var i=lines.length-1;i>=0;i--){if(n+lines[i].length>4000)break;out.unshift(lines[i]);n+=lines[i].length+1;}return out.join("\n");}
 function noteNow(){NT=0;var s=M();if(NOTING||!s.on||!s.learn)return;
   try{if(W.Engine.status!=="ready"||!W.Engine.modelId||W.liveBot||!W.Engine.adapter)return;}catch(e){return;}
+  try{if(W.ingModelInUse&&W.ingModelInUse(60000)){NT=setTimeout(noteNow,IDLE);return;}}catch(e){}  /* 7.94 (r397): never between another task's parts */
   if(!chatShown())return;if(Date.now()-LAST<90000){NT=setTimeout(noteNow,90000-(Date.now()-LAST));return;}
   var inp=$("chatInput");if(inp&&String(inp.value||"").trim()){NT=setTimeout(noteNow,IDLE);return;}
   var cid=chatId(),msgs=[];try{msgs=W.curMsgs()||[];}catch(e){}if(!cid||!msgs.length)return;

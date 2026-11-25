@@ -103,7 +103,8 @@ function learn(){var k=K();if(!k.opts.learn)return 0;var n=0;
   if(n)save();return n;}
 /* ---------- folders bring themselves up to date: idle three minutes, one folder at a time, the notes as they were kept for Undo ---------- */
 var lastKey=Date.now();D.addEventListener("keydown",function(){lastKey=Date.now();},true);D.addEventListener("pointerdown",function(){lastKey=Date.now();},true);
-function busy(){try{return !!(W.IngFolders&&IngFolders.run&&IngFolders.run.busy);}catch(e){return true;}}
+function busy(){try{if(W.ingModelInUse&&W.ingModelInUse(180000))return true;  /* 7.94 (r397): nothing else using the model for three minutes */
+  return !!(W.IngFolders&&IngFolders.run&&IngFolders.run.busy);}catch(e){return true;}}
 function autoTick(){var k=K();if(!k.opts.auto||D.hidden||Date.now()-lastKey<180000||busy())return;
   var p=apps().filter(function(x){try{return IngFolders.unread(x).length>0&&!(k.undo[x.id]&&Date.now()-k.undo[x.id].at<600000);}catch(e){return false;}})[0];if(!p)return;
   var a=p.app||{};k.undo[p.id]={brief:a.brief||"",decisions:(a.decisions||[]).slice(),open:(a.open||[]).slice(),briefAt:a.briefAt||0,at:Date.now(),done:false};save();

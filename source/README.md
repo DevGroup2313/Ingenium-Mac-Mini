@@ -395,6 +395,27 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.94 (25 November 2026): Memoria, a page of its own; Vocatio waits for a busy model.
+
+- Her words (25 November 2026): "I think that the Memory section and Ingneum's Cloud should not be buried inside of the Settings page.
+  Please put them together in their own page under a new page name that better fits them and the rest of the app"; on the preview
+  (https://claude.ai/artifact/X2RfPYe2XfMb4twrkiUAVs): "I approve of the previews ... please build it into Ingenium".
+  `r396.js`, new: Memoria (Latin: memory, remembrance), in the side bar under Studio after Ingenia. Made as Vesta is made (r235, r290):
+  the constellation mind (r392) as its head, 470 pixels tall, with the page's words, raised keys and italic hint; Vesta's raised room
+  cards below, one room at a time: What it knows (r390), From your chats (r271), Ingenium Cloud (r255, r394), each card moved whole.
+  Settings keeps a card under Your data, Memory and Ingenium Cloud, that opens Memoria; what opened those sections opens Memoria.
+  Her next words (25 November 2026): "Backup and move should also move into Memoria as a fourth room beside Ingenium Cloud": the fourth
+  room holds the backup (r143's card, made through IngBackup.show), its restore points (r393) and scheduled backups (r395).
+  `r392.js` takes Memoria's head slot when there is one; `r234.js` sorts the three cards Settings keeps.
+  Test: rig/t_794_memoria.js (9 checks).
+- Vocatio's notices. Her words (25 November 2026): they "keep saying the model is busy and can't finish when I can clearly see the model
+  working and writing still". Found: 7.88's background step that brings an app's folder up to date after three quiet minutes (`r390.js`)
+  asked only whether Ingenia was busy, so it took the model between two parts of a long Vocatio reading; Vocatio waited five minutes at
+  most and then said "It could not be finished: busy". And a reply from a lent model longer than its ten minutes was asked for again while
+  the lending computer still wrote the first. `r397.js`, new: who is using the model (window.ingModelInUse); the background steps wait
+  until nothing has used it for a while (`r390.js` three minutes, `r271.js` one); Vocatio (`r188.js`) waits as long as the model works,
+  saying for whom, and goes on by itself; a reply from a lent model may take 30 minutes. Test: rig/t_794_model.js (6 checks).
+
 Ingenium 7.93 (25 November 2026): scheduled backups into a folder she chooses.
 
 - Stage 2 of the approved recommendations: "Automatic backups on a schedule, daily or weekly, keeping the last few". `r395.js` (new),
