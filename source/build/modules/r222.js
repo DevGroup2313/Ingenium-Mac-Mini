@@ -281,6 +281,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.90", "Memory opens on the constellation mind: your apps are its brightest stars, twinkling in their own colours and linked by lines of light; press a star to read what Ingenium knows about it."],
   ["7.89", "Cool running: every moving scene (Adamas's diamond, Vesta's stones, Fabrica's tree and the rest) draws at most 30 frames a second, at a lighter resolution, so your computer and phone stay cool and quiet; text stays as sharp as before."],
   ["7.88", "What Ingenium knows: one place for what Ingenium knows about your apps and about you, each fact with where it came from. Your own facts come first; what it learns waits for you to keep it; chats use the facts that fit and say how many."],
   ["7.88", "Ingenia: each app's folder has What Ingenium knows (its facts, its links and its timeline), and folders bring themselves up to date while you are away from the keyboard, with Undo."],

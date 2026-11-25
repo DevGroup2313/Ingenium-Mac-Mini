@@ -395,6 +395,16 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.90 (25 November 2026): Memory's head, the constellation mind.
+
+- Her choice (25 November 2026): "I choose Design B - The Constellation mind design and animation, please refine and elevate the design"
+  (preview https://claude.ai/artifact/Kj1C1N9NmDhu3NJ3RtTLp7, its drawing reused as it stands). `r392.js`, new: above What Ingenium knows
+  (r390), a head with the mind as a constellation under a dawn sky by day and Vesta's northern lights by night; her apps its brightest
+  stars, soft and twinkling in their own colours (no logo, no card, no ray, no flash), named in plain words, a faint second glow where
+  facts wait; real links (Ingenium to every app, an app to another its facts name); a star pressed opens its facts. Refined: names never
+  sit on one another. Light on the device: drawn only on screen and while Ingenium is in use, at most 30 frames a second at a lighter
+  resolution, still 30 seconds after the last touch. Test: rig/t_790_head.js (4 checks).
+
 Ingenium 7.89 (25 November 2026): cool running.
 
 - Her words (25 November 2026): "I don't want it to drain my devices and overheat them and have the fan running high ... I had the same
