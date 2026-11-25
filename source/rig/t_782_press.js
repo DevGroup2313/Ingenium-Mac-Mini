@@ -44,7 +44,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const t0 = await p.evaluate(() => { for (const f of document.querySelectorAll('#page-folders .fd-file, #page-folders .fd-front')) { const l = f.querySelector('.ig-ls'); if (!l || !f.offsetParent) continue; const r = l.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2, e = document.elementFromPoint(x, y); if (e && l.contains(e)) return { x, y }; } return null; });
   if (t0) { await p.mouse.move(t0.x, t0.y); await p.mouse.down(); await sleep(120); const d1 = await p.evaluate(() => !!document.querySelector('#page-folders .ig-ls.down')); await p.mouse.up(); await sleep(80); const k1 = await p.evaluate(() => !!document.querySelector('#page-folders .ig-ls.knock'));
     ok(d1 && k1, "a folder's logo in the drawer sinks when pressed and knocks when let go", { d1, k1 }); } else ok(false, 'a folder file with a logo is in view');
-  // 2. Fabrica's little diamond: over it the pointer is a small open ring; pressed, no grabbing hand; while it spins, no pointer at all
+  // 2. Fabrica's little diamond: over it the pointer is the plain arrow (7.86: the ring and every hand gone, at her word); while it spins, no pointer at all
   await p.evaluate(() => go('fabrica')); await sleep(4000);
   const g0 = await p.evaluate(() => window.IngTree && IngTree.gems ? IngTree.gems() : null);
   const pt = g0 && g0.at[0] ? await p.evaluate(([gx, gy]) => { const c = document.querySelector('#page-fabrica canvas'), r = c.getBoundingClientRect(), s = r.width / 460; return { x: r.left + gx * s, y: r.top + gy * s }; }, [g0.at[0][0], g0.at[0][1]]) : null;
@@ -52,27 +52,27 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   if (pt) {
     await p.mouse.move(pt.x, pt.y); await sleep(500);
     const c1 = await p.evaluate(() => { const s = document.querySelector('#page-fabrica .fbt-stage'); return { gem: s.classList.contains('fbt-on-gem'), bead: s.classList.contains('fbt-on-bead'), cursor: getComputedStyle(s).cursor.slice(0, 40), hover: IngTree.gems().hover }; });
-    ok(c1.gem && !c1.bead && /^url\("data:image\/png/.test(c1.cursor) && c1.hover >= 0, 'over the diamond the pointer is a small open ring, not the hand', c1);
+    ok(c1.gem && !c1.bead && c1.cursor === 'default' && c1.hover >= 0, 'over the diamond the pointer is the plain arrow: no ring and no hand (7.86, at her word)', c1);
     await p.mouse.down(); await sleep(120);
     const c2 = await p.evaluate(() => { const s = document.querySelector('#page-fabrica .fbt-stage'); return { drag: s.classList.contains('fbt-drag'), cursor: getComputedStyle(s).cursor.slice(0, 40) }; });
-    ok(!c2.drag && /^url\(/.test(c2.cursor), 'pressed, it does not turn into the grabbing hand', c2);
+    ok(!c2.drag && c2.cursor === 'default', 'pressed, it does not turn into the grabbing hand', c2);
     await p.mouse.up(); await sleep(200);
     const c3 = await p.evaluate(() => { const s = document.querySelector('#page-fabrica .fbt-stage'); return { spin: IngTree.gems().spin, cls: s.classList.contains('fbt-gem-spin'), cursor: getComputedStyle(s).cursor }; });
     await p.screenshot({ path: OUT + '/diamond_spin.png', clip: { x: pt.x - 80, y: pt.y - 80, width: 160, height: 160 } });
     ok(c3.spin && c3.cls && c3.cursor === 'none', 'while it spins the pointer steps aside, so the stone is in full view', c3);
     await sleep(1500);
     const c4 = await p.evaluate(() => { const s = document.querySelector('#page-fabrica .fbt-stage'); return { cls: s.classList.contains('fbt-gem-spin'), cursor: getComputedStyle(s).cursor.slice(0, 20) }; });
-    ok(!c4.cls && /^url\(/.test(c4.cursor), 'the spin over, the ring comes back', c4);
+    ok(!c4.cls && c4.cursor === 'default', 'the spin over, the plain arrow comes back', c4);
     await p.evaluate(() => document.body.setAttribute('data-theme', 'night')); await sleep(600);
     const c5 = await p.evaluate(() => getComputedStyle(document.querySelector('#page-fabrica .fbt-stage')).cursor.slice(0, 120));
-    ok(/^url\(/.test(c5) && c5 !== c4.cursor, 'by night the ring is lavender', c5.slice(0, 60));
+    ok(c5 === 'default', 'by night too, the plain arrow', c5.slice(0, 60));
     await p.mouse.move(pt.x + 200, pt.y + 200); await sleep(300);
     // dragging from the diamond still turns the tree, with the grabbing hand
     await p.evaluate(() => document.body.setAttribute('data-theme', 'day'));
     await p.mouse.move(pt.x, pt.y); await sleep(300); await p.mouse.down(); await p.mouse.move(pt.x + 40, pt.y, { steps: 6 }); await sleep(100);
     const c6 = await p.evaluate(() => document.querySelector('#page-fabrica .fbt-stage').classList.contains('fbt-drag'));
     await p.mouse.up();
-    ok(c6, 'dragged from the diamond, the tree still turns with the grabbing hand', c6);
+    ok(c6, 'dragged from the diamond, the tree still turns', c6);
   }
   ok(errs.length === 0, 'no page errors', errs.slice(0, 5));
   await b.close(); console.log(pass + ' passed, ' + fail + ' failed'); process.exit(fail ? 1 : 0);
