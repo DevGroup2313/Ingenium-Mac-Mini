@@ -281,6 +281,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.80", "The guided tour shows an AI of your own built step by step on the models page; every page of the tour now shows a task done."],
   ["7.79", "On Ingenia, every app's logo is now the same 3D logo as on Lector and Fabrica: it sways, tilts to follow the pointer, lifts, and sinks when pressed.", "master"],
   ["7.79", "Clavis's logo is see-through inside its gold ring wherever Ingenium shows it.", "master"],
   ["7.79", "The guided tour shows a folder brought up to date on Ingenia."],

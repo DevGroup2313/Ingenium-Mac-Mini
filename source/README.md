@@ -395,6 +395,20 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.80 (25 November 2026): the guided tour shows an AI of her own built on the models page; every page of the tour now shows a
+task done, and the whole tour is checked from its first card to its last.
+
+- The models page's demonstration (`r379.js`, new). Her request (24 November 2026): "I want live demonstrations added to the Guided Tour
+  to showcase all of Ingenium's pages ... specifically curated to showcase each page being used to complete a specific task". After Build
+  your own AI, the page's own builder makes an example garden helper for houseplants, step by step: its name, symbol, colour (Jade) and
+  purpose; the base model the builder suggests; how it works; an example that teaches it; its knowledge and settings as they are; then
+  Try it and save, which shows what the model will be told, and the builder's own Save keeps it in Your own AIs. Only the conversation
+  the builder would open next is held, so the tour stays on the page. It is removed when the tour ends. Test: rig/t_780_tour_mentes.js.
+- The whole tour, checked (`rig/t_780_tour_whole.js`): every card from the first to the last, with every demonstration (Chat, Code,
+  Adamas, Concordia, Lector, Ingenia, Vocatio, Fabrica, the models page, the Engine panel, Vesta): none throws, each shows its words, and
+  when the tour ends everything of hers is as it was (conversations, folders and the folder open, her own AIs, repositories, applications,
+  her page in Adamas, her question in Concordia, tasks and parked thoughts).
+
 Ingenium 7.79 (25 November 2026): Ingenia's app logos are Lector's and Fabrica's 3D logos; Clavis's face is see-through; the guided
 tour shows a task done on Ingenia, Fabrica and Vocatio.
 
