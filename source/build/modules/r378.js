@@ -37,29 +37,30 @@ body[data-motion="minimal"] #page-folders .ig-ls-tilt{transform:none !important}
 (function r378(){"use strict";
 if(window.IngFolderLogos)return;
 var W=window,D=document;
-var NAMES={cd:["Carpe Diem"],forge:["The Forge","Forge"],ingenium:["Ingenium"],inkwell:["Inkwell"],lakay:["Lakay"],clavis:["Clavis"]};
+/* no app is named here: an app's name is read from its folder (an edition carries only the apps it carries, and names no other) */
+function nameOf(k){try{var fs=W.IngFolders&&typeof IngFolders.folders==="function"?IngFolders.folders():[];for(var i=0;i<fs.length;i++){if(W.IngAppLogo&&IngAppLogo.key(fs[i].name)===k)return fs[i].name;}}catch(e){}return "";}
 /* the sway of each starts at its own moment, as on Fabrica, so the logos never move in step */
-var DELAY={cd:0,forge:1.6,ingenium:3.1,inkwell:4.4,lakay:2.3,clavis:5.2};
+function delayOf(k){var n=0;for(var i=0;i<k.length;i++)n=(n*31+k.charCodeAt(i))%997;return (n%60)/10;}
 function night(){return D.body.getAttribute("data-theme")==="night";}
 function page(){return D.getElementById("page-folders");}
-function mine(k){try{if(!W.IngAppLogo||typeof IngAppLogo.own!=="function")return "";var n=NAMES[k]||[];for(var i=0;i<n.length;i++){var s=IngAppLogo.own(n[i]);if(s)return s;}}catch(e){}return "";}
+function mine(k){try{if(!W.IngAppLogo||typeof IngAppLogo.own!=="function")return "";var n=nameOf(k);return n?IngAppLogo.own(n)||"":"";}catch(e){}return "";}
 function sizeOf(e){var w=parseFloat(e.style.width)||e.width||0;if(!w){var r=e.getBoundingClientRect();w=r.width;}return Math.max(18,Math.round(w||56));}
 function h(tag,cls){var e=D.createElement(tag);if(cls)e.className=cls;return e;}
 /* Fabrica's sealEl, made for Ingenia: the seal in its layers, each at its depth, its edge and its cast; or, for a logo of her own, that logo */
 function make(k,size){var L=W.LX7_LAYERS||{},key=night()&&L[k+"N"]?k+"N":k,ls=L[key],own=mine(k);
   var root=h("span","ig-ls fd-seal");root.setAttribute("aria-hidden","true");root.setAttribute("data-fd-seal",k);root.setAttribute("data-ig",key+(own?":own":""));root.style.setProperty("--S",size+"px");
-  var tilt=h("span","ig-ls-tilt"),idle=h("span","ig-ls-idle");idle.style.animationDelay=(-(DELAY[k]||0))+"s";idle.appendChild(h("i","ig-ls-cast"));
+  var tilt=h("span","ig-ls-tilt"),idle=h("span","ig-ls-idle");idle.style.animationDelay=(-delayOf(k))+"s";idle.appendChild(h("i","ig-ls-cast"));
   if(own||!ls){root.classList.add("flat");var im=new Image();im.src=own||"";im.alt="";im.className="ig-ls-l";idle.appendChild(im);}
   else ls.forEach(function(L1){var im=new Image();im.src=L1.src;im.alt="";im.className="ig-ls-l"+(L1.side?" side":"");im.style.setProperty("--z",String(L1.z));idle.appendChild(im);});
   tilt.appendChild(idle);root.appendChild(tilt);return root;}
 var busy=false;
 function paint(){var pg=page();if(!pg||busy)return 0;var L=W.LX7_LAYERS||{},n=0;busy=true;
-  try{[].forEach.call(pg.querySelectorAll(".fd-seal"),function(e){var k=e.getAttribute("data-fd-seal");if(!k||!NAMES[k]||e.classList.contains("fd-wm"))return;
+  try{[].forEach.call(pg.querySelectorAll(".fd-seal"),function(e){var k=e.getAttribute("data-fd-seal");if(!k||k==="app"||e.classList.contains("fd-wm"))return;
       if(!L[k]&&!mine(k))return;
       var want=(night()&&L[k+"N"]?k+"N":k)+(mine(k)?":own":"");if(e.classList.contains("ig-ls")&&e.getAttribute("data-ig")===want)return;
       var nw=make(k,sizeOf(e));if(e.classList.contains("ig-ls"))nw.style.setProperty("--S",e.style.getPropertyValue("--S"));
       /* the open folder's own logo is a key of its own: it answers the pointer and the keyboard */
-      if(e.closest(".fd-oh")){nw.classList.add("ig-key");nw.setAttribute("role","img");nw.removeAttribute("aria-hidden");nw.setAttribute("aria-label",(NAMES[k]||[k])[0]+"'s logo");nw.tabIndex=0;}
+      if(e.closest(".fd-oh")){nw.classList.add("ig-key");nw.setAttribute("role","img");nw.removeAttribute("aria-hidden");nw.setAttribute("aria-label",(nameOf(k)||"The app")+"'s logo");nw.tabIndex=0;}
       e.replaceWith(nw);n++;});}catch(x){try{console.warn("Ingenia logos:",x);}catch(_){}}
   busy=false;return n;}
 /* the pointer, as on Fabrica: the logo of the folder, tab, card or head under it tilts to follow it and lifts; pressed, it sinks */
