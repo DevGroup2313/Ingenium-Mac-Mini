@@ -281,6 +281,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.92", "Ingenium Cloud: when the same conversation or an app's notes changed on two devices, your version is kept aside and shown beside the one brought in, so you choose which to keep."],
   ["7.91", "Memory opens on its mind: the constellation of what Ingenium knows is now Memory's header, first and full height, and shows only under Memory. What Ingenium knows sits under Memory too, so a star you press opens its facts in view; restore points and scheduled backups sit under Back up and move."],
   ["7.91", "Restore points: your whole desk kept every day and before anything big changes it; bring all of one back, or just one conversation, an app's notes or what Ingenium knew. Check a backup: Ingenium opens it and checks every part without changing anything."],
   ["7.90", "Memory opens on the constellation mind: your apps are its brightest stars, twinkling in their own colours and linked by lines of light; press a star to read what Ingenium knows about it."],

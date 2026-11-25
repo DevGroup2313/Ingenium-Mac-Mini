@@ -395,6 +395,16 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.92 (25 November 2026): Ingenium Cloud keeps what two devices both changed, for her to choose.
+
+- Stage 2 of the approved recommendations. Found: what Cloud brings in merges as a backup's Merge does (r143 mergeVal: the newer copy
+  wins), so a conversation or an app's notes changed here since work last came in, then changed elsewhere later, was replaced without a
+  word. Now (`r394.js`, new): before any merge, the conversations and the apps' folders are looked at; after it, any she had changed here
+  since the last sync (or, with none, in the last seven days) and that the merge replaced is kept aside on this device; the Cloud card
+  shows each side by side (hers and the one brought in) with Keep mine and Keep the one brought in, and says when this device last sent
+  and brought in work. A copy she changed here that the merge kept, while the other device's changes were left out, is not yet shown:
+  the incoming copy is not kept by the merge. Test: rig/t_792_conflicts.js (4 checks).
+
 Ingenium 7.91 (25 November 2026): restore points, one thing brought back, a backup checked.
 
 - Stage 2 of the recommendations she approved (25 November 2026: "proceed with stage 2: backups, restore points and Cloud").
