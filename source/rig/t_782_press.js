@@ -18,7 +18,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await p.evaluate(() => { window.__snd = []; if (window.IngSound) { const o = IngSound.play; IngSound.play = function (n) { window.__snd.push(n); try { return o.apply(this, arguments); } catch (e) {} }; } });
   // 1. Ingenia: the open folder's logo is a button, pressed as Ingenium's own logo is
   await p.evaluate(() => go('folders')); await sleep(1200);
-  await p.evaluate(() => { const c = [...document.querySelectorAll('#page-folders .fd-file')].find(x => /Clavis/.test(x.textContent)) || document.querySelector('#page-folders .fd-file'); if (c) c.click(); }); await sleep(1500);
+  await p.evaluate(() => { const c = [...document.querySelectorAll('#page-folders .fd-file')].find(x => /Ingenium/.test(x.textContent)) || document.querySelector('#page-folders .fd-file'); if (c) c.click(); }); await sleep(1500);
   const k0 = await p.evaluate(() => { const k = document.querySelector('#page-folders .fd-oh .ig-ls.ig-key'); if (!k) return null; const r = k.getBoundingClientRect(); return { role: k.getAttribute('role'), tab: k.tabIndex, label: k.getAttribute('aria-label'), cursor: getComputedStyle(k).cursor, x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width }; });
   ok(k0 && k0.role === 'button' && k0.tab === 0 && k0.cursor === 'pointer' && /logo/.test(k0.label), "the open folder's logo is a button: the pointer's hand, the keyboard, and a name", k0);
   if (k0) {

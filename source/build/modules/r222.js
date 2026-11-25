@@ -281,6 +281,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.87", "Chat and Code: an app in a reply shows as its card and in the stage beside the chat, its code folded under one bar (Show code opens it), while it is being written too."],
+  ["7.87", "Ingenia: each app's logo has a press of its own, made from its own seal: Carpe Diem's sun rises, The Forge's anvil takes a blow, Inkwell's quill dips, Clavis's key turns, Lakay's shell spirals; Ingenium keeps its knock.", "master"],
   ["7.86", "Ingenium's models: a fifth house, Oracle, with the strongest open models there are, shown on every device with the memory each needs, so a stronger computer can use them later."],
   ["7.86", "Inkling 2 Mini, from Thinking Machines, joins Magister and Faber on a Mac with 32 GB or more whose newer engine reads it; each of its replies stops at 8,192 tokens, as its makers advise."],
   ["7.86", "Mentes: Find models, a room of its own. Search Hugging Face and see a model's kind, size, licence and fingerprint before anything downloads; open Hugging Face, Ollama, LM Studio, ModelScope, Kaggle Models or any other site, each with its own keys to open it and to sign in."],

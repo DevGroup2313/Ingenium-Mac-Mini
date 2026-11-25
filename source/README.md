@@ -395,6 +395,21 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.87 (25 November 2026): an app in a reply shows as the app; each app's logo with a press of its own.
+
+- Her words (25 November 2026): "I don't want to see the entire code of the HTML all laid out, it makes it really hard to navigate the
+  chats ... I prefer to see the app instead of the raw code, please fix this issue in both chat pages." Found (rig/t_787_presses.js on
+  7.86): r101 already marked an app's code as folded, but the chat's rule for code in a message (.msg .md pre code) is more specific than
+  the fold's, so the whole code stayed laid out (3,893 pixels for 205 lines), in Chat and Code alike; a reply cut off before its fence
+  closed had no card and no fold; and an app being written grew in the chat. Now (`r389.js`, new): the fold wins; a cut-off reply is
+  still read as its app (its card, the stage, the fold); and an app being written waits folded under one line that counts it, the stage
+  beside the chat drawing it.
+- Ingenia (approved with the live preview, 25 November 2026: "I approve of the previews"; `r388.js`, new): each app's logo has a press of
+  its own, made from its seal's own layers: Carpe Diem, Sunrise; The Forge, Strike (sparks); Inkwell, Dip (the ink ripples); Clavis,
+  Unlock (the key turns in the astrolabe); Lakay, Spiral; Ingenium keeps its knock. A press she makes plays even where the system asks
+  for reduced motion; Ingenium's own Minimal motion stills it. rig/t_782_press.js now checks the knock on Ingenium's folder.
+  Test: rig/t_787_presses.js (11 checks).
+
 Ingenium 7.86 (25 November 2026): Inkling 2, the Oracle house and Find models; her fixes of 25 November.
 
 - The models (approved with the live preview, 25 November 2026: "I approve of the previews, please commit and push it everywhere"):
