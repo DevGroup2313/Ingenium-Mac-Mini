@@ -7,8 +7,8 @@
 //   the app library knows Clavis by name, knows its page, and keeps the copy the page carries on first start (Clavis by its pass, built in,
 //   its size and fingerprint as builtin.json records them);
 //   the library's list, Adamas's Open an app, the chat's Your apps, Lector's apps, Fabrica's apps and the Guide name it;
-//   Ingenia (Folders): its folder wears its seal (its own picture in the drawer, its layered seal on the card and on an opened folder),
-//   and by night its night picture;
+//   Ingenia (Folders): its folder wears its seal (7.79: everywhere its layered seal, as on Lector and Fabrica, modules/r378.js: in the
+//   drawer, on the card and on an opened folder), and by night its night layers;
 //   a repository brought from GitHub named Clavis-Mac is known as Clavis;
 //   Clavis opened from Ingenium starts in a window of its own (a sandboxed frame), with its title and no error of its own;
 //   no page error.
@@ -99,20 +99,22 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   // 3. Ingenia (Folders): its folder wears its own seal, never a letter
   await p.evaluate(() => { IngFolders.make('Clavis'); try { saveState(); } catch (e) {} go('folders'); }); await sleep(3000);
   const fd = await p.evaluate(() => { const o = { tab: null, card: null, coins: document.querySelectorAll('#page-folders .fd-coin').length };
-    document.querySelectorAll('#page-folders .fd-tab').forEach(t => { const n = (t.querySelector('.fd-tn') || {}).textContent; if (n === 'Clavis') { const s = t.firstElementChild; o.tab = { tag: s && s.tagName, which: s && s.getAttribute && s.getAttribute('data-applogo'), src: s && s.src ? s.src.slice(0, 30) : '' }; } });
+    document.querySelectorAll('#page-folders .fd-tab').forEach(t => { const n = (t.querySelector('.fd-tn') || {}).textContent; if (n === 'Clavis') { const s = t.firstElementChild; o.tab = { tag: s && s.tagName, which: s && s.getAttribute && (s.getAttribute('data-applogo') || s.getAttribute('data-fd-seal')), src: s && s.src ? s.src.slice(0, 30) : '', layers: s ? s.querySelectorAll('img.ig-ls-l').length : 0 }; } });
     document.querySelectorAll('#page-folders .fld-card .fld-name').forEach(nm => { if (nm.textContent.trim() === 'Clavis') { const w = nm.firstElementChild; o.card = { cls: w && w.className, layers: w ? w.querySelectorAll('img, .ls-l').length : 0 }; } });
     return o; });
-  ok(fd.tab && fd.tab.tag === 'IMG' && fd.tab.which === 'clavis' && /^data:image\/png/.test(fd.tab.src), "Ingenia: Clavis's folder wears its seal in the drawer", fd);
+  ok(fd.tab && fd.tab.which === 'clavis' && ((fd.tab.tag === 'IMG' && /^data:image\/png/.test(fd.tab.src)) || fd.tab.layers >= 4), "Ingenia: Clavis's folder wears its seal in the drawer (7.79: its seal in its four layers)", fd);
   ok(fd.card && !/fd-coin|ing-logo-wait/.test(fd.card.cls || '') && fd.card.layers >= 1, "Ingenia: its card wears its seal, never a letter or a stand-in", fd.card);
   ok(fd.coins === 0, 'no letter coin anywhere on Ingenia', fd.coins);
   await p.screenshot({ path: OUT + '/ingenia_day.png' });
   await p.evaluate(() => { const c = [...document.querySelectorAll('#page-folders .fld-card')].find(x => /Clavis/.test(x.textContent)); if (c) c.click(); }); await sleep(1500);
-  const op = await p.evaluate(() => { const s = document.querySelector('#page-folders .fd-oh > *'); return s ? { tag: s.tagName, which: s.getAttribute('data-applogo'), cls: s.className } : null; });
-  ok(op && ((op.tag === 'IMG' && op.which === 'clavis') || /fd-ls|f-ls/.test(op.cls || '')), 'an opened Clavis folder wears its seal on its cover', op);
+  const op = await p.evaluate(() => { const s = document.querySelector('#page-folders .fd-oh > *'); return s ? { tag: s.tagName, which: s.getAttribute('data-applogo') || s.getAttribute('data-fd-seal'), cls: s.className, layers: s.querySelectorAll('img.ig-ls-l').length } : null; });
+  ok(op && ((op.tag === 'IMG' && op.which === 'clavis') || /fd-ls|f-ls/.test(op.cls || '') || (/ig-ls/.test(op.cls || '') && op.which === 'clavis' && op.layers >= 4)), 'an opened Clavis folder wears its seal on its cover', op);
   await p.screenshot({ path: OUT + '/ingenia_clavis_open.png' });
   await p.evaluate(() => { state.theme = 'night'; try { applyTheme(); } catch (e) { document.body.setAttribute('data-theme', 'night'); } go('folders'); }); await sleep(2000);
-  const nt = await p.evaluate(() => { const im = document.querySelector('#page-folders img[data-applogo="clavis"]'); return { src: im ? im.src : null, night: 'data:image/png;base64,' + ING_SEALS.clavisN.b64 }; });
-  ok(nt.src && nt.src === nt.night, 'by night Clavis wears its night picture', { has: !!nt.src });
+  const nt = await p.evaluate(() => { const im = document.querySelector('#page-folders img[data-applogo="clavis"]'), ls = document.querySelector('#page-folders .ig-ls[data-fd-seal="clavis"]');
+    if (ls) { const l0 = ls.querySelector('img.ig-ls-l'); return { layered: true, ig: ls.getAttribute('data-ig'), src: l0 ? l0.src : null, night: (window.LX7_LAYERS && LX7_LAYERS.clavisN) ? LX7_LAYERS.clavisN[0].src : '' }; }
+    return { src: im ? im.src : null, night: 'data:image/png;base64,' + ING_SEALS.clavisN.b64 }; });
+  ok(nt.src && nt.src === nt.night, 'by night Clavis wears its night picture (7.79: its night layers)', { has: !!nt.src, layered: !!nt.layered, ig: nt.ig });
   await p.screenshot({ path: OUT + '/ingenia_night.png' });
   await p.evaluate(() => { state.theme = 'day'; try { applyTheme(); } catch (e) { document.body.setAttribute('data-theme', 'day'); } }); await sleep(800);
 
