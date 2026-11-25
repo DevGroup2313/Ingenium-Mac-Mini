@@ -150,8 +150,13 @@ var Stones=(function(){
     ["uT","uN","uAsp","uTan","uOx","uCP","uCM","uCur","uOver","uSw","uGl"].forEach(function(n){U[n]=gl.getUniformLocation(pr,n);});U.uS=gl.getUniformLocation(pr,"uS[0]");U.uS2=gl.getUniformLocation(pr,"uS2[0]");U.uRp=gl.getUniformLocation(pr,"uRp[0]");
     gl.uniform3fv(U.uCP,new Float32Array(CP));gl.uniformMatrix3fv(U.uCM,false,new Float32Array([CR[0],CR[1],CR[2],CU[0],CU[1],CU[2],-CF[0],-CF[1],-CF[2]]));gl.uniform1f(U.uTan,TAN);gl.uniform1f(U.uAsp,W0/H0);gl.uniform1f(U.uOx,OX);return true;}
   /* 7.19: a head stacked as on a phone because it is narrow (r307, .skh-narrow) is framed as on a phone too */
-  function measure(){if(!host)return false;var w=Math.max(200,host.clientWidth||520),h=Math.max(160,host.clientHeight||424);if(w===W0&&h===H0)return false;W0=w;H0=h;var vw=W.innerWidth||1440,L0=vw<=980?350:(vw<=1180?400:440);if((!(W.matchMedia&&matchMedia("(max-width:760px)").matches))&&!(host.closest&&host.closest(".skh-narrow"))&&W0>L0+200){var cx=L0+0.62*(W0-L0),s0=(cx-W0/2)/(W0/2);OX=-s0*(W0/H0)*TAN;}else OX=-0.24*(W0/H0)*TAN;
-    if(gl){gl.uniform1f(U.uAsp,W0/H0);gl.uniform1f(U.uOx,OX);}return true;}
+  /* 7.86, her words (25 November 2026): "I want the landscape and the stones from vesta to actually be bigger and match the landscape,
+     they look too tiny on their own." The view kept one height however wide the head was, so on her 34-inch display the stones shrank
+     as the head widened. Now, once the head is wider than 2.6 times its height, the view comes closer (up to 1.55 times) and tilts down a
+     little, so the stones grow with the landscape and the far shore, the sky and every stone stay in view; on a smaller screen nothing
+     changes */
+  function measure(){if(!host)return false;var w=Math.max(200,host.clientWidth||520),h=Math.max(160,host.clientHeight||424);if(w===W0&&h===H0)return false;W0=w;H0=h;var Z=Math.max(1,Math.min(1.55,(W0/H0)/2.6));TAN=Math.tan(FOV/2)/Z;var tg=[TG[0],TG[1]-0.42*(Z-1),TG[2]];CF=nrm(sub(tg,CP));CR=nrm(crs(CF,[0,1,0]));CU=crs(CR,CF);W.__ingVestaZoom=Z;var vw=W.innerWidth||1440,L0=vw<=980?350:(vw<=1180?400:440);if((!(W.matchMedia&&matchMedia("(max-width:760px)").matches))&&!(host.closest&&host.closest(".skh-narrow"))&&W0>L0+200){var cx=L0+0.62*(W0-L0),s0=(cx-W0/2)/(W0/2);OX=-s0*(W0/H0)*TAN;}else OX=-0.24*(W0/H0)*TAN;
+    if(gl){gl.uniform1f(U.uAsp,W0/H0);gl.uniform1f(U.uOx,OX);gl.uniform1f(U.uTan,TAN);gl.uniformMatrix3fv(U.uCM,false,new Float32Array([CR[0],CR[1],CR[2],CU[0],CU[1],CU[2],-CF[0],-CF[1],-CF[2]]));}return true;}
   function size(){var d=Math.min(Math.min(2,Math.max(1,W.devicePixelRatio||1)),Math.sqrt(900000/(W0*H0)))*q;var w=Math.round(W0*d),h=Math.round(H0*d);if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h;}}
   function proj(P){var vv=sub(P,CP),z=dot(vv,CF);var x=(dot(vv,CR)/z-OX)/TAN/(W0/H0),y=dot(vv,CU)/z/TAN;return [(x+1)/2*W0,(1-(y+1)/2)*H0,z];}
   function night(){return D.body.getAttribute("data-theme")==="night";}
@@ -213,7 +218,9 @@ function now(){var t=null,i=-1;try{if(typeof W.taskCur==="function")t=W.taskCur(
 function paint(){if(!tag)return;var s=now(),cnt=5,cur=0,b="One step at a time",sm="Nothing planned yet";
   if(s.n&&s.i<0){cnt=Math.min(5,s.n);cur=99;b="Every step done";sm=short(s.t.title||"Your task",40);}
   else if(s.n){var s0=Math.max(0,Math.min(s.i-1,s.n-5));cnt=Math.min(5,s.n-s0);cur=s.i-s0;b="Step "+(s.i+1)+" of "+s.n;sm=short((s.t.steps[s.i]||{}).t||"",44);}
-  Stones.setSteps(cnt,cur);if(b+"|"+sm===LAST)return;LAST=b+"|"+sm;setText(tag.querySelector("b"),b);setText(tag.querySelector("small"),sm);
+  /* 7.86, her words (25 November 2026): "I want the Vesta missing stones restored": the five stones always stand above the water; the
+     step in hand is still the one in the light, and a task with fewer steps leaves the stones beyond it as they are */
+  Stones.setSteps(5,cur);if(b+"|"+sm===LAST)return;LAST=b+"|"+sm;setText(tag.querySelector("b"),b);setText(tag.querySelector("small"),sm);
   HD.obj.setAttribute("aria-label","Stepping stones across still water. "+b+(sm?": "+sm:"")+".");}
 /* the keys never move the page (her word, 6.95); what they open is said when it is out of sight */
 function said(el,words){try{var r=el&&el.getBoundingClientRect();if(r&&(r.top>W.innerHeight-60||r.bottom<60)&&typeof W.ingToast==="function")W.ingToast(words);}catch(e){}}

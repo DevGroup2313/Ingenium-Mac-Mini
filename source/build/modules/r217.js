@@ -60,7 +60,7 @@ function knownRepos(){var o={};try{Object.keys(ING_LINEUP.models).forEach(functi
 var newerKinds=null;
 function loadable(arch){if(!arch)return null;arch=String(arch).toLowerCase();if(KINDS.indexOf(arch)>=0)return "proven";if(newerKinds&&newerKinds.indexOf(arch)>=0)return "newer";return "";}
 function readNewer(){var a=null;try{a=typeof deskApi==="function"?deskApi():null;}catch(e){}if(!a||typeof a.engine_choice!=="function")return Promise.resolve();
-  return Promise.resolve(a.engine_choice()).then(function(r){newerKinds=r&&r.newer&&r.newer.available?KINDS_NEWER.slice():null;},function(){});}
+  return Promise.resolve(a.engine_choice()).then(function(r){newerKinds=r&&r.newer&&r.newer.available?((Array.isArray(r.newer.only)&&r.newer.only.length)?r.newer.only.map(String):KINDS_NEWER.slice()):null;},function(){});}
 function house(name,params){var n=String(name).toLowerCase();if(/coder|code|devstral|codestral/.test(n))return "faber";if(/think|reason|r1\b|qwq|magistral/.test(n))return "scriba";return params&&params<=4.5?"velox":"magister";}
 var HOUSE={velox:"Velox",scriba:"Scriba",magister:"Magister",faber:"Faber"};
 /* the file of a repository to install: the first quant on the list that fits, whole or in parts */

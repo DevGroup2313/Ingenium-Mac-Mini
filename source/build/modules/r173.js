@@ -238,11 +238,13 @@ var CONF={
     {k:"get",t:"Ingenium's models",i:"get",says:"Ingenium's own models, in four houses. Choose a size and get one.",ids:["lineupCard",/^the four houses/]},
     /* 6.35: newer models, found online when she presses Check (modules/r217.js), in a room of their own, so they can be seen */
     {k:"newer",t:"Newer models",i:"newer",says:"Models newer than Ingenium's own, looked for online only when you press Check: each with its size, its fingerprint and whether this device can run it.",ids:["foundCard"]},
+    /* 7.86: Find models (modules/r385.js): search where new models appear, the sites to open and sign in to, and the four checks */
+    {k:"find",t:"Find models",i:"newer",says:"Search where new models appear, open the sites and sign in to them, and see the four checks Ingenium makes before anything is downloaded.",ids:["fmCard"]},
     {k:"catalogue",t:"More models",i:"cat",says:"A wider choice of strong, open models. They are sorted by what fits this device.",ids:["catBox"]},
     {k:"studio",t:"Studio",i:"studio",star:true,says:"The Studio: make and train your own models. Give a model its own name and instructions, or convert a model's file.",
       ids:["trainCard","aiCard","convCard"]},
     {k:"engine",t:"Engine",i:"engine",says:"The engine that runs your models on this device.",ids:[/^the engine/]}],
-    words:[[/train|studio|convert|own ai|your own/,"studio"],[/engine/,"engine"],[/kept for|for later|downloaded lately|stronger computer/,"kept"],[/newer|found online/,"newer"],[/catalog|more models/,"catalogue"],[/house|lineup|ingenium's/,"get"],[/model|health|add/,"yours"]]},
+    words:[[/train|studio|convert|own ai|your own/,"studio"],[/engine/,"engine"],[/kept for|for later|downloaded lately|stronger computer/,"kept"],[/find models|sign in|hugging face|ollama|lm studio/,"find"],[/newer|found online/,"newer"],[/catalog|more models/,"catalogue"],[/house|lineup|ingenium's/,"get"],[/model|health|add/,"yours"]]},
   /* 6.26: the Guide in rooms (modules/r230.js folds each topic into a tile and puts What is new in a key) */
   guide:{label:"The Guide, in rooms",find:true,all:true,findLabel:"Find in the guide",findHint:"effort, connectors, lend",found:["topic","topics"],
     allLabels:["Show the whole guide at once","Show the guide in rooms","For those who prefer one long page","Back to one room at a time"],rooms:[

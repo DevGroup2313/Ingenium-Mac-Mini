@@ -158,9 +158,10 @@ function modelReady(){try{var o=W.IngLector&&W.IngLector.plan?W.IngLector.plan()
 function modelName(){try{var o=W.IngLector.plan();if(o&&(o.cloud||o.link)&&typeof W.lxCloudName==="function")return W.lxCloudName();if(o&&o.chosen)return o.chosen.customName||o.chosen.name||"your model";}catch(e){}return "your model";}
 function ask(msgs,max){var o=null;try{o=W.IngLector.plan();}catch(e){}if(typeof W.lxAsk!=="function")return Promise.reject(new Error("no model can be asked from here"));
   return W.lxAsk({modelId:o&&o.chosen?o.chosen.id:null},msgs,max,0.2,function(){});}
-function sysText(){return "You keep the working notes of one of my apps, for me and for the models that help me with it. You write only what the conversations and the notes say: never a version, a date, a decision, a file or a feature they do not give. Where they disagree, the later conversation wins. Plain English, short sentences, no jargon. My preferences are quoted in my own words.";}
+function sysText(){return "You keep the working notes of one of my apps, for me and for the models that help me with it. You write only what the conversations and the notes say: never a version, a date, a decision, a file or a feature they do not give. Where they disagree, the later conversation wins. Plain English, short sentences, no jargon. My preferences are quoted in my own words."+(W.IngAppFacts?" What the app is, as I have said it, is true above everything else: never name a system, device or platform for the app that it does not name.":"");}
 function userText(p,batch,last){var a=p.app;
-  return "THE APP: "+p.name+"\n\nTHE SUMMARY SO FAR:\n"+(a.brief||"(none yet)")+"\n\nTHE DECISIONS SO FAR:\n"+((a.decisions||[]).map(function(x){return "- "+x;}).join("\n")||"(none yet)")+"\n\nOPEN SO FAR:\n"+((a.open||[]).map(function(x){return "- "+x;}).join("\n")||"(none yet)")+
+  var fb="";try{fb=W.IngAppFacts?IngAppFacts.block(p.name):"";}catch(e){fb="";}
+  return "THE APP: "+p.name+(fb?"\n\n"+fb:"")+"\n\nTHE SUMMARY SO FAR:\n"+(a.brief||"(none yet)")+"\n\nTHE DECISIONS SO FAR:\n"+((a.decisions||[]).map(function(x){return "- "+x;}).join("\n")||"(none yet)")+"\n\nOPEN SO FAR:\n"+((a.open||[]).map(function(x){return "- "+x;}).join("\n")||"(none yet)")+
     "\n\nHOW I WORK, AS I HAVE WRITTEN IT:\n"+(a.how||"(nothing yet)")+"\n\nNEW CONVERSATIONS:\n"+batch+
     "\n\nBring the notes up to date with the new conversations. Answer in exactly this form, and nothing else:\nSUMMARY:\n(the whole summary, updated: what the app is, what has been done, and where it stands now; at most 350 words)\n"+
     "DECISION: a decision still standing, and its reason (one to a line, every decision still standing, at most 20)\nOPEN: something still to do (at most 12)\nHOW: a preference of mine about how I like to work that is not yet in HOW I WORK, quoted or closely in my words (only new ones, at most 6)"+(last?"":"\n(More conversations follow after these: keep what will still matter.)");}
@@ -298,8 +299,10 @@ function folderView(p,host){var a=p.app;
   else{hd.appendChild(h("h2",null,esc(p.name)));hd.appendChild(key("ghost small","Rename",function(){F().ui.renaming=p.id;paint();}));hd.appendChild(key("primary","Start a conversation in this folder",function(){startIn(p);}));}
   host.appendChild(hd);status(host);
   /* where we left off */
+  try{if(W.IngAppFacts&&IngAppFacts.fix(p))save();}catch(e){}
   var u=unread(p),wl=card("Where we left off",a.briefAt?"Brought up to date "+day(a.briefAt)+(a.model?" with "+((W.ingPrettyModels||String)(a.model)):"")+". "+(u.length?u.length+" conversation"+(u.length===1?"":"s")+" not read yet.":"Every conversation in this folder is read."):"No summary yet. Ingenium reads the conversations in this folder once, and writes where things stand: what is done, the decisions, and what is open.");
   if(a.brief)wl.appendChild(h("div","fld-brief",esc(a.brief)));
+  if(a.brief&&a.fixNote)wl.appendChild(h("p","fld-note",esc(a.fixNote)));
   try{if(W.IngFolderFab&&typeof W.IngFolderFab.left==="function")W.IngFolderFab.left(p,wl);}catch(e){}  /* 7.48: what happened in Fabrica (modules/r337.js) */
   var r=h("div","fld-row");r.style.marginTop="10px";var up=key(u.length?"primary":"",u.length?"Bring it up to date ("+u.length+")":"Up to date",function(){bringUp(p);},"Reads only the conversations not read yet, once");if(!u.length||RUN.busy)up.disabled=true;r.appendChild(up);wl.appendChild(r);host.appendChild(wl);
   if(a.sugg&&a.sugg.length){var sg=card("Seen in the conversations: how you like to work","Keep the ones that are right, in How I work on "+p.name+"; drop the rest."),ul=h("ul","fld-list fld-sugg");

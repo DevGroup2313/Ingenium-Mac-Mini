@@ -281,6 +281,12 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.86", "Ingenium's models: a fifth house, Oracle, with the strongest open models there are, shown on every device with the memory each needs, so a stronger computer can use them later."],
+  ["7.86", "Inkling 2 Mini, from Thinking Machines, joins Magister and Faber on a Mac with 32 GB or more whose newer engine reads it; each of its replies stops at 8,192 tokens, as its makers advise."],
+  ["7.86", "Mentes: Find models, a room of its own. Search Hugging Face and see a model's kind, size, licence and fingerprint before anything downloads; open Hugging Face, Ollama, LM Studio, ModelScope, Kaggle Models or any other site, each with its own keys to open it and to sign in."],
+  ["7.86", "Vesta's header always shows its five stones, and on a wide screen they grow with the landscape. Ingenia's head and rooms start at the left, under its tabs, and its drawer grows with its head."],
+  ["7.86", "Fabrica's tree keeps one little diamond, on top, and the pointer over the tree stays the plain arrow: no ring and no hand.", "fabrica"],
+  ["7.86", "Carpe Diem's folder knows it is an app for all devices, and the summary that called it a Windows app is corrected.", "master"],
   ["7.85", "Nothing changes in this edition: 7.85 brings a part of Ingenium this edition does not carry.", "nofabrica"],
   ["7.85", "Vocatio reads your profile once, part by part, and keeps the facts each part gives with where each came from; readings start from them, and only a part you change is read again. In Your profile, Read once.", "career"],
   ["7.85", "Vocatio's Practise: answer aloud with Scriba's own ears, on this device, with a clock beside the question; each answer read against the posting's criteria, with the sentence it rests on; and your best answers kept.", "career"],

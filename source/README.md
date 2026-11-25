@@ -395,6 +395,29 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.86 (25 November 2026): Inkling 2, the Oracle house and Find models; her fixes of 25 November.
+
+- The models (approved with the live preview, 25 November 2026: "I approve of the previews, please commit and push it everywhere"):
+  `r385.js`, new. Inkling 2 Mini (ggml-org's IQ4_NL, 17.6 GB, with its eyes) and Inkling 2 Small (unsloth's UD-IQ1_S, five parts, 171.7
+  GB), sizes and SHA-256 from Hugging Face's records, each repository's commit pinned. Offered to install only where the computer app's
+  newer engine reports their kinds (inkling2_loop from llama.cpp b12600, inkling2 from b12599; the Macs' newer engine is now b12723) and
+  her engine choice is not the proven engine only; elsewhere they wait under Oracle, saying why. Inkling 2 Mini joins Magister and Faber
+  on a computer after the larger models (32 GB or more). Each Inkling 2 reply stops at 8,192 tokens, as its makers advise. Oracle, a fifth
+  house on the Models page: the strongest open models there are (twelve, smallest first, from Qwen3.8 Flash Next to Kimi K3), on every
+  device, each with the memory it needs; one that fits installs from its row. The first Inkling is left out: no llama.cpp build reads its
+  kind. Find models, a room of its own: a search of Hugging Face with four checks shown before anything downloads (kind, size, licence,
+  fingerprint); Hugging Face, Ollama, LM Studio, ModelScope and Kaggle Models each as a card with its own keys, Open and (where its
+  sign-in page was confirmed) Sign in; any other site by its link, kept among her own. Newer models, found online, reads the newer
+  engine's kinds from the computer app (`r217.js`).
+- Her fixes (her message of 25 November 2026): Fabrica's tree keeps one diamond, on top, and the pointer over the tree is the plain arrow,
+  the ring and every hand gone (`r294.js`); Vesta's header always shows its five stones (`r291.js`; fewer stood above the water when the
+  task in hand had fewer steps), and on a wide screen its view comes closer so the stones grow with the landscape; Ingenia's head and rooms start at the left under its tabs on a wide screen, its drawer growing with its
+  head (`r386.js`); what an app is,
+  as she says it, is kept with its folder and comes first when its notes are brought up to date (`r386.js`, `r208.js`), and Carpe Diem's
+  fact, "an app for all devices", corrects the summary that called it a Windows app (`r387.js`, her master copy's alone); the small chips
+  on the Models page, Vocatio and the engine panel stand raised and lift under the pointer (`r385.js`).
+  Test: rig/t_786_models.js.
+
 Ingenium 7.85 (25 November 2026): Vocatio reads her profile once.
 
 - Recommendation 1 of 24 November, before her Cambridge deadline of 8 December, approved with the live preview (25 November 2026: "I
