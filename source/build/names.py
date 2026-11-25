@@ -181,7 +181,7 @@ _MENTES = [
     ('tr-head tu-head");head.setAttribute("aria-label","Models");', 'tr-head tu-head");head.setAttribute("aria-label","%s");'),   # its head (r269)
     ('models:{label:"Models, in rooms",', 'models:{label:"%s, in rooms",'),           # its rooms (r173)
     ('Tap to open Models.', 'Tap to open %s.'),                                       # the top bar's engine and model keys
-    ('Press it to open Models.', 'Press it to open %s.'),
+    # 7.78: the Engine key's help no longer names Models (it opens the Engine panel, r144), so its line here is gone
     ('btn("Relink on Models",', 'btn("Relink on %s",'),
     ('"bk-key sm","Open Models")', '"bk-key sm","Open %s")'),
     ('btn("Open Models","primary",', 'btn("Open %s","primary",'),
