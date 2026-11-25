@@ -395,6 +395,16 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.89 (25 November 2026): cool running.
+
+- Her words (25 November 2026): "I don't want it to drain my devices and overheat them and have the fan running high ... I had the same
+  issue with Adamas' 3D diamond and the rest of the headers' animations ... I want this to be made standard and added as a rule for all
+  of my apps." Found: r310 and r324 already rest every scene after 30 seconds untouched; while she works, each scene still asked for a
+  frame at every refresh of the screen (120 a second on a MacBook's screen) and drew at full Retina sharpness. Now (`r391.js`, new):
+  requestAnimationFrame is answered at most 30 times a second for every scene (each callback given the true time), and scenes size their
+  canvases at a pixel ratio of 1.25 at most (2.56 times fewer pixels than a Retina screen's 2); text, pictures and keys keep full
+  sharpness. IngCool is the switch for future scenes. Test: rig/t_789_cool.js (6 checks).
+
 Ingenium 7.88 (25 November 2026): what Ingenium knows, stage 1.
 
 - Her words (25 November 2026): "I approve of all your recommendations, please build them into the app". Stage 1 (`r390.js`, new): one
