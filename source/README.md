@@ -395,6 +395,39 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.83 (25 November 2026): Troubleshoot in the full edition; Vocatio's submission pack, and its dates in Vesta.
+
+- Her words (24 November 2026): "I want the Full edition of Ingenium to have the Author Studio with limited access or functions that will
+  only be reserved for the owner's master edition. I want the Full edition app to at least have the Troubleshoot page from the Author
+  Studio". Before that, her authorship "limited to my master edition only" (17 November 2026), and the full edition "without my Author
+  access and owner administrative functions" (19 November 2026).
+- Found: Troubleshoot (`r329.js`) read its check and its errors from the workshop (`r226.js`), which also holds her layers, her scripts and
+  Ingenium's own page in Code, and it lived inside the Author Studio (`r236.js`); all three were the master's alone (build/editions.py).
+- Now: the full edition has Troubleshoot as a room of Settings (`r173.js`), the room she approved: Check everything with its gauge, the
+  checks in their groups, each unfolding to say why and what to do, what went wrong since Ingenium started, Copy the report, and what
+  happened in the person's own words, copied with what they tick, ready to send to Ingenium's author. Its check and error list come from
+  `r381.js` (new), copied from r226's own code less the line on her layers; the full edition carries neither the workshop nor the Author
+  Studio. The keys that hand Ingenium's own page to a model (Ask a model about this, Ask a model to fix, Hand to a model in Code) and the
+  note on fixing with one stay the master's alone (`r329.js` asks ING_HAS("author")). In the full edition its tips name no device of
+  hers (editions.py, _trouble_words). The master is as before; its example sentence now reads "on my laptop".
+- The other parts of the Author Studio she may want in the full edition (Look, Side bar, Change log; my recommendation of 24 November,
+  section 7) wait for her answer.
+  Test: rig/t_783_full_trouble.js (on the full edition and the master). rig/t_745_owner_free.js now allows Troubleshoot (p329) in the full
+  edition; every other part of the master's stays refused there.
+- Vocatio's submission pack, and its dates in Vesta (`r382.js`, new; hooks in `r188.js` and `r121.js`). Recommendations 2 and 3 of 24
+  November, for her Cambridge deadline of 8 December. Her approval of the live preview (25 November 2026): "I approve of the previews but
+  I want the "Your submission pack" cards to also have the animated effect and lift of hover and I want the same effect for the "Against
+  the posting's criteria" section as well". Now, first in an application's What you send, folded under one raised bar that counts what is
+  final: one card for each thing the posting asks to send (the checklist's own items, in the posting's words), with its limit and a gauge
+  of the words written (and by how much a document is over), the file name the portal expects (from her profile's name; hers to change),
+  and a lever of four notches, To write, Drafted, Checked, Final (Final ticks the checklist item; an examined document starts at Checked).
+  The cards lift under the pointer, as she asked. A final check: her name the same everywhere, the dates against her CV, the referees
+  told, the files the portal takes, and no square brackets left (read by Vocatio itself, naming what is still to fill). Export the pack,
+  once all is final and ticked: each document as the PDF the portal will receive, named as it expects, made as Save as PDF makes it, with
+  its Word file in Word/. In Vesta's Today asks of you: each application closing within a fortnight, with its date, each referee asked ten
+  days ago or more, and each person's follow-up due; a week, three days and a day before a closing date, a reminder rings once.
+  Test: rig/t_783_pack.js (18 checks).
+
 Ingenium 7.82 (25 November 2026): Lector writes each document for its reader, cleanly, from her approved drafts; Ingenia's logos are
 buttons; Fabrica's little diamond stays in view when pressed.
 

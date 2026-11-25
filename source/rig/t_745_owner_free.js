@@ -24,7 +24,9 @@ for (const pair of process.argv.slice(2)) {
   const [ed, file] = pair.split('='); const s = fs.readFileSync(file, 'utf8');
   const edv = (/var ING_EDITION="([a-z]+)"/.exec(s) || [])[1];
   ok(edv === ed, ed + ': the file is the ' + ed + ' edition', edv);
-  for (const [what, re] of REFUSED) {
+  for (const [what, re0] of REFUSED) {
+    // 7.83: Troubleshoot (p329) is the full edition's too, at her word; the rest of the master's parts stay refused there
+    const re = ed === 'full' && /p\(126/.test(re0.source) ? new RegExp(re0.source.replace('|329', '')) : re0;
     const g = new RegExp(re.source, 'g'); const hits = []; let m;
     while ((m = g.exec(s)) && hits.length < 6) hits.push(s.slice(Math.max(0, m.index - 60), m.index + 60).replace(/\s+/g, ' '));
     ok(hits.length === 0, ed + ': none of ' + what, hits);

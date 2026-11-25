@@ -183,13 +183,19 @@ function fromWorkshop(lines){var out=[];(lines||[]).forEach(function(l){var m=/^
   var st=l.st==="warn"?"look":l.st,txt=plain(m[2]),cut=txt.search(/\.\s/),first=cut>=0?txt.slice(0,cut+1):txt;first=first.charAt(0).toUpperCase()+first.slice(1);out.push({g:g,st:st,n:n,t:first,why:txt,what:st==="ok"?"":(DO[n]||""),ask:st!=="ok"});});return out;}
 function all(){return (LINES||[]).concat(extra());}
 function tally(lines){var t={ok:0,look:0,bad:0};lines.forEach(function(l){t[l.st]=(t[l.st]||0)+1;});return t;}
-function run(){if(RUNNING||!W.IngWorkshop)return Promise.resolve();RUNNING=true;paintChecks();
-  return Promise.resolve().then(function(){return IngWorkshop.run();}).then(function(lines){LINES=fromWorkshop(lines);AT=Date.now();},function(e){LINES=[{g:"app",st:"bad",n:"The check",t:"It stopped: "+(e&&e.message||e),why:String(e&&e.stack||e),ask:true}];AT=Date.now();})
+/* 7.83: in the full edition there is no workshop (r226, the master's alone); r381 gives the same check and error list (IngChecks), and
+   the keys that hand Ingenium's own page to a model are the master's alone (her words, 17 November 2026: her authorship "limited to my
+   master edition only"; 24 November 2026: "I want the Full edition app to at least have the Troubleshoot page from the Author Studio") */
+function WS(){return W.IngWorkshop||W.IngChecks||null;}
+var AUTH=(function(){try{return typeof ING_HAS!=="function"||ING_HAS("author");}catch(e){return true;}})();
+function copyOut(t){var ok=function(){toast("Copied, with what you ticked: ready to send to Ingenium's author.");};try{navigator.clipboard.writeText(t).then(ok,function(){toast("It could not be copied here.");});}catch(e){toast("It could not be copied here.");}}
+function run(){if(RUNNING||!WS())return Promise.resolve();RUNNING=true;paintChecks();
+  return Promise.resolve().then(function(){return WS().run();}).then(function(lines){LINES=fromWorkshop(lines);AT=Date.now();},function(e){LINES=[{g:"app",st:"bad",n:"The check",t:"It stopped: "+(e&&e.message||e),why:String(e&&e.stack||e),ask:true}];AT=Date.now();})
     .then(function(){RUNNING=false;try{if(W.IngAuthor)IngAuthor.room("trouble");}catch(e){}paint();});}
 function reportText(){var lines=all(),r="Ingenium's own check"+(AT?", "+new Date(AT).toLocaleString():"")+":\n";
   GROUPS.forEach(function(g){var ls=lines.filter(function(l){return l.g===g[0];});if(!ls.length)return;r+=g[1]+"\n"+ls.map(function(l){return "  ["+(l.st==="ok"?"ok":l.st==="look"?"look":"wrong")+"] "+l.n+": "+l.why;}).join("\n")+"\n";});
   return r;}
-function errs(){try{return (IngWorkshop.errors||[]).slice().reverse();}catch(e){return [];}}
+function errs(){try{return ((WS()||{}).errors||[]).slice().reverse();}catch(e){return [];}}
 function errText(e){return "["+e.kind+"] "+e.msg+(e.where?" ("+e.where+")":"")+(e.n>1?" (x"+e.n+")":"");}
 function fix(about){try{if(W.IngAuthor)IngAuthor.close();}catch(e){}try{return IngWorkshop.fix(about);}catch(e){toast("Ingenium's own page cannot be opened in Code from here.");}}
 /* ---------- the room ---------- */
@@ -203,7 +209,7 @@ function paintChecks(){if(!BODY)return;var sum=BODY.querySelector(".ts-sum"),gs=
   if(RUNNING)ta.appendChild(mk("span","ts-chip lav","Checking: each page is opened in turn…"));
   else{[["ok","fine"],["look","worth a look"],["bad","wrong"]].forEach(function(x){var c=mk("span","ts-chip "+x[0]);c.appendChild(mk("i"));c.appendChild(D.createTextNode(t[x[0]]+" "+x[1]));ta.appendChild(c);});
     if(!LINES)ta.appendChild(mk("span","ts-chip lav","The full check not run yet"));}
-  sum.querySelector(".ts-when").textContent=RUNNING?"Pages open and close behind the studio; it takes a few seconds.":LINES?"Checked at "+hhmm(AT)+". Press a line to see why.":"Check everything opens every page, tests both stores and the engine, and reads the rest. Shown now: what is known without it.";
+  sum.querySelector(".ts-when").textContent=RUNNING?(AUTH?"Pages open and close behind the studio; it takes a few seconds.":"Pages open and close behind Settings; it takes a few seconds."):LINES?"Checked at "+hhmm(AT)+". Press a line to see why.":"Check everything opens every page, tests both stores and the engine, and reads the rest. Shown now: what is known without it.";
   var rk=sum.querySelector("#tsRun");if(rk){rk.disabled=RUNNING;rk.textContent=RUNNING?"Checking…":"Check everything";}
   gs.innerHTML="";GROUPS.forEach(function(g){var ls=lines.filter(function(l){return l.g===g[0];});var c=mk("section","ts-grp");c.innerHTML='<h3><svg viewBox="0 0 24 24" aria-hidden="true">'+IC[g[0]]+'</svg>'+esc(g[1])+'</h3>';
     if(!ls.length){c.appendChild(mk("p","ts-none",RUNNING?"Checking…":"Shown after Check everything."));}
@@ -211,7 +217,7 @@ function paintChecks(){if(!BODY)return;var sum=BODY.querySelector(".ts-sum"),gs=
       b.innerHTML='<span class="ts-st '+st+'" title="'+(st==="ok"?"Fine":st==="look"?"Worth a look":st==="bad"?"Wrong":"Checking")+'"></span><span><b>'+esc(l.n)+'</b><span class="t">'+esc(l.t)+'</span></span><span class="o">Why</span>';
       var w=mk("div","ts-why");w.appendChild(mk("p",null,l.why||l.t));if(l.what){var p=mk("p");var bb=mk("b",null,"What to do: ");bb.style.color="var(--ts-ink1)";p.appendChild(bb);p.appendChild(D.createTextNode(l.what));w.appendChild(p);}
       var ks=mk("div","ts-keys");(l.acts||[]).forEach(function(a){ks.appendChild(key("sm",a[0],a[1]));});
-      if(l.ask)ks.appendChild(key("sm","Ask a model about this",function(){fix("This line of Ingenium's own check is "+(l.st==="bad"?"wrong":"worth a look")+": "+l.n+": "+(l.why||l.t)+"\n\n"+reportText());}));
+      if(l.ask&&AUTH)ks.appendChild(key("sm","Ask a model about this",function(){fix("This line of Ingenium's own check is "+(l.st==="bad"?"wrong":"worth a look")+": "+l.n+": "+(l.why||l.t)+"\n\n"+reportText());}));
       ks.appendChild(key("sm","Copy this line",function(){var t0=l.n+": "+(l.why||l.t),b2=this;try{navigator.clipboard.writeText(t0).then(function(){b2.textContent="Copied";},function(){toast(t0);});}catch(e){toast(t0);}}));
       w.appendChild(ks);b.addEventListener("click",function(){var o=b.getAttribute("aria-expanded")==="true";b.setAttribute("aria-expanded",String(!o));b.querySelector(".o").textContent=o?"Why":"Fold";snd();});
       c.appendChild(b);c.appendChild(w);});
@@ -220,14 +226,14 @@ function paintErrs(){if(!BODY)return;var h=BODY.querySelector(".ts-errs");if(!h)
   if(!es.length){h.appendChild(mk("p","ts-none","Nothing went wrong since Ingenium started."));return;}
   es.slice(0,20).forEach(function(e){var r=mk("div","ts-err"),t=mk("time",null,hhmm(e.at));if(e.before)t.title="Before this start";r.appendChild(t);
     var m=mk("span");m.appendChild(mk("b",null,(e.before?"Before this start: ":"")+(e.msg||"").split("\n")[0].slice(0,160)));m.appendChild(mk("code",null,"["+e.kind+"]"+(e.where?" "+e.where:"")+(e.n>1?" (x"+e.n+")":"")));r.appendChild(m);
-    var ks=mk("span","ts-keys");ks.appendChild(key("sm","Ask a model to fix",function(){fix("This error was met in Ingenium: "+errText(e)+"\n\n"+reportText());}));
+    var ks=mk("span","ts-keys");if(AUTH)ks.appendChild(key("sm","Ask a model to fix",function(){fix("This error was met in Ingenium: "+errText(e)+"\n\n"+reportText());}));
     ks.appendChild(key("sm","Copy",function(){var t0=errText(e),b=this;try{navigator.clipboard.writeText(t0).then(function(){b.textContent="Copied";},function(){toast(t0);});}catch(x){toast(t0);}}));r.appendChild(ks);h.appendChild(r);});
   if(es.length>20)h.appendChild(mk("p","ts-none","And "+(es.length-20)+" older; Copy the report holds the last twelve."));}
 function deviceText(){var x=extra().filter(function(l){return l.g==="dev";});return "This device:\n"+x.map(function(l){return "  "+l.n+": "+(l.why||l.t);}).join("\n")+"\n  "+(navigator.userAgent||"").slice(0,160);}
 function recordText(){try{return "The model settings record (newest first):\n"+IngGen.log().slice(0,15).map(function(e){return "  "+new Date(e.at).toLocaleString()+": "+(FN[e.f]||e.f)+" for "+(e.n||"?")+": "+(e.reset?"asked "+e.from+", kept "+e.to:e.from+" to "+e.to)+(e.p?" ("+e.p+")":"");}).join("\n");}catch(e){return "";}}
 function hand(){var t=String(ASK.text||"").trim();if(!t){toast("Write what happened first, in your own words.");return;}
   var go=function(){var parts=["What happened, in my own words: "+t];if(ASK.report)parts.push(reportText());if(ASK.errors){var es=errs().slice(0,10);if(es.length)parts.push("The last errors:\n"+es.map(function(e){return "  "+new Date(e.at).toLocaleString()+" "+errText(e);}).join("\n"));}
-    if(ASK.device)parts.push(deviceText());if(ASK.record)parts.push(recordText());fix(parts.join("\n\n"));};
+    if(ASK.device)parts.push(deviceText());if(ASK.record)parts.push(recordText());(AUTH?fix:copyOut)(parts.join("\n\n"));};
   if(ASK.report&&!LINES)run().then(go);else go();}
 function paint(body){if(body)BODY=body;if(!BODY)return;BODY.innerHTML="";var R=mk("div");R.id="tsRoom";BODY.appendChild(R);
   var sum=mk("section","ts-sum");sum.setAttribute("aria-label","Check everything");var dl=mk("div","ts-dial");sum.appendChild(dl);var sr=mk("div","ts-sum-r");sr.appendChild(mk("div","ts-tally"));sr.appendChild(mk("div","ts-when"));
@@ -237,15 +243,16 @@ function paint(body){if(body)BODY=body;if(!BODY)return;BODY.innerHTML="";var R=m
   var h1=mk("h3","ts-sec","The checks");h1.appendChild(mk("small",null,"Press a line to see why, and what to do."));R.appendChild(h1);R.appendChild(mk("div","ts-groups"));
   var h2=mk("h3","ts-sec","What went wrong");h2.appendChild(mk("small",null,"Every error since Ingenium started, newest first; the last 50 are kept across restarts."));R.appendChild(h2);R.appendChild(mk("div","ts-errs"));
   var h3=mk("h3","ts-sec","Say it in your own words");h3.appendChild(mk("small",null,"For what a check cannot see."));R.appendChild(h3);
-  var ask=mk("section","ts-ask"),L=mk("div"),lb=mk("label",null,"What happened?");lb.htmlFor="tsProb";L.appendChild(lb);var ta=mk("textarea");ta.id="tsProb";ta.value=ASK.text;ta.placeholder="For example: on my HP laptop, Adamas froze for a moment and then the app closed.";
-  ta.addEventListener("input",function(){ASK.text=ta.value;});L.appendChild(ta);var go=mk("div","ts-go");go.appendChild(key("pri","Hand to a model in Code",hand));go.appendChild(mk("small",null,"Ingenium's own page opens in Code with this message ready. You read it before you send it."));L.appendChild(go);ask.appendChild(L);
+  var ask=mk("section","ts-ask"),L=mk("div"),lb=mk("label",null,"What happened?");lb.htmlFor="tsProb";L.appendChild(lb);var ta=mk("textarea");ta.id="tsProb";ta.value=ASK.text;ta.placeholder="For example: on my laptop, Adamas froze for a moment and then the app closed.";
+  ta.addEventListener("input",function(){ASK.text=ta.value;});L.appendChild(ta);var go=mk("div","ts-go");if(AUTH){go.appendChild(key("pri","Hand to a model in Code",hand));go.appendChild(mk("small",null,"Ingenium's own page opens in Code with this message ready. You read it before you send it."));}
+  else{go.appendChild(key("pri","Copy it, with what you tick",hand));go.appendChild(mk("small",null,"Copied, ready to send to Ingenium's author. Nothing leaves this device unless you send it."));}L.appendChild(go);ask.appendChild(L);
   var wi=mk("div","ts-with");wi.appendChild(mk("b",null,"Sent with it"));[["report","The report of the checks"],["errors","The last ten errors"],["device","This device: graphics, memory, at rest"],["record","The model settings record"]].forEach(function(x){
     var b=mk("button","ts-tick");b.type="button";b.setAttribute("role","checkbox");b.setAttribute("aria-checked",String(!!ASK[x[0]]));b.appendChild(mk("span","bx"));b.appendChild(D.createTextNode(x[1]));
     b.addEventListener("click",function(){ASK[x[0]]=!ASK[x[0]];b.setAttribute("aria-checked",String(ASK[x[0]]));snd();});wi.appendChild(b);});ask.appendChild(wi);R.appendChild(ask);
-  var f=D.createElement("details");f.className="ts-fold";f.appendChild(mk("summary",null,"Fixing safely"));var ul=mk("ul");["Every change a model makes is a version you can undo, in Additions, Your page.","A changed page counts as working once it reports in; if it does not within half a minute, Ingenium goes back to the last version that worked, and says so.","The built page is always one choice away."].forEach(function(t){ul.appendChild(mk("li",null,t));});f.appendChild(ul);R.appendChild(f);
+  if(AUTH){var f=D.createElement("details");f.className="ts-fold";f.appendChild(mk("summary",null,"Fixing safely"));var ul=mk("ul");["Every change a model makes is a version you can undo, in Additions, Your page.","A changed page counts as working once it reports in; if it does not within half a minute, Ingenium goes back to the last version that worked, and says so.","The built page is always one choice away."].forEach(function(t){ul.appendChild(mk("li",null,t));});f.appendChild(ul);R.appendChild(f);}
   paintChecks();paintErrs();}
 /* the errors list follows r226's as it grows, while the room is open */
-var ET=0;setInterval(function(){if(!BODY||!BODY.isConnected||!D.getElementById("tsRoom"))return;try{var n=(IngWorkshop.errors||[]).length;if(n!==ET){ET=n;paintErrs();}}catch(e){}},2000);
+var ET=0;setInterval(function(){if(!BODY||!BODY.isConnected||!D.getElementById("tsRoom"))return;try{var n=((WS()||{}).errors||[]).length;if(n!==ET){ET=n;paintErrs();}}catch(e){}},2000);
 W.IngTrouble={version:1,paint:paint,run:run,report:reportText,lines:all,hand:hand,ask:ASK};
 try{window.__ingParts["p329"]="running";}catch(_){}
 })();

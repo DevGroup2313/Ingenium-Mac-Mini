@@ -31,5 +31,6 @@ else
   TAG=_gift run t_767_scramble "$E/ingenium_gift.html"; TAG=_demo run t_767_scramble "$E/ingenium_demo.html"
   TAG=_gift pair run t_769_stage_kit "$E/ingenium_gift.html"; TAG=_gift run t_626_guide "$EU/ingenium_gift.html" "$OUT/guide_gift" gift; wait
   TAG=_gift pair run t_771_carried_folders "$U/ingenium.html" "$EU/ingenium_gift.html"; wait
+  run t_783_full_trouble full="$EU/ingenium_full.html" master="$U/ingenium.html" "$OUT/full_trouble"   # 7.83: Troubleshoot in the full edition
 fi
 cat "$R"

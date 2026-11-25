@@ -70,7 +70,10 @@ def skip_modules(ed):
     out |= {"r226.js"}  # 6.18: the author's workshop, the master's alone ("I want that capability added to my master version")
     out |= {"r227.js"}  # 6.19: her own page in place of the built one, the master's alone, with the Workshop
     out |= {"r236.js"}  # 6.37: the Author Studio, the room behind the rooms, the master's alone, with the Workshop it holds
-    out |= {"r329.js"}  # 7.42: Troubleshoot, the Author Studio's first room, the master's alone
+    if ed != "full":
+        out |= {"r329.js"}  # 7.42: Troubleshoot, the Author Studio's first room, the master's alone (7.83: and the full edition's)
+    if ed != "full":
+        out |= {"r381.js"}  # 7.83: the full edition's check and error list for Troubleshoot (its own room in Settings)
     out |= {"r353.js"}  # 7.62: the Author Studio raised, the master's alone, as the studio is
     out |= {"r246.js"}  # 6.48: the Offline Project made from her apps in Fabrica, the master's alone (it gathers her four apps)
     out |= {"r268.js"}  # 6.77: the demonstrations the master edition carries for it (her apps' demos), the master's alone
@@ -91,6 +94,7 @@ def skip_modules(ed):
         out |= {"r188.js"}  # 6.8.3: the Career Studio, which writes with Lector ("Please keep the Lector page and the new Career Studio page off the demo and its tour")
         out |= {"r283.js", "r290.js"}  # 6.93: the counsellor, and the heads of the Career Studio and Lector, where those pages are
         out |= {"r293.js"}  # 6.94: the Career Studio's compass, turned on (held), where that page is
+        out |= {"r382.js"}  # 7.83: Vocatio's submission pack and its dates in Vesta, where the Career Studio is
     if not has_fabrica(ed):
         out |= {"r288.js"}  # 6.93: Fabrica's tree of versions (held, paused), where there is a Fabrica
         out |= {"r298.js"}  # 7.08: Fabrica's runs, workflows, machines, every device in a release, Needs you and Learn, where there is a Fabrica
@@ -186,6 +190,18 @@ def _lector_voice():
         ("HER PAST COVER LETTERS (for their shape", "THE AUTHOR'S PAST COVER LETTERS (for their shape", "Lector: past letters", 1),
         ("HER SOURCES (kept in Fontes;", "THE AUTHOR'S SOURCES (kept in Fontes;", "Lector: Fontes", 1),
         ('"\\n    Her note: "', '"\\n    The author\'s note: "', "Lector: a source's note", 1),
+    ]
+
+
+def _trouble_words():
+    """7.83: Troubleshoot (modules/r329.js) in the full edition, at her words (24 November 2026): "I want the Full edition app to at least
+    have the Troubleshoot page from the Author Studio". Its advice names no device of the owner's (rig/t_745_owner_free.js)."""
+    return [
+        ("or keep large models on your Mac mini and use them from here.",
+         "or keep large models on another computer of yours and use them from here.", "Troubleshoot: room", 1),
+        ("Pair your Mac mini and other computers in Settings, Your devices,", "Pair your other computers in Settings, Your devices,",
+         "Troubleshoot: pairing", 1),
+        ("Wake your Mac mini or an HP laptop, on the same Wi-Fi,", "Wake your other computers, on the same Wi-Fi,", "Troubleshoot: waking", 1),
     ]
 
 
@@ -769,7 +785,7 @@ def edits(ed):
     if ed in ("gift", "demo", "full"):  # 6.27: no edition but the master names the owner's other apps
         E += _blank(ed)
     if ed == "full":
-        E += _full_apps()
+        E += _full_apps() + _trouble_words()
     if not carries_desk(ed):  # the gift and demo editions carry none of the Desk's five apps (6.27); the full edition did not from 7.49 to 7.73
         E += _no_desk(ed)
     if not has_fabrica(ed):  # 6.27: the public editions

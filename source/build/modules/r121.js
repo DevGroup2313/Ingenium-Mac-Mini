@@ -64,6 +64,8 @@ function todayRows(){var rs=[],now=new Date();
   if(ps.length&&!SC.on("inbox"))ps=[];
   if(ps.length)rs.push({ico:"💭",text:ps.length===1?"One thought waits in the Inbox.":ps.length+" thoughts wait in the Inbox.",acts:x?[["Open the Inbox",function(){x.inbox();}]]:null});
   try{var run=typeof lxActive==="function"?lxActive():null;if(run&&run.status==="reading")rs.push({ico:"📖",text:"Lector is reading "+(run.name||"an app")+": "+(run.done||0)+" of "+(run.total||0)+" parts.",acts:[["Open Lector",function(){go("lector");}]]});}catch(e){}
+  /* 7.83: what other parts add to today (Vocatio's closing dates and follow-ups, r382) */
+  try{(window.__ingTodayRows||[]).forEach(function(f){try{(f()||[]).forEach(function(r){if(r&&r.text)rs.push(r);});}catch(e){}});}catch(e){}
   try{if(state.clep)rs.push({ico:"⏳",text:pomoTodayText().replace(/^\w/,function(c){return c.toUpperCase();})+".",acts:pomo.running?null:[["Start one",function(){pomoReset();pomoStart();redraw();SC.refresh();}]]});}catch(e){}
   return rs;}
 

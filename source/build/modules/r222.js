@@ -281,6 +281,10 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.83", "Vocatio's submission pack, first in What you send: what the posting asks you to send, each with its limit, its file name and where it stands, a final check, and the pack exported as the PDFs the portal expects. Vesta's Today lists the closing dates and the follow-ups due.", "career"],
+  ["7.83", "Nothing changes in this edition: 7.83 brings parts of Ingenium this edition does not carry.", "nofabrica"],
+  ["7.82", "Nothing changes in this edition: 7.82 brings parts of Ingenium this edition does not carry.", "nofabrica"],
+  ["7.83", "Settings has a Troubleshoot room: Ingenium's own check of this device, what went wrong since it started, and a report to copy and send to Ingenium's author.", "trouble"],
   ["7.82", "On Ingenia, every app's logo is a button: pressed, it sinks; let go, it knocks back up and its layers settle, as Ingenium's own logo does.", "master"],
   ["7.82", "Fabrica's little diamond stays in view when you press it: over it the pointer is a small ring, and while it spins the pointer steps aside.", "fabrica"],
   ["7.82", "Lector writes each document for its reader: a programme, a post or your portfolio. Its thinking, its notes and any citation that is none of your sources are taken out, and it starts from the drafts you keep in the recipe, changing only what is no longer true.", "lector"],
@@ -685,7 +689,7 @@ var NEW=[
 /* 7.46: in another person's profile (the full edition, R331) no line names her apps, as the full edition's page carries none
    (build/editions.py); which line names one is known to modules/r336.js alone, which only her master copy carries */
 function hersLine(t){try{return !!(W.IngNotHers&&typeof W.IngNotHers.hers==="function"&&W.IngNotHers.hers(t));}catch(e){return false;}}
-function newNow(){return NEW.filter(function(x){return (x[2]!=="lector"||has("page-lector"))&&(x[2]!=="career"||has("page-career"))&&(x[2]!=="nocareer"||!has("page-career"))&&(x[2]!=="fabrica"||has("page-fabrica"))&&(x[2]!=="nofabrica"||!has("page-fabrica"))&&(x[2]!=="master"||!!W.IngWorkshop)&&(!W.__ingGuest||!hersLine(x[1]))&&(x[2]!=="desk"||!!W.IngDesk);});}
+function newNow(){return NEW.filter(function(x){return (x[2]!=="lector"||has("page-lector"))&&(x[2]!=="career"||has("page-career"))&&(x[2]!=="nocareer"||!has("page-career"))&&(x[2]!=="fabrica"||has("page-fabrica"))&&(x[2]!=="nofabrica"||!has("page-fabrica"))&&(x[2]!=="master"||!!W.IngWorkshop)&&(x[2]!=="trouble"||!!W.IngChecks)&&(!W.__ingGuest||!hersLine(x[1]))&&(x[2]!=="desk"||!!W.IngDesk);});}
 function card(id,title,lede){var c=mk("div","card blx-guide");c.id=id;c.appendChild(mk("h3",null,title));if(lede){var p=mk("p","small muted",lede);p.style.marginTop="0";c.appendChild(p);}return c;}
 function dl(rows){var d=mk("dl");rows.forEach(function(r){d.appendChild(mk("dt",null,r[0]));d.appendChild(mk("dd",null,r[1]));});return d;}
 function guide(){var page=$("page-guide");if(!page)return;var added=false;

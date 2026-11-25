@@ -187,6 +187,7 @@ var IC={
   ai:svg('<path d="M10.5 3.5l1.6 4.6 4.6 1.6-4.6 1.6-1.6 4.6-1.6-4.6-4.6-1.6 4.6-1.6z"/><path d="M17.5 13.5l.9 2.4 2.4.9-2.4.9-.9 2.4-.9-2.4-2.4-.9 2.4-.9z"/>'),
   data:svg('<rect x="3.5" y="4" width="17" height="5" rx="1.5"/><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9"/><path d="M10 13h4"/>'),
   security:svg('<path d="M12 2.8l7.5 3v5.6c0 4.6-3.2 8.4-7.5 9.8-4.3-1.4-7.5-5.2-7.5-9.8V5.8z"/><path d="M8.8 12.2l2.2 2.2 4.4-4.6"/>'),
+  trouble:svg('<path d="M14.5 6.5a4 4 0 0 0-5.3 5.3L4 17v3h3l5.2-5.2a4 4 0 0 0 5.3-5.3l-2.4 2.4-2.6-.6-.6-2.6z"/>'),
   own:svg('<circle cx="8" cy="15.5" r="4"/><path d="M11 12.5l8.5-8.5M16.2 7.3l2.4 2.4M13.8 9.7l1.8 1.8"/>'),
   author:svg('<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>'),
   more:svg('<circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/>'),
@@ -221,6 +222,9 @@ var CONF={
       ids:["ingImportCard","bkCard","cloudCard","ingLockCard","stxCard",/^data on this device/]},
     /* 7.36: Security (modules/r318.js), her approved preview (18 November 2026, https://claude.ai/artifact/H4ieskf4TqQR7DXc6YSeAQ) */
     {k:"security",t:"Security",i:"security",says:"Everything Ingenium does to keep your work yours: sealed on this device, between your devices, and in what you ship. What is on, what is off, and what comes next.",ids:["secCard","profCard"]},
+    /* 7.83: Troubleshoot, the full edition's own room (modules/r381.js, r329.js); in the master it is the Author Studio's first room */
+    {k:"trouble",t:"Troubleshoot",i:"trouble",says:"Find what is wrong and see why: Ingenium's own check of this device, what went wrong since it started, and a report to copy and send to Ingenium's author.",ids:["tsHostFull"],
+      when:function(){try{return typeof ING_EDITION!=="undefined"&&ING_EDITION==="full";}catch(e){return false;}}},
     {k:"own",t:"Ownership",i:"own",says:"Who owns Ingenium, its licence, the permissions kept on this device, and its terms and privacy.",ids:["ingPermitCard","termsCard"]},
     /* 6.25: the Author Studio (modules/r226.js, the master edition only; in every other edition the room holds nothing, so its tab hides) */
     {k:"author",t:"Author Studio",i:"author",says:"Your master edition's Author Studio, the room behind the rooms: Ingenium's words, names and look, its checks and errors, your own parts and its own page, every change kept and undoable.",ids:["wsStudio"],
