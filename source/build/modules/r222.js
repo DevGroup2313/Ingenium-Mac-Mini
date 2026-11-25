@@ -281,6 +281,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.88", "What Ingenium knows: one place for what Ingenium knows about your apps and about you, each fact with where it came from. Your own facts come first; what it learns waits for you to keep it; chats use the facts that fit and say how many."],
+  ["7.88", "Ingenia: each app's folder has What Ingenium knows (its facts, its links and its timeline), and folders bring themselves up to date while you are away from the keyboard, with Undo."],
   ["7.87", "Chat and Code: an app in a reply shows as its card and in the stage beside the chat, its code folded under one bar (Show code opens it), while it is being written too."],
   ["7.87", "Ingenia: each app's logo has a press of its own, made from its own seal: Carpe Diem's sun rises, The Forge's anvil takes a blow, Inkwell's quill dips, Clavis's key turns, Lakay's shell spirals; Ingenium keeps its knock.", "master"],
   ["7.86", "Ingenium's models: a fifth house, Oracle, with the strongest open models there are, shown on every device with the memory each needs, so a stronger computer can use them later."],

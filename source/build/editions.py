@@ -81,6 +81,7 @@ def skip_modules(ed):
     out |= {"r258.js"}  # 6.65: her build library on the Folders page, the master's alone (it names her apps; modules/r208.js calls it only where it is)
     out |= {"r297.js"}  # 7.07: Ingenium's own rules in Ingenium's folder, the master's alone (her rules for building Ingenium)
     out |= {"r323.js"}  # 7.45: her DPhil plan in Vocatio (7.40), the master's alone: her plans, her answers and her deadline
+    out |= {"r388.js"}  # 7.87: each of her apps' logos with a press of its own (it names her apps), the master's alone
     out |= {"r387.js"}  # 7.86: what her apps are, in her words (it names her apps), the master's alone
     out |= {"r345.js"}  # 7.55: the record of Ingenium's security, profiles and design, put into Ingenium's folder, the master's alone (her ways and her apps' plans)
     if has_fabrica(ed) and carries_desk(ed):

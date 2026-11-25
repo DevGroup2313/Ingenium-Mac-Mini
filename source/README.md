@@ -395,6 +395,19 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.88 (25 November 2026): what Ingenium knows, stage 1.
+
+- Her words (25 November 2026): "I approve of all your recommendations, please build them into the app". Stage 1 (`r390.js`, new): one
+  store of what Ingenium knows (state.know, so it goes with backups and Ingenium Cloud): facts about each app and about her (her memories,
+  read where they are kept), each with where it came from, when and who gave it; her facts first and never overwritten (r386's facts of
+  what an app is now live here); a fact naming a system hers do not is shown as disagreeing with hers. It learns, asking first: a new
+  decision in a folder's notes and a version Fabrica keeps wait for her (Keep, Change, Not this; what she leaves out is not suggested
+  again). Folders bring themselves up to date when she has been away from the keyboard three minutes, one at a time, with Undo. A chat
+  draws the facts that fit (hers first), a chat in an app's folder all of that app's, and the reply says Used N facts. Seen in each
+  app's folder (What Ingenium knows: its facts, its links, its timeline) and in Settings, Your data, Memory (Waiting for you, Find a
+  fact, each app, three switches). The map's 3D head waits for her choice among the designs.
+  Test: rig/t_788_know.js (10 checks).
+
 Ingenium 7.87 (25 November 2026): an app in a reply shows as the app; each app's logo with a press of its own.
 
 - Her words (25 November 2026): "I don't want to see the entire code of the HTML all laid out, it makes it really hard to navigate the
