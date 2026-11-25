@@ -395,6 +395,24 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.91 (25 November 2026): restore points, one thing brought back, a backup checked.
+
+- Stage 2 of the recommendations she approved (25 November 2026: "proceed with stage 2: backups, restore points and Cloud").
+  `r393.js`, new, in Settings, Your data, Back up and move, under the backup: restore points of the whole desk in the device's larger
+  store (IndexedDB), sealed with her lock when it is on (IngLock.sealText): once a day, before a new version first opens, before a
+  backup is restored or merged (which covers what Ingenium Cloud brings in) and at her press; the last 30 kept, each with when, why and
+  what it held. Bring all of it back (the desk of now kept first), or one thing: a conversation, an app's folder notes, the facts
+  Ingenium knew. Check a backup: the file opened and every part's fingerprint checked, what it holds said, nothing changed.
+  Test: rig/t_791_points.js (9 checks).
+- Memory's head is Memory's header. Her words (25 November 2026): "The memory brain 3D header looks odd placed at the bottom of the
+  page like that, its a header for a reason and should be appropriately placed instead of looking like a last minute add-on. It is the
+  literal brain of Ingenium and as such it needs to be properly showcased". Found: Settings (`r234.js`) showed only the cards it knew
+  under each key of Your data; it did not know the head, so the head stood under every key, after whatever was there; What Ingenium
+  knows, restore points and scheduled backups all fell under Sign-in and reset. Now `r392.js` puts the head first in Memory, above
+  Memory's own card, as tall as the heads of Ingenium's pages (growing with a taller screen), its words beside the mind; Memory's own card
+  no longer repeats a header under it. `r234.js` sorts the head, Memory's card and What Ingenium knows under Memory, and the backup,
+  restore points and scheduled backups under Back up and move. Tests: rig/t_791_head.js (7 checks); rig/t_790_head.js follows the head.
+
 Ingenium 7.90 (25 November 2026): Memory's head, the constellation mind.
 
 - Her choice (25 November 2026): "I choose Design B - The Constellation mind design and animation, please refine and elevate the design"

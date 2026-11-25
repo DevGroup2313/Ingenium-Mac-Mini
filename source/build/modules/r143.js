@@ -192,7 +192,7 @@ var KNOWN=["ingenium_big","ingenium_apps","ingenium_repos","ingenium_hub","ingen
 var DATA_DBS=["ingenium_big","ingenium_apps","ingenium_repos","ingenium_claude"];
 /* never in a backup: the model files, file links and the engine (ingenium_files and its older name), and the desk's
    overflow copy (the desk itself goes whole, in desk/state.json) */
-var NEVER={ingenium_files:1,the_foundry_files:1,ingenium_desk:1,ingenium_cloudkey:1};  /* 6.57: and Ingenium Cloud's key, which never leaves the device it was made on (modules/r255.js) */
+var NEVER={ingenium_files:1,the_foundry_files:1,ingenium_desk:1,ingenium_cloudkey:1,ingenium_points:1,ingenium_conflicts:1};  /* 7.91: and the restore points (r393) and the conflicts kept aside (r394): each device's own */  /* 6.57: and Ingenium Cloud's key, which never leaves the device it was made on (modules/r255.js) */
 var LABEL={ingenium_big:"Long texts (the large store)",ingenium_apps:"Your app library",ingenium_repos:"Fabrica's apps, with every version",
   ingenium_hub:"Fabrica's issues, pull requests and pages",ingenium_claude:"Conversations you brought in from elsewhere",ingenium_keys:"Signing keys",fabrica_made:"Fabrica's packages",
   "ingenium-buildlib":"Your build library (the notes on how your apps were built)"};  /* 6.65: modules/r258.js; it goes in a backup and over Ingenium Cloud as any other store does */
@@ -544,7 +544,7 @@ function make(o){o=o||{};var say=o.onProgress||function(){},sig=o.signal||{},api
     .then(function(){return listDbs();})
     .then(function(names){DATA_DBS.forEach(function(db){if(names.indexOf(db)<0)m.absent.push(db);});
       /* every store this page holds is named in the manifest: those that go, and those left out with the reason */
-      var WHY={ingenium_files:"model files, file links and the engine: models never go in a backup",the_foundry_files:"an older name of the same store",ingenium_desk:"the desk's overflow copy: the desk itself goes whole (desk/state.json)",
+      var WHY={ingenium_files:"model files, file links and the engine: models never go in a backup",the_foundry_files:"an older name of the same store",ingenium_desk:"the desk's overflow copy: the desk itself goes whole (desk/state.json)",ingenium_points:"restore points: each device keeps its own",ingenium_conflicts:"what two devices both changed, kept aside on this device for you to choose",
         ingenium_keys:o.keys?"locked with the password (secrets.enc)":"not chosen",fabrica_made:"not chosen",ingenium_hub:"read through Fabrica's own export (fabrica/hub.json)"};
       m.excluded=[];
       /* 6.57: Ingenium Cloud leaves out what each device keeps for itself (o.leave: the app library, whose builds every Ingenium carries) */

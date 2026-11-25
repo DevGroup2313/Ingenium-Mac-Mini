@@ -163,7 +163,7 @@ function roomCard(){var mem=D.getElementById("memRoomCard");if(!mem||!mem.parent
   c=mk("section","card kn-card");c.id="knRoom";c.setAttribute("aria-label","What Ingenium knows");mem.parentNode.insertBefore(c,mem.nextSibling);return c;}
 function paintRoom(){var c=roomCard();if(!c)return;var k=K(),A=apps(),W1=waiting();c.innerHTML="";
   var hd=mk("div","kn-add");var h=mk("h3",null,"What Ingenium knows");h.style.margin="0";h.style.flex="1 1 auto";hd.appendChild(h);c.appendChild(hd);
-  var kept=k.facts.filter(function(f){return f.st==="kept";}).length,mems=memFacts().length;var ch=mk("div","kn-chips");ch.appendChild(mk("span","kn-chip",A.length+" apps · "+(kept+mems)+" facts"));
+  var kept=k.facts.filter(function(f){return f.st==="kept";}).length,mems=memFacts().length;var ch=mk("div","kn-chips");ch.appendChild(mk("span","kn-chip",A.length+" app"+(A.length===1?"":"s")+" · "+(kept+mems)+" fact"+((kept+mems)===1?"":"s")));
   ch.appendChild(mk("span","kn-chip"+(W1.length?" warn":""),W1.length?W1.length+" wait for you":"Nothing waits"));c.appendChild(ch);
   c.appendChild(mk("p","small muted","One place for what Ingenium knows about your apps and about you, each fact with where it came from. Chats draw on it, and a chat in an app's folder starts from it. It is kept on this device, goes with your backups, and travels with Ingenium Cloud when you use it."));
   if(W1.length){var ws=mk("div","kn-sec");ws.appendChild(mk("h4",null,"Waiting for you"));var wl=mk("ul","kn-list");W1.forEach(function(f){wl.appendChild(row(f,"all"));});ws.appendChild(wl);c.appendChild(ws);}

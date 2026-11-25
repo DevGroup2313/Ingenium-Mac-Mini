@@ -281,6 +281,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.91", "Memory opens on its mind: the constellation of what Ingenium knows is now Memory's header, first and full height, and shows only under Memory. What Ingenium knows sits under Memory too, so a star you press opens its facts in view; restore points and scheduled backups sit under Back up and move."],
+  ["7.91", "Restore points: your whole desk kept every day and before anything big changes it; bring all of one back, or just one conversation, an app's notes or what Ingenium knew. Check a backup: Ingenium opens it and checks every part without changing anything."],
   ["7.90", "Memory opens on the constellation mind: your apps are its brightest stars, twinkling in their own colours and linked by lines of light; press a star to read what Ingenium knows about it."],
   ["7.89", "Cool running: every moving scene (Adamas's diamond, Vesta's stones, Fabrica's tree and the rest) draws at most 30 frames a second, at a lighter resolution, so your computer and phone stay cool and quiet; text stays as sharp as before."],
   ["7.88", "What Ingenium knows: one place for what Ingenium knows about your apps and about you, each fact with where it came from. Your own facts come first; what it learns waits for you to keep it; chats use the facts that fit and say how many."],

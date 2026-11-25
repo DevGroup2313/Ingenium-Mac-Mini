@@ -9,8 +9,15 @@
    real: Ingenium to every app, and an app to another when one's facts name the other. Press a star: its links light and its facts open
    below. Refined from the preview: names never sit on one another; the stars nearer stand larger and clearer, those behind fade.
    Light on her devices (her rule of 25 November): it draws only while it is on screen and Ingenium is in use, at most 30 frames a
-   second at a lighter resolution (r391), and holds still 30 seconds after she last touched it; Minimal motion holds it still. */
-#knHead{position:relative;min-height:400px;border-radius:28px;overflow:hidden;margin:0 0 16px;isolation:isolate;
+   second at a lighter resolution (r391), and holds still 30 seconds after she last touched it; Minimal motion holds it still.
+   7.91, her words (25 November 2026): "The memory brain 3D header looks odd placed at the bottom of the page like that, its a header for a
+   reason and should be appropriately placed instead of looking like a last minute add-on. It is the literal brain of Ingenium and as such
+   it needs to be properly showcased". Found: Settings (r234) showed only the cards it knew under each key of Your data, and it did not
+   know the head, so the head stood under every key (Back up and move, Sign-in and reset), after whatever was there; What Ingenium knows
+   fell under Sign-in and reset, so a star pressed opened nothing in view. Now the head opens the Memory section, first, above Memory's own
+   card, taller, as the heads of Ingenium's pages are; it is shown under Memory only (and in Show every setting at once); What Ingenium
+   knows follows under Memory, where a star pressed opens its facts. */
+#knHead{position:relative;min-height:clamp(440px,52vh,580px);border-radius:28px;overflow:hidden;margin:0 0 16px;isolation:isolate;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 3px 0 rgba(96,62,150,.14),0 18px 40px rgba(60,34,110,.16)}
 #knHead canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab}
 #knHead .kh-fade{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(236,226,250,.94) 0%,rgba(236,226,250,.66) 30%,rgba(236,226,250,0) 52%)}
@@ -24,6 +31,11 @@ body[data-theme="night"] #knHead .kh-fade{background:linear-gradient(90deg,rgba(
 #knHead .kh-say{position:absolute;right:22px;bottom:16px;z-index:2;text-align:right;pointer-events:none;font:600 12px/1.4 var(--sans,system-ui,sans-serif);color:var(--ink-3)}
 @media (max-width:860px){#knHead{min-height:560px}#knHead .kh-words{max-width:none}#knHead .kh-fade{background:linear-gradient(180deg,rgba(236,226,250,.95) 0%,rgba(236,226,250,.7) 42%,rgba(236,226,250,0) 64%)}
   body[data-theme="night"] #knHead .kh-fade{background:linear-gradient(180deg,rgba(17,11,32,.95) 0%,rgba(17,11,32,.65) 42%,rgba(17,11,32,0) 64%)}}
+/* 7.91: Memory's header; Memory's own card under it opens on its line, without a second header */
+#knHead{display:flex;align-items:center}
+@media (max-width:860px){#knHead{align-items:flex-start}}
+#knHead + #memRoomCard > .mr-eye,#knHead + #memRoomCard > h2.mr-h{display:none}
+#knHead + #memRoomCard > .mr-say{font:600 15px/1.45 var(--sans,system-ui,sans-serif);color:var(--mr-ink1,var(--ink-1));margin:2px 0 6px}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p392"]="started";}catch(_){}
 (function r392(){"use strict";
@@ -93,7 +105,8 @@ function wake(){lastUse=performance.now();if(!raf)raf=requestAnimationFrame(loop
 function hitAt(x,y){for(var i=hits.length-1;i>=0;i--){var h=hits[i];if(Math.hypot(h.x-x,h.y-y)<h.r)return h.ab;}return null;}
 function chips(){var A=apps(),K=W.IngKnow?IngKnow.store():{facts:[]},kept=(K.facts||[]).filter(function(f){return f.st==="kept";}).length,wt=(K.facts||[]).filter(function(f){return f.st==="waiting";}).length;
   var c=host&&host.querySelector(".kh-chips");if(!c)return;c.innerHTML="";var a=D.createElement("span");a.className="kn-chip";a.textContent=A.length+" app"+(A.length===1?"":"s")+" · "+kept+" fact"+(kept===1?"":"s");c.appendChild(a);var b=D.createElement("span");b.className="kn-chip"+(wt?" warn":"");b.textContent=wt?wt+" wait for you":"Nothing waits";c.appendChild(b);}
-function mount(){var room=D.getElementById("knRoom");if(!room||!room.parentNode)return false;host=D.getElementById("knHead");
+function anchor(){return D.getElementById("memRoomCard")||D.getElementById("knRoom");}  /* 7.91: first in Memory, above its own card */
+function mount(){var room=anchor();if(!room||!room.parentNode)return false;host=D.getElementById("knHead");
   if(!host){host=D.createElement("section");host.id="knHead";host.setAttribute("aria-label","What Ingenium knows, as a constellation");
     host.innerHTML='<div class="kh-fade"></div><div class="kh-words"><div class="kh-eye">Memory</div><h2>What Ingenium knows</h2><p>Your apps are the brightest stars of the mind, each in its own colour; the lines of light between them are what links them. Press a star to read what Ingenium knows about it.</p><div class="kn-chips kh-chips"></div><div class="kh-keys"></div></div><div class="kh-say">Drag to turn it; press a star</div>';
     var keys=host.querySelector(".kh-keys");[["Waiting for you",function(){var w=D.querySelector("#knRoom .kn-row.wait");if(w)w.scrollIntoView({block:"center",behavior:"smooth"});},true],["Find a fact",function(){var f=D.getElementById("knFind");if(f){f.scrollIntoView({block:"center",behavior:"smooth"});setTimeout(function(){try{f.focus({preventScroll:true});}catch(e){}},400);}}]].forEach(function(k){var b=D.createElement("button");b.type="button";b.className="btn small"+(k[2]?" primary":"");b.textContent=k[0];b.onclick=k[1];keys.appendChild(b);});
@@ -109,7 +122,7 @@ function mount(){var room=D.getElementById("knRoom");if(!room||!room.parentNode)
   if(host.nextSibling!==room)room.parentNode.insertBefore(host,room);
   if(!P){P=cloud(900,1.3);AIR=sparkles(60);for(var i=0;i<P.length;i++){var best=[];for(var j=0;j<P.length;j++){if(i===j)continue;var a=P[i].p,b=P[j].p;best.push([(a[0]-b[0])*(a[0]-b[0])+(a[1]-b[1])*(a[1]-b[1])+(a[2]-b[2])*(a[2]-b[2]),j]);}best.sort(function(x,y){return x[0]-y[0];});for(var q=0;q<2;q++)if(i<best[q][1]&&best[q][0]<0.03)PAIRS.push([i,best[q][1]]);}}
   model=build();chips();size();draw(performance.now());wake();return true;}
-(function start(){var n=0;(function w(){if(W.__ingReady===true){setInterval(function(){try{var r=D.getElementById("knRoom");if(r&&(!host||host.nextSibling!==r||!host.isConnected))mount();else if(host&&host.isConnected){var m2=build(),sg=m2?m2.nodes.map(function(n){return n.name+":"+n.wait;}).join("|")+"#"+m2.links.length:"";if(sg!==SIG){SIG=sg;model=m2;chips();if(!raf)draw(performance.now());}}}catch(e){}},2000);return;}if(++n<400)setTimeout(w,500);})();})();
+(function start(){var n=0;(function w(){if(W.__ingReady===true){setInterval(function(){try{var r=anchor();if(r&&(!host||host.nextSibling!==r||!host.isConnected))mount();else if(host&&host.isConnected){var m2=build(),sg=m2?m2.nodes.map(function(n){return n.name+":"+n.wait;}).join("|")+"#"+m2.links.length:"";if(sg!==SIG){SIG=sg;model=m2;chips();if(!raf)draw(performance.now());}}}catch(e){}},2000);return;}if(++n<400)setTimeout(w,500);})();})();
 W.IngMindHead={mount:mount,model:function(){return model;},live:live,wake:wake,frames:function(){return lastDraw;}};
 })();
 ;try{window.__ingParts["p392"]="running";}catch(_){}
