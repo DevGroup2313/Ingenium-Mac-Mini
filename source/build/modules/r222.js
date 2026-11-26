@@ -281,6 +281,12 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.97", "Mentes, Health: each model's card and the readings above it lie flat, as Your models' cards do, and pop out with Ingenium's raised lift only under the pointer."],
+  ["7.97", "Adamas: Show the preview and Show the code appear whenever their panel is closed or hidden, and bring it back; a large app opened part by part says so, and its Close key names it. Display has Bring back every panel, for every page."],
+  ["7.97", "The Engine panel, from the top bar: Unload, naming the model, and Load stand first, right under the model in use."],
+  ["7.97", "Ingenia: an app's logo on its folder page is a real button: it goes down into a socket while you hold it, springs back, and plays a flourish, a different one each time; Ingenium's seal plays its own, as on Home."],
+  ["7.97", "Fabrica's tree: the little hand is back over the diamond, the glass bulbs and the parts, smaller, and it steps aside while the diamond spins."],
+  ["7.97", "The Mac and Windows apps always quit when their window closes, stopping the engine first; a model's file is found again wherever Ingenium keeps models, built-in models included."],
   ["7.96", "In a chat, the list of what Ingenium remembered has a Close key: it puts the list away for that chat, until a later answer brings memories it has not shown you."],
   ["7.96", "Memoria's words name only the pages this copy has; the words under lending say that the screen now stays on while a computer lends."],
   ["7.95", "Mentes, Health: each model's card and the four readings above it rise under the pointer with Ingenium's raised lift, as the sticky notes do; they had lain flat."],

@@ -395,6 +395,40 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.97 (26 November 2026): Health's cards flat at rest; every closed panel comes back; Unload first; the logos press; the hand on Fabrica's tree; the app always quits; a model's file found again.
+
+- Her words (26 November 2026, on 7.95): "I want the models cards to stay flat and just have the lifted 3D popped out effect when I hover
+  the mouse on it, not just have it look poppped out and 3D at rest all the time ... I want the same effect that the "Your models" and
+  "Where your models are kept" sections have to be applied to the Health section." `r398.js`, corrected: each model's card and each
+  reading rest as Your models' cards rest (the pale card ground and a hairline), and under the pointer the white face fades in, the raised
+  shadow comes up and the card rises 3 pixels. Test: rig/t_797_health.js (by day and by night; part (1) of rig/t_795_lift_awake.js expected the raised look she refused).
+- Adamas (her words: "I have no way of bringing the Live Preview panel back when I close it ... When I close either side of the panels on
+  the Adamas page, I have no way of bringing either one of them back"). The cause: the base page's Show preview and Show keys were hidden by
+  an inline style that outweighed the rule meant to show them. `r400.js`: they show (Show the preview, Show the code), raised; closing the
+  preview gives the code its width back; a page opened part by part says so and its Close key names it, and once closed the sample comes
+  back; Display, App, Panels: Bring back every panel (window.IngPanels.restore). A search of every element the page hides inline found no
+  other key of the kind. Test: rig/t_797_panels.js (12 checks).
+- The Engine panel (her words: "The unload button is far too low on the Engine panel, it needs to be one of the first option I see next
+  to the model"). `r374.js`: Load and Unload (naming the model) stand right under the card that names the model in use.
+- Ingenia's logos (her words: "I want the apps logos to sink and actually look pressed and clicked on ... I want them to feel like real 3D
+  app buttons"). `r402.js` (window.IngAppKeyPress): held, the open folder's logo goes down into a socket that shows only then; let go, it
+  springs back and plays a flourish, a different one each time (hop, twirl, spin, wobble, pulse, flip; held over half a second, a full spin
+  with a glow); Ingenium's seal plays the seal key's set on its own layers (star, ring, heart stone); each app's own press (r388) still
+  plays inside. Test: rig/t_797_logo_press.js (11 checks).
+- Fabrica's tree (her words: "I want the little hand clicker reinstated ... made slightly smaller"). `r401.js`: the pointing hand, about
+  four fifths of the system's, over the diamond, a glass bulb or a part, by day and by night; it still steps aside while the diamond
+  spins. Test: rig/t_797_hand.js (6 checks).
+- The computer apps (her words: "I am also having issues with simply closing the app, it never does and I keep on seeing the little
+  spinning rainbow wheel"; and the Windows Full edition: "the built-in models do not work ... the Mellum model also refused to load").
+  `desktop/app_quit_models_797.py`: when the window closes, the engine, the trainer and lending are stopped and the app ends at once; a
+  watch started at the close ends it at most 8 seconds later whatever is left running, writing to the crash log which threads were still
+  running. A model's file is found again before the app says it is gone: the list read again, the built-in models asked for, then every
+  name the file can have, in every place Ingenium keeps models. The Windows build now has the Full and Gift apps load a built-in model in
+  their self-test too (a warning, never fatal). Neither fault could be watched on her own computers, so their causes are not proven; the
+  crash log will say more if either comes back. Test: python3 -I rig/t_797_app.py (models, quit, closed).
+- Held: `r403.js` (the nature sound Noel, made for the name: Noël, Christmas, a robin in the frost, wind in the pines, bells far off; and
+  Snowfall, Summer night, Autumn wind) waits for her answer to the four samples.
+
 Ingenium 7.96 (26 November 2026): the chat's memory list has a Close key; Memoria names only the pages a copy has; the words under lending.
 
 - Her words (26 November 2026, in her answers): "the memory card does not have a "Close" option inside of the chat panel, once opened inside

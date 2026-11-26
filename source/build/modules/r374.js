@@ -129,6 +129,7 @@ body[data-theme="night"] #ingEngine .pk:hover{background:linear-gradient(rgba(18
 #ingEngine .plate{font:700 10px/1 var(--l-sans);letter-spacing:.1em;text-transform:uppercase;padding:6px 9px;border-radius:999px;box-shadow:var(--l-pill);background:linear-gradient(var(--l-a),var(--l-b));white-space:nowrap}
 #ingEngine .plate.ok{color:var(--l-ok)}#ingEngine .plate.ld{color:#b8701a}#ingEngine .plate.rec{color:var(--l-acc)}
 #ingEngine .ie-keys{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 16px 4px}
+#ingEngine .ie-keys.ie-keys-top{margin:10px 16px 6px}
 #ingEngine .ie-r{display:grid;grid-template-columns:74px 1fr 80px;align-items:center;gap:10px;margin:8px 18px 0}
 #ingEngine .ie-r label,#ingEngine .ie-r .l{font:600 12.5px/1.2 var(--l-sans);color:var(--l-ink2)}
 #ingEngine .ie-r output{font:600 13px/1 var(--l-sans);font-variant-numeric:tabular-nums;text-align:right;color:var(--l-ink1)}
@@ -226,8 +227,21 @@ function choose(m){try{if(linked()&&W.IngLend&&IngLend.useDevice)IngLend.useDevi
   if(!(loaded()&&loaded().id===m.id)){try{loadActiveModel();}catch(e){}}
   paintSoon();}
 function chooseLent(c,model){try{IngLend.use(c.id,model);}catch(e){}setTimeout(paint,400);}
+/* 7.97: Load and Unload stand right under the card that names the model, first of all (her words, 26 November 2026: "The unload button
+   is far too low on the Engine panel, it needs to be one of the first option I see next to the model so that I can click to unload it
+   with ease instead of having to scroll and search for it"); before, they came after the whole list of models. Unload names the model. */
+function keysRow(){var L=lent(),l=loaded(),s=st(),ch=chosen();
+  var ks=mk("div","ie-keys ie-keys-top"),ld=mk("button","k pri","Load"),ul=mk("button","k ie-unload",l&&!L?"Unload "+(l.customName||l.name||"the model"):"Unload"),mn=mk("button","lnk","Your models, in Mentes");ld.type=ul.type=mn.type="button";
+  if(ch&&!(l&&l.id===ch.id))ld.textContent="Load "+(ch.customName||ch.name||"the model");
+  ld.disabled=!!L||!ch||s==="loading"||!!(l&&ch&&l.id===ch.id);ul.disabled=s==="loading"||!(l&&!L);
+  ul.title="Frees the memory the model holds; Load brings it back";
+  ld.onclick=function(){click();try{loadActiveModel();}catch(e){}paintSoon();};
+  ul.onclick=function(){click();try{Promise.resolve(Engine.unload()).then(function(){try{renderEngineCtl();renderModels();}catch(e){}paint();});}catch(e){}};
+  mn.onclick=function(){close();try{go("models");}catch(e){}};
+  if(l&&!L){ks.appendChild(ul);ks.appendChild(ld);}else{ks.appendChild(ld);ks.appendChild(ul);}ks.appendChild(mn);return ks;}
 function paint(){if(!P)return;var b=$("ieBody"),keep=b.scrollTop;b.innerHTML="";
   b.appendChild(stateCard());
+  b.appendChild(keysRow());
   b.appendChild(mk("div","ie-sec","Every page writes with it"));var pg=mk("div","ie-pages");pagesHere().forEach(function(p){var s=mk("span","pk");s.innerHTML=svg(p[2])+esc(p[1]);pg.appendChild(s);});b.appendChild(pg);
   b.appendChild(mk("div","ie-sec","Choose the model"));
   var ch=chosen(),L=lent(),l=loaded(),s=st(),rec=recId();
@@ -241,11 +255,6 @@ function paint(){if(!P)return;var b=$("ieBody"),keep=b.scrollTop;b.innerHTML="";
   comps().forEach(function(c){var g=mk("div","ie-grp");g.innerHTML=svg("M4 5h16v10H4zM2 19h20")+esc("Lent by "+c.name+(c.status&&c.status!=="ok"?" (not answering now)":"")+", over your Wi-Fi");b.appendChild(g);
     var li=mk("div","ie-list");(c.models||[]).forEach(function(md){var on=!!(L&&L.id===c.id&&L.model===md);
       li.appendChild(row(md,"Runs on "+c.name+" · nothing loads here",["#b79ce6","#5d37a1"],"",on?'<span class="plate ok">In use</span>':'',on,function(){chooseLent(c,md);}));});b.appendChild(li);});
-  var ks=mk("div","ie-keys"),ld=mk("button","k pri","Load"),ul=mk("button","k","Unload"),mn=mk("button","lnk","Your models, in Mentes");ld.type=ul.type=mn.type="button";
-  ld.disabled=!!L||!ch||s==="loading"||!!(l&&ch&&l.id===ch.id);ul.disabled=s==="loading"||!(l&&!L);
-  ld.onclick=function(){click();try{loadActiveModel();}catch(e){}paintSoon();};
-  ul.onclick=function(){click();try{Promise.resolve(Engine.unload()).then(function(){try{renderEngineCtl();renderModels();}catch(e){}paint();});}catch(e){}};
-  mn.onclick=function(){close();try{go("models");}catch(e){}};ks.appendChild(ld);ks.appendChild(ul);ks.appendChild(mn);b.appendChild(ks);
   /* Reply, Memory and Effort for the model, through the one record (r249), as the Controls sheet sets them (r321) */
   var k=gkey(),g=G();if(g&&k&&k!=="none"){var v=vals(k),m=ch;b.appendChild(mk("div","ie-sec","For "+(L?(L.model||"the lent model"):(m?m.customName:"this model"))));
     function range(lab,min,max,step,val,field,say){var r=mk("div","ie-r"),l2=mk("label",null,lab),i=D.createElement("input"),o=mk("output",null,fmt(val));i.type="range";i.min=String(min);i.max=String(max);i.step=String(step);if(val%step||val<min)i.step="any";i.value=String(val);
