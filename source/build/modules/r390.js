@@ -15,7 +15,9 @@
    - Used everywhere: a chat draws the facts that fit what is asked (hers first), and a chat in an app's folder all of that app's facts;
      under the reply, Used N facts lists them.
    - Seen in two places: Settings, Your data, Memory (Waiting for you, Find a fact, each app's facts, the switches) and each app's folder
-     in Ingenia (What Ingenium knows about it, its links, its timeline). Every card, row and key stands raised and answers the pointer. */
+     in Ingenia (What Ingenium knows about it, its links, its timeline). Every card, row and key stands raised and answers the pointer. 
+   7.99 (26 November 2026): a fact she leaves out in the atlas (r406 sets f.off) stays kept and shown, but is given to no model: the chat's
+   facts (fit), a folder's facts (IngFolderFab.lines) and an app's own words (IngAppFacts.block) all pass it by. */
 .kn-card{display:grid;gap:12px}
 .kn-sec{display:grid;gap:8px}
 .kn-sec>h4{margin:6px 0 0;font:600 12px/1.2 var(--sans,system-ui,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
@@ -92,7 +94,7 @@ function bridge(){var A=W.IngAppFacts;if(!A||A.__r390)return;var F=W.state.appFa
   Object.keys(F).forEach(function(n){(F[n]||[]).forEach(function(x){var f=add(appKey(n),x.t,{k:"her",label:x.her?"your words":"yours",at:x.at});if(f&&x.at)f.at=Date.parse(x.at)||f.at;});});
   var oAdd=A.add;A.add=function(n,t){var r=oAdd?oAdd.apply(A,arguments):false;add(appKey(n),t,{k:"her",label:"yours"});return r;};
   A.of=function(n){return of(appKey(n),"kept").filter(function(f){return f.src&&f.src.k==="her";}).map(function(f){return {t:f.t,src:"her",at:day(f.at)};});};
-  A.block=function(n){var L=of(appKey(n),"kept");if(!L.length)return "";return "WHAT THE APP IS, AS I HAVE SAID IT AND AS INGENIUM KNOWS IT (what I said is true above everything else here; never name a system, device or platform these facts do not name):\n"+
+  A.block=function(n){var L=of(appKey(n),"kept").filter(function(f){return !f.off;});if(!L.length)return "";return "WHAT THE APP IS, AS I HAVE SAID IT AND AS INGENIUM KNOWS IT (what I said is true above everything else here; never name a system, device or platform these facts do not name):\n"+
     L.map(function(f){return "- "+f.t+(f.src&&f.src.k==="her"?" (mine)":"");}).join("\n");};A.__r390=1;}
 /* ---------- learning, asking first: new decisions in a folder's notes, and what Fabrica writes in its log ---------- */
 function learn(){var k=K();if(!k.opts.learn)return 0;var n=0;
@@ -113,7 +115,7 @@ function undo(p){var k=K(),u=k.undo[p.id];if(!u)return;var a=p.app;a.brief=u.bri
 /* ---------- used everywhere: a chat draws the facts that fit; a chat in an app's folder, all of that app's ---------- */
 function toks(t){return (String(t||"").toLowerCase().match(/[a-z0-9À-ɏ]{3,}/g)||[]);}
 function fit(q,cap){var Q={};toks(q).forEach(function(w){Q[w]=1;});var A=apps(),names=A.filter(function(p){return toks(p.name).some(function(w){return Q[w];});}).map(function(p){return appKey(p.name);});
-  var F=K().facts.filter(function(f){return f.st==="kept";}).map(function(f){var s=toks(f.t).filter(function(w){return Q[w];}).length+(names.indexOf(f.about)>=0?3:0)+(f.src&&f.src.k==="her"?1:0);return {f:f,s:s};})
+  var F=K().facts.filter(function(f){return f.st==="kept"&&!f.off;}).map(function(f){var s=toks(f.t).filter(function(w){return Q[w];}).length+(names.indexOf(f.about)>=0?3:0)+(f.src&&f.src.k==="her"?1:0);return {f:f,s:s};})
     .filter(function(x){return x.s>=2;}).sort(function(a,b){return b.s-a.s;});var out=[],n=0;F.forEach(function(x){var line="- "+nameOf(x.f.about)+": "+x.f.t;if(n+line.length>cap)return;out.push(x.f);n+=line.length;});return out;}
 function wrapMem(){if(typeof W.memLayer!=="function"||W.memLayer.__r390)return;var o=W.memLayer;
   var nm=function(budget){var r=o.apply(this,arguments)||"";try{var msgs=W.curMsgs?W.curMsgs():[],q=msgs.filter(function(m){return m.role==="me";}).slice(-2).map(function(m){return m.text||"";}).join("\n");
@@ -123,7 +125,7 @@ function wrapMem(){if(typeof W.memLayer!=="function"||W.memLayer.__r390)return;v
   nm.__r390=1;W.memLayer=nm;try{memLayer=nm;}catch(e){}}
 /* a chat in an app's folder: all of that app's kept facts go with the folder's notes (r208 asks IngFolderFab for its lines) */
 function wrapFolder(){var F=W.IngFolderFab;if(!F){F=W.IngFolderFab={lines:function(){return "";}};}if(F.__r390)return;var ol=F.lines,oc=F.card;
-  F.lines=function(p){var r=ol?ol.apply(this,arguments):"";try{var L=of(appKey(p.name),"kept");if(L.length)r=(r?r+"\n\n":"")+"What Ingenium knows about "+p.name+" (what I said is true above everything else):\n"+L.map(function(f){return "- "+f.t+(f.src&&f.src.k==="her"?" (mine)":"");}).join("\n");}catch(e){}return r;};
+  F.lines=function(p){var r=ol?ol.apply(this,arguments):"";try{var L=of(appKey(p.name),"kept").filter(function(f){return !f.off;});if(L.length)r=(r?r+"\n\n":"")+"What Ingenium knows about "+p.name+" (what I said is true above everything else):\n"+L.map(function(f){return "- "+f.t+(f.src&&f.src.k==="her"?" (mine)":"");}).join("\n");}catch(e){}return r;};
   F.card=function(p,host,ui){var r=oc?oc.apply(this,arguments):undefined;try{folderCard(p,host,ui);}catch(e){try{console.warn("r390 folder card",e);}catch(_){}}return r;};F.__r390=1;}
 /* ---------- under a reply: Used N facts ---------- */
 function wrapMsg(){if(typeof W.fillMsg!=="function"||W.fillMsg.__r390)return;var o=W.fillMsg;

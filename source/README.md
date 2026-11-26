@@ -395,6 +395,22 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.99 (26 November 2026): Memoria's What it knows becomes an atlas of plates, chosen from two directions drawn in the real page.
+
+- Her words (26 November 2026): "the Memoria page looks super plain and basic"; of the first redesign (r405, never released):
+  "lackluster", "a clustered mess. It does not look tidy and organised"; then, shown a card cabinet and a star atlas drawn under the real
+  head: "I choose direction B- the atlas." `r406.js`: a medallion for each plate (Waiting, You, and each app in the colour of its star in
+  the head), Find a fact on every plate, and one plate at a time: a round chart where each fact is a star (her words near the middle, what
+  was learned further out, what waits as a hollow star), the chosen star read large with its source, its date and how many chats used it
+  this week, and the key of every star. Keys where they act: Keep and Not this; Keep mine, Keep the new one and Keep both beside a fact
+  that disagrees with hers; Edit, Leave out and Use it again; Add a fact; Keep all that agree on the Waiting plate. How it is kept turns
+  the plate over: how it learns, what is never kept, which models may read it. The head's stars and its two keys open the plates.
+  Test: rig/t_799_atlas.js (41 checks).
+- `r390.js`: a fact she leaves out stays kept and shown, but is given to no model (the chat's facts, a folder's facts, an app's own words).
+- The use counts are read from the replies themselves: each reply keeps the facts it was given (r390), and from 7.99 a chat in an app's
+  folder keeps the folder's facts it was given too.
+- `r405.js`, refused and never released, is taken out of the sources; its never-kept guard and its model readers live on in r406.
+
 Ingenium 7.98 (26 November 2026): Autumn wind joins the nature sounds; Adamas's Bring back the panels on the page itself; no circle around the
 logos; the Engine panel never reads For undefined.
 

@@ -281,6 +281,12 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.99", "Memoria, What it knows: an atlas of plates. Each fact is a star on its plate's round chart: your own words near the middle, what was learned further out, what waits for you as a hollow star."],
+  ["7.99", "Memoria: a medallion for each plate (Waiting, You and each of your apps, in the colour of its star in the head), and Find a fact on every plate at the end of the row."],
+  ["7.99", "Memoria: the chosen star is read large, with where it came from, when, and how many chats used it this week; Keep, Not this, Edit, Leave out and Add a fact stand beside it."],
+  ["7.99", "Memoria: a fact that disagrees with your words stands beside them, with Keep mine, Keep the new one and Keep both."],
+  ["7.99", "Memoria: a fact you leave out stays on its plate, dimmed, and no model is given it until you use it again."],
+  ["7.99", "Memoria: How it is kept turns the plate over: how it learns, what is never kept, and which models may read it."],
   ["7.98", "A new nature sound in a new group, Winter: Noel, a winter brook at dawn, low soft water over stones and a robin far off now and then; quieter than the others."],
   ["7.98", "A new nature sound in Wind and fire: Autumn wind, gusts through dry leaves, leaves skittering over the ground, crows far off."],
   ["7.98", "Noel, Snowfall and Summer night, which reached 7.97 by mistake, are taken out of the nature sounds; Autumn wind stays."],
