@@ -21,15 +21,15 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const rooms = [];
   for (const k of ['knows', 'chats', 'cloud', 'backup']) { await p.evaluate(k => IngMemoria.show(k, false), k); await sleep(700);
     rooms.push(await p.evaluate(k => { const P = document.getElementById('mmPanel'); const on = [...P.children].filter(c => getComputedStyle(c).display !== 'none').map(c => c.id); const t = document.getElementById('mmT-' + k); return { k, on, sel: t.getAttribute('aria-selected') }; }, k)); }
-  ok(rooms[0].on.join() === 'knRoom' && rooms[1].on.join() === 'memRoomCard' && rooms[2].on.join() === 'cloudCard' && rooms[3].on.join() === 'bkCard,rpCard,sbCard' && rooms.every(r => r.sel === 'true'), 'four rooms, one at a time: What it knows, From your chats, Ingenium Cloud, Back up and move (the backup, restore points, scheduled backups)', rooms);
+  ok(rooms[0].on.join() === 'mmAtlas' && rooms[1].on.join() === 'memRoomCard' && rooms[2].on.join() === 'cloudCard' && rooms[3].on.join() === 'bkCard,rpCard,sbCard' && rooms.every(r => r.sel === 'true'), 'four rooms, one at a time: What it knows, From your chats, Ingenium Cloud, Back up and move (the backup, restore points, scheduled backups)', rooms);
   const big = await p.evaluate(() => [...document.querySelectorAll('#mmPanel svg')].filter(s => s.getBoundingClientRect().width > 120).length);
   ok(big === 0, 'every card drawn as in Settings (no icon out of size)', big);
   // a star pressed: What it knows opens, in view
   await p.evaluate(() => { IngMemoria.show('cloud', false); window.scrollTo(0, 0); }); await sleep(800);
   const pt = await p.evaluate(() => { const r = document.querySelector('#knHead canvas').getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
   let hit = null; for (let gx = 0.5; gx < 0.97 && !hit; gx += 0.015) for (let gy = 0.1; gy < 0.92 && !hit; gy += 0.025) { const x = pt.x + pt.w * gx, y = pt.y + pt.h * gy; await p.mouse.move(x, y); if (await p.evaluate(() => document.querySelector('#knHead canvas').style.cursor) === 'pointer') hit = { x, y }; }
-  let st = null; if (hit) { await p.mouse.click(hit.x, hit.y); await sleep(2500); st = await p.evaluate(() => ({ page: (document.querySelector('section.active') || {}).id, room: IngMemoria.room(), shown: getComputedStyle(document.getElementById('knRoom')).display !== 'none' })); }
-  ok(hit && st && st.page === 'page-memoria' && st.room === 'knows' && st.shown, 'a star pressed opens What it knows, on Memoria', { hit, st });
+  let st = null; if (hit) { await p.mouse.click(hit.x, hit.y); await sleep(2500); st = await p.evaluate(() => ({ page: (document.querySelector('section.active') || {}).id, room: IngMemoria.room(), shown: !!document.getElementById('mmAtlas') && getComputedStyle(document.getElementById('mmAtlas')).display !== 'none', plate: window.IngAtlas ? IngAtlas.plate() : null })); }
+  ok(hit && st && st.page === 'page-memoria' && st.room === 'knows' && st.shown && /^app:/.test(st.plate || ''), 'a star pressed opens What it knows, on Memoria, at that app\'s plate of the atlas (7.99)', { hit, st });
   // what opened Memory or Ingenium Cloud in Settings opens Memoria
   await p.evaluate(() => go('home')); await sleep(800); await p.evaluate(() => IngChatMemory.open()); await sleep(1500);
   const o1 = await p.evaluate(() => ({ page: (document.querySelector('section.active') || {}).id, room: IngMemoria.room() }));

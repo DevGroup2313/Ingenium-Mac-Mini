@@ -410,6 +410,8 @@ Ingenium 7.99 (26 November 2026): Memoria's What it knows becomes an atlas of pl
 - The use counts are read from the replies themselves: each reply keeps the facts it was given (r390), and from 7.99 a chat in an app's
   folder keeps the folder's facts it was given too.
 - `r405.js`, refused and never released, is taken out of the sources; its never-kept guard and its model readers live on in r406.
+- rig/t_794_memoria.js expects the atlas in What it knows, and a star pressed in the head to open that app's plate (9/9).
+  rig/t_791_head.js is out of date since 7.94 (it looks for Memory inside Settings): it fails the same four checks on 7.98 as on 7.99.
 
 Ingenium 7.98 (26 November 2026): Autumn wind joins the nature sounds; Adamas's Bring back the panels on the page itself; no circle around the
 logos; the Engine panel never reads For undefined.
