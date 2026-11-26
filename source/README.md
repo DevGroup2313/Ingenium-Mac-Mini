@@ -395,6 +395,38 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.95 (26 November 2026): Health's cards lift; the screen and the computer stay awake while Ingenium works or lends; Windows builds publish again.
+
+- Her words (26 November 2026): "I just want you to make the models name cards on the Health section of the Mentes page lift on hover in
+  Ingenium's signature popped out 2D lift from the sticky notes and the Live Preview panel, please make the fix"; and "It should be set as
+  a rule for my preference for that style on my display for all of my apps, not just Ingenium."
+  Measured on 7.94, with the page drawn holding two models: under Health, Each model, every model's card (.hm-row, r116) lay flat. Health's
+  four readings were flat too, though 7.72 (r364) had made them raised: the Turret's rule (r267, #page-models.tu-on #healthBox .hl-row,
+  two ids and two classes) outweighed r364's (one id, two classes), so only their 3 pixel rise showed, never their raised shadow.
+  `r398.js`, new, styles only: both take the lift r364 meant (--pop at rest, --pop-hi and 3 pixels up with a spring under the pointer, a
+  sink when pressed, still under Minimal or reduced motion), stated with the weight to hold on the Turret. Her rule joins How I work once,
+  in her master copy (r327's LATER, u795): "No flat, motionless cards: every card and tile lifts under the pointer with the signature
+  popped-out lift of the sticky notes and the Live Preview panel, in every app".
+- Her words (26 November 2026): "I want Ingenium to keep my device screen awake when it is running a task or a model is writing and working
+  on something and when the device is lending a model"; and, again: "everytime I start the reading on Lector it gets stopped and it never
+  goes through". Measured on 7.94: a lending computer held only the system awake (caffeinate -i; ES_SYSTEM_REQUIRED), letting its screen
+  sleep; the Mac app never asked to be left out of App Nap, which slows an app whose window is out of sight, its lending server included;
+  and a computer or tablet reading with another computer's model held nothing, because the page's wake lock (r256) is not offered in the
+  Mac app's window (its switch stood disabled there) and the Fire and iPhone apps had no way to hold the screen.
+  `build/desktop/app_awake_795.py`, new (in release.py's list): one hold for the whole app while anything lends or works: caffeinate -d -i
+  -m and an NSProcessInfo activity (user initiated, latency critical) on the Mac, ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED
+  on Windows; the screen only while her switch is on; keep_awake(on, screen) for the page, renewed each minute, let go three minutes after
+  a page stops renewing. `ingenium.spec` (Mac mini and MacBook Pro): NSAppSleepDisabled. `r256.js`: the page asks the app it runs in as
+  well as the browser (the computer apps' keep_awake; the Fire app's and the iPhone app's keepAwake), so its switch works wherever either
+  way exists. The Fire repository: Bridge.java keepAwake (FLAG_KEEP_SCREEN_ON) and EngineBridge.swift keepAwake (the idle timer off).
+  Not tested here: App Nap, caffeinate and SetThreadExecutionState need a Mac or a Windows computer, and the native holds a device; the
+  hold's own logic was checked on a copy of the computer app (six checks).
+- The Windows builds (Ingenium-HPWindows, .github/workflows/build-windows.yml): from 7.87 to 7.94 every Windows build failed, because it
+  waited for the Mac mini repository's Full and Gift editions of the same version and none were made after 7.86, so Ingenium for Windows
+  was not published at all. The 7.94 editions are made, and the editions no longer hold Ingenium's own installer back: a missing edition is
+  said in a warning and the build's summary, and the Full and Gift installers already in the release stay until editions of the same
+  version come.
+
 Ingenium 7.94 (25 November 2026): Memoria, a page of its own; Vocatio waits for a busy model.
 
 - Her words (25 November 2026): "I think that the Memory section and Ingneum's Cloud should not be buried inside of the Settings page.

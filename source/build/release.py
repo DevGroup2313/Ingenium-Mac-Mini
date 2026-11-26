@@ -145,7 +145,8 @@ DESKTOP = [("app_lite_62", "_window_page", ("mini", "intel", "win")), ("app_refr
            ("app_self2_764", "_self2_764", ("mini", "intel", "win")),  # 7.64: part two, the copy her phones and tablets carry
            ("app_ask_770", "_ask_start", ("mini", "intel", "win")),  # 7.70: asking and offering with Accept, each device's use, the memory now
            ("app_zoom_775", "_display_zoom", ("mini", "intel", "win")),  # 7.75: the Mac window zooms its page, to fill a large screen (modules/r368.js)
-           ("app_backup_793", "_backup_files_793", ("mini", "intel", "win"))]  # 7.93: scheduled backups into a folder she chooses (modules/r395.js)
+           ("app_backup_793", "_backup_files_793", ("mini", "intel", "win")),  # 7.93: scheduled backups into a folder she chooses (modules/r395.js)
+           ("app_awake_795", "_awake_set_795", ("mini", "intel", "win"))]  # 7.95: the computer and its screen awake while Ingenium works or lends; out of App Nap
 
 
 def desktop():

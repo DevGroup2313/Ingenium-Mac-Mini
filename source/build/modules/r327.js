@@ -93,7 +93,10 @@ var HERS=[["Software that looks and feels alive",""],["The animated, popped-out 
 /* 7.54: her rules added after her list was first seeded go into it once, in her master copy and her own profile only (never another
    person's profile, never another edition): her words (20 November 2026): "I want you to add the purple pressable words underlined to my
    rules in my way of working in the Ingenia page." */
-var LATER=[["u753","Purple words that can be pressed are underlined","Added 20 November 2026"]];
+var LATER=[["u753","Purple words that can be pressed are underlined","Added 20 November 2026"],
+  /* 7.95, her words (26 November 2026): "I don't want it to just be motionless and flat ... It should be set as a rule for my preference
+     for that style on my display for all of my apps, not just Ingenium." */
+  ["u795","No flat, motionless cards: every card and tile lifts under the pointer with the signature popped-out lift of the sticky notes and the Live Preview panel, in every app","Added 26 November 2026"]];
 function master(){try{return W.IngTerms?IngTerms.mine():(typeof ING_EDITION!=="string"||ING_EDITION==="master");}catch(e){return true;}}
 function uid(){return "w"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function S(){if(!W.state)return null;var w=state.ways;

@@ -192,6 +192,10 @@ if sys.platform == 'darwin':
             # 6.56 (8 November 2026): the one exception is the microphone, for dictation in the message box, which Ingenium
             # writes down on this Mac with Scriba's speech models (modules/r254.js); macOS asks her once, with these words.
             'NSLocalNetworkUsageDescription': 'Ingenium uses the home network only to lend models to your other devices, or to use the models of your other computer, when you set that up in Settings.',
+            # 7.95: App Nap left out. macOS slows an app whose window is out of sight (its timers, its network); a Mac mini lending
+            # its models with Ingenium's window behind another, or a MacBook reading with the Mac mini's model, must not be slowed.
+            # (The app also holds an NSProcessInfo activity while it lends or works: desktop/app_awake_795.py.)
+            'NSAppSleepDisabled': True,
             'NSMicrophoneUsageDescription': 'Ingenium listens only while you press the microphone key in the message box, to write down what you say here on this Mac. The sound never leaves it.',
         },
     )

@@ -281,6 +281,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.95", "Mentes, Health: each model's card and the four readings above it rise under the pointer with Ingenium's raised lift, as the sticky notes do; they had lain flat."],
+  ["7.95", "The screen stays on while Ingenium works, a reply is written or a computer lends its models, in the Mac and Windows apps and the Fire, iPhone and iPad apps too; a Mac that lends is no longer slowed when Ingenium's window is out of sight."],
   ["7.94", "Memoria: Memory, Ingenium Cloud and Back up and move now have a page of their own, in the side bar after Ingenia. It opens on the constellation mind, with four rooms below: What it knows, From your chats, Ingenium Cloud, and Back up and move. Settings keeps a card for each that opens it."],
   ["7.94", "Vocatio no longer says the model is busy and could not finish while the model is still writing. It waits for as long as the model works, says what is using it, and goes on by itself; Ingenia's and Memory's background steps no longer take the model between two parts of a reading."],
   ["7.93", "Scheduled backups on your computers: a whole backup every day or every Sunday into a folder you choose, keeping the last few; or Back up now."],
