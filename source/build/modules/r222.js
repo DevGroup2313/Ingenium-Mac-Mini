@@ -281,6 +281,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.96", "In a chat, the list of what Ingenium remembered has a Close key: it puts the list away for that chat, until a later answer brings memories it has not shown you."],
+  ["7.96", "Memoria's words name only the pages this copy has; the words under lending say that the screen now stays on while a computer lends."],
   ["7.95", "Mentes, Health: each model's card and the four readings above it rise under the pointer with Ingenium's raised lift, as the sticky notes do; they had lain flat."],
   ["7.95", "The screen stays on while Ingenium works, a reply is written or a computer lends its models, in the Mac and Windows apps and the Fire, iPhone and iPad apps too; a Mac that lends is no longer slowed when Ingenium's window is out of sight."],
   ["7.94", "Memoria: Memory, Ingenium Cloud and Back up and move now have a page of their own, in the side bar after Ingenia. It opens on the constellation mind, with four rooms below: What it knows, From your chats, Ingenium Cloud, and Back up and move. Settings keeps a card for each that opens it."],

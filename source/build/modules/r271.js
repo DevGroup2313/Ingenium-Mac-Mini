@@ -78,6 +78,9 @@ body[data-theme="night"]{--mr-keyA:#2b2339;--mr-keyB:#221b2f;--mr-card2:#272033;
 #memTray{flex:0 0 auto;margin:2px 4px 8px;border-radius:18px;--mr-pp:1600px}
 #memTray .mt-head{display:flex;align-items:center;gap:12px;width:100%;padding:10px 13px;border:0;border-radius:18px;background:none;cursor:pointer;text-align:left;color:var(--mr-ink1)}
 #memTray .mt-what{flex:1 1 auto;min-width:0}
+#memTray .mt-row{display:flex;align-items:center;gap:6px;padding-right:10px}
+#memTray .mt-row > .mt-head{flex:1 1 auto;min-width:0}
+#memTray .mt-close{flex:0 0 auto}
 #memTray .mt-what b{display:block;font:600 13px/1.3 var(--sans)}
 #memTray .mt-what small{display:block;color:var(--mr-ink3);font-size:11.5px;line-height:1.4}
 #memTray .mt-chev{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;flex:0 0 auto;background:linear-gradient(var(--mr-keyA),var(--mr-keyB));box-shadow:var(--mr-sh-small);
@@ -314,10 +317,19 @@ function trayEl(){var t=$("memTray");if(t)return t;var sc=$("chatScroll");if(!sc
   var c=coin("","0");c.classList.add("mt-coin");var w=mk("span","mt-what");w.appendChild(mk("b","mt-name"));w.appendChild(mk("small","mt-where"));
   var ch=mk("span","mt-chev","▸");ch.setAttribute("aria-hidden","true");h.appendChild(c);h.appendChild(w);h.appendChild(ch);
   h.addEventListener("click",function(){var s=M();change(t,function(){s.trayOpen=!s.trayOpen;t.classList.toggle("mt-open",s.trayOpen);h.setAttribute("aria-expanded",String(s.trayOpen));},{height:t});save();});
-  var l=mk("div","mt-list");l.id="memTrayList";t.appendChild(h);t.appendChild(l);sc.parentElement.insertBefore(t,sc);return t;}
+  /* 7.96, her words (26 November 2026): "the memory card does not have a "Close" option inside of the chat panel, once opened inside of the
+     chat it hovers over the conversation or session and I can't remove, please fix this issues as well." Close puts it away for this
+     chat; it comes back only when a later answer brings memories it has not shown her. */
+  var row=mk("div","mt-row"),cl=key("Close","mt-close",function(){var s=M(),cid=chatId(),v=trayView();if(!s.trayShut||typeof s.trayShut!=="object")s.trayShut={};
+    s.trayShut[cid]=v.ids.slice().sort().join(",");save();fallAway(t).then(function(){t.hidden=true;t.__sig="";});},"Close this list for this chat");
+  row.appendChild(h);row.appendChild(cl);
+  var l=mk("div","mt-list");l.id="memTrayList";t.appendChild(row);t.appendChild(l);sc.parentElement.insertBefore(t,sc);return t;}
 function paintTray(){var s=M(),sc=$("chatScroll"),t=$("memTray");
   if(!sc||!s.on||(!s.items.length&&!s.waiting.length)){if(t&&!t.hidden)t.hidden=true;return;}
   t=trayEl();if(!t)return;var v=trayView(),sig=JSON.stringify([v,s.trayOpen,v.ids.map(function(id){var it=byId(id);return it?it.text:"";})]);
+  var cid0=chatId(),shut=s.trayShut&&typeof s.trayShut==="object"?s.trayShut[cid0]:undefined;   /* 7.96: closed for this chat */
+  if(shut!==undefined){var now=v.ids.slice().sort().join(",");if(!v.ids.length||now===shut||now.split(",").every(function(x){return shut.split(",").indexOf(x)>=0;})){if(!t.hidden)t.hidden=true;return;}
+    delete s.trayShut[cid0];save();}
   if(t.hidden)t.hidden=false;if(t.__sig===sig)return;t.__sig=sig;
   t.classList.toggle("mt-open",!!s.trayOpen);var h=t.querySelector(".mt-head");h.setAttribute("aria-expanded",String(!!s.trayOpen));
   setCoin(t.querySelector(".mt-coin"),v.count);t.querySelector(".mt-name").textContent=v.name;t.querySelector(".mt-where").textContent=v.where;

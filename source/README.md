@@ -395,6 +395,19 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.96 (26 November 2026): the chat's memory list has a Close key; Memoria names only the pages a copy has; the words under lending.
+
+- Her words (26 November 2026, in her answers): "the memory card does not have a "Close" option inside of the chat panel, once opened inside
+  of the chat is hovers over the conversation or session and I can't remove, please fix this issues as well." `r271.js`: the tray (the list
+  of what Ingenium remembered for a chat, above the conversation) gains a raised Close key beside its head; Close puts it away for that
+  chat (kept by chat in the memory's own state, trayShut), and it comes back only when a later answer brings a memory it has not shown.
+  Test: rig/t_796_tray.js.
+- The editions' test (t_627_editions, run on the 7.95 editions) found that Memoria (7.94, r396) told the gift and demo editions it learns
+  from "Fabrica", a page they do not have: `r396.js` names Fabrica only where the copy has it. The test now expects Memoria in every
+  edition's side bar (it came in 7.94).
+- `r274.js` and `r255.js`: the words under Lend my models and the Cloud no longer say the screen may turn off: since 7.95 it stays on
+  while she keeps Keep the screen on while Ingenium works.
+
 Ingenium 7.95 (26 November 2026): Health's cards lift; the screen and the computer stay awake while Ingenium works or lends; Windows builds publish again.
 
 - Her words (26 November 2026): "I just want you to make the models name cards on the Health section of the Mentes page lift on hover in

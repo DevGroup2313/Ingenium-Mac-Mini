@@ -291,7 +291,7 @@ function paint(){var c=$("cloudCard");if(!c)return;if(OPEN===0)OPEN=openFirst();
   c.appendChild(step(2,"The computer that keeps it",CFG.box&&CFG.box.addr?(CFG.box.self?"This computer":(CFG.box.computer||CFG.box.addr)):"",!!(CFG.box&&CFG.keyOk),function(bd){
     var api=shell(),sy=sayEl();
     if(api&&typeof api.share_status==="function"){
-      bd.appendChild(el("p","cl-say","This computer can keep your Cloud for your other devices: choose this on your Mac mini at home, or on the computer you take with you. It stays awake while it does (its screen may turn off)."));
+      bd.appendChild(el("p","cl-say","This computer can keep your Cloud for your other devices: choose this on your Mac mini at home, or on the computer you take with you. It stays awake while it does, its screen too unless you turn off Keep the screen on while Ingenium works."));
       var me=btn("This computer keeps it",!CFG.box);bd.appendChild(me);
       me.onclick=function(){if(!PASS){sy.className="cl-say bad";sy.textContent="Write your passphrase in step 1 first.";OPEN=1;paint();return;}me.disabled=true;
         /* 6.57: the computer keeps the Cloud (desktop/app_cloud_657.py); lending its models stays as she set it */
