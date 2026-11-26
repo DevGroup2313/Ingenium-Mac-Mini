@@ -282,6 +282,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
   ["7.98", "A new nature sound in Wind and fire: Autumn wind, gusts through dry leaves, leaves skittering over the ground, crows far off."],
+  ["7.98", "Noel, Snowfall and Summer night, which reached 7.97 by mistake, are taken out of the nature sounds; Autumn wind stays."],
+  ["7.98", "Adamas: a large app's Close key stands in the main row of keys, beside Open an app; the narrow panel is as it was."],
   ["7.98", "Adamas: Bring back the panels stands on the page itself, beside Save this page, whenever a panel is closed, hidden, folded or floated; it is no longer in the Display panel."],
   ["7.98", "Ingenia: an app's logo sinks when held with nothing drawn around it; the recess and the spreading ring of 7.97 are gone."],
   ["7.98", "The Engine panel names the model in use in its lower section even when the model has no name of its own (it read For undefined)."],

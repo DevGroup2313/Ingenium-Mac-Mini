@@ -1947,7 +1947,8 @@ def _owner_only(t):
 # 6.1 (21 October 2026): a release build (ING_RELEASE=1, set by release.py page) leaves out the modules held.json names:
 # those still being finished, or not yet through their independent review. Every other build keeps them in.
 if os.environ.get("ING_RELEASE") == "1" and os.path.exists(os.path.join(HERE, "held.json")):
-    _held = set(json.load(open(os.path.join(HERE, "held.json")))["modules"])
+    # 7.98: a name with or without its .js is held (7.97 listed "r403" and the build, looking for "r403.js", held nothing)
+    _held = set((x if str(x).endswith(".js") else str(x) + ".js") for x in json.load(open(os.path.join(HERE, "held.json")))["modules"])
     mods = [m for m in mods if os.path.basename(m) not in _held]
     print("held out of this release:", ", ".join(sorted(_held)) or "nothing")
 # ---- R121: the shared thought cloud (thoughts/thought_cloud.html, the same file the Forge and Carpe Diem carry) is

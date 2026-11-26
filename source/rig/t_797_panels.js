@@ -30,12 +30,12 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   await p.click('#showPreview'); await sleep(500);
   await p.evaluate(() => { let s = '<!doctype html><html><head></head><body><h1>Tide Clock</h1>'; for (let i = 0; i < 160; i++) s += '<script>var x' + i + '="' + 'a'.repeat(22000) + '";</script>\n'; s += '</body></html>'; IngBuild.open({ name: 'tide.html', text: s, title: 'Tide Clock' }); });
   await sleep(1500);
-  const lg = await p.evaluate(() => { const box = document.getElementById('bdBox'); const c = box.querySelector('.r400-close'); const say = box.querySelector('.r400-say'); return { close: c ? c.textContent : null, say: say ? say.textContent : null, raised: c ? getComputedStyle(c).boxShadow !== 'none' : false }; });
-  ok(lg.close === 'Close Tide Clock' && lg.raised, 'a page opened part by part has a raised key that says what it closes', lg);
-  ok(lg.say && /part by part/.test(lg.say) && /Close Tide Clock brings back your own page/.test(lg.say), 'and one line that says how the two panels go together', lg.say);
-  await p.evaluate(() => document.getElementById('bdBox').scrollIntoView({ block: 'start' })); await sleep(300); await p.evaluate(() => window.scrollBy(0, -160)); await sleep(300);
+  const lg = await p.evaluate(() => { const k = document.getElementById('r400Close'), box = document.getElementById('bdBox'), inner = box.querySelector('.r400-close'); const row = k && k.parentElement; return { close: k ? k.textContent : null, shown: !!(k && k.offsetParent), mainRow: !!(row && row.querySelector('#runBtn')), raised: k ? getComputedStyle(k).boxShadow !== 'none' : false, innerHidden: !inner || !inner.offsetParent, say: !!box.querySelector('.r400-say'), tip: k ? k.title : '' }; });
+  ok(lg.close === 'Close Tide Clock' && lg.shown && lg.mainRow && lg.raised, 'a page opened part by part: its raised Close key, naming it, stands in the main row of keys', lg);
+  ok(lg.innerHidden && !lg.say && /part by part/.test(lg.tip), 'the narrow panel carries no squeezed key and no extra line; what the panels are is in the key\'s tooltip', lg);
+  await p.evaluate(() => document.getElementById('runBtn').scrollIntoView({ block: 'start' })); await sleep(300); await p.evaluate(() => window.scrollBy(0, -120)); await sleep(300);
   await p.screenshot({ path: PIC('r400_large.png') });
-  await p.evaluate(() => { window.confirm = () => true; }); await p.click('#bdBox .r400-close'); await sleep(1500);
+  await p.evaluate(() => { window.confirm = () => true; }); await p.click('#r400Close'); await sleep(1500);
   const back = await p.evaluate(() => ({ large: document.getElementById('buildGrid').classList.contains('bd-large'), code: document.getElementById('codeEditor').value.length, frame: (() => { try { const d = document.getElementById('previewFrame').contentDocument; return d && d.body ? d.body.innerText.slice(0, 60) : '(no access)'; } catch (e) { return '(sandboxed)'; } })() }));
   ok(!back.large && back.code > 50, 'closed, your own page is back in the code (the sample when the code was empty)', back);
   ok(!(await vis('#r400Back')), 'with every panel in place, Bring back the panels is not shown');

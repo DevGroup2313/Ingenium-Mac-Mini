@@ -401,6 +401,13 @@ logos; the Engine panel never reads For undefined.
 - Her words (26 November 2026): "I don't want the "bring back every panel" button for the Adamas page to be hidden inside of the Display
   panel. Why would you even put it there? It makes no sense!" `r400.js`: the key, Bring back the panels, stands in Adamas's own row of keys,
   beside Save this page, whenever a panel there is closed, hidden, folded or floated; Display no longer carries it. Test: rig/t_797_panels.js.
+- A mistake of mine found and mended: 7.97's held list named its part "r403", and build_page.py, looking for "r403.js", held nothing,
+  so the first samples of Noel, Snowfall and Summer night (all refused) and Autumn wind reached 7.97. 7.98 takes the three out (r403
+  carries Autumn wind alone), and build_page.py now holds a name with or without .js. `r404.js` (Noel, a fourth time: the water and one
+  far robin, about 6 dB quieter than Forest) is held, as "r404.js".
+- Her words on the large app in Adamas: "This is too clusttered. Why squeeze the button there??" `r400.js`: its Close key stands in
+  Adamas's main row of keys, beside Open an app, and the narrow panel carries no added key or line (what the panels are is the key's
+  tooltip).
 - Her words: "I don't want a dented circle around the apps logos." `r402.js`: the recess shown around a held logo and the violet ring that
   spread out in some flourishes are removed; the logo sinks, springs back and plays its flourish. Test: rig/t_797_logo_press.js.
 
