@@ -281,6 +281,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.98", "A new nature sound in a new group, Winter: Noel, a winter brook at dawn, low soft water over stones and a robin far off now and then; quieter than the others."],
   ["7.98", "A new nature sound in Wind and fire: Autumn wind, gusts through dry leaves, leaves skittering over the ground, crows far off."],
   ["7.98", "Noel, Snowfall and Summer night, which reached 7.97 by mistake, are taken out of the nature sounds; Autumn wind stays."],
   ["7.98", "Adamas: a large app's Close key stands in the main row of keys, beside Open an app; the narrow panel is as it was."],

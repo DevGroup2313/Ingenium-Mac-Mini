@@ -404,7 +404,8 @@ logos; the Engine panel never reads For undefined.
 - A mistake of mine found and mended: 7.97's held list named its part "r403", and build_page.py, looking for "r403.js", held nothing,
   so the first samples of Noel, Snowfall and Summer night (all refused) and Autumn wind reached 7.97. 7.98 takes the three out (r403
   carries Autumn wind alone), and build_page.py now holds a name with or without .js. `r404.js` (Noel, a fourth time: the water and one
-  far robin, about 6 dB quieter than Forest) is held, as "r404.js".
+  far robin, about 6 dB quieter than Forest) rides in 7.98 too, approved on its sample: "I approve of the Noel sound, please commit and
+  push it everywhere".
 - Her words on the large app in Adamas: "This is too clusttered. Why squeeze the button there??" `r400.js`: its Close key stands in
   Adamas's main row of keys, beside Open an app, and the narrow panel carries no added key or line (what the panels are is the key's
   tooltip).
