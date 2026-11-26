@@ -1,7 +1,7 @@
 // node rig/t_797_panels.js <page url> <modules/r400.js> [inject]
 // Ingenium 7.97 (modules/r400.js): Adamas's Show the preview and Show the code keys appear when their panel is away and bring it back; a page
 // opened part by part says so and its Close key names it; closed, your own page comes back; Display, Bring back every panel.
-const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs');
+const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const os = require('os'); const path = require('path'); const PIC = (n) => path.join(os.tmpdir(), n);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + JSON.stringify(d).slice(0, 300))); c ? pass++ : fail++; };
 (async () => {
@@ -17,12 +17,12 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   ok(!(await vis('#previewPane')) && await vis('#showPreview'), 'Close the preview: the preview goes, and Show the preview stands in its place');
   ok((await p.textContent('#showPreview')).trim() === 'Show the preview', 'the key says what it does');
   await p.evaluate(() => document.getElementById('showPreview').scrollIntoView({ block: 'center' })); await sleep(300);
-  await p.screenshot({ path: 'r400_show_preview.png' });
+  await p.screenshot({ path: PIC('r400_show_preview.png') });
   await p.click('#showPreview'); await sleep(600);
   ok(await vis('#previewPane') && await vis('#editorPane'), 'Show the preview brings it back beside the code');
   await p.click('#hideEditor'); await sleep(600);
   ok(!(await vis('#editorPane')) && await vis('#showEditor'), 'Hide the code: the code goes, and Show the code stands in the preview bar');
-  await p.screenshot({ path: 'r400_show_code.png' });
+  await p.screenshot({ path: PIC('r400_show_code.png') });
   await p.click('#showEditor'); await sleep(600);
   ok(await vis('#editorPane'), 'Show the code brings it back');
   await p.click('#hideEditor'); await sleep(300); await p.click('#closePreview'); await sleep(600);
@@ -34,7 +34,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   ok(lg.close === 'Close Tide Clock' && lg.raised, 'a page opened part by part has a raised key that says what it closes', lg);
   ok(lg.say && /part by part/.test(lg.say) && /Close Tide Clock brings back your own page/.test(lg.say), 'and one line that says how the two panels go together', lg.say);
   await p.evaluate(() => document.getElementById('bdBox').scrollIntoView({ block: 'start' })); await sleep(300); await p.evaluate(() => window.scrollBy(0, -160)); await sleep(300);
-  await p.screenshot({ path: 'r400_large.png' });
+  await p.screenshot({ path: PIC('r400_large.png') });
   await p.evaluate(() => { window.confirm = () => true; }); await p.click('#bdBox .r400-close'); await sleep(1500);
   const back = await p.evaluate(() => ({ large: document.getElementById('buildGrid').classList.contains('bd-large'), code: document.getElementById('codeEditor').value.length, frame: (() => { try { const d = document.getElementById('previewFrame').contentDocument; return d && d.body ? d.body.innerText.slice(0, 60) : '(no access)'; } catch (e) { return '(sandboxed)'; } })() }));
   ok(!back.large && back.code > 50, 'closed, your own page is back in the code (the sample when the code was empty)', back);
@@ -42,7 +42,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   await p.evaluate(() => { document.getElementById('displayPanel').hidden = false; }); await sleep(300);
   ok(await vis('#r400Panels'), 'Display has Bring back every panel');
   await p.evaluate(() => document.getElementById('r400Panels').scrollIntoView({ block: 'center' })); await sleep(300);
-  await p.screenshot({ path: 'r400_display.png' });
+  await p.screenshot({ path: PIC('r400_display.png') });
   await p.click('#r400Panels'); await sleep(600); await p.evaluate(() => { document.getElementById('displayPanel').hidden = true; }); await sleep(300);
   ok(await vis('#previewPane') && (await p.evaluate(() => document.body.getAttribute('data-buildfold'))) === '0', 'pressed, every panel is back (the preview docked and unfolded)');
   ok(errs.length === 0, 'no page error', errs);

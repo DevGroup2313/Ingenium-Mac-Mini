@@ -395,6 +395,16 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 7.98 (26 November 2026): Autumn wind joins the nature sounds; the Engine panel never reads For undefined.
+
+- Her word on the four samples (26 November 2026): "All of these sounds sound absolutely crappy except for the Autumn wind, I like that
+  one you can add it to the list and redo the others." `r403.js` now carries Autumn wind alone (Wind and fire), the very sample she heard.
+  `r404.js` (Noel, made a third time from Brook's water and Morning birds' singers, with no wind or hiss and quieter than the others) is
+  held for her word; Snowfall and Summer night, refused twice, are withdrawn.
+- `r374.js`: the Engine panel's lower section named the model by its own name only, and read "For undefined" for a model without one;
+  it now falls back to the model's name, then its file.
+- rig/t_797_panels.js writes its pictures to the system's temporary folder, never into the sources.
+
 Ingenium 7.97 (26 November 2026): Health's cards flat at rest; every closed panel comes back; Unload first; the logos press; the hand on Fabrica's tree; the app always quits; a model's file found again.
 
 - Her words (26 November 2026, on 7.95): "I want the models cards to stay flat and just have the lifted 3D popped out effect when I hover

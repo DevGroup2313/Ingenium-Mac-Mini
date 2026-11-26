@@ -281,6 +281,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["7.98", "A new nature sound in Wind and fire: Autumn wind, gusts through dry leaves, leaves skittering over the ground, crows far off."],
+  ["7.98", "The Engine panel names the model in use in its lower section even when the model has no name of its own (it read For undefined)."],
   ["7.97", "Mentes, Health: each model's card and the readings above it lie flat, as Your models' cards do, and pop out with Ingenium's raised lift only under the pointer."],
   ["7.97", "Adamas: Show the preview and Show the code appear whenever their panel is closed or hidden, and bring it back; a large app opened part by part says so, and its Close key names it. Display has Bring back every panel, for every page."],
   ["7.97", "The Engine panel, from the top bar: Unload, naming the model, and Load stand first, right under the model in use."],

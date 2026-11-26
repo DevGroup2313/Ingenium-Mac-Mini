@@ -256,7 +256,7 @@ function paint(){if(!P)return;var b=$("ieBody"),keep=b.scrollTop;b.innerHTML="";
     var li=mk("div","ie-list");(c.models||[]).forEach(function(md){var on=!!(L&&L.id===c.id&&L.model===md);
       li.appendChild(row(md,"Runs on "+c.name+" · nothing loads here",["#b79ce6","#5d37a1"],"",on?'<span class="plate ok">In use</span>':'',on,function(){chooseLent(c,md);}));});b.appendChild(li);});
   /* Reply, Memory and Effort for the model, through the one record (r249), as the Controls sheet sets them (r321) */
-  var k=gkey(),g=G();if(g&&k&&k!=="none"){var v=vals(k),m=ch;b.appendChild(mk("div","ie-sec","For "+(L?(L.model||"the lent model"):(m?m.customName:"this model"))));
+  var k=gkey(),g=G();if(g&&k&&k!=="none"){var v=vals(k),m=ch;b.appendChild(mk("div","ie-sec","For "+(L?(L.model||"the lent model"):(m?(m.customName||m.name||m.fileName||"this model"):"this model"))));  /* 7.98: a model with no name of its own read "For undefined" */
     function range(lab,min,max,step,val,field,say){var r=mk("div","ie-r"),l2=mk("label",null,lab),i=D.createElement("input"),o=mk("output",null,fmt(val));i.type="range";i.min=String(min);i.max=String(max);i.step=String(step);if(val%step||val<min)i.step="any";i.value=String(val);
       l2.htmlFor=i.id="ie"+field;var tm=0;i.addEventListener("input",function(){o.textContent=fmt(+i.value);clearTimeout(tm);tm=setTimeout(function(){try{g.note(k,field,Math.round(+i.value),"Engine");}catch(e){}chips();},350);});
       i.addEventListener("change",function(){clearTimeout(tm);try{g.note(k,field,Math.round(+i.value),"Engine");}catch(e){}chips();});r.appendChild(l2);r.appendChild(i);r.appendChild(o);b.appendChild(r);b.appendChild(mk("div","ie-say",say));}
