@@ -395,7 +395,14 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
-Ingenium 7.98 (26 November 2026): Autumn wind joins the nature sounds; the Engine panel never reads For undefined.
+Ingenium 7.98 (26 November 2026): Autumn wind joins the nature sounds; Adamas's Bring back the panels on the page itself; no circle around the
+logos; the Engine panel never reads For undefined.
+
+- Her words (26 November 2026): "I don't want the "bring back every panel" button for the Adamas page to be hidden inside of the Display
+  panel. Why would you even put it there? It makes no sense!" `r400.js`: the key, Bring back the panels, stands in Adamas's own row of keys,
+  beside Save this page, whenever a panel there is closed, hidden, folded or floated; Display no longer carries it. Test: rig/t_797_panels.js.
+- Her words: "I don't want a dented circle around the apps logos." `r402.js`: the recess shown around a held logo and the violet ring that
+  spread out in some flourishes are removed; the logo sinks, springs back and plays its flourish. Test: rig/t_797_logo_press.js.
 
 - Her word on the four samples (26 November 2026): "All of these sounds sound absolutely crappy except for the Autumn wind, I like that
   one you can add it to the list and redo the others." `r403.js` now carries Autumn wind alone (Wind and fire), the very sample she heard.

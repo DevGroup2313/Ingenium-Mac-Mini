@@ -1,5 +1,5 @@
 // node rig/t_797_logo_press.js <page url> <modules/r402.js> <out folder> [inject]
-// Ingenium 7.97 (modules/r402.js): on an Ingenia folder's page, the app's logo goes down into a socket while held, springs back, and plays a
+// Ingenium 7.97 and 7.98 (modules/r402.js): on an Ingenia folder's page, the app's logo sinks while held (7.98: nothing drawn around it), springs back, and plays a
 // flourish, a different one at each press; Ingenium's own seal plays the seal key's set on its own layers; Minimal motion keeps only the press.
 const pw = require('/opt/node-tools/node_modules/playwright'); const fs = require('fs'); const path = require('path');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -22,8 +22,8 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
     await p.mouse.move(box.x, box.y); await sleep(500);
     await p.screenshot({ path: path.join(OUT, tag + '_1_rest.png'), clip });
     await p.mouse.down(); await sleep(250);
-    const down = await p.evaluate(() => { const k = document.querySelector('#page-folders .ig-ls.ig-key'); const c = getComputedStyle(k), w = getComputedStyle(k, '::before'); return { tr: c.translate, sc: c.scale, well: w.opacity }; });
-    ok(parseFloat(down.sc) <= 0.91 && parseFloat(down.tr.split(' ')[1] || down.tr) > 5 && down.well === '1', app + ': held, it goes down into its socket (lower, smaller, the recess shown)', down);
+    const down = await p.evaluate(() => { const k = document.querySelector('#page-folders .ig-ls.ig-key'); const c = getComputedStyle(k), w = getComputedStyle(k, '::before'); return { tr: c.translate, sc: c.scale, around: w.content, ring: !!k.querySelector(':scope > .r402-ring') }; });
+    ok(parseFloat(down.sc) <= 0.91 && parseFloat(down.tr.split(' ')[1] || down.tr) > 5 && down.around === 'none' && !down.ring, app + ': held, it sinks (lower, smaller), and nothing is drawn around it (no recess, no ring)', down);
     await p.screenshot({ path: path.join(OUT, tag + '_2_held.png'), clip });
     await p.mouse.up(); await sleep(140);
     const fl = await p.evaluate(() => { const k = document.querySelector('#page-folders .ig-ls.ig-key'); return { n: k.getAttribute('data-r402'), cls: k.className, anim: getComputedStyle(k).animationName }; });

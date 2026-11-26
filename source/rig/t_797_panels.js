@@ -10,7 +10,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   const errs = []; p.on('pageerror', (e) => errs.push(e.message.slice(0, 160)));
   await p.goto(process.argv[2], { waitUntil: 'domcontentloaded', timeout: 300000 }); await p.waitForFunction(() => window.__ingReady === true, null, { timeout: 300000 });
   for (let i = 0; i < 2; i++) { await p.evaluate(() => { const k = [...document.querySelectorAll('button')].find((x) => /^(Enter|I agree)$/.test(x.textContent.trim()) && x.offsetParent); if (k) k.click(); try { tourEnd(); } catch (e) {} }); await sleep(900); }
-  if (process.argv[4] === 'inject') await p.evaluate(([css, js]) => { if (!document.getElementById('r400-css')) { const s = document.createElement('style'); s.id = 'r400-css'; s.textContent = css; document.head.appendChild(s); (0, eval)(js); } }, [css, js]);
+  if (process.argv[4] === 'inject') await p.evaluate(([css, js]) => { const old = document.getElementById('r400-css'); if (old) { old.remove(); delete window.IngPanels; const r = document.querySelector('#displayPanel .r400-row'); if (r) r.remove(); } { const s = document.createElement('style'); s.id = 'r400-css'; s.textContent = css; document.head.appendChild(s); (0, eval)(js); } }, [css, js]);
   await p.evaluate(() => go('build')); await sleep(1800);
   const vis = (sel) => p.evaluate((sel) => { const e = document.querySelector(sel); return !!(e && e.offsetParent && e.getBoundingClientRect().width > 20); }, sel);
   await p.click('#closePreview'); await sleep(600);
@@ -38,13 +38,14 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   await p.evaluate(() => { window.confirm = () => true; }); await p.click('#bdBox .r400-close'); await sleep(1500);
   const back = await p.evaluate(() => ({ large: document.getElementById('buildGrid').classList.contains('bd-large'), code: document.getElementById('codeEditor').value.length, frame: (() => { try { const d = document.getElementById('previewFrame').contentDocument; return d && d.body ? d.body.innerText.slice(0, 60) : '(no access)'; } catch (e) { return '(sandboxed)'; } })() }));
   ok(!back.large && back.code > 50, 'closed, your own page is back in the code (the sample when the code was empty)', back);
-  await p.evaluate(() => { setBuildView('closed'); document.body.setAttribute('data-buildfold', '1'); }); await sleep(300);
-  await p.evaluate(() => { document.getElementById('displayPanel').hidden = false; }); await sleep(300);
-  ok(await vis('#r400Panels'), 'Display has Bring back every panel');
-  await p.evaluate(() => document.getElementById('r400Panels').scrollIntoView({ block: 'center' })); await sleep(300);
-  await p.screenshot({ path: PIC('r400_display.png') });
-  await p.click('#r400Panels'); await sleep(600); await p.evaluate(() => { document.getElementById('displayPanel').hidden = true; }); await sleep(300);
-  ok(await vis('#previewPane') && (await p.evaluate(() => document.body.getAttribute('data-buildfold'))) === '0', 'pressed, every panel is back (the preview docked and unfolded)');
+  ok(!(await vis('#r400Back')), 'with every panel in place, Bring back the panels is not shown');
+  await p.evaluate(() => { setBuildView('closed'); document.body.setAttribute('data-buildfold', '1'); document.body.setAttribute('data-builded', 'hidden'); }); await sleep(400);
+  ok(await vis('#r400Back'), 'a panel away: Bring back the panels stands on the Adamas page itself, beside Save this page');
+  ok(!(await p.evaluate(() => !!document.getElementById('r400Panels'))), 'and the Display panel no longer carries it');
+  await p.evaluate(() => document.getElementById('r400Back').scrollIntoView({ block: 'center' })); await sleep(300);
+  await p.screenshot({ path: PIC('r400_back_key.png') });
+  await p.click('#r400Back'); await sleep(700);
+  ok(await vis('#previewPane') && await vis('#editorPane') && (await p.evaluate(() => document.body.getAttribute('data-buildfold'))) === '0' && !(await vis('#r400Back')), 'pressed, the code and the preview are back, docked and unfolded, and the key steps away');
   ok(errs.length === 0, 'no page error', errs);
   console.log(pass + ' passed, ' + fail + ' failed'); await b.close(); process.exit(fail ? 1 : 0);
 })();
