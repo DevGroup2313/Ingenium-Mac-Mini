@@ -395,6 +395,30 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.02 (27 November 2026): Custodia's dial with Ingenium's own seal, cool at rest, deep by night, moving under the pointer, refined in its own look.
+
+- Her words (27 November 2026), with pictures of Custodia by day and by night on her Mac: "Custodia has the wrong logo on the inside of the
+  3D drawing and also is overheating my devices again, please fix it. Also, the design looks entirely too bright on Night mode ... I want
+  Custodia to have the same animated and clickable feel and look as the other pages inside of Ingenium"; then "deepen and enhance the
+  Custodia 3D header in both Day and Night mode"; and, shown a vault painted in the compass's manner (never released): "i preferred this
+  original look, I just wanted it to look more defined, refined, elegant and elevated without you copying the compass' literal design".
+  `r408.js`:
+  - What heated: the dial's ring turned without end (a 16 second round) and the amber lamps pulsed their glow without end (a changing glow
+    is painted again on every frame). Both are gone; nothing on the page moves by itself but the seal's own breath, as on every page.
+  - The logo: the knob's well holds Ingenium's own seal (Home's, in its layers, from IngStudios.kit.sealKey where the compass's part is
+    carried, else the welcome door's seal with a press of its own), upright while the ring turns.
+  - The approved pewter dial, refined in its own terms: the bezel finely brushed, its polished rim catching the light from the upper left,
+    a crisper lip around the face, finer ticks with a middle tick between the numbers, the numbers a little larger, the knurl finer and lit
+    as a dome, the pointer cut in two facets, the lamps small polished beads ringed with a hairline of light. By night the bezel, the knob
+    and the empty lamps are dark metal and the light is low.
+  - It answers: the dial tilts toward the pointer and a light follows it; the ring turns under the hand, glides a little, and settles on a
+    mark with a click; a lamp names its key under the pointer and, pressed, flares once while the dial turns its number under the pointer
+    and the key opens below (the head is kept while the parts below are drawn again, so a turn is never cut short); the seal plays a
+    flourish; as the page opens the ring turns home once and a key with no way back yet calls twice. Minimal motion keeps it flat and still.
+  - Test: rig/t_802_custodia_dial.js (22 checks: the seal and its layers, nothing running at rest and no frames asked for, the dial's metal
+    by day and by night, the tilt and its light, a lamp's name, its press and its key, the turn by hand and its settling, the seal's press,
+    Minimal motion); rig/t_800_custodia.js still 26/26.
+
 Ingenium 8.01 (27 November 2026): the Guides of the Gift and Demo editions name only the pages those editions have.
 
 - The editions tests on 8.00 (run after its push) found the Guide's What is new naming Fabrica (7.97's line of the little hand, 7.89's

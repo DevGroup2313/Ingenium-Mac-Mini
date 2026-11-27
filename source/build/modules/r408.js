@@ -7,8 +7,11 @@
    sign-in, a hint; r197); the Cloud's passphrase (r255), a backup's password (r143), the owner key's password (PermitCore) and the
    reading key's password (r357) had none: forgotten, they locked their thing for good.
    Custodia (Latin: safekeeping), a page of its own in the side bar, before Settings:
-   - its head: a combination dial in pewter with Ingenium's star at its knob, turning now and then; around it a lamp for each key,
-     violet when it has a way back, amber when it has none yet (pressed, it opens that key);
+   - its head: a combination dial in pewter, Ingenium's own seal at its knob (8.02: Home's seal in its layers, pressed as on Home; the
+     bezel finely brushed with a polished rim, finer ticks with a middle tick between the numbers, a finer knurl lit as a dome, the pointer
+     cut in two facets); around it a bead for each key, violet when it has a way back, amber when it has none yet (pressed, the dial turns
+     its number under the pointer and the key opens). It tilts toward the pointer and its light follows; the ring turns under the hand;
+     nothing moves by itself but the seal's breath;
    - Your keys: a tag for each key this copy holds (the owner key and the reading key in the master edition alone; GitHub only where
      Fabrica is), with its ways back as lamps;
    - each key opened: its ways back, read from the part that holds it, with keys to the places that already keep them (Settings' sign-in
@@ -54,31 +57,51 @@ body[data-theme="night"] .cu-key:not(.primary){color:#e9defc;background:linear-g
 #cuHead .cu-say b{font-style:normal;font-weight:600;color:var(--c-ink1)}
 /* the dial: a combination dial in pewter, its knob with Ingenium's star */
 #cuHead .cu-dialbox{position:absolute;right:78px;top:50%;width:380px;height:380px;margin-top:-190px}
+/* the dial: a combination dial in pewter, as approved; 8.02 refines it in its own terms: a finely brushed bezel whose polished rim catches
+   the light, a crisper lip around the face, finer ticks with a middle tick between the numbers, a finer knurl lit as a dome, the pointer
+   cut in two facets, the lamps as small polished beads; Ingenium's own seal at its knob */
 .cu-dial{position:absolute;inset:0;border-radius:50%;
-  background:conic-gradient(from 200deg,#fdfdff,#d6d2df 12%,#9e99ab 26%,#e9e7ee 40%,#ffffff 50%,#bfbaca 64%,#8f8a9c 80%,#e4e1ea 92%,#fdfdff);
-  box-shadow:0 3px 0 #8d879b,0 6px 0 #7b7589,0 14px 22px rgba(40,22,68,.25),0 30px 54px rgba(40,22,68,.18),inset 0 0 0 1px rgba(255,255,255,.6)}
-body[data-theme="night"] .cu-dial{box-shadow:0 3px 0 #4a445a,0 6px 0 #322d40,0 14px 22px rgba(0,0,0,.55),0 30px 54px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.35)}
+  background:repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.08) 0 1px,rgba(60,50,80,.03) 1px 2px),
+    conic-gradient(from 200deg,#fdfdff,#d6d2df 12%,#9e99ab 26%,#e9e7ee 40%,#ffffff 50%,#bfbaca 64%,#8f8a9c 80%,#e4e1ea 92%,#fdfdff);
+  box-shadow:0 3px 0 #8d879b,0 6px 0 #7b7589,0 14px 22px rgba(40,22,68,.25),0 30px 54px rgba(40,22,68,.18),inset 0 0 0 1px rgba(255,255,255,.8),0 0 0 .6px rgba(60,50,80,.4)}
+.cu-dial::before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:linear-gradient(145deg,rgba(255,255,255,.85),rgba(255,255,255,0) 36%,rgba(40,22,68,0) 64%,rgba(40,22,68,.24));
+  -webkit-mask:radial-gradient(circle closest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));mask:radial-gradient(circle closest-side,transparent calc(100% - 7px),#000 calc(100% - 6px))}
+body[data-theme="night"] .cu-dial{background:repeating-radial-gradient(circle at 50% 50%,rgba(214,200,244,.035) 0 1px,rgba(0,0,0,.05) 1px 2px),
+    conic-gradient(from 200deg,#5a5373,#3a3450 12%,#221d30 26%,#4a4361 40%,#6a6388 50%,#2e2940 64%,#1a1625 80%,#433c58 92%,#5a5373);
+  box-shadow:0 3px 0 #2c273a,0 6px 0 #1d1928,0 14px 22px rgba(0,0,0,.55),0 30px 54px rgba(0,0,0,.45),inset 0 0 0 1px rgba(214,200,244,.22),0 0 0 .6px rgba(0,0,0,.6)}
+body[data-theme="night"] .cu-dial::before{background:linear-gradient(145deg,rgba(214,200,244,.34),rgba(214,200,244,0) 36%,rgba(0,0,0,0) 64%,rgba(0,0,0,.38))}
 .cu-face{position:absolute;inset:22px;border-radius:50%;background:radial-gradient(circle at 46% 36%,var(--c-face0),var(--c-face1) 78%);
-  box-shadow:inset 0 3px 8px rgba(40,22,68,.30),inset 0 -2px 0 rgba(255,255,255,.5),0 0 0 1.5px rgba(60,50,80,.35)}
-.cu-turn{position:absolute;inset:22px;border-radius:50%;animation:cuTurn 16s cubic-bezier(.45,0,.25,1) infinite}
-@keyframes cuTurn{0%{transform:rotate(0)}18%{transform:rotate(-118deg)}30%{transform:rotate(-118deg)}52%{transform:rotate(64deg)}64%{transform:rotate(64deg)}86%{transform:rotate(-22deg)}100%{transform:rotate(0)}}
+  box-shadow:inset 0 3px 8px rgba(40,22,68,.30),inset 0 -2px 0 rgba(255,255,255,.5),0 0 0 1.5px rgba(60,50,80,.38),0 0 0 3.5px rgba(255,255,255,.6)}
+body[data-theme="night"] .cu-face{box-shadow:inset 0 3px 10px rgba(0,0,0,.6),inset 0 -1px 0 rgba(214,200,244,.10),0 0 0 1.5px rgba(10,6,18,.75),0 0 0 3px rgba(214,200,244,.10)}
+.cu-turn{position:absolute;inset:22px;border-radius:50%;transform:rotate(0deg);cursor:grab;touch-action:none}
+.cu-turn.held{cursor:grabbing}
 .cu-ticks{position:absolute;inset:6px;border-radius:50%;
-  background:repeating-conic-gradient(from -.4deg,var(--c-l1) 0 .8deg,transparent .8deg 3.6deg);
+  background:repeating-conic-gradient(from -.3deg,var(--c-l1) 0 .6deg,transparent .6deg 3.6deg);
   -webkit-mask:radial-gradient(circle,transparent 0 69%,#000 69.5% 76%,transparent 76.5%);mask:radial-gradient(circle,transparent 0 69%,#000 69.5% 76%,transparent 76.5%)}
-.cu-ticks.big{background:repeating-conic-gradient(from -.7deg,var(--c-ink2) 0 1.4deg,transparent 1.4deg 36deg);
+.cu-ticks.mid{background:repeating-conic-gradient(from 17.55deg,var(--c-ink3) 0 .9deg,transparent .9deg 36deg);
+  -webkit-mask:radial-gradient(circle,transparent 0 67%,#000 67.5% 76%,transparent 76.5%);mask:radial-gradient(circle,transparent 0 67%,#000 67.5% 76%,transparent 76.5%)}
+.cu-ticks.big{background:repeating-conic-gradient(from -.6deg,var(--c-ink2) 0 1.2deg,transparent 1.2deg 36deg);
   -webkit-mask:radial-gradient(circle,transparent 0 65%,#000 65.5% 76%,transparent 76.5%);mask:radial-gradient(circle,transparent 0 65%,#000 65.5% 76%,transparent 76.5%)}
-.cu-num{position:absolute;left:50%;top:50%;width:30px;height:20px;margin:-10px 0 0 -15px;text-align:center;font:600 15px/20px var(--c-serif);color:var(--c-ink2)}
+.cu-num{position:absolute;left:50%;top:50%;width:30px;height:20px;margin:-10px 0 0 -15px;text-align:center;font:600 16px/20px var(--c-serif);color:var(--c-ink1);letter-spacing:.02em;text-shadow:0 1px 0 rgba(255,255,255,.8);pointer-events:none}
+body[data-theme="night"] .cu-num{color:var(--c-ink2);text-shadow:0 1px 0 rgba(0,0,0,.6)}
 .cu-knob{position:absolute;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;
-  background:repeating-conic-gradient(from 0deg,#f4f3f7 0 3deg,#b8b3c4 3deg 6deg);
-  box-shadow:0 2px 0 #8d879b,0 6px 12px rgba(40,22,68,.35),inset 0 0 0 4px rgba(255,255,255,.35)}
-.cu-knob::after{content:"";position:absolute;inset:14px;border-radius:50%;background:radial-gradient(circle at 40% 32%,#a47de6,#6a3fb5 58%,#4b2a86);
-  box-shadow:inset 0 2px 5px rgba(20,6,46,.5),inset 0 -1px 0 rgba(255,255,255,.25),0 0 0 2px #cfcadb,0 0 18px rgba(122,76,200,.45)}
-.cu-knob svg{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;z-index:1;filter:drop-shadow(0 0 6px rgba(255,255,255,.7))}
-.cu-mark{position:absolute;left:50%;top:-14px;width:0;height:0;margin-left:-11px;border-left:11px solid transparent;border-right:11px solid transparent;border-top:18px solid #6a3fb5;filter:drop-shadow(0 2px 2px rgba(40,22,68,.35));z-index:3}
-.cu-lamp{position:absolute;width:12px;height:12px;border-radius:50%;z-index:3}
-.cu-lamp.ok{background:radial-gradient(circle at 35% 30%,#d8c6ff,#7a52c7 60%);box-shadow:0 0 10px rgba(122,76,200,.7)}
-.cu-lamp.warn{background:radial-gradient(circle at 35% 30%,#ffe3b3,#d9902f 60%);box-shadow:0 0 10px rgba(217,144,47,.7);animation:cuPulse 2.4s ease-in-out infinite}
-@keyframes cuPulse{50%{box-shadow:0 0 18px rgba(217,144,47,.95)}}
+  background:repeating-conic-gradient(from 0deg,#f6f5f9 0 2deg,#b6b1c3 2deg 4deg);
+  box-shadow:0 2px 0 #8d879b,0 6px 12px rgba(40,22,68,.35),inset 0 0 0 4px rgba(255,255,255,.35),0 0 0 1px rgba(60,50,80,.3)}
+.cu-knob::before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.6),rgba(255,255,255,0) 48%),radial-gradient(circle at 70% 78%,rgba(40,22,68,.24),rgba(40,22,68,0) 55%)}
+.cu-knob::after{content:"";position:absolute;inset:14px;border-radius:50%;background:radial-gradient(circle at 42% 34%,#f3eefb,#ddd3ef 70%,#cbbfe3);
+  box-shadow:inset 0 3px 7px rgba(40,22,68,.28),inset 0 -1px 0 rgba(255,255,255,.6),0 0 0 2px #eeeaf5,0 0 0 3px rgba(60,50,80,.28)}
+body[data-theme="night"] .cu-knob{background:repeating-conic-gradient(from 0deg,#4e4766 0 2deg,#2a2439 2deg 4deg);box-shadow:0 2px 0 #17131f,0 6px 12px rgba(0,0,0,.55),inset 0 0 0 4px rgba(214,200,244,.08),0 0 0 1px rgba(0,0,0,.6)}
+body[data-theme="night"] .cu-knob::before{background:radial-gradient(circle at 32% 26%,rgba(214,200,244,.22),rgba(214,200,244,0) 48%),radial-gradient(circle at 70% 78%,rgba(0,0,0,.35),rgba(0,0,0,0) 55%)}
+body[data-theme="night"] .cu-knob::after{background:radial-gradient(circle at 42% 34%,#2e2546,#1b1529 70%,#130e1d);box-shadow:inset 0 3px 8px rgba(0,0,0,.6),inset 0 -1px 0 rgba(214,200,244,.12),0 0 0 2px #3a3350,0 0 0 3px rgba(0,0,0,.5)}
+.cu-mark{position:absolute;left:50%;top:-14px;width:24px;height:19px;margin-left:-12px;z-index:5;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(40,22,68,.35))}
+.cu-mark i{position:absolute;inset:0;clip-path:polygon(0 0,100% 0,50% 100%);background:linear-gradient(180deg,rgba(255,255,255,.4) 0 1.5px,rgba(255,255,255,0) 1.5px),linear-gradient(90deg,#8d66d9 0 50%,#5a31a6 50% 100%)}
+body[data-theme="night"] .cu-mark i{background:linear-gradient(180deg,rgba(255,255,255,.3) 0 1.5px,rgba(255,255,255,0) 1.5px),linear-gradient(90deg,#a986ee 0 50%,#6d44bd 50% 100%)}
+.cu-lamp{position:absolute;width:14px;height:14px;border-radius:50%;z-index:3;box-shadow:0 0 0 1px rgba(255,255,255,.8),0 1px 2px rgba(40,22,68,.35)}
+.cu-lamp.ok{background:radial-gradient(circle at 35% 30%,#efe6ff 0,#a682e8 32%,#6a3fb5 68%,#43247f 100%);box-shadow:0 0 0 1px rgba(255,255,255,.8),0 1px 2px rgba(40,22,68,.35),0 0 10px rgba(122,76,200,.6)}
+.cu-lamp.warn{background:radial-gradient(circle at 35% 30%,#fff2d9 0,#f0b65c 34%,#d08a2b 70%,#94570f 100%);box-shadow:0 0 0 1px rgba(255,255,255,.8),0 1px 2px rgba(40,22,68,.35),0 0 10px rgba(217,144,47,.55)}
+.cu-lamp.none{background:radial-gradient(circle at 35% 30%,#ffffff 0,#dedae6 40%,#a9a3b8 80%,#8a849b 100%)}
 /* the board of key tags */
 #cuBoard{margin:22px 0 0}
 #cuBoard .cu-bh{display:flex;align-items:baseline;gap:14px;margin:0 4px 16px}
@@ -179,9 +202,51 @@ body[data-theme="night"] .cu-err{color:#f08a95}
 #cuSheet .sh-keys{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;margin:26px 0 0}
 #cuSheet .words span.blank{color:#b7afc4}
 @media (max-width:860px){#cuHead{height:auto;min-height:760px}#cuHead .cu-words{position:relative;left:auto;top:auto;width:auto;padding:26px 22px 0}#cuHead .cu-say{left:22px;right:22px;bottom:18px}
-  #cuHead .cu-dialbox{position:relative;right:auto;top:auto;margin:20px auto 70px;width:300px;height:300px}.cu-tags{grid-template-columns:minmax(0,1fr)}.cu-way{grid-template-columns:36px minmax(0,1fr)}.cu-way .acts{grid-column:1/-1;justify-content:flex-start}
+  #cuHead .cu-dialbox{position:relative;right:auto;top:auto;margin:20px auto 70px;width:300px;height:300px;--k:.79}.cu-tags{grid-template-columns:minmax(0,1fr)}.cu-way{grid-template-columns:36px minmax(0,1fr)}.cu-way .acts{grid-column:1/-1;justify-content:flex-start}
   .cu-wgrid,#cuSheet .words{grid-template-columns:repeat(2,minmax(0,1fr))}#cuOpen{padding:26px 22px}#cuSheet{padding:30px 22px}}
 @media print{body *{visibility:hidden}#cuSheet,#cuSheet *{visibility:visible}#cuSheet{position:absolute;left:0;top:0;box-shadow:none}#cuSheet .sh-keys{display:none}}
+/* 8.02 (her words, 27 November 2026): "Custodia has the wrong logo on the inside of the 3D drawing and also is overheating my devices again,
+   please fix it. Also, the design looks entirely too bright on Night mode ... I want Custodia to have the same animated and clickable feel and
+   look as the other pages inside of Ingenium"; and, shown a painted vault in the compass's manner: "i preferred this original look, I just
+   wanted it to look more defined, refined, elegant and elevated without you copying the compass' literal design". What heated: the ring
+   turned for ever (a 16 second round) and the amber lamps pulsed their glow for ever (a glow that changes is painted again on every frame).
+   Now nothing moves by itself but the seal's own breath, as on every page: the plate tilts toward the pointer and its light follows it, the
+   ring turns under her hand and to a lamp she presses, once as the page opens; the knob's well holds Ingenium's own seal, upright; by night
+   the metal is dark and its light low. The dial keeps its approved look, refined in its own terms (see the dial's rules above). */
+#cuHead .cu-dialbox{perspective:1100px;--k:1}
+.cu-tilt{position:absolute;left:50%;top:50%;width:380px;height:380px;margin:-190px 0 0 -190px}
+.cu-tilt{transform:scale(var(--k,1)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.cu-dialbox.live .cu-tilt{transition:transform .14s linear}
+.cu-sheen{position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:3;opacity:0;transition:opacity .4s ease;
+  background:radial-gradient(circle at var(--lx,32%) var(--ly,24%),rgba(255,255,255,.58),rgba(255,255,255,.14) 22%,rgba(255,255,255,0) 46%)}
+.cu-dialbox.live .cu-sheen{opacity:1}
+body[data-theme="night"] .cu-sheen{background:radial-gradient(circle at var(--lx,32%) var(--ly,24%),rgba(214,196,250,.26),rgba(214,196,250,.07) 24%,rgba(214,196,250,0) 48%)}
+.cu-sealbox{position:absolute;left:50%;top:50%;width:116px;height:116px;margin:-58px 0 0 -58px;z-index:4;border-radius:50%}
+.cu-sealbox .hx-seal{position:absolute;inset:0;width:100%;height:100%;margin:0;transform:none}
+.cu-sealbox .r175-seal{position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:50%;background:transparent;box-shadow:none;cursor:pointer}
+.cu-sealbox .r175-seal:focus-visible{outline:2.5px solid var(--c-acc);outline-offset:4px}
+.cu-fx{display:grid;place-items:center;width:100%;height:100%}
+.cu-lamp{transition:transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .28s ease}
+.cu-lamp:focus-visible{outline:2px solid var(--c-acc);outline-offset:3px}
+.cu-lamp.ok{color:#8a62d6}.cu-lamp.warn{color:#d9902f}.cu-lamp.none{color:#9d97ad}
+.cu-lamp:hover,.cu-lamp:focus-visible{transform:scale(1.55)}
+.cu-lamp.ok:hover{box-shadow:0 0 0 1px rgba(255,255,255,.9),0 2px 3px rgba(40,22,68,.35),0 0 0 4px rgba(122,76,200,.16),0 0 16px rgba(122,76,200,.85)}
+.cu-lamp.warn:hover{box-shadow:0 0 0 1px rgba(255,255,255,.9),0 2px 3px rgba(40,22,68,.35),0 0 0 4px rgba(217,144,47,.16),0 0 16px rgba(217,144,47,.9)}
+body[data-theme="night"] .cu-lamp{box-shadow:0 0 0 1px rgba(214,200,244,.28),0 1px 2px rgba(0,0,0,.6)}
+body[data-theme="night"] .cu-lamp.ok{box-shadow:0 0 0 1px rgba(214,200,244,.3),0 1px 2px rgba(0,0,0,.6),0 0 12px rgba(150,104,236,.6)}
+body[data-theme="night"] .cu-lamp.warn{box-shadow:0 0 0 1px rgba(214,200,244,.3),0 1px 2px rgba(0,0,0,.6),0 0 12px rgba(217,144,47,.5)}
+body[data-theme="night"] .cu-lamp.none{background:radial-gradient(circle at 35% 30%,#8e87a8 0,#5d5675 60%,#3a344d 100%)}
+.cu-lamp::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid currentColor;opacity:0;pointer-events:none}
+.cu-lamp.pop::after{animation:cuRing .6s cubic-bezier(.2,.7,.3,1) 1}
+.cu-lamp.hello::after{animation:cuRing 1.1s ease-out 2}
+@keyframes cuRing{0%{opacity:.85;transform:scale(.6)}100%{opacity:0;transform:scale(2.1)}}
+.cu-lab{position:absolute;z-index:6;padding:6px 10px;border-radius:10px;white-space:nowrap;pointer-events:none;opacity:0;transform:translate(-50%,var(--ty,18px)) translateY(4px);transition:opacity .2s ease,transform .2s ease;
+  font:600 12px/1.25 var(--sans,system-ui,sans-serif);color:var(--c-ink1);background:rgba(255,255,255,.96);box-shadow:0 0 0 1px rgba(106,63,181,.14),0 6px 16px rgba(40,22,68,.16)}
+.cu-lab small{display:block;font-weight:500;color:var(--c-ink3);margin-top:2px}
+.cu-lab.on{opacity:1;transform:translate(-50%,var(--ty,18px))}
+body[data-theme="night"] .cu-lab{background:rgba(32,25,48,.97);box-shadow:0 0 0 1px rgba(205,184,240,.16),0 8px 18px rgba(0,0,0,.45)}
+body[data-motion="minimal"] .cu-tilt{transform:scale(var(--k,1))!important}
+body[data-motion="minimal"] .cu-sheen{display:none}
 @media (prefers-reduced-motion:reduce){#page-custodia *{animation:none!important;transition:none!important}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p408"]="started";}catch(_){}
@@ -274,13 +339,76 @@ function head(keys){var h=mk("div");h.id="cuHead";var w=mk("div","cu-words");w.a
   ch.appendChild(mk("span","cu-chip",keys.length+" keys · "+(live.length-bad)+" with a way back"));if(bad)ch.appendChild(mk("span","cu-chip warn",bad+" with no way back yet"));w.appendChild(ch);
   var ks=mk("div","cu-keys"),a=mk("button","cu-key primary");a.type="button";a.innerHTML=svg(I.shield)+"Give every key a way back";a.onclick=function(){var k=keys.filter(function(x){return !x.none&&!x.ok;})[0];if(!k){toast("Every key has a way back.");return;}heard();open(k.k,true);};ks.appendChild(a);
   var b=mk("button","cu-key");b.type="button";b.innerHTML=svg(I.sheet)+"My recovery sheet";b.onclick=sheetStart;ks.appendChild(b);w.appendChild(ks);h.appendChild(w);
-  var say=mk("div","cu-say");say.innerHTML="Each lamp around the dial is one of your keys. <b>Violet</b> has a way back; <b>amber</b> has none yet.";h.appendChild(say);
-  var box=mk("div","cu-dialbox"),dial=mk("div","cu-dial"),turn=mk("div","cu-turn");dial.appendChild(mk("div","cu-face"));turn.appendChild(mk("div","cu-ticks"));turn.appendChild(mk("div","cu-ticks big"));
+  var say=mk("div","cu-say");say.innerHTML="Each lamp around the dial is one of your keys. <b>Violet</b> has a way back; <b>amber</b> has none yet. Press a lamp to dial its key.";h.appendChild(say);
+  /* 8.02: the dial in a tilting plate; the ring turns under her hand; Ingenium's own seal in the knob's well, upright, pressed as on Home */
+  var box=mk("div","cu-dialbox"),tilt=mk("div","cu-tilt"),dial=mk("div","cu-dial"),turn=mk("div","cu-turn");dial.appendChild(mk("div","cu-face"));
+  turn.appendChild(mk("div","cu-ticks"));turn.appendChild(mk("div","cu-ticks mid"));turn.appendChild(mk("div","cu-ticks big"));
   for(var n=0;n<100;n+=10){var a2=n*3.6,s=mk("span","cu-num",String(n));s.style.transform="rotate("+a2+"deg) translateY(-122px)";turn.appendChild(s);}
-  var knob=mk("div","cu-knob");knob.innerHTML=STAR;turn.appendChild(knob);dial.appendChild(turn);box.appendChild(dial);box.appendChild(mk("div","cu-mark"));
-  keys.forEach(function(x,i){var t=(-90+i*(360/keys.length)+22)*Math.PI/180,l=mk("button","cu-lamp "+(x.none?"":x.ok?"ok":"warn"));l.type="button";l.style.left=(190+201*Math.cos(t)-6)+"px";l.style.top=(190+201*Math.sin(t)-6)+"px";l.title=x.name;l.setAttribute("aria-label",x.name);
-    if(x.none){l.style.background="radial-gradient(circle at 35% 30%,#fff,#b9b4c5 65%)";l.style.boxShadow="0 0 0 1px rgba(60,50,80,.3)";}l.style.border="0";l.style.padding="0";l.style.cursor="pointer";l.onclick=function(){open(x.k,true);};box.appendChild(l);});
-  h.appendChild(box);return h;}
+  turn.appendChild(mk("div","cu-knob"));turn.style.transform="rotate("+DL.rot.toFixed(2)+"deg)";dial.appendChild(turn);dial.appendChild(mk("div","cu-sheen"));tilt.appendChild(dial);
+  var sb=mk("div","cu-sealbox"),se=sealKey();if(se)sb.appendChild(se);tilt.appendChild(sb);var mkk=mk("div","cu-mark");mkk.appendChild(mk("i"));tilt.appendChild(mkk);var lab=mk("div","cu-lab");lab.setAttribute("aria-hidden","true");
+  keys.forEach(function(x,i){var t=(-90+i*(360/keys.length)+22)*Math.PI/180,l=mk("button","cu-lamp "+(x.none?"none":x.ok?"ok":"warn"));l.type="button";l.style.left=(190+201*Math.cos(t)-7)+"px";l.style.top=(190+201*Math.sin(t)-7)+"px";
+    l.setAttribute("aria-label",x.name+": "+(x.none?x.st:x.ok?"has a way back":"no way back yet"));l.setAttribute("data-key",x.k);l.style.border="0";l.style.padding="0";l.style.cursor="pointer";
+    l.addEventListener("pointerenter",function(){showLab(lab,l,x);});l.addEventListener("focus",function(){showLab(lab,l,x);});
+    l.addEventListener("pointerleave",function(){lab.classList.remove("on");});l.addEventListener("blur",function(){lab.classList.remove("on");});
+    l.onclick=function(){lampPress(box,l,x,i,keys.length);};tilt.appendChild(l);});
+  tilt.appendChild(lab);box.appendChild(tilt);wireDial(box,turn);h.appendChild(box);return h;}
+/* ---------- 8.02: the dial moves and answers, and runs cool (her words, 27 November 2026: "the same animated and clickable feel and look as the
+   other pages"; "overheating my devices again"). Nothing turns or glows by itself any more but the seal's own breath, as on every page; what
+   moves moves whole (turned, tilted, faded), and only while she moves it or for a moment after: a turn as the page opens, a press. ---------- */
+var DL={rot:0,last:0,n:0,tt:0};
+function still(){try{if(D.body.getAttribute("data-motion")==="minimal")return true;}catch(e){}try{return !!(W.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);}catch(e){return false;}}
+function sealKey(){var K=W.IngStudios&&IngStudios.kit;
+  if(K&&typeof K.sealKey==="function"){try{var hs0=K.sealKey("cu-seal","Ingenium's seal. Press it for fun.",116);if(hs0)return hs0;}catch(e){}}
+  /* where the compass's part is not carried (the Gift and Demo editions): the welcome door's own seal, in its layers, with a press of its own */
+  var src=D.querySelector("#introSeal .isl")||D.querySelector("#brandSealBtn .isl")||D.querySelector("#hxSeal .isl");if(!src)return null;
+  var c=src.cloneNode(true),pre="cu"+(++DL.n)+"_",html;c.className="isl isl-home";c.removeAttribute("style");c.setAttribute("aria-hidden","true");html=c.outerHTML;
+  [].forEach.call(c.querySelectorAll("[id]"),function(nd){var id=nd.getAttribute("id"),q=id.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+    html=html.replace(new RegExp('id="'+q+'"',"g"),'id="'+pre+id+'"').replace(new RegExp("url\\(#"+q+"\\)","g"),"url(#"+pre+id+")").replace(new RegExp('href="#'+q+'"',"g"),'href="#'+pre+id+'"');});
+  var w=mk("div");w.innerHTML=html;var isl=w.firstElementChild;isl.style.setProperty("--S","116px");[].forEach.call(isl.querySelectorAll(".isl-tilt,.isl-idle"),function(nd){nd.removeAttribute("style");});
+  var hs=mk("div","hx-seal cu-seal"),k=mk("button","r175-seal"),g=mk("span","r175-glow"),fx=mk("span","r175-fx"),cx=mk("span","cu-fx"),f=0;k.type="button";k.setAttribute("aria-label","Ingenium's seal. Press it for fun.");
+  g.setAttribute("aria-hidden","true");cx.appendChild(isl);fx.appendChild(cx);k.appendChild(g);k.appendChild(fx);hs.appendChild(k);
+  k.addEventListener("pointermove",function(e){if(e.pointerType!=="mouse"||still())return;var r=isl.getBoundingClientRect();if(!r.width)return;var x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+    isl.classList.add("hover");isl.style.setProperty("--ry",(x*28).toFixed(1)+"deg");isl.style.setProperty("--rx",(-y*24).toFixed(1)+"deg");},{passive:true});
+  k.addEventListener("pointerleave",function(){isl.classList.remove("hover","down");isl.style.setProperty("--rx","0deg");isl.style.setProperty("--ry","0deg");});
+  k.addEventListener("pointerdown",function(){if(!still())isl.classList.add("down");},{passive:true});
+  ["pointerup","pointercancel"].forEach(function(t){k.addEventListener(t,function(){isl.classList.remove("down");},{passive:true});});
+  var FL=[[{transform:"rotate(0deg)"},{transform:"rotate(360deg)"}],[{transform:"scale(1)"},{transform:"scale(1.12)"},{transform:"scale(.95)"},{transform:"scale(1)"}],
+    [{transform:"translateY(0)"},{transform:"translateY(-12px)"},{transform:"translateY(0)"},{transform:"translateY(-4px)"},{transform:"translateY(0)"}],
+    [{transform:"rotate(0deg)"},{transform:"rotate(-14deg)"},{transform:"rotate(10deg)"},{transform:"rotate(-5deg)"},{transform:"rotate(0deg)"}]];
+  k.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();heard();if(still()||!cx.animate)return;var q=FL[f++%FL.length];try{cx.animate(q,{duration:q.length>3?760:640,easing:"cubic-bezier(.3,.7,.3,1)"});}catch(x){}});
+  return hs;}
+function showLab(lab,l,x){lab.textContent="";lab.appendChild(D.createTextNode(x.name));lab.appendChild(mk("small",null,x.none?x.st:x.ok?"Has a way back":"No way back yet"));
+  var lx=parseFloat(l.style.left)+7,ly=parseFloat(l.style.top)+7;lab.style.left=Math.max(96,Math.min(284,lx))+"px";lab.style.top=ly+"px";lab.style.setProperty("--ty",ly<190?"18px":"calc(-100% - 18px)");lab.classList.add("on");}
+/* the ring turned to a number: the shortest way round; already there, a whole turn */
+function turnTo(turn,target,ms){var d=((target-DL.rot)%360+540)%360-180;if(Math.abs(d)<2)d=d>=0?360:-360;DL.rot+=d;clearTimeout(DL.tt);
+  if(!ms){turn.style.transition="none";turn.style.transform="rotate("+DL.rot.toFixed(2)+"deg)";return;}
+  turn.style.transition="transform "+ms+"ms cubic-bezier(.2,.85,.25,1)";turn.style.transform="rotate("+DL.rot.toFixed(2)+"deg)";DL.tt=setTimeout(function(){turn.style.transition="";heard();},ms);}
+/* a lamp pressed: it flares once, the ring dials its number under the mark, and its key opens below */
+function lampPress(box,l,x,i,n){heard();var turn=box.querySelector(".cu-turn");l.classList.remove("pop");void l.offsetWidth;l.classList.add("pop");setTimeout(function(){l.classList.remove("pop");},700);
+  if(turn)turnTo(turn,-Math.round(i*(100/n))*3.6,still()?0:950);setTimeout(function(){open(x.k,true);},still()?0:560);}
+/* the plate tilts toward the pointer and its light follows it (a mouse only; one drawing a frame, and only while it moves); the ring turns
+   under her hand, glides on a little when let go, and settles on a number with a click */
+function wireDial(box,turn){var raf=0,px=0,py=0,drag=null;
+  function frame(){raf=0;if(!drag&&!box.classList.contains("live"))return;var r=box.getBoundingClientRect();if(!r.width)return;var x=(px-r.left)/r.width,y=(py-r.top)/r.height;
+    box.style.setProperty("--lx",(x*100).toFixed(1)+"%");box.style.setProperty("--ly",(y*100).toFixed(1)+"%");
+    if(!drag){box.style.setProperty("--rx",(-(y-.5)*14).toFixed(2)+"deg");box.style.setProperty("--ry",((x-.5)*16).toFixed(2)+"deg");}}
+  box.addEventListener("pointermove",function(e){if((e.pointerType!=="mouse"&&!drag)||still())return;px=e.clientX;py=e.clientY;box.classList.add("live");if(!raf)raf=requestAnimationFrame(frame);},{passive:true});
+  box.addEventListener("pointerleave",function(){if(drag)return;if(raf){cancelAnimationFrame(raf);raf=0;}box.classList.remove("live");box.style.setProperty("--rx","0deg");box.style.setProperty("--ry","0deg");});
+  function ang(e){var r=box.getBoundingClientRect();return Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2))*180/Math.PI;}
+  function clicks(){var s=Math.floor(DL.rot/36);if(s!==DL.last){DL.last=s;heard();}}
+  function snap(){var to=Math.round(DL.rot/3.6)*3.6;DL.rot=to;turn.style.transition="transform .2s cubic-bezier(.3,1.4,.5,1)";turn.style.transform="rotate("+to.toFixed(2)+"deg)";setTimeout(function(){turn.style.transition="";},220);}
+  turn.addEventListener("pointerdown",function(e){if(e.button!==0)return;clearTimeout(DL.tt);drag={a:ang(e),t:performance.now(),v:0,id:e.pointerId};turn.style.transition="none";turn.classList.add("held");try{turn.setPointerCapture(e.pointerId);}catch(x){}});
+  turn.addEventListener("pointermove",function(e){if(!drag||e.pointerId!==drag.id)return;var a=ang(e),d=a-drag.a;if(d>180)d-=360;if(d<-180)d+=360;drag.a=a;
+    var t=performance.now(),dt=Math.max(8,t-drag.t);drag.t=t;drag.v=d/dt*1000;DL.rot+=d;turn.style.transform="rotate("+DL.rot.toFixed(2)+"deg)";clicks();});
+  function end(e){if(!drag)return;var v=drag.v;drag=null;turn.classList.remove("held");try{turn.releasePointerCapture(e.pointerId);}catch(x){}
+    if(still()||Math.abs(v)<60){snap();return;}var t0=performance.now(),last=t0;
+    (function glide(now){var dt=Math.min(.05,(now-last)/1000);last=now;v*=Math.pow(.05,dt);DL.rot+=v*dt;turn.style.transform="rotate("+DL.rot.toFixed(2)+"deg)";clicks();
+      if(Math.abs(v)>30&&now-t0<1000)requestAnimationFrame(glide);else snap();})(t0);}
+  turn.addEventListener("pointerup",end);turn.addEventListener("pointercancel",end);}
+/* as the page opens: the ring turns home once, and a lamp with no way back yet calls twice */
+function settle(){var box=D.querySelector("#cuHead .cu-dialbox"),turn=box&&box.querySelector(".cu-turn");if(!turn||still())return;
+  DL.rot=-48;turn.style.transition="none";turn.style.transform="rotate(-48deg)";void turn.offsetWidth;turnTo(turn,0,1300);
+  [].forEach.call(box.querySelectorAll(".cu-lamp.warn"),function(l){l.classList.remove("hello");void l.offsetWidth;l.classList.add("hello");setTimeout(function(){l.classList.remove("hello");},2400);});}
 /* ---------- the board of key tags ---------- */
 function board(keys){var b=mk("section");b.id="cuBoard";var bh=mk("div","cu-bh");bh.appendChild(mk("h3",null,"Your keys"));bh.appendChild(mk("span",null,"press one to see its ways back"));b.appendChild(bh);
   var g=mk("div","cu-tags");keys.forEach(function(x){var t=mk("button","cu-tag"+(x.none?" none":x.ok?"":" warn"));t.type="button";t.setAttribute("data-key",x.k);t.setAttribute("aria-pressed",OPEN===x.k?"true":"false");
@@ -418,7 +546,9 @@ function sheet(keys){var s=mk("section");s.id="cuSheet";s.innerHTML=sheetHtml(ke
   k.appendChild(word("Close the sheet",function(){SHEET=null;paint();}));s.appendChild(k);return s;}
 /* ---------- painting ---------- */
 function root(){return D.getElementById("cuRoot");}
-function paint(){var r=root();if(!r)return;var keys=KEYS;r.innerHTML="";r.appendChild(head(keys));r.appendChild(board(keys));
+function paint(){var r=root();if(!r)return;var keys=KEYS,old=D.getElementById("cuHead"),sig=keys.map(function(x){return x.k+(x.none?"0":x.ok?"1":"2");}).join(",");
+  var keep=!!(old&&old.parentNode===r&&old.getAttribute("data-sig")===sig);[].slice.call(r.childNodes).forEach(function(nd){if(!(keep&&nd===old))r.removeChild(nd);});
+  if(!keep){var hd=head(keys);hd.setAttribute("data-sig",sig);r.insertBefore(hd,r.firstChild);}r.appendChild(board(keys));
   if(OPEN){var x=keys.filter(function(k){return k.k===OPEN;})[0];if(x&&PANELS[x.k]){var o=mk("section");o.id="cuOpen";o.setAttribute("data-key",x.k);PANELS[x.k](o,x);r.appendChild(o);}}
   if(SHEET)r.appendChild(sheet(keys));}
 function refresh(){return model().then(function(k){KEYS=k;paint();return k;});}
@@ -433,7 +563,7 @@ function nav(){var st=D.querySelector('.nav-btn[data-page="settings"]');if(st&&!
 function wrapBackup(){var B=W.IngBackup;if(!B||B.__r408||typeof B.make!=="function")return;var o=B.make;B.make=function(opts){var pw=opts&&opts.password,r=o.apply(this,arguments);
     try{if(pw&&C().keepBackup!==false&&keysInHand())Promise.resolve(r).then(function(){return sealCopy("backup",String(pw));}).then(function(c){var v=C().v;v.backup.push({c:c,at:Date.now(),n:opts&&opts.seal?"the whole backup sealed":"its keys sealed"});if(v.backup.length>10)v.backup=v.backup.slice(-10);save();}).catch(function(){});}catch(e){}
     return r;};B.__r408=1;}
-function wrapGo(){var og=W.go;if(typeof og!=="function"||og.__r408)return;var ng=function(p){var r=og.apply(this,arguments);try{if(p==="custodia"){install();refresh();}else{SHEET=null;REVEAL=null;FORM=null;WORDS=null;}}catch(e){}return r;};
+function wrapGo(){var og=W.go;if(typeof og!=="function"||og.__r408)return;var ng=function(p){var r=og.apply(this,arguments);try{if(p==="custodia"){install();refresh().then(function(){setTimeout(settle,60);});}else{SHEET=null;REVEAL=null;FORM=null;WORDS=null;}}catch(e){}return r;};
   try{Object.keys(og).forEach(function(k){ng[k]=og[k];});}catch(e){}ng.__r408=true;W.go=ng;try{go=ng;}catch(e){}}
 function tick(){try{install();wrapGo();wrapBackup();}catch(e){}}
 install();
