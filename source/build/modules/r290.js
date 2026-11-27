@@ -1226,7 +1226,7 @@ function vcAim(st,goal,kick,quiet){st.goal=goal;if(kick)st.v+=kick;if(quiet||sti
    beneath, the case's thickness in stacked rims, the dial sunk inside it, the rose, the medallions and the logo standing off the dial,
    the crystal and the case above. The whole sways on its own as the logo does, leans to the pointer on a spring, rises when it appears */
 function vcBuild(){var box=mk("div","skc skv"),tilt=mk("div","skv-tilt"),idle=mk("div","skv-idle"),P=mk("div","skv-rise");box.appendChild(tilt);tilt.appendChild(idle);idle.appendChild(P);
-  box.setAttribute("role","group");box.setAttribute("aria-label","The dial: your counsellor's stages");
+  box.setAttribute("role","group");box.setAttribute("aria-label","The dial: Dux's stages");
   P.appendChild(mk("i","skv-under"));
   for(var z=1;z<=9;z+=2.6){var e=mk("i","skv-side");e.style.setProperty("--z",z);e.setAttribute("aria-hidden","true");P.appendChild(e);}
   var base=mk("div","skv-base");P.appendChild(base);
@@ -1382,10 +1382,10 @@ function vcStages(box,list,nt,onPick,onHover){var st=box.__vc;st.onHover=onHover
 
 function careerHero(){if(!W.ING_COMPASS)return null;var pg=$("page-career"),cs=$("cs");if(!pg||!cs)return null;if(CP.h&&CP.h.el.isConnected)return CP.h;
   var lede=(cs.querySelector(".c-head p")||{}).textContent||"Your profile, the posts, programmes and grants you are weighing, and what you send. Everything stays on this device.";
-  var H=hero({title:"Vocatio",eyebrow:"Vocatio · the compass of your path",lede:lede,
-    keys:[{pri:true,ico:ICO.compass,txt:"Your counsellor",id:"skCareerGo",fn:function(){var S=W.IngCareer.state();S.ui.room="mentor";S.ui.show="work";try{saveState();}catch(e){}W.IngCareer.render();scrollTo(cs);}},
+  var H=hero({title:"Vocatio",eyebrow:"The Career Studio · The compass of your path",lede:lede,  /* 8.05: The Career Studio in the eyebrow, at her approval of the names preview */
+    keys:[{pri:true,ico:ICO.compass,txt:"Dux",id:"skCareerGo",fn:function(){var S=W.IngCareer.state();S.ui.room="mentor";S.ui.show="work";try{saveState();}catch(e){}W.IngCareer.render();scrollTo(cs);}},
       {ico:ICO.plus,txt:"Bring one in",fn:function(){var S=W.IngCareer.state();S.ui.room="apps";S.ui.open="new";S.ui.show="work";try{saveState();}catch(e){}W.IngCareer.render();scrollTo(cs);}}],
-    says:"Your counsellor's stages, one after another: what you have, your record, what you want, where you could go, and this week.",hint:"Press a stage to turn the compass to it."});
+    says:"Dux leads you through the stages, one after another: what you have, your record, what you want, where you could go, and this week.",hint:"Press a stage to turn the compass to it."});
   var who=cs.querySelector(".c-who");if(who)H.keys.appendChild(who);
   var box=vcBuild(),st=box.__vc;st.head=H.el;st.onLand=function(){tick();};H.el.classList.add("skv-head");
   /* at its heart, Home's own engine button: Home's animation and Home's click (her words, 13 November 2026) */

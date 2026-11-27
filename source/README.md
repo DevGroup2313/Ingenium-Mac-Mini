@@ -395,6 +395,26 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.05 (27 November 2026): Vocatio's rooms named in Latin, each with its meaning under the pointer.
+
+- Her choices in the questionnaire (27 November 2026), then her approval of the live preview: Latin names for Vocatio's rooms, as
+  Ingenium's pages have; the Latin name alone on each tab, its English meaning shown only on hover; "Career Studio" kept, in the
+  head's eyebrow. `r188.js`, `r283.js`, `r290.js`:
+  - The rooms: Diurna (Today, the daily record), Dux (once Your mentor: the guide, dux itineris, the guide of a journey), Petitiones
+    (Applications: candidacies, as for an office in Rome), Socii (People: companions and allies), Vita (Your profile: a life), Dotes
+    (Your edge: gifts, talents), Cursus (Goals and plan: the course, cursus honorum) and Gradus (Learn: steps, as in Gradus ad
+    Parnassum). Each room's panel opens under the same name.
+  - The meaning shows in a small label beneath the tab while the pointer rests on it or the keyboard reaches it, and goes when the
+    pointer leaves; the tabs carry no other tooltip. Each tab's spoken name gives the Latin name and its meaning.
+  - The head: its eyebrow reads "The Career Studio · The compass of your path", its key reads Dux, and its line says Dux leads you
+    through the stages, one after another.
+  - Every sentence that sends you to a room names it by its new name (`r188.js`, `r222.js`, `r283.js`, `r290.js`, `r323.js`,
+    `r377.js`): the back keys, How it works, the messages ("It is in Vocatio, under Petitiones"), the cards in Dux, the DPhil plan, the
+    Guide's card and the guided tour, where each Latin name comes with its meaning. Dux speaks as Dux where it said Your mentor or
+    Your counsellor. What is new keeps the old names in the lines of the releases that used them.
+  - Test: rig/t_805_vocatio_names.js (9 checks: the eight names, the meanings by hover only, the head, each room's panel, no old
+    name left in any room, the Guide's card).
+
 Ingenium 8.04 (27 November 2026): Ingenia's app logos, weighted 3D buttons as their own doors draw them; Clavis's astrolabe on its own.
 
 - Her words (27 November 2026): "All of the apps logos look flat and one dimensional on the Ingenia folder pages, especially Clavis which

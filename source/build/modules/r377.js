@@ -143,7 +143,7 @@ var S={
     b:"Watch: the breathing app is kept in Fabrica as a real repository, in two versions (the circle, then a count of the breaths), and Fabrica's own Test runs on the second: the page reads cleanly, every file it names is there, it opens with no errors, its own small check passes, and its build number moved forward. The tree in the header grows a version for each. The tour's repository is removed when the tour ends."},
   career4:{r377:1,levels:NEWSOME,go:function(){onPage("career");},ring:"#cs",demo:"r377Vocatio",
     t:"📌 An application, kept",
-    b:"Watch: an example posting is pasted in. Vocatio reads its title, who offers it and its closing date from the text, and keeps it in Applications with its stage and the days left, so Today can put the next step in front of you. Reading it against your profile waits for your own press, on your own postings: the tour asks no model. The example is removed when the tour ends."}};
+    b:"Watch: an example posting is pasted in. Vocatio reads its title, who offers it and its closing date from the text, and keeps it in Petitiones with its stage and the days left, so Diurna can put the next step in front of you. Reading it against your profile waits for your own press, on your own postings: the tour asks no model. The example is removed when the tour ends."}};
 
 function bare(t){return String(t||"").replace(/^[^A-Za-z]+/,"").trim();}
 function idx(fn){for(var i=0;i<ING_TOUR.length;i++)if(fn(ING_TOUR[i]))return i;return -1;}

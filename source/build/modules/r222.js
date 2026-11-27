@@ -169,7 +169,7 @@ var S={
     b:"Bring in Claude's export (its chats and projects), Claude Code's sessions on this computer (in the computer app), a conversation pasted from Claude Code on the web or from Ollama, and an Ollama Modelfile as a way of working. Each is read on this device; each conversation is sorted into the folder of the app it names, and any can be moved."},
   career1:{r222:1,chap:"Vocatio",sub:"Applications and people",go:function(){goPage("career");},ring:"#page-career .rm-tabs",
     t:"🧭 Applications and your path",
-    b:"Vocatio helps with applications for jobs, PhD places, fellowships and grants. Applications keeps each one with its documents and dates; People keeps the supervisors, referees, recruiters and hiring managers you write to, each with a status and a date to follow up; Today shows the single most urgent step.",
+    b:"Vocatio helps with applications for jobs, PhD places, fellowships and grants. Petitiones, your applications, keeps each one with its documents and dates; Socii, your companions and allies, keeps the supervisors, referees, recruiters and hiring managers you write to, each with a status and a date to follow up; Diurna, the daily record, shows the single most urgent step.",
     tip:"One step at a time: the rest waits, folded, until you ask for it."},
   career2:{r222:1,chap:"Vocatio",go:function(){goPage("career");},ring:"#csWork",
     t:"🔗 A posting from its link",
@@ -271,16 +271,17 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
       some:["Where we left off is brought up to date when you press it: only the conversations not read yet are read."],
       expert:["A conversation that names no app clearly waits under Not sorted yet; move it by hand."]}};
   if(has("page-career")&&!P.career)P.career={name:"Vocatio",tour:["Vocatio"],
-    what:"Vocatio helps with applications for jobs, PhD places, fellowships and grants: each application, the people you write to, and Today's step.",
+    what:"Vocatio helps with applications for jobs, PhD places, fellowships and grants: each application, the people you write to, and the step for today, in Diurna.",
     plain:"It drafts from your profile and your notes alone; you read, change and send everything yourself.",
     dos:[["Bring a posting by its link","Paste the link: it is read against your profile at once.","#csWork"],
-      ["Applications","Each application with its documents and dates.","#csList"]],
-    tips:{"new":["One step at a time: Today shows the most urgent one, and the rest waits, folded."],
+      ["Petitiones","Each application with its documents and dates.","#csList"]],
+    tips:{"new":["One step at a time: Diurna shows the most urgent one, and the rest waits, folded."],
       some:["Draft an email for me leaves what it does not know in square brackets, for you to fill in."],
       expert:["The jobs you saved on LinkedIn come in from LinkedIn's own copy of your data, one at a time."]}};}
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["8.05", "Vocatio's rooms have Latin names, as Ingenium's pages do: Diurna (Today), Dux (the guide, once Your mentor), Petitiones (Applications), Socii (People), Vita (Your profile), Dotes (Your edge), Cursus (Goals and plan) and Gradus (Learn). Rest the pointer on a name, or reach it with the keyboard, and its meaning shows beneath it. Every sentence that sends you to a room names it so. The head reads The Career Studio, The compass of your path, and its key is Dux.", "career"],
   ["8.04", "Ingenia: each app's logo is a weighted 3D button, as on its own door: a rim behind its face, a slow, gentle sway, a lean of twelve degrees at most, each raised part casting its own small shadow, and a soft shadow of its own beneath it, never violet; no press turns it sideways any more. Clavis's astrolabe stands on its own, as on its door, with no plate behind it.", "master"],
   ["8.03", "Adamas: the diamond's holder is drawn at your screen's true sharpness again, so its engraving, its turned lines, its knurled foot and every edge come through, and its outline is smoothed; it stays cool by drawing fewer frames a second, never by stretching a smaller picture."],
   ["8.02", "Custodia's dial carries Ingenium's own seal, set into its face within a fine engraved ring, and is refined: its pewter finely brushed with a polished rim, finer ticks, a cut pointer and small polished beads for its lamps; by night it is dark metal, its light low."],
@@ -763,8 +764,8 @@ function guide(){var page=$("page-guide");if(!page)return;var added=false;
       ["A GitHub repository","Brought into a folder on your press (6.39): its README joins the folder's files and goes with every conversation in it; its text files and its issues, with their comments, are kept in the folder, each with Show and Use in a conversation. It is read from GitHub, the only part of Folders that uses the internet; a private repository needs the token Add from GitHub keeps."],
       ["What it does not do","No model is retrained. A folder gives the model what it should read about your way of working, briefly."]]));page.appendChild(f);added=true;}
   if(has("page-career")&&!$("csGuide")){var cs=card("csGuide","Vocatio","Applications for jobs, PhD places, fellowships and grants, one step at a time.");
-    cs.appendChild(dl([["Today","The single most urgent step across your applications and the people you write to; the rest waits, folded."],
-      ["Applications and people","Each application with its documents and dates; supervisors, referees, recruiters and hiring managers, each with a status and a date to follow up."],
+    cs.appendChild(dl([["Diurna","The single most urgent step across your applications and the people you write to; the rest waits, folded."],
+      ["Petitiones and Socii","Each application with its documents and dates; supervisors, referees, recruiters and hiring managers, each with a status and a date to follow up."],
       ["Drafts","The CV, the cover letter and a portfolio for each application, shaped by templates for 25 roles in 8 fields, with every fact from your profile. Draft an email for me leaves what it does not know in square brackets. You send everything yourself."],
       ["Postings and LinkedIn","A posting's link is fetched once and read against your profile. Your saved jobs come in from LinkedIn's own copy of your data; nothing signs in to LinkedIn."]]));page.appendChild(cs);added=true;}
   if(!$("mdGuide")){var md=card("mdGuide","Models: newer ones, and two engines","How Ingenium keeps your models current, and runs them.");

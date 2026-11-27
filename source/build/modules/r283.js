@@ -193,7 +193,7 @@ function cReview(R){var p=P(),sg=p.suggested||[],it=sg[0],c=h("div","c-col c-pad
   var card=h("div","c-entry");card.appendChild(h("span","c-sec",esc(secName(it.sec))));card.appendChild(h("b",null,esc(it.title)));
   var meta=[it.place,[it.from,it.to].filter(Boolean).join(" to "),it.src==="linkedin-new"?(it.note||"From your LinkedIn export"):"Found in your sources"].filter(Boolean).join(" · ");card.appendChild(h("small",null,esc(meta)));if(it.text)card.appendChild(h("p",null,esc(it.text)));c.appendChild(card);
   c.appendChild(h("p","c-note",esc("Keep it if it is right (you can change it later), or drop it. Enter keeps. Nothing enters your record by itself.")));R.body.appendChild(c);
-  R.foot.appendChild(cbtn("quiet","Keep all the rest",function(){var n=keepAllFound();p.at=Date.now();save();render();say(n+" kept, each marked found: check them in this card or in Your profile when you like.");}));R.foot.appendChild(h("span","c-grow"));
+  R.foot.appendChild(cbtn("quiet","Keep all the rest",function(){var n=keepAllFound();p.at=Date.now();save();render();say(n+" kept, each marked found: check them in this card or in Vita when you like.");}));R.foot.appendChild(h("span","c-grow"));
   R.foot.appendChild(cbtn("","Drop",function(){p.suggested=sg.slice(1);save();render();}));
   var k=cbtn("pri","Keep",function(){keepOne(it);p.suggested=sg.slice(1);p.at=Date.now();save();render();});k.id="cnKeep";R.foot.appendChild(k);
   setTimeout(function(){try{k.focus();}catch(e){}},30);return R;}
@@ -252,7 +252,7 @@ function aimGoals(){var S=CS(),A=CN().aims,made=0;
 function cWant(){var c=CN(),m=U.MT(),T=U.TALK,R=panel("csWork","3. What you want",{chip:chip("Step 3 of 5","")});
   if(!m.talkSeeded){["need","avoid","where","when"].forEach(function(k){if(!m.ans[k]&&String(P().wants[k]||"").trim())m.ans[k]=String(P().wants[k]).trim();});m.talkSeeded=true;}
   var i=Math.max(0,Math.min(T.length,c.qi)),col=h("div","c-col c-pad");
-  if(i===0){var L=h("div","cn-lede");L.style.padding="0";L.appendChild(h("h3",null,esc("Tap what is true. Words of your own are welcome, never required.")));L.appendChild(h("p",null,esc("Eight short questions, one at a time, then your two aims. Saved as you tap; stop and come back whenever you like. Your answers become What you are looking for in Your profile, where you can change them.")));col.appendChild(L);}
+  if(i===0){var L=h("div","cn-lede");L.style.padding="0";L.appendChild(h("h3",null,esc("Tap what is true. Words of your own are welcome, never required.")));L.appendChild(h("p",null,esc("Eight short questions, one at a time, then your two aims. Saved as you tap; stop and come back whenever you like. Your answers become What you are looking for in Vita, where you can change them.")));col.appendChild(L);}
   if(i<T.length){var q=T[i],on=c.chips[q[0]]=c.chips[q[0]]||[];col.appendChild(h("span","c-k",esc("Question "+(i+1)+" of "+T.length)));col.appendChild(h("h3","c-today-step",esc(q[1])));if(q[2])col.appendChild(h("p","c-note",esc(q[2])));
     col.appendChild(chipsRow(q[0],CHIPS[q[0]]||[],on,save));
     var own=h("div","cn-own"),t=h("textarea","c-ta");t.id="cnOwn";t.placeholder="In your own words, if you like";t.value=m.ans[q[0]]||"";t.setAttribute("aria-label",q[1]+", in your own words");var tm=null;
@@ -260,15 +260,15 @@ function cWant(){var c=CN(),m=U.MT(),T=U.TALK,R=panel("csWork","3. What you want
     if(i>0)R.foot.appendChild(cbtn("quiet","Back",function(){c.qi=i-1;save();render();}));else R.foot.appendChild(cbtn("quiet","Back",function(){go1("record");}));
     R.foot.appendChild(h("span","c-grow"));R.foot.appendChild(cbtn("","Skip",function(){c.qi=i+1;save();render();}));R.foot.appendChild(cbtn("pri","Next",function(){c.qi=i+1;save();render();}));return R;}
   col.appendChild(h("span","c-k",esc("Last: your aims")));col.appendChild(aimsCard());
-  var pr=P().prefs;if(!pr.tone)pr.tone="frank";col.appendChild(h("div","c-label",esc("How your counsellor speaks")));
-  col.appendChild(U.seg([["frank","Frank, like a good recruiter"],["warm","Warm and encouraging"],["measured","Measured, like a supervisor"]],pr.tone,function(v){pr.tone=v;save();render();},"How your counsellor speaks"));
+  var pr=P().prefs;if(!pr.tone)pr.tone="frank";col.appendChild(h("div","c-label",esc("How Dux speaks")));
+  col.appendChild(U.seg([["frank","Frank, like a good recruiter"],["warm","Warm and encouraging"],["measured","Measured, like a supervisor"]],pr.tone,function(v){pr.tone=v;save();render();},"How Dux speaks"));
   col.appendChild(h("p","c-note",esc(pr.tone==="frank"?"It says plainly when a plan or a document is weak, and why, then what would mend it.":pr.tone==="warm"?"It names what is strong first, and still says what is weak and how to mend it.":"Exact and even, with the evidence for every judgement.")));R.body.appendChild(col);
   R.foot.appendChild(cbtn("quiet","Back",function(){c.qi=T.length-1;save();render();}));R.foot.appendChild(h("span","c-grow"));
   R.foot.appendChild(cbtn("pri","Finish: that is what I want",function(){var p=P(),a=m.ans;U.TALK.forEach(function(q){var v=answerOf(q[0]);if(v)a[q[0]]=v;});U.talkApply();
     /* the chips' own words stay the chips (the talk keeps what she typed under them) */
     U.TALK.forEach(function(q){var own=String(m.ans[q[0]]||"");var ch=(c.chips[q[0]]||[]);ch.forEach(function(v){own=own.replace(v+", ","").replace(", "+v,"").replace(v,"");});m.ans[q[0]]=own.trim();});
     var made=aimGoals();m.done.talk=Date.now();c.done.want=Date.now();c.qi=0;save();
-    say("Thank you. That is in Your profile, What you are looking for"+(made?", and your aim"+(made===1?" is":"s are")+" in Goals and plan":"")+".");go1("go");
+    say("Thank you. That is in Vita, What you are looking for"+(made?", and your aim"+(made===1?" is":"s are")+" in Cursus":"")+".");go1("go");
     if(U.modelReady()&&!stDone("go"))runGo();}));return R;}
 /* ---------------- 4. Where you could go: one chain ---------------- */
 function aimGoalSteps(){var S=CS(),q=Promise.resolve();S.goals.filter(function(g){return g.aim&&!g.steps.length&&!(g.suggested||[]).length;}).forEach(function(g){q=q.then(function(){return U.runOne(function(){U.goalSteps(g);}).then(function(){if(g.suggested&&g.suggested.length&&!g.steps.length){g.steps=g.suggested.slice(0,7).map(function(s){return {id:uid("st"),text:s.text,by:s.by||"",why:s.why||"",done:false};});g.suggested=[];save();}});});});return q;}
@@ -276,13 +276,13 @@ function runGo(){if(U.busyNow()||U.needModel())return Promise.resolve();var c=CN
   var q=U.edgeAll(false);
   if(!(S.paths&&S.paths.list&&S.paths.list.length)){q=q.then(function(){if(!U.wantsText()&&!S.goals.length){say("The paths start from what you want: step 3.");return;}return U.runOne(IngCareer.paths);});}
   q=q.then(aimGoalSteps);
-  return q.then(function(){c.chain=false;save();render();say("Your counsellor has thought it through. The paths are here and in Goals and plan.");},
+  return q.then(function(){c.chain=false;save();render();say("Dux has thought it through. The paths are here and in Cursus.");},
     function(e){c.chain=false;save();render();var m=String(e&&e.message||e);if(m!=="stopped")say("It could not be finished: "+m);});}
 function cGo(){var S=CS(),E=U.EDGE(),c=CN(),R=panel("csWork","4. Where you could go",{chip:chip("Step 4 of 5","")}),any=false;
   var L=h("div","cn-lede");
   if(!stDone("go")){L.appendChild(h("h3",null,esc("Your edge, your blind spots, and the paths that fit.")));L.appendChild(h("p",null,esc("From your record and what you want, in one run: how to present yourself as a professional and as an academic; what transfers from one setting to another; what a reader will miss or ask; two to four paths that fit, each with a first step; and the steps towards your aims. Only what your sources show; nothing invented, nothing searched online.")));R.body.appendChild(L);
     R.body.appendChild(whereRow());}
-  else{L.appendChild(h("h3",null,esc("Here is where you could go.")));L.appendChild(h("p",null,esc("The first path is the one your counsellor recommends, with its reason; the second is the alternative to weigh against it. A point about the world (what a field asks for, how it hires, a deadline) is for you to check before you rely on it. Everything about you rests on your record.")));R.body.appendChild(L);}
+  else{L.appendChild(h("h3",null,esc("Here is where you could go.")));L.appendChild(h("p",null,esc("The first path is the one Dux recommends, with its reason; the second is the alternative to weigh against it. A point about the world (what a field asks for, how it hires, a deadline) is for you to check before you rely on it. Everything about you rests on your record.")));R.body.appendChild(L);}
   var pos=E.ed&&E.ed.pos||{};if(pos.pro||pos.acad||pos.bridge){any=true;R.body.appendChild(h("div","c-label c-pad",esc("How to present yourself")));var pg=h("div","cn-pos");
     [["pro","As a professional"],["acad","As an academic"],["bridge","The bridge"]].forEach(function(x){if(!pos[x[0]])return;var e=h("div","c-entry");e.appendChild(h("small",null,esc(x[1])));e.appendChild(h("p",null,esc(pos[x[0]])));var k=h("div","c-keys");k.appendChild(cbtn("sm","Copy",function(){U.copyText(pos[x[0]]);}));e.appendChild(k);pg.appendChild(e);});R.body.appendChild(pg);}
   var tr=U.mList("What transfers",E.tr&&E.tr.list.slice(0,4),function(x){return esc(x.skill)+(x.line?"<small>"+esc(x.line)+"</small>":x.evidence?"<small>"+esc(x.evidence)+"</small>":"");});if(tr){any=true;R.body.appendChild(tr);}
@@ -296,9 +296,9 @@ function cGo(){var S=CS(),E=U.EDGE(),c=CN(),R=panel("csWork","4. Where you could
       k.appendChild(cbtn("sm quiet","More",function(){S.ui.room="goals";S.ui.gsel="paths";U.show("work");save();render();}));e.appendChild(k);grid.appendChild(e);});R.body.appendChild(grid);
     if(Pa.find&&Pa.find.some(function(f){return !f.done;})){var fl=U.mList("Before you choose: find out",Pa.find.filter(function(f){return !f.done;}).slice(0,4),function(f){return esc(f.q)+(f.how?"<small>"+esc("How: "+f.how)+"</small>":"");});if(fl)R.body.appendChild(fl);}}
   var aims=S.goals.filter(function(g){return g.aim;});if(aims.length){R.body.appendChild(h("div","c-label c-pad",esc("Your aims, with their steps")));aims.forEach(function(g){var done=g.steps.filter(function(s){return s.done;}).length;
-    R.body.appendChild(item(g.text,g.steps.length?done+" of "+g.steps.length+" steps done · the next: "+(g.steps.filter(function(s){return !s.done;})[0]||{text:"all done"}).text:"No steps yet: the counsellor adds them in this stage",false,function(){S.ui.room="goals";S.ui.gsel=g.id;U.show("work");save();render();}));});}
-  if(any)R.body.appendChild(h("p","c-note c-pad",esc("Found with "+(U.modelName()||"your model")+" from your record and what you said. See it all in Your edge and Goals and plan.")));
-  R.foot.appendChild(cbtn("quiet","Back",function(){go1("want");}));if(any)R.foot.appendChild(cbtn("quiet","See it all in Your edge",function(){S.ui.room="edge";S.ui.show="list";save();render();}));R.foot.appendChild(h("span","c-grow"));
+    R.body.appendChild(item(g.text,g.steps.length?done+" of "+g.steps.length+" steps done · the next: "+(g.steps.filter(function(s){return !s.done;})[0]||{text:"all done"}).text:"No steps yet: Dux adds them in this stage",false,function(){S.ui.room="goals";S.ui.gsel=g.id;U.show("work");save();render();}));});}
+  if(any)R.body.appendChild(h("p","c-note c-pad",esc("Found with "+(U.modelName()||"your model")+" from your record and what you said. See it all in Dotes and Cursus.")));
+  R.foot.appendChild(cbtn("quiet","Back",function(){go1("want");}));if(any)R.foot.appendChild(cbtn("quiet","See it all in Dotes",function(){S.ui.room="edge";S.ui.show="list";save();render();}));R.foot.appendChild(h("span","c-grow"));
   if(!stDone("go"))R.foot.appendChild(cbtn("pri",any?"Finish this stage":"Think it through for me",function(){runGo();}));
   else{R.foot.appendChild(cbtn("","Think it through again",function(){var E2=U.EDGE();E2.tr=E2.bl=E2.ed=null;S.paths=null;save();runGo();}));R.foot.appendChild(cbtn("pri","Next: this week",function(){buildWeek();go1("week");}));}
   return R;}
@@ -314,7 +314,7 @@ function buildWeek(){var S=CS(),E=U.EDGE(),c=CN(),items=[],seen={};
   (E.bl&&E.bl.list||[]).filter(function(b){return !b.done&&b.fix;}).slice(0,2).forEach(function(b){add(b.fix,20,"fix",b.id,"A blind spot: "+b.what);});
   (S.paths&&S.paths.find||[]).filter(function(f){return !f.done;}).slice(0,2).forEach(function(f){add(f.q,15,"find",f.id,f.how?"How: "+f.how:"Find out before you choose.");});
   if(cv&&E.docs[cv.id]&&E.docs[cv.id].fb&&E.docs[cv.id].fb.NEXT)E.docs[cv.id].fb.NEXT.slice(0,1).forEach(function(p){add(p[0],25,"doc",cv.id,"The first thing to do to your CV.");});
-  if(!S.opps.length)add("Bring one posting, programme or grant to Applications",10,"opp","","The studio reads it against your record and says how you fit, then one step a day.");
+  if(!S.opps.length)add("Bring one posting, programme or grant to Petitiones",10,"opp","","The studio reads it against your record and says how you fit, then one step a day.");
   var old=c.week.items||[];old.forEach(function(o){if(o.done){var m=items.filter(function(x){return x.text===o.text;})[0];if(m)m.done=true;}});
   c.week={at:Date.now(),items:items.slice(0,9)};save();}
 function doItem(it){var S=CS(),E=U.EDGE();
@@ -333,22 +333,22 @@ function markDone(it,v){var S=CS(),E=U.EDGE();it.done=v;
 function cWeek(){var S=CS(),c=CN(),R=panel("csWork","5. This week",{chip:chip("Step 5 of 5","")}),low=U.lowDay();if(!c.week.at||!c.week.items.length)buildWeek();
   var its=c.week.items,open=its.filter(function(x){return !x.done;}),SH=low?1:3,L=h("div","cn-lede");
   L.appendChild(h("h3",null,esc(open.length?(low?"A low-energy day: one small thing is enough.":"Three things, one at a time."):"Everything for this week is done.")));
-  L.appendChild(h("p",null,esc("Each says why and about how long. Do it for me runs it where the model can; otherwise it takes you to the place. Done when it is done; the next takes its place. Today, beside this room, keeps one step a day for your applications.")));R.body.appendChild(L);
+  L.appendChild(h("p",null,esc("Each says why and about how long. Do it for me runs it where the model can; otherwise it takes you to the place. Done when it is done; the next takes its place. Diurna, beside this room, keeps one step a day for your applications.")));R.body.appendChild(L);
   var box=h("div","cn-rec cn-week");open.slice(0,SH).forEach(function(it){box.appendChild(weekRow(it));});
   if(open.length>SH){var f=U.fold("cn-week-later","Later this week ("+(open.length-SH)+")");open.slice(SH).forEach(function(it){f.appendChild(weekRow(it));});box.appendChild(f);}
   var dn=its.filter(function(x){return x.done;});if(dn.length){var fd=U.fold("cn-week-done","Done ("+dn.length+")");dn.forEach(function(it){fd.appendChild(weekRow(it));});box.appendChild(fd);}
   R.body.appendChild(box);
   var docs=U.edgeDocs().filter(function(d){return !/^o:/.test(d.id);}),E=U.EDGE();if(docs.length){R.body.appendChild(h("div","c-label c-pad",esc("Your documents, with suggestions")));var dl=h("div","cn-rec");
-    docs.forEach(function(d){var r=h("div","cn-row"),tx=h("div","tx"),a=E.docs[d.id];tx.appendChild(h("b",null,esc(d.name)));tx.appendChild(h("small",null,esc(a?"Looked at "+dayStr(a.at)+": "+Object.keys(a.fb||{}).filter(function(k){return k!=="RAW";}).reduce(function(n,k){return n+(a.fb[k]||[]).length;},0)+" suggestions, in Your edge.":d.sub)));r.appendChild(tx);
+    docs.forEach(function(d){var r=h("div","cn-row"),tx=h("div","tx"),a=E.docs[d.id];tx.appendChild(h("b",null,esc(d.name)));tx.appendChild(h("small",null,esc(a?"Looked at "+dayStr(a.at)+": "+Object.keys(a.fb||{}).filter(function(k){return k!=="RAW";}).reduce(function(n,k){return n+(a.fb[k]||[]).length;},0)+" suggestions, in Dotes.":d.sub)));r.appendChild(tx);
       var kk=h("div","c-keys");kk.appendChild(cbtn("sm"+(a?"":" pri"),a?"Read them":"Look at it with me",function(){if(a){S.ui.room="edge";S.ui.esel="d:"+d.id;U.show("work");save();render();}else U.docAdvise(d);}));r.appendChild(kk);dl.appendChild(r);});R.body.appendChild(dl);}
   R.body.appendChild(h("p","c-note c-pad",esc("Made "+dayStr(c.week.at)+" from your aims, the paths, your blind spots and your documents. Make the week again after a change.")));
   R.foot.appendChild(cbtn("quiet","Back",function(){go1("go");}));R.foot.appendChild(cbtn("quiet","Make the week again",function(){buildWeek();render();}));R.foot.appendChild(h("span","c-grow"));
   R.foot.appendChild(cbtn("","Copy the summary",function(){U.copyText(summaryText());}));
-  R.foot.appendChild(cbtn("pri","Open Today",function(){S.ui.room="today";S.ui.show="list";save();render();}));return R;}
+  R.foot.appendChild(cbtn("pri","Open Diurna",function(){S.ui.room="today";S.ui.show="list";save();render();}));return R;}
 function weekRow(it){var r=h("div","cn-row"+(it.done?" is-done":"")),sw=h("label","c-check"),cb=h("input");cb.type="checkbox";cb.checked=!!it.done;cb.setAttribute("aria-label","Done: "+it.text);cb.addEventListener("change",function(){markDone(it,cb.checked);});sw.appendChild(cb);r.appendChild(sw);
   var tx=h("div","tx");tx.appendChild(h("b",null,esc(it.text)));if(it.why)tx.appendChild(h("small",null,esc(it.why)));r.appendChild(tx);r.appendChild(h("span","cn-min",esc("about "+it.mins+" min")));
   if(!it.done){var kk=h("div","c-keys");kk.appendChild(cbtn("sm"+(it.kind==="cvlook"||it.kind==="apps"?" pri":""),it.kind==="cvlook"||it.kind==="apps"?"Do it for me":"Go there",function(){doItem(it);}));r.appendChild(kk);}return r;}
-function summaryText(){var S=CS(),E=U.EDGE(),c=CN(),L=["Your counsellor's summary, "+dayStr(Date.now())],pos=E.ed&&E.ed.pos||{};
+function summaryText(){var S=CS(),E=U.EDGE(),c=CN(),L=["Dux's summary, "+dayStr(Date.now())],pos=E.ed&&E.ed.pos||{};
   if(pos.pro||pos.acad||pos.bridge){L.push("","How to present yourself:");["pro","acad","bridge"].forEach(function(k){if(pos[k])L.push("- "+pos[k]);});}
   function block(t,list,f){if(!list||!list.length)return;L.push("",t+":");list.forEach(function(x){L.push("- "+f(x));});}
   block("This week",c.week.items.filter(function(x){return !x.done;}),function(x){return x.text+" (about "+x.mins+" min)";});
@@ -361,39 +361,39 @@ function letWork(){if(U.busyNow()||U.needModel())return;var c=CN();U.setStop(fal
   if(!stDone("record")&&haveAny())q=q.then(function(){return U.readSources().then(function(){keepAllFound();c.done.record=Date.now();c.done.have=c.done.have||Date.now();save();});});
   if(!stDone("go")&&(U.wantsText()||CS().goals.length))q=q.then(function(){return U.edgeAll(false).then(function(){var S=CS();if(!(S.paths&&S.paths.list&&S.paths.list.length))return U.runOne(IngCareer.paths);}).then(aimGoalSteps);});
   var cv=U.cvDoc();if(cv&&!U.EDGE().docs[cv.id])q=q.then(function(){return U.runOne(function(){U.docAdvise(cv);});});
-  c.chain=true;save();q.then(function(){c.chain=false;buildWeek();c.stage=nextStage();save();render();say(stDone("want")?"Your counsellor has done what it could. This week is ready.":"Your record is built. Next: what you want, which only you can say.");},
+  c.chain=true;save();q.then(function(){c.chain=false;buildWeek();c.stage=nextStage();save();render();say(stDone("want")?"Dux has done what it could. This week is ready.":"Your record is built. Next: what you want, which only you can say.");},
     function(e){c.chain=false;save();render();var m=String(e&&e.message||e);if(m!=="stopped")say("It could not be finished: "+m);else say("Stopped. Whatever was finished is kept.");});}
 /* ---------------- the room ---------------- */
-function paint(par){var S=CS(),c=CN(),cur=curStage(),nx=nextStage(),L=panel("csList","Your counsellor"),me=U.isMe();
+function paint(par){var S=CS(),c=CN(),cur=curStage(),nx=nextStage(),L=panel("csList","Dux"),me=U.isMe();
   var pr=h("div","cn-prog c-pad");STAGES.forEach(function(s){var i=h("i");if(stDone(s[0]))i.className="on";else if(s[0]===cur)i.className="now";pr.appendChild(i);});pr.appendChild(h("span",null,esc(doneN()+" of 5 done"+(me?"":" · "+U.personLabel(S)))));L.body.appendChild(pr);
   STAGES.forEach(function(s,i){var d=stDone(s[0]),sub=d?"Done "+dayStr(d):(s[0]===nx?"Next: "+s[2]:s[2]);L.body.appendChild(item((i+1)+". "+s[1],sub,cur===s[0],function(){go1(s[0]);},s[0]===nx&&!d?"c-new":""));});
   var ft=h("div","cn-foot");
   if(RUN.busy||c.chain)ft.appendChild(cbtn("pri","Stop",U.stopNow,"Stops after the step running; what was finished is kept"));
-  else ft.appendChild(cbtn("pri","Let the counsellor work",letWork,"Reads your sources, finds your edge and paths, looks at your CV: everything the model can do, one after another"));
-  ft.appendChild(h("span","c-note",esc("Begin another profile:")));var pk=h("div","cn-two");pk.appendChild(cbtn("quiet sm","Another side of me",function(){if(!me){say("Begin it from your own profile: choose yours in Profile first.");return;}IngCareer.newPerson("me","","").then(function(){var m=U.MT();m.cn=null;CS().ui.room="mentor";CS().ui.show="work";save();render();say("A copy of your profile, to change as you like: its counsellor starts from the beginning, with everything carried over.");});},"A copy of your profile, entries, documents and CV, to change: the academic and the professional kept apart, nothing mixed"));
-  pk.appendChild(cbtn("quiet sm","Someone else",function(){IngCareer.newPerson("other","","").then(function(){var m=U.MT();m.cn=null;CS().ui.room="mentor";CS().ui.show="work";save();render();say("A new profile. Its counsellor starts from the beginning: give it what they have.");});},"Another person you help: a profile of their own, nothing of yours in it"));ft.appendChild(pk);
+  else ft.appendChild(cbtn("pri","Let Dux work",letWork,"Reads your sources, finds your edge and paths, looks at your CV: everything the model can do, one after another"));
+  ft.appendChild(h("span","c-note",esc("Begin another profile:")));var pk=h("div","cn-two");pk.appendChild(cbtn("quiet sm","Another side of me",function(){if(!me){say("Begin it from your own profile: choose yours in Profile first.");return;}IngCareer.newPerson("me","","").then(function(){var m=U.MT();m.cn=null;CS().ui.room="mentor";CS().ui.show="work";save();render();say("A copy of your profile, to change as you like: Dux starts it from the beginning, with everything carried over.");});},"A copy of your profile, entries, documents and CV, to change: the academic and the professional kept apart, nothing mixed"));
+  pk.appendChild(cbtn("quiet sm","Someone else",function(){IngCareer.newPerson("other","","").then(function(){var m=U.MT();m.cn=null;CS().ui.room="mentor";CS().ui.show="work";save();render();say("A new profile. Dux starts it from the beginning: give Dux what they have.");});},"Another person you help: a profile of their own, nothing of yours in it"));ft.appendChild(pk);
   L.foot.appendChild(ft);
   if(RUN.busy){U.two(L,U.livePanel(),par);return;}
   var R=({have:cHave,record:cRecord,want:cWant,go:cGo,week:cWeek}[cur]||cHave)();
-  R.head.insertBefore(cbtn("quiet c-back","‹ Your counsellor",function(){U.show("list");save();render();}),R.head.firstChild);U.two(L,R,par);}
+  R.head.insertBefore(cbtn("quiet c-back","‹ Dux",function(){U.show("list");save();render();}),R.head.firstChild);U.two(L,R,par);}
 /* the whole picture on Today (her answer: "The whole picture: applications, mentor, profile"), and what changed while she was away */
 function picture(par,S){var E=U.EDGE(),c=CN(),p=P(),now=Date.now(),seen=S.ui.seenAt||0,box=h("div","cn-pic");
   var open=S.opps.filter(function(o){return !U.FINISHED[o.stage];}),soon=[];open.forEach(function(o){(U.datesOf(o)||[]).forEach(function(d){var n=U.daysTo(d.at);if(n!=null&&n>=0&&n<=7)soon.push(o);});});
   function card(title,sub,key,fn){var b=item(title,sub,false,fn,"cn-pc");b.appendChild(h("span","cn-pc-k",esc(key)));return b;}
   var nx=nextStage(),st=STAGES.filter(function(x){return x[0]===nx;})[0],wkOpen=c.week.items.filter(function(x){return !x.done;});
-  box.appendChild(card("Applications",open.length?open.length+" open"+(soon.length?", "+soon.length+" closing within a week":"")+(open.some(function(o){return U.nextOf(o);})?" · a step waits on the left":""):"None yet: bring a posting, a programme's call or a grant","Open",function(){S.ui.room="apps";S.ui.show="list";save();render();}));
-  box.appendChild(card("Your counsellor",doneN()===5?(wkOpen.length?"This week: "+wkOpen[0].text+" (about "+wkOpen[0].mins+" min)":"All five stages done; the week's list is done"):doneN()+" of 5 stages done · next: "+st[1],"Open",function(){S.ui.room="mentor";S.ui.show="work";save();render();}));
+  box.appendChild(card("Petitiones",open.length?open.length+" open"+(soon.length?", "+soon.length+" closing within a week":"")+(open.some(function(o){return U.nextOf(o);})?" · a step waits on the left":""):"None yet: bring a posting, a programme's call or a grant","Open",function(){S.ui.room="apps";S.ui.show="list";save();render();}));
+  box.appendChild(card("Dux",doneN()===5?(wkOpen.length?"This week: "+wkOpen[0].text+" (about "+wkOpen[0].mins+" min)":"All five stages done; the week's list is done"):doneN()+" of 5 stages done · next: "+st[1],"Open",function(){S.ui.room="mentor";S.ui.show="work";save();render();}));
   var m=M(),srcs=[m.cv?"your CV":"",p.linkedin?"LinkedIn":"",p.files.length?p.files.length+" document"+(p.files.length===1?"":"s"):"",runs().length?runs().length+" app"+(runs().length===1?"":"s")+" read":""].filter(Boolean);
-  box.appendChild(card("Your profile",(p.items.length?p.items.length+" entr"+(p.items.length===1?"y":"ies")+(foundN()?" ("+foundN()+" to check)":""):"No entries yet")+(srcs.length?" · from "+srcs.join(", "):" · no sources yet"),"Open",function(){S.ui.room="profile";S.ui.show="list";save();render();}));
+  box.appendChild(card("Vita",(p.items.length?p.items.length+" entr"+(p.items.length===1?"y":"ies")+(foundN()?" ("+foundN()+" to check)":""):"No entries yet")+(srcs.length?" · from "+srcs.join(", "):" · no sources yet"),"Open",function(){S.ui.room="profile";S.ui.show="list";save();render();}));
   par.appendChild(h("div","c-label",esc("The whole picture")));par.appendChild(box);
   if(seen&&now-seen>6*3600*1000){var ago=Math.round((now-seen)/3600000),lines=[];
     S.opps.forEach(function(o){(U.datesOf(o)||[]).forEach(function(d){var n=U.daysTo(d.at);if(n!=null&&n<0&&new Date(d.at+"T12:00:00").getTime()>seen)lines.push((o.title||"An application")+": its date ("+d.label.toLowerCase()+") passed.");else if(n!=null&&n>=0&&n<=3)lines.push((o.title||"An application")+" "+d.label.toLowerCase()+" in "+n+" day"+(n===1?"":"s")+".");});});
     runs().forEach(function(r){if((r.finished||r.updated||0)>seen)lines.push("Lector finished reading "+r.name+(r.version?" "+r.version:"")+(E.apps&&E.apps[r.name]?": "+E.apps[r.name].list.length+" things it adds to your record.":"."));});
-    STAGES.forEach(function(x){var d=stDone(x[0]);if(d&&d>seen)lines.push("Your counsellor: "+x[1]+" done.");});
+    STAGES.forEach(function(x){var d=stDone(x[0]);if(d&&d>seen)lines.push("Dux: "+x[1]+" done.");});
     if(lines.length||ago>=24){var w=h("div","cn-away");w.appendChild(h("b",null,esc("While you were away ("+(ago>=48?Math.round(ago/24)+" days":ago+" hours")+")")));var ul=h("ul");(lines.length?lines:["Nothing changed. Your place is kept."]).slice(0,5).forEach(function(l){ul.appendChild(h("li",null,esc(l)));});w.appendChild(ul);par.appendChild(w);}}
   S.ui.seenAt=now;}
-function todayText(){var nx=nextStage(),c=CN();if(doneN()===5){var open=c.week.items.filter(function(x){return !x.done;});return open.length?"Your counsellor, this week: "+open[0].text+" (about "+open[0].mins+" min).":"Your counsellor: this week's list is done.";}
-  var s=STAGES.filter(function(x){return x[0]===nx;})[0];return "Your counsellor's next stage: "+s[1]+". "+s[2]+".";}
+function todayText(){var nx=nextStage(),c=CN();if(doneN()===5){var open=c.week.items.filter(function(x){return !x.done;});return open.length?"Dux, this week: "+open[0].text+" (about "+open[0].mins+" min).":"Dux: this week's list is done.";}
+  var s=STAGES.filter(function(x){return x[0]===nx;})[0];return "Dux's next stage: "+s[1]+". "+s[2]+".";}
 /* ---------------- in Lector: the studio's suggestions beside the document ---------------- */
 function lectorAdvise(){var k=D.getElementById("l7Advise");if(!k||k.__cn)return;k.__cn=true;var orig=k.onclick;
   k.onclick=function(){if(!(W.IngLector&&W.IngCareer&&IngCareer.adviseDoc)){if(orig)orig.apply(this,arguments);return;}
@@ -410,14 +410,14 @@ function lxPane(d,it){var host=D.getElementById("l7Doc");if(!host)return;var old
   var bd=h("div","bd");bd.appendChild(h("p",null,esc("Looking at it with you, from your record"+(U.wantsText()?" and your targets":"")+". It is never rewritten.")));var live=h("div","live");bd.appendChild(live);p.appendChild(bd);
   var ft=h("div","ft");var ok=cbtn("","Open in Vocatio",function(){CS().ui.room="edge";CS().ui.esel="d:"+d.id;U.show("work");save();go("career");render();});ok.className="l-btn";ft.appendChild(ok);p.appendChild(ft);host.appendChild(p);
   var t=setInterval(function(){if(!p.isConnected){clearInterval(t);return;}if(RUN.busy){live.textContent=(RUN.think?RUN.think.slice(-600)+"\n":"")+(RUN.live||"…");return;}clearInterval(t);
-    var a=U.EDGE().docs[d.id];live.textContent="";if(!a){bd.appendChild(h("p",null,esc("Nothing came back. Try again, or look in Vocatio, Your edge.")));return;}
+    var a=U.EDGE().docs[d.id];live.textContent="";if(!a){bd.appendChild(h("p",null,esc("Nothing came back. Try again, or look in Vocatio, Dotes.")));return;}
     bd.innerHTML="";U.ADV_TAGS.forEach(function(tg){var rows=a.fb[tg[0]];if(!rows||!rows.length)return;bd.appendChild(h("h4",null,esc(tg[1])));var ul=h("ul");rows.forEach(function(r){var li=h("li");li.appendChild(D.createTextNode(r[0]));if(r[1])li.appendChild(h("small",null,esc(r.slice(1).join(" · "))));ul.appendChild(li);});bd.appendChild(ul);});
     if(a.fb.RAW)bd.appendChild(h("p",null,esc(a.fb.RAW[0][0])));bd.appendChild(h("p",null,esc("Looked at with "+(a.model||"your model")+". Suggestions only: the document is yours.")));},700);}
 var ogo=W.go;if(typeof ogo==="function"){W.go=function(p){var r=ogo.apply(this,arguments);try{if(p==="lector")setTimeout(lectorAdvise,50);}catch(e){}return r;};}
 try{lectorAdvise();}catch(e){}
 W.IngCounsel={picture:picture,paint:paint,stages:STAGES,state:CN,next:nextStage,done:stDone,go:go1,take:takeFiles,build:buildRecord,runGo:runGo,week:buildWeek,letWork:letWork,todayText:todayText,summary:summaryText,chips:CHIPS,keepAll:keepAllFound,looksCv:looksCv};
 /* the room's tab takes the counsellor's name (r188 names it Your mentor while this part is held out of a build) */
-try{var tb=D.querySelector('#cs .rm-tabs [data-room="mentor"] span');if(tb)tb.textContent="Your counsellor";var tbb=tb&&tb.parentNode;if(tbb)tbb.title="Your counsellor";}catch(e){}
+try{var tb=D.querySelector('#cs .rm-tabs [data-room="mentor"] span');if(tb)tb.textContent="Dux";var tbb=tb&&tb.parentNode;if(tbb){tbb.removeAttribute("title");tbb.setAttribute("data-mean","the guide (dux itineris, the guide of a journey)");tbb.setAttribute("aria-label","Dux, the guide (dux itineris, the guide of a journey)");}  /* 8.05: Dux, her name for it; its meaning on hover (r188) */}catch(e){}
 try{if(CS().ui.room==="mentor"&&D.getElementById("page-career")&&D.getElementById("page-career").classList.contains("active"))render();}catch(e){}
 try{window.__ingParts["p283"]="running";}catch(_){}
 })();

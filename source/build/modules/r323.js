@@ -150,7 +150,7 @@ function goal(make){var s=S();if(!s)return null;if(!Array.isArray(s.goals))s.goa
   if(!g&&make){var uid=function(pre){try{return IngCareer.ui.uid(pre);}catch(e){return pre+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}};
     g={id:uid("g"),text:GOAL,kind:"academic",by:"7 January 2027",at:Date.now(),dphil:true,
       steps:STEPS.map(function(x){return {id:uid("st"),text:x[1],by:"by "+longDay(x[0]),done:false};})};s.goals.unshift(g);p.goal=g.id;save();
-    try{IngCareer.ui.say("Your DPhil plan's seven steps are in Goals and plan too.");}catch(e){}}
+    try{IngCareer.ui.say("Your DPhil plan's seven steps are in Cursus too.");}catch(e){}}
   if(g&&p.goal!==g.id){p.goal=g.id;}
   return g;}
 function doneOf(g,i){var x=g&&g.steps&&g.steps.filter(function(s){return s.text===STEPS[i][1];})[0];return !!(x&&x.done);}
@@ -177,7 +177,7 @@ function open(){close();var g=goal(true);V=mk("div","dp-veil");V.addEventListene
   D.addEventListener("keydown",esc,true);paint(p,g);try{p.querySelector(".dp-tab[aria-selected=true]").focus({preventScroll:true});}catch(e){}}
 function paint(p,g){p.innerHTML="";
   /* head */
-  var hd=mk("section","dp-head"),l=mk("div");l.appendChild(mk("div","dp-eye","Vocatio · Your counsellor · Where you could go"));l.appendChild(mk("h1",null,"Your DPhil plan"));
+  var hd=mk("section","dp-head"),l=mk("div");l.appendChild(mk("div","dp-eye","Vocatio · Dux · Where you could go"));l.appendChild(mk("h1",null,"Your DPhil plan"));
   l.appendChild(mk("p","dp-lede","The DPhil in Information, Communication and the Social Sciences at the Oxford Internet Institute, from October 2027. The two ways Oxford offers, side by side, and the weeks to the deadline."));hd.appendChild(l);
   var ct=mk("div","dp-count");var w=Math.floor(days()/7);[[days(),"days"],[w,"weeks"]].forEach(function(x){var t=mk("div","dp-tile");t.appendChild(mk("b",null,String(x[0])));t.appendChild(mk("span",null,x[1]));ct.appendChild(t);});hd.appendChild(ct);
   var du=mk("div","dp-due");du.appendChild(mk("span","dp-chip chk","Deadline"));du.appendChild(D.createTextNode("12 noon (UK time) on Thursday 7 January 2027, for October 2027. Complete applications only, references included."));hd.appendChild(du);p.appendChild(hd);
@@ -199,7 +199,7 @@ function paint(p,g){p.innerHTML="";
     [["ft","Full-time, funded"],["pt","Part-time, with my job"],["","Not decided"]].forEach(function(x){var b=mk("button","dp-key",x[1]);b.type="button";b.setAttribute("aria-pressed",String(lean===x[0]));
       b.addEventListener("click",function(){st().lean=x[0];save();paint(p,g);});lr.appendChild(b);});pane.appendChild(lr);
     pane.appendChild(mk("p","dp-fine","Leaning marks a way and changes nothing else. One application form serves both, so the weeks are the same either way."));}
-  else if(TAB==="weeks"){pane.appendChild(mk("h2",null,"The weeks to 7 January"));pane.appendChild(mk("p","dp-sub","The next steps first. Tick a step when it is done: it is ticked in Goals and plan too."));
+  else if(TAB==="weeks"){pane.appendChild(mk("h2",null,"The weeks to 7 January"));pane.appendChild(mk("p","dp-sub","The next steps first. Tick a step when it is done: it is ticked in Cursus too."));
     var pg=mk("div","dp-prog"),pi=mk("i");pi.style.width=(nd/STEPS.length*100)+"%";pg.appendChild(pi);pane.appendChild(pg);pane.appendChild(mk("div","dp-sub",nd+" of "+STEPS.length+" done"));
     var n=nextI(g),start=n<0?STEPS.length-3:n,box=mk("div","dp-steps");
     STEPS.forEach(function(s,i){if(!ALL&&(i<start||i>=start+3))return;var on=doneOf(g,i),b=mk("button","dp-step");b.type="button";b.setAttribute("aria-pressed",String(on));
