@@ -395,6 +395,27 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.00 (27 November 2026): Custodia, every key and its ways back; sort keys beside Your apps and Your models.
+
+- Her words (26 November 2026): "I want Ingenium to have a recovery system for the passwords and key terms and keys, so that I am not
+  locked out ... for every user on all devices"; shown it drawn in the real page, her word (27 November 2026): "I approve of the
+  previews, please commit and push it everywhere". `r408.js`: Custodia, a page of its own before Settings, in every edition. Found
+  first, by reading every part: only the sign-in had ways back (r197); the Cloud passphrase (r255), a backup's password (r143), the owner
+  key's password (PermitCore) and the reading key's password (r357) had none. Now each key is listed with its ways back, read from the
+  part that holds it, and each can have one: a sealed copy inside the sign-in (IngLock.sealText; the Cloud passphrase, the owner key's
+  and the reading key's passwords, each checked first against the key it opens; every backup password, kept as each backup is made, the
+  last ten), shown again only after the sign-in's password; the owner key's own ten words, apart from the sign-in (PBKDF2-SHA-256,
+  600,000 rounds, AES-GCM, in the owner key's own store); and a recovery sheet (the ten words after the sign-in's password, and where each
+  way back is; no password on it), to print or save. Test: rig/t_800_custodia.js (26 checks; the Cloud stood in for, made its own way).
+- Her words (26 November 2026): "I also want to be able to filter through the "Your apps" section ... and reorganise them by dates and
+  alphabetical order"; shown both lists with their keys: approved the same day. `r407.js`: Used last, Newest, Oldest and A to Z beside
+  Ingenia's Your apps (the very choice of the head's right pull, r279; the cards below now follow it; Newest and Oldest by the day each
+  folder was made) and Newest, Oldest and A to Z beside Mentes's Your models (in the order they were added: a model keeps no date).
+  Test: rig/t_800_sort.js (17 checks).
+- `r390.js`: the switch Learn from my folders names Fabrica only where the copy has Fabrica. The editions tests found the Gift and Demo
+  editions naming it, present since before 7.98 and unseen because the editions tests had not run since 7.95. rig/t_627_editions.js
+  knows Custodia is in every edition's side bar.
+
 Ingenium 7.99 (26 November 2026): Memoria's What it knows becomes an atlas of plates, chosen from two directions drawn in the real page.
 
 - Her words (26 November 2026): "the Memoria page looks super plain and basic"; of the first redesign (r405, never released):

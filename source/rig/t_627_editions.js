@@ -12,10 +12,10 @@ const pw = require('/opt/node-tools/node_modules/playwright'); const fs = requir
 const [OUT, ...pairs] = process.argv.slice(2); fs.mkdirSync(OUT, { recursive: true });
 const URLS = Object.fromEntries(pairs.map(s => s.split(/=(.*)/s).slice(0, 2)));
 let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === undefined ? '' : '  ' + String(typeof d === 'string' ? d : JSON.stringify(d)).slice(0, 1800))); c ? pass++ : fail++; };
-const PUBLIC_PAGES = ['home', 'chat', 'code', 'folders', 'memoria', 'focus', 'models', 'blend', 'build', 'guide', 'settings'];
+const PUBLIC_PAGES = ['home', 'chat', 'code', 'folders', 'memoria', 'focus', 'models', 'blend', 'build', 'guide', 'custodia', 'settings'];  // 8.00: Custodia (r408), for every user, before Settings
 // 7.52 (her answer, 20 November 2026: "Yes for the mini app question"): the full edition carries none of the Desk's five apps either
 // 7.74 (her answer, 24 November 2026: "Back in the Full edition"): the five apps of the Desk are in the full edition again, as before 7.52
-const FULL_PAGES = ['home', 'chat', 'code', 'folders', 'memoria', 'focus', 'models', 'blend', 'lector', 'career', 'build', 'fabrica', 'tabula', 'abacus', 'slides', 'scriba', 'fontes', 'guide', 'settings'];
+const FULL_PAGES = ['home', 'chat', 'code', 'folders', 'memoria', 'focus', 'models', 'blend', 'lector', 'career', 'build', 'fabrica', 'tabula', 'abacus', 'slides', 'scriba', 'fontes', 'guide', 'custodia', 'settings'];
 // what an edition must not show or name. The copyright line and the licence, which every edition keeps, are taken out of the words first.
 const OWNERS = /Designed and built by Yannie D\. Forest|© 2026 Yannie D\. Forest|Copyright \(c\) 2026 Yannie D\. Forest|Yannie D\. Forest\b(?=[^.]{0,80}(All rights reserved|licen[cs]e|Licen[cs]e|owner|Owner))/g;
 const NOT = {

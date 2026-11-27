@@ -17,7 +17,9 @@
    - Seen in two places: Settings, Your data, Memory (Waiting for you, Find a fact, each app's facts, the switches) and each app's folder
      in Ingenia (What Ingenium knows about it, its links, its timeline). Every card, row and key stands raised and answers the pointer. 
    7.99 (26 November 2026): a fact she leaves out in the atlas (r406 sets f.off) stays kept and shown, but is given to no model: the chat's
-   facts (fit), a folder's facts (IngFolderFab.lines) and an app's own words (IngAppFacts.block) all pass it by. */
+   facts (fit), a folder's facts (IngFolderFab.lines) and an app's own words (IngAppFacts.block) all pass it by.
+   8.00 (27 November 2026): the switch Learn from my folders names Fabrica only where the copy has Fabrica (the editions tests found the
+   Gift and Demo editions naming it, from this card, which the atlas, r406, keeps unseen). */
 .kn-card{display:grid;gap:12px}
 .kn-sec{display:grid;gap:8px}
 .kn-sec>h4{margin:6px 0 0;font:600 12px/1.2 var(--sans,system-ui,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
@@ -177,7 +179,7 @@ function paintRoom(){var c=roomCard();if(!c)return;var k=K(),A=apps(),W1=waiting
   fi.addEventListener("input",find);find();
   A.forEach(function(p){var ab=appKey(p.name),L=of(ab,"kept");var s=mk("div","kn-sec");s.setAttribute("data-kn-about",ab);s.appendChild(mk("h4",null,p.name));var ul=mk("ul","kn-list");L.forEach(function(f){ul.appendChild(row(f));});
     if(!L.length)ul.appendChild(mk("li","small muted","Nothing kept yet."));s.appendChild(ul);s.appendChild(adder(ab,"A fact about "+p.name));c.appendChild(s);});
-  var sw=mk("div","kn-sec");sw.appendChild(mk("h4",null,"How it is kept"));[["learn","Learn from my folders and from Fabrica"],["ask","Ask me before keeping what it learns"],["auto","Bring my folders up to date by themselves while I am away from the keyboard"]].forEach(function(x){
+  var sw=mk("div","kn-sec");sw.appendChild(mk("h4",null,"How it is kept"));[["learn",D.getElementById("page-fabrica")?"Learn from my folders and from Fabrica":"Learn from my folders"],["ask","Ask me before keeping what it learns"],["auto","Bring my folders up to date by themselves while I am away from the keyboard"]].forEach(function(x){
     var l=mk("label","kn-sw"),cb=mk("input");cb.type="checkbox";cb.id="knOpt-"+x[0];cb.checked=!!k.opts[x[0]];cb.onchange=function(){k.opts[x[0]]=cb.checked;save();};l.appendChild(cb);l.appendChild(D.createTextNode(x[1]));sw.appendChild(l);});c.appendChild(sw);
   if(FOCUS){var t=c.querySelector('[data-kn-about="'+FOCUS+'"]');FOCUS="";if(t)setTimeout(function(){try{t.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){}},60);}}
 function open(about){FOCUS=about||"";try{W.IngChatMemory.open();}catch(e){try{W.go("settings");}catch(_){}}setTimeout(paintRoom,120);}

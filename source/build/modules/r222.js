@@ -281,6 +281,13 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["8.00", "Custodia, a page of its own before Settings: every password and key Ingenium keeps for you, each with its ways back, so that you are never locked out."],
+  ["8.00", "Custodia: a sealed copy inside your sign-in for the Cloud passphrase, checked first against the Cloud, and shown again only after your password."],
+  ["8.00", "Custodia: a copy of each backup password you use is kept sealed inside your sign-in (your choice, on at first)."],
+  ["8.00", "Custodia: your owner key can have ten words of its own, apart from your sign-in; they bring back its password. Its password and the reading key's can also be kept sealed inside your sign-in.", "master"],
+  ["8.00", "Custodia: your recovery sheet shows your ten words after your password, and where each key's ways back are, to print or save; no password is written on it."],
+  ["8.00", "Ingenia: Used last, Newest, Oldest and A to Z beside Your apps, the same choice as the right pull in its head; the cards follow it."],
+  ["8.00", "Mentes: Newest, Oldest and A to Z beside Your models; the choice is kept."],
   ["7.99", "Memoria, What it knows: an atlas of plates. Each fact is a star on its plate's round chart: your own words near the middle, what was learned further out, what waits for you as a hollow star."],
   ["7.99", "Memoria: a medallion for each plate (Waiting, You and each of your apps, in the colour of its star in the head), and Find a fact on every plate at the end of the row."],
   ["7.99", "Memoria: the chosen star is read large, with where it came from, when, and how many chats used it this week; Keep, Not this, Edit, Leave out and Add a fact stand beside it."],
