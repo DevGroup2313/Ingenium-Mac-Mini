@@ -281,6 +281,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["8.03", "Adamas: the diamond's holder is drawn at your screen's true sharpness again, so its engraving, its turned lines, its knurled foot and every edge come through, and its outline is smoothed; it stays cool by drawing fewer frames a second, never by stretching a smaller picture."],
   ["8.02", "Custodia's dial carries Ingenium's own seal, set into its face within a fine engraved ring, and is refined: its pewter finely brushed with a polished rim, finer ticks, a cut pointer and small polished beads for its lamps; by night it is dark metal, its light low."],
   ["8.02", "Custodia's dial answers you: it leans toward the pointer and lifts a little, its light following, and a gleam runs round its rim; turn its ring by hand; press the face right or left of the seal and the ring steps one number that way; press the rim and it gives and springs back; press a lamp and the dial turns to it and opens its key; press the seal for a flourish, as on Home."],
   ["8.02", "The thin purple circle in Custodia's seal stays in step with the seal (it drifted about as the seal swayed on its own); the seal now moves only with the dial, as on the compass."],

@@ -179,14 +179,18 @@ var Diamond=(function(){
   "  float d=1e9;vec2 bb=vec2(0.0,1.0);float sg=1.0;vec2 pv=V[13];for(int i=0;i<14;i++){vec2 vi=V[i];vec2 e=pv-vi;vec2 w=p-vi;vec2 b=w-e*clamp(dot(w,e)/dot(e,e),0.0,1.0);float bd=dot(b,b);if(bd<d){d=bd;bb=b;}",
   "    bvec3 c=bvec3(p.y>=vi.y,p.y<pv.y,e.x*w.y>e.y*w.x);if(all(c)||all(not(c)))sg=-sg;pv=vi;}return sg*bb/max(sqrt(d),1e-6);}",
   "vec3 nCase(vec3 p){float r=length(p.xz);vec2 g=polyN(vec2(r,p.y));vec2 dr=p.xz/max(r,1e-5);return normalize(vec3(g.x*dr.x,g.y,g.x*dr.y));}",
-  "float holder(vec3 ro,vec3 rd,out vec3 n,out vec3 p,out float part){float t=1e9;part=-1.0;n=vec3(0.0,1.0,0.0);p=vec3(0.0);vec3 q;float tt;",
+    /* 8.03: the outline smoothed. A ray that passes the case within a pixel (its nearest approach, measured as the walk goes, over the
+     size of a pixel at that distance) covers the rest of that pixel, so the outline is drawn as a fine edge, not in steps */
+"float HCV=1.0;",
+"float holder(vec3 ro,vec3 rd,out vec3 n,out vec3 p,out float part){float t=1e9;part=-1.0;n=vec3(0.0,1.0,0.0);p=vec3(0.0);vec3 q;float tt;HCV=1.0;",
   /* the bounding drum: where the ray enters it, the walk begins */
   "  float A=dot(rd.xz,rd.xz),B=dot(ro.xz,rd.xz),C=dot(ro.xz,ro.xz)-1.62*1.62,h=B*B-A*C;float t0=1e9,t1=-1e9;",
   "  if(h>0.0){float sq=sqrt(h);t0=(-B-sq)/A;t1=(-B+sq)/A;}else if(C<0.0){t0=-1e9;t1=1e9;}",
   "  if(abs(rd.y)>1e-6){float ya=(0.012-ro.y)/rd.y,yb=(-0.405-ro.y)/rd.y;t0=max(t0,min(ya,yb));t1=min(t1,max(ya,yb));}",
   "  bool seat=false;if(t1>max(t0,0.0)){float te=max(t0,0.0);vec3 pe=ro+rd*te;float tsx=rd.y<0.0?(-0.010-ro.y)/rd.y:-1.0;vec3 ps=ro+rd*tsx;",
   "    if(tsx>te&&pe.y>-0.0101&&dot(pe.xz,pe.xz)<1.205*1.205&&dot(ps.xz,ps.xz)<1.205*1.205){t=tsx;p=ps;part=1.0;seat=true;}",
-  "    else{float tm2=te;for(int i=0;i<56;i++){vec3 pp=ro+rd*tm2;float d=sdCase(pp);if(d<0.0008){t=tm2;p=pp;part=1.0;break;}tm2+=d*0.95;if(tm2>t1)break;}}}",
+  "    else{float tm2=te,mk=1e9,mt=-1.0;for(int i=0;i<56;i++){vec3 pp=ro+rd*tm2;float d=sdCase(pp);if(d<0.0008){t=tm2;p=pp;part=1.0;break;}float kk=d/max(uPx.y*tm2,1e-6);if(kk<mk){mk=kk;mt=tm2;}tm2+=d*0.95;if(tm2>t1)break;}",
+"      if(part<0.0&&mt>0.0&&mk<1.0){t=mt;p=ro+rd*mt;part=1.0;HCV=1.0-mk;}}}",
   "  if(part>0.5)n=seat?vec3(0.0,1.0,0.0):nCase(p);",
   "  return t;}",
   /* the compass's light (Vocatio's studio: its window, its dark horizon line, its fill), as the other session drew it for the holder */
@@ -370,16 +374,17 @@ var Diamond=(function(){
   "  float glow=exp(-max(0.0,f-0.07)*9.0)*step(0.05,f);float aft=exp(-max(0.0,f-0.09)*12.0)*step(0.03,f);float lit=glow;",
   "  float A=uL.x;vec3 dA=vec3(cos(A),0.0,sin(A)),tg=vec3(-dA.z,0.0,dA.x);vec3 E=uDC+dA*0.30+vec3(0.0,0.24,0.0),P1=uDC-dA*0.05+vec3(0.0,-0.30,0.0),P2=uDC-dA*0.34+vec3(0.0,-0.05,0.0);",
   "  vec3 col=vec3(0.0);float a=0.0;float th=1e9;",
-  "  if(hs>0.5&&ts<tp){col=sc;a=1.0;th=ts;col*=1.0+mix(0.22,0.46,uN)*glow;",
+  "  if(hs>0.5&&(ts<tp||HCV<0.999)){col=sc;a=1.0;th=ts;col*=1.0+mix(0.22,0.46,uN)*glow;",
   "    float s1=clamp((f-0.028)/0.012,0.0,1.0),s2=clamp((f-0.040)/0.012,0.0,1.0);float on1=step(0.026,f)*step(f,0.075),on2=step(0.038,f)*step(f,0.085);",
   "    vec3 Xi=uDC-dA*0.55+vec3(0.0,-0.42,0.0);if(f<0.7)col+=vec3(1.0,0.96,1.0)*beam(ro,rd,E,Xi,0.022,1e9,s1,0.30,0.0,1.2*on1);",
   "    col=fam(uCd>0.5?1.0-exp(-col*1.30):tm(col));}",
-  "  else if(tp<1e8){vec3 hc=holderCol(pp,pn,rdL,part,lit);col=uN>0.5?tm(hc):min(hc,vec3(1.0));a=1.0;th=tp;}",
+  "  else if(tp<1e8&&HCV>0.999){vec3 hc=holderCol(pp,pn,rdL,part,lit);col=uN>0.5?tm(hc):min(hc,vec3(1.0));a=1.0;th=tp;}",
   "  else{if(uBG<0.5){vec4 au=aurora(v);float ai=uN>0.5?0.95:1.0;col=au.rgb*ai;a=clamp(au.a*ai,0.0,1.0);}",
   "    if(uN<0.5&&uBG<0.5){vec2 wc=(v-vec2(0.50,0.52))*vec2(uAsp,1.0);float wg=exp(-dot(wc,wc)/0.34);vec3 wcol=mix(vec3(1.0,0.70,0.86),vec3(0.70,0.60,1.0),clamp(v.x*0.8+v.y*0.3,0.0,1.0));col+=wcol*wg*0.50;a=max(a,wg*0.50);vec2 gc=(v-vec2(0.50,0.60))*vec2(uAsp,1.0);float gg=exp(-dot(gc,gc)/0.045);col+=vec3(0.70,0.50,1.0)*gg*0.34;a=max(a,gg*0.34);",
   "      vec2 fc=(v-vec2(0.52,0.22))*vec2(uAsp,1.6);float fg=exp(-dot(fc,fc)/0.12);col+=vec3(0.78,0.62,1.0)*fg*0.34;a=max(a,fg*0.34);}",
   /* the holder's own soft shadow beneath it, so it seems to float */
-  "    if(rd.y<0.0){float tf=(-0.37-ro.y)/rd.y;vec3 f=ro+rd*tf;float r=length(f.xz);float sa=mix(0.20,0.42,uN)*exp(-pow(max(r-1.30,0.0)/0.42,2.0))*smoothstep(2.6,1.8,r);vec3 scl=uN>0.5?vec3(0.0):vec3(0.20,0.15,0.34)*sa;col=col*(1.0-sa)+scl;a=a+sa*(1.0-a);}col=aurx(col,v.x+uT*0.004);}",
+  "    if(rd.y<0.0){float tf=(-0.37-ro.y)/rd.y;vec3 f=ro+rd*tf;float r=length(f.xz);float sa=mix(0.20,0.42,uN)*exp(-pow(max(r-1.30,0.0)/0.42,2.0))*smoothstep(2.6,1.8,r);vec3 scl=uN>0.5?vec3(0.0):vec3(0.20,0.15,0.34)*sa;col=col*(1.0-sa)+scl;a=a+sa*(1.0-a);}col=aurx(col,v.x+uT*0.004);",
+"    if(tp<1e8){vec3 hc=holderCol(pp,pn,rdL,part,lit);vec3 hcc=uN>0.5?tm(hc):min(hc,vec3(1.0));col=mix(col,hcc,HCV);a=mix(a,1.0,HCV);}}",
   /* the ray in, the three fans out (the falling one glances off the holder), each with its pulse and a quick afterglow, then gone */
   /* her words (14 November 2026): "I want only or two rays shooting through the diamond and at diagonal or opposite angles so that it looks
      more natural and enhances the sparkles of the diamond without ruining the look"; the fans that bounced off "like a lightning bolt" are
@@ -429,7 +434,13 @@ var Diamond=(function(){
     try{if(D.fonts&&D.fonts.load)D.fonts.load('600 88px "Home Cormorant"').then(word,word);else word();}catch(e){word();}
 
     return true;}
-  function dpr(){return Math.min(2,Math.max(1,W.devicePixelRatio||1));}
+  /* 8.03, her words (27 November 2026): "The diamon holder of the Adamas page looks blurry and unrefined. I have been asking for this to be
+     fixed for ages! I want it to look detailed, defined, sharpened and refined and not look like a blurry, poorly generated blob. I need
+     you to fix it for good please." Found: since 7.89 every scene reads a pixel ratio of at most 1.25 (r391, cool running), so on a
+     Retina screen (2) the scene was drawn at 1.25 and stretched 1.6 times to fit, which smeared the holder's engraving, its turned lines,
+     its knurled foot and every edge. This scene now reads the screen's true ratio (at most 2, as before 7.89) and keeps cool by drawing
+     fewer frames a second instead (below), never by stretching a smaller picture where the graphics chip can afford the true one. */
+  function dpr(){var r=1;try{r=W.__ingRealRatio?W.__ingRealRatio():W.devicePixelRatio;}catch(e){r=W.devicePixelRatio;}return Math.min(2,Math.max(1,r||1));}
   /* the compass's dial, as Vocatio draws it (modules/r290.js: its enamel picture under its engraved rings and Ingenium's Orrery), read from
      the compass itself once it has been drawn, by day and by night, and put under the glass as a picture */
   /* the engine logo at the heart of the seat (her words, 14 November 2026: "the engine logo needs to be drawn to fit the middle of the
@@ -543,7 +554,7 @@ var Diamond=(function(){
     c.addEventListener("webglcontextlost",function(e){e.preventDefault();BG.ok=false;try{c.parentNode.removeChild(c);}catch(x){}kick();});}
   function sh2(g,type,src){var x=g.createShader(type);g.shaderSource(x,src);g.compileShader(x);if(!g.getShaderParameter(x,g.COMPILE_STATUS))throw new Error(g.getShaderInfoLog(x));return x;}
   function bgSize(){if(!BG.ok)return;var cr=BG.card.getBoundingClientRect(),hr=host.getBoundingClientRect();if(cr.width<10||cr.height<10)return;
-    BG.w=cr.width;BG.h=cr.height;BG.box=[hr.left-cr.left,hr.top-cr.top,Math.max(10,hr.width),Math.max(10,hr.height)];var k=dpr()*0.5,w=Math.round(BG.w*k),h=Math.round(BG.h*k);
+    BG.w=cr.width;BG.h=cr.height;BG.box=[hr.left-cr.left,hr.top-cr.top,Math.max(10,hr.width),Math.max(10,hr.height)];var k=Math.min(1.25,dpr())*0.5,w=Math.round(BG.w*k),h=Math.round(BG.h*k);
     if(BG.cv.width!==w||BG.cv.height!==h){BG.cv.width=w;BG.cv.height=h;}}
   function bgDraw(t,nt){if(!BG.ok)return;if(BG.n%30===0)bgSize();var g=BG.gl;g.viewport(0,0,BG.cv.width,BG.cv.height);g.uniform1f(BG.U.uT,t);g.uniform1f(BG.U.uN,nt?1:0);g.uniform1f(BG.U.uAsp,W0/H0);
     g.uniform2f(BG.U.uRes,BG.w,BG.h);g.uniform4f(BG.U.uBox,BG.box[0],BG.box[1],BG.box[2],BG.box[3]);var au=aurNow(nt);g.uniform1f(BG.U.uAo,au?(au==="spectrum"?2:1):0);g.uniform4fv(BG.U.uAh,new Float32Array(au&&au!=="spectrum"?au:[0,0,1,1]));g.drawArrays(g.TRIANGLE_STRIP,0,4);}
@@ -695,7 +706,7 @@ var Diamond=(function(){
   ["pointerdown","pointermove","keydown","wheel","touchstart"].forEach(function(n){try{D.addEventListener(n,function(){var w=performance.now()-LASTIN>120000;LASTIN=performance.now();if(w)kick();},{passive:true,capture:true});}catch(e){}});
   W.addEventListener("focus",function(){LASTIN=performance.now();kick();});
   function frame(ts){raf=0;if(!vis||!shown||!ok)return;if(PENDING){return;}if(W.IngStill&&IngStill.on()){IngStill.wake(kick);return;}  /* 7.40: at rest, still (modules/r324.js) */
-  var t=(ts-t0)/1000,st=still();if(AUTO){var bv=byHour();if(bv!==VAR){if(VAR>=0&&!st&&LIGHT)pulse(t);VAR=bv;}}if(!st&&LIGHT&&t>=NEXT){pulse(t);NEXT=t+16+Math.random()*12;}var busy=over||DDN!=null||t-DKB<1.2*PK()||t-DFL.t<3.5*PK()||t-press<3.5||Math.abs(YV)>0.05||t-PL.s<PER*0.35||holderBusy(t),idle=!(D.hasFocus?D.hasFocus():true)||performance.now()-LASTIN>120000||!!(W.IngPace&&IngPace.typing()),gap=(over||t-press<2.5)&&FAST?16:Math.round((idle?100:busy?33:50)*SLOW);
+  var t=(ts-t0)/1000,st=still();if(AUTO){var bv=byHour();if(bv!==VAR){if(VAR>=0&&!st&&LIGHT)pulse(t);VAR=bv;}}if(!st&&LIGHT&&t>=NEXT){pulse(t);NEXT=t+16+Math.random()*12;}var busy=over||DDN!=null||t-DKB<1.2*PK()||t-DFL.t<3.5*PK()||t-press<3.5||Math.abs(YV)>0.05||t-PL.s<PER*0.35||holderBusy(t),idle=!(D.hasFocus?D.hasFocus():true)||performance.now()-LASTIN>120000||!!(W.IngPace&&IngPace.typing()),gap=(over||t-press<2.5)&&FAST?16:Math.round((idle?100:busy?33:66)*SLOW);
     if(!DUE&&ts-lastDraw<gap*0.85){later(gap);return;}DUE=false;  /* 7.27: the next frame is waited for asleep, not at every refresh of the screen */  /* a little slack, so a frame that falls a hair early is not put off a whole frame */var dt=Math.min(0.1,(ts-lastDraw)/1000||0.033);
     if(FIRST<0)FIRST=t;if(lastDraw&&t-FIRST>2.5){var took=ts-lastDraw;if(took<700){EW=EW*0.92+Math.min(4,took/gap)*0.08;if(gap<20){F16=F16*0.9+took*0.1;if(F16>24){FAST=false;FASTT=t;}}else if(!FAST&&t-FASTT>45){FAST=true;F16=16;}
       /* 7.21, her words (16 November 2026): "The holder of Adamas' diamond still look really blurry on build 7.20, it does not look more
@@ -703,7 +714,7 @@ var Diamond=(function(){
          at fewer pixels (down to 0.45 of the screen's sharpness on a Retina screen, stretched to fit), which smeared the turned lines,
          the knurled foot and the engraved face that 7.20 cut. The scene is now always drawn at the screen's full sharpness; a computer
          that falls behind draws fewer frames a second instead (down to 15 at rest), and more again once it keeps up. */
-      if(EW>1.3&&t-QT>1.2&&SLOW<2){SLOW=Math.min(2,SLOW*1.25);QT=t;EW=1;}else if(EW<1.05&&t-QT>8&&SLOW>1){SLOW=Math.max(1,SLOW/1.1);QT=t;}}}
+      if(EW>1.3&&t-QT>1.2&&SLOW<2){SLOW=Math.min(2,SLOW*1.25);QT=t;EW=1;}else if(EW<1.05&&t-QT>8&&SLOW>SLOW0){SLOW=Math.max(SLOW0,SLOW/1.1);QT=t;}}}
     lastDraw=ts;if(!st){if(!over)yaw+=dt*(Math.PI*2/36);yaw+=dt*YV;}YV*=Math.exp(-dt/1.8);
     gx+=((over?mX*0.22:0)-gx)*Math.min(1,dt*2.8);gz+=((over?-mY*0.16:0)-gz)*Math.min(1,dt*2.8);tx=gz;tz=-gx*0.6;
     var tt=st?1.0:(W.__tFix!=null?W.__tFix:t);if(W.__tFix!=null&&W.__pFix){PL.a=W.__pFix[0];PL.e=W.__pFix[1];PL.s=W.__pFix[2];PL.n=W.__pFix[3]||1;}
@@ -730,7 +741,7 @@ var Diamond=(function(){
      frames a second at most; beyond, or when the graphics card is lost, or when the app stopped while the scene was being tried (a mark
      kept on this device until three frames have been drawn), the stone is shown still, as its colours' panel draws it, and the sky behind
      it is not drawn. localStorage "ing.gpu.diamond": "full" or "still" chooses by hand (the tests use it). */
-  var GPU={st:"",n:0,ms:0,est:0,good:0,why:""},PX1=new Uint8Array(4),PQ=0.35;
+  var GPU={st:"",n:0,ms:0,est:0,good:0,why:""},PX1=new Uint8Array(4),PQ=0.35,SLOW0=1;  /* 8.03: SLOW0, the fewest frames a chip that only just affords the true ratio keeps to at rest (its graphics chip busy half the time at most) */
   function trying(on){try{if(on)localStorage.setItem("ing.diamond.trying","1");else localStorage.removeItem("ing.diamond.trying");}catch(e){}}
   /* 7.75 (her words, 24 November 2026: "The diamond is blurred in the background, and the holder is missing from view in the Guided Tour
      section of the Adamas page ... it ruins the entire 3D visuals of the tour page"). Read in the code: the still stone is drawn from
@@ -744,9 +755,13 @@ var Diamond=(function(){
   function seenOk(){try{return !!localStorage.getItem("ing.gpu.diamond.ok");}catch(e){return false;}}
   var REPROBED=false;
   function decide(){var full=GPU.ms/Math.max(1,GPU.n-1)/(PQ*PQ);GPU.est=Math.round(full);
-    if(full>900&&!REPROBED){REPROBED=true;GPU.n=0;GPU.ms=0;return;}   /* 7.75: once more, a moment later, before the stone is shown still */
-    if(full<=55){q=1;GPU.st="full";}else if(full<=220){q=Math.max(0.6,Math.min(1,Math.sqrt(55/full)));GPU.st="lite";SLOW=Math.max(SLOW,1.25);}
-    else if(full<=900){q=0.5;GPU.st="low";SLOW=2;}else{goStill("slow");return;}size();}
+    /* 8.03: measured at the true ratio now (full); c is what the same frame costs at the ratio drawn before 8.03 (at most 1.25), and the
+       tiers keep their old limits in it, so no chip does worse than before: a chip that cannot draw the true ratio within the budget draws
+       as many pixels as the budget allows (the square root of the budget over the cost), never fewer than it drew before */
+    var fq=Math.sqrt(55/full),q0=Math.min(1.25,dpr())/dpr(),c=full*q0*q0;
+    if(c>900&&!REPROBED){REPROBED=true;GPU.n=0;GPU.ms=0;return;}   /* 7.75: once more, a moment later, before the stone is shown still */
+    if(full<=55){q=1;GPU.st="full";SLOW0=Math.max(1,Math.min(1.6,full/33));SLOW=Math.max(SLOW,SLOW0);}else if(c<=220){q=Math.max(0.6*q0,Math.min(1,fq));GPU.st="lite";SLOW=Math.max(SLOW,1.25);}
+    else if(c<=900){q=Math.max(0.5*q0,Math.min(1,fq));GPU.st="low";SLOW=2;}else{goStill("slow");return;}size();}
   function goStill(why){GPU.st="still";GPU.why=why;ok=false;if(raf===-1){clearTimeout(TMO);TMO=0;}else if(raf)cancelAnimationFrame(raf);raf=0;trying(false);
     try{cv.style.visibility="hidden";}catch(e){}try{if(BG.cv&&BG.cv.parentNode)BG.cv.parentNode.removeChild(BG.cv);}catch(e){}BG.ok=false;
     if(host)host.setAttribute("data-still",why);stillDraw();}

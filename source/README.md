@@ -395,6 +395,25 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.03 (27 November 2026): Adamas, the diamond's holder drawn sharp at the screen's true pixel ratio, its outline smoothed.
+
+- Her words (27 November 2026): "The diamon holder of the Adamas page looks blurry and unrefined. I have been asking for this to be fixed
+  for ages! I want it to look detailed, defined, sharpened and refined and not look like a blurry, poorly generated blob. I need you to
+  fix it for good please." `r292.js`:
+  - Found: since 7.89 every scene reads a pixel ratio of at most 1.25 (r391, cool running: "a Retina screen's 2 drew 2.56 times the
+    pixels"), so on a Retina screen the Adamas scene was drawn at 1.25 and stretched 1.6 times to fit its card. The stretch smeared the
+    holder's engraving, its turned lines, its knurled foot and every edge (measured on the same frame, its edges' strength 18, against 33
+    drawn at the true ratio). The page's text and pictures were never touched; only the scenes.
+  - The Adamas scene now reads the screen's true ratio (window.__ingRealRatio, at most 2 as before 7.89); every other scene keeps r391's
+    ceiling. The soft sky behind the stone keeps its old size.
+  - Cool running kept by frames, not pixels: 15 frames a second at rest (was 20); the graphics measurement (7.40) now measures at the true
+    ratio and keeps its tiers in what the same frame costs at the old ratio, so a chip draws the true ratio when it affords it, as many
+    pixels as its budget allows when it nearly does, and never fewer than before 8.03; a chip that only just affords the true ratio
+    draws fewer frames at rest (its graphics chip busy half the time at most).
+  - The outline smoothed: a ray that passes the case within a pixel covers the rest of that pixel (its nearest approach, measured as the
+    walk goes), so the outline is a fine edge, not steps.
+  - Test: rig/t_803_adamas_sharp.js.
+
 Ingenium 8.02 (27 November 2026): Custodia's dial with Ingenium's own seal, cool at rest, deep by night, moving under the pointer, refined in its own look.
 
 - Her words (27 November 2026), with pictures of Custodia by day and by night on her Mac: "Custodia has the wrong logo on the inside of the
