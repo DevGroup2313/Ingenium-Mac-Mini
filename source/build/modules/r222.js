@@ -281,7 +281,7 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
-  ["8.02", "Custodia's dial carries Ingenium's own seal at its knob, and is refined: its pewter finely brushed with a polished rim, finer ticks, a finer knurl, a cut pointer and small polished beads for its lamps; by night it is dark metal, its light low."],
+  ["8.02", "Custodia's dial carries Ingenium's own seal, set into its face within a fine engraved ring, and is refined: its pewter finely brushed with a polished rim, finer ticks, a cut pointer and small polished beads for its lamps; by night it is dark metal, its light low."],
   ["8.02", "Custodia's dial answers you: it tilts toward the pointer and its light follows; turn its ring by hand; press a lamp and the dial turns to it and opens its key; press the seal for a flourish, as on Home."],
   ["8.02", "Custodia runs cool: nothing on it moves by itself any more (its ring turned and its lamps pulsed without end, which kept your device working)."],
   ["8.01", "The Guide's What is new names only the pages your copy of Ingenium has."],

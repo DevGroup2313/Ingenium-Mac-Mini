@@ -15,11 +15,11 @@ const rot = (t) => { const m = /matrix\(([^)]+)\)/.exec(t || ''); if (!m) return
   await p.evaluate(() => { const x = document.getElementById('introEnter') || [...document.querySelectorAll('button')].find((b) => /^Enter$/.test(b.textContent.trim())); if (x) x.click(); });
   await sleep(800); await p.evaluate(() => go('custodia')); await sleep(2600);
 
-  // the logo: Ingenium's own seal in the knob's well, no plain star
+  // the logo: Ingenium's own seal in the dial's face, no plain star
   const logo = await p.evaluate(() => { const sb = document.querySelector('#cuHead .cu-sealbox'); return { seal: !!(sb && sb.querySelector('.r175-seal .isl')), layers: sb ? [...sb.querySelectorAll('.isl-layer')].map((x) => x.className.split(' ')[1]) : [], star: !![...document.querySelectorAll('#cuHead svg path')].some((x) => /^M0,-10C1\.6/.test(x.getAttribute('d') || '')),
     upright: sb ? !document.querySelector('#cuHead .cu-turn').contains(sb) : false }; });
   check(logo.seal && ['isl-ring', 'isl-star', 'isl-heart'].every((k) => logo.layers.indexOf(k) >= 0), "the dial's centre holds Ingenium's own seal, in its layers (ring, star, heart)", logo);
-  check(!logo.star && logo.upright, 'no plain star is left in the knob, and the seal stands upright outside the turning ring', logo);
+  check(!logo.star && logo.upright, 'no plain star is left, and the seal stands upright outside the turning ring', logo);
 
   // cool at rest: once the opening turn has ended, nothing in the head moves by itself but the seal's own breath
   await sleep(1500);
@@ -86,11 +86,13 @@ const rot = (t) => { const m = /matrix\(([^)]+)\)/.exec(t || ''); if (!m) return
     return { dial: +Math.max(...d).toFixed(3), knob: +Math.max(...k).toFixed(3), none: n.length ? +Math.max(...n).toFixed(3) : 0, face: !!document.querySelector('#cuHead .cu-face'), ticks: document.querySelectorAll('#cuHead .cu-ticks').length, plate: !!document.querySelector('#cuHead canvas') }; };
   const day = await p.evaluate(metal);
   check(day.face && day.ticks === 3 && !day.plate, 'the pewter dial as approved: its face, its ticks (with a middle tick between the numbers), nothing painted over it', day);
-  check(day.dial > 0.9 && day.knob > 0.9, 'by day the bezel and the knob are bright polished pewter', day);
+  check(day.dial > 0.9, 'by day the bezel is bright polished pewter', day);
+  const centre = await p.evaluate(() => { const sb = document.querySelector('#cuHead .cu-sealbox'); return { knob: !!document.querySelector('#cuHead .cu-knob'), w: sb ? Math.round(sb.getBoundingClientRect().width) : 0, ring: sb ? getComputedStyle(sb, '::before').boxShadow : '' }; });
+  check(!centre.knob && centre.w > 70 && centre.w <= 92 && /inset/.test(centre.ring), 'no knob: the seal, smaller, sits in the face within a fine engraved ring', centre);
   // by night: dark metal, no bright white left on the dial
   await p.evaluate(() => { document.body.setAttribute('data-theme', 'night'); }); await sleep(900);
   const night = await p.evaluate(metal);
-  check(night.dial < 0.5 && night.knob < 0.4 && night.none < 0.6, 'by night the bezel, the knob and the empty lamps are dark metal, with nothing bright white', night);
+  check(night.dial < 0.5 && night.none < 0.6, 'by night the bezel and the empty lamps are dark metal, with nothing bright white', night);
   await p.screenshot({ path: pics + '/2_night.png', clip: { x: 0, y: 0, width: 1440, height: 760 } });
   await p.evaluate(() => { document.body.setAttribute('data-theme', 'day'); }); await sleep(400);
 

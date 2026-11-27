@@ -405,11 +405,12 @@ Ingenium 8.02 (27 November 2026): Custodia's dial with Ingenium's own seal, cool
   `r408.js`:
   - What heated: the dial's ring turned without end (a 16 second round) and the amber lamps pulsed their glow without end (a changing glow
     is painted again on every frame). Both are gone; nothing on the page moves by itself but the seal's own breath, as on every page.
-  - The logo: the knob's well holds Ingenium's own seal (Home's, in its layers, from IngStudios.kit.sealKey where the compass's part is
-    carried, else the welcome door's seal with a press of its own), upright while the ring turns.
+  - The logo: Ingenium's own seal (Home's, in its layers, from IngStudios.kit.sealKey where the compass's part is carried, else the
+    welcome door's seal with a press of its own) sits in the dial's face within a fine engraved ring, upright while the ring turns.
   - The approved pewter dial, refined in its own terms: the bezel finely brushed, its polished rim catching the light from the upper left,
-    a crisper lip around the face, finer ticks with a middle tick between the numbers, the numbers a little larger, the knurl finer and lit
-    as a dome, the pointer cut in two facets, the lamps small polished beads ringed with a hairline of light. By night the bezel, the knob
+    a crisper lip around the face, finer ticks with a middle tick between the numbers, the numbers a little larger, no knob (her words on the
+    knob: "I don't like how ugly and bulky the engine button and the inside dial looks, it looks weird and plastic with the white turn
+    thing"; the seal, smaller, sits in the face), the pointer cut in two facets, the lamps small polished beads ringed with a hairline of light. By night the bezel, the knob
     and the empty lamps are dark metal and the light is low.
   - It answers: the dial tilts toward the pointer and a light follows it; the ring turns under the hand, glides a little, and settles on a
     mark with a click; a lamp names its key under the pointer and, pressed, flares once while the dial turns its number under the pointer

@@ -8,8 +8,8 @@
    reading key's password (r357) had none: forgotten, they locked their thing for good.
    Custodia (Latin: safekeeping), a page of its own in the side bar, before Settings:
    - its head: a combination dial in pewter, Ingenium's own seal at its knob (8.02: Home's seal in its layers, pressed as on Home; the
-     bezel finely brushed with a polished rim, finer ticks with a middle tick between the numbers, a finer knurl lit as a dome, the pointer
-     cut in two facets); around it a bead for each key, violet when it has a way back, amber when it has none yet (pressed, the dial turns
+     bezel finely brushed with a polished rim, finer ticks with a middle tick between the numbers, the pointer cut in two facets, the knob taken away so the seal sits in
+     the face within a fine engraved ring); around it a bead for each key, violet when it has a way back, amber when it has none yet (pressed, the dial turns
      its number under the pointer and the key opens). It tilts toward the pointer and its light follows; the ring turns under the hand;
      nothing moves by itself but the seal's breath;
    - Your keys: a tag for each key this copy holds (the owner key and the reading key in the master edition alone; GitHub only where
@@ -58,8 +58,8 @@ body[data-theme="night"] .cu-key:not(.primary){color:#e9defc;background:linear-g
 /* the dial: a combination dial in pewter, its knob with Ingenium's star */
 #cuHead .cu-dialbox{position:absolute;right:78px;top:50%;width:380px;height:380px;margin-top:-190px}
 /* the dial: a combination dial in pewter, as approved; 8.02 refines it in its own terms: a finely brushed bezel whose polished rim catches
-   the light, a crisper lip around the face, finer ticks with a middle tick between the numbers, a finer knurl lit as a dome, the pointer
-   cut in two facets, the lamps as small polished beads; Ingenium's own seal at its knob */
+   the light, a crisper lip around the face, finer ticks with a middle tick between the numbers, the pointer cut in two
+   facets, the lamps as small polished beads; no knob: Ingenium's own seal sits in the face within a fine engraved ring */
 .cu-dial{position:absolute;inset:0;border-radius:50%;
   background:repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.08) 0 1px,rgba(60,50,80,.03) 1px 2px),
     conic-gradient(from 200deg,#fdfdff,#d6d2df 12%,#9e99ab 26%,#e9e7ee 40%,#ffffff 50%,#bfbaca 64%,#8f8a9c 80%,#e4e1ea 92%,#fdfdff);
@@ -85,16 +85,6 @@ body[data-theme="night"] .cu-face{box-shadow:inset 0 3px 10px rgba(0,0,0,.6),ins
   -webkit-mask:radial-gradient(circle,transparent 0 65%,#000 65.5% 76%,transparent 76.5%);mask:radial-gradient(circle,transparent 0 65%,#000 65.5% 76%,transparent 76.5%)}
 .cu-num{position:absolute;left:50%;top:50%;width:30px;height:20px;margin:-10px 0 0 -15px;text-align:center;font:600 16px/20px var(--c-serif);color:var(--c-ink1);letter-spacing:.02em;text-shadow:0 1px 0 rgba(255,255,255,.8);pointer-events:none}
 body[data-theme="night"] .cu-num{color:var(--c-ink2);text-shadow:0 1px 0 rgba(0,0,0,.6)}
-.cu-knob{position:absolute;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;
-  background:repeating-conic-gradient(from 0deg,#f6f5f9 0 2deg,#b6b1c3 2deg 4deg);
-  box-shadow:0 2px 0 #8d879b,0 6px 12px rgba(40,22,68,.35),inset 0 0 0 4px rgba(255,255,255,.35),0 0 0 1px rgba(60,50,80,.3)}
-.cu-knob::before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.6),rgba(255,255,255,0) 48%),radial-gradient(circle at 70% 78%,rgba(40,22,68,.24),rgba(40,22,68,0) 55%)}
-.cu-knob::after{content:"";position:absolute;inset:14px;border-radius:50%;background:radial-gradient(circle at 42% 34%,#f3eefb,#ddd3ef 70%,#cbbfe3);
-  box-shadow:inset 0 3px 7px rgba(40,22,68,.28),inset 0 -1px 0 rgba(255,255,255,.6),0 0 0 2px #eeeaf5,0 0 0 3px rgba(60,50,80,.28)}
-body[data-theme="night"] .cu-knob{background:repeating-conic-gradient(from 0deg,#4e4766 0 2deg,#2a2439 2deg 4deg);box-shadow:0 2px 0 #17131f,0 6px 12px rgba(0,0,0,.55),inset 0 0 0 4px rgba(214,200,244,.08),0 0 0 1px rgba(0,0,0,.6)}
-body[data-theme="night"] .cu-knob::before{background:radial-gradient(circle at 32% 26%,rgba(214,200,244,.22),rgba(214,200,244,0) 48%),radial-gradient(circle at 70% 78%,rgba(0,0,0,.35),rgba(0,0,0,0) 55%)}
-body[data-theme="night"] .cu-knob::after{background:radial-gradient(circle at 42% 34%,#2e2546,#1b1529 70%,#130e1d);box-shadow:inset 0 3px 8px rgba(0,0,0,.6),inset 0 -1px 0 rgba(214,200,244,.12),0 0 0 2px #3a3350,0 0 0 3px rgba(0,0,0,.5)}
 .cu-mark{position:absolute;left:50%;top:-14px;width:24px;height:19px;margin-left:-12px;z-index:5;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(40,22,68,.35))}
 .cu-mark i{position:absolute;inset:0;clip-path:polygon(0 0,100% 0,50% 100%);background:linear-gradient(180deg,rgba(255,255,255,.4) 0 1.5px,rgba(255,255,255,0) 1.5px),linear-gradient(90deg,#8d66d9 0 50%,#5a31a6 50% 100%)}
 body[data-theme="night"] .cu-mark i{background:linear-gradient(180deg,rgba(255,255,255,.3) 0 1.5px,rgba(255,255,255,0) 1.5px),linear-gradient(90deg,#a986ee 0 50%,#6d44bd 50% 100%)}
@@ -221,7 +211,11 @@ body[data-theme="night"] .cu-err{color:#f08a95}
   background:radial-gradient(circle at var(--lx,32%) var(--ly,24%),rgba(255,255,255,.58),rgba(255,255,255,.14) 22%,rgba(255,255,255,0) 46%)}
 .cu-dialbox.live .cu-sheen{opacity:1}
 body[data-theme="night"] .cu-sheen{background:radial-gradient(circle at var(--lx,32%) var(--ly,24%),rgba(214,196,250,.26),rgba(214,196,250,.07) 24%,rgba(214,196,250,0) 48%)}
-.cu-sealbox{position:absolute;left:50%;top:50%;width:116px;height:116px;margin:-58px 0 0 -58px;z-index:4;border-radius:50%}
+.cu-sealbox{position:absolute;left:50%;top:50%;width:88px;height:88px;margin:-44px 0 0 -44px;z-index:4;border-radius:50%}
+.cu-sealbox::before{content:"";position:absolute;inset:-11px;border-radius:50%;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(60,50,80,.26),0 0 0 1px rgba(255,255,255,.8)}
+.cu-sealbox::after{content:"";position:absolute;inset:-5px;border-radius:50%;pointer-events:none;box-shadow:inset 0 1px 3px rgba(40,22,68,.16)}
+body[data-theme="night"] .cu-sealbox::before{box-shadow:inset 0 0 0 1px rgba(0,0,0,.55),0 0 0 1px rgba(214,200,244,.14)}
+body[data-theme="night"] .cu-sealbox::after{box-shadow:inset 0 1px 3px rgba(0,0,0,.45)}
 .cu-sealbox .hx-seal{position:absolute;inset:0;width:100%;height:100%;margin:0;transform:none}
 .cu-sealbox .r175-seal{position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:50%;background:transparent;box-shadow:none;cursor:pointer}
 .cu-sealbox .r175-seal:focus-visible{outline:2.5px solid var(--c-acc);outline-offset:4px}
@@ -344,7 +338,7 @@ function head(keys){var h=mk("div");h.id="cuHead";var w=mk("div","cu-words");w.a
   var box=mk("div","cu-dialbox"),tilt=mk("div","cu-tilt"),dial=mk("div","cu-dial"),turn=mk("div","cu-turn");dial.appendChild(mk("div","cu-face"));
   turn.appendChild(mk("div","cu-ticks"));turn.appendChild(mk("div","cu-ticks mid"));turn.appendChild(mk("div","cu-ticks big"));
   for(var n=0;n<100;n+=10){var a2=n*3.6,s=mk("span","cu-num",String(n));s.style.transform="rotate("+a2+"deg) translateY(-122px)";turn.appendChild(s);}
-  turn.appendChild(mk("div","cu-knob"));turn.style.transform="rotate("+DL.rot.toFixed(2)+"deg)";dial.appendChild(turn);dial.appendChild(mk("div","cu-sheen"));tilt.appendChild(dial);
+  turn.style.transform="rotate("+DL.rot.toFixed(2)+"deg)";dial.appendChild(turn);dial.appendChild(mk("div","cu-sheen"));tilt.appendChild(dial);
   var sb=mk("div","cu-sealbox"),se=sealKey();if(se)sb.appendChild(se);tilt.appendChild(sb);var mkk=mk("div","cu-mark");mkk.appendChild(mk("i"));tilt.appendChild(mkk);var lab=mk("div","cu-lab");lab.setAttribute("aria-hidden","true");
   keys.forEach(function(x,i){var t=(-90+i*(360/keys.length)+22)*Math.PI/180,l=mk("button","cu-lamp "+(x.none?"none":x.ok?"ok":"warn"));l.type="button";l.style.left=(190+201*Math.cos(t)-7)+"px";l.style.top=(190+201*Math.sin(t)-7)+"px";
     l.setAttribute("aria-label",x.name+": "+(x.none?x.st:x.ok?"has a way back":"no way back yet"));l.setAttribute("data-key",x.k);l.style.border="0";l.style.padding="0";l.style.cursor="pointer";
@@ -358,13 +352,13 @@ function head(keys){var h=mk("div");h.id="cuHead";var w=mk("div","cu-words");w.a
 var DL={rot:0,last:0,n:0,tt:0};
 function still(){try{if(D.body.getAttribute("data-motion")==="minimal")return true;}catch(e){}try{return !!(W.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);}catch(e){return false;}}
 function sealKey(){var K=W.IngStudios&&IngStudios.kit;
-  if(K&&typeof K.sealKey==="function"){try{var hs0=K.sealKey("cu-seal","Ingenium's seal. Press it for fun.",116);if(hs0)return hs0;}catch(e){}}
+  if(K&&typeof K.sealKey==="function"){try{var hs0=K.sealKey("cu-seal","Ingenium's seal. Press it for fun.",88);if(hs0)return hs0;}catch(e){}}
   /* where the compass's part is not carried (the Gift and Demo editions): the welcome door's own seal, in its layers, with a press of its own */
   var src=D.querySelector("#introSeal .isl")||D.querySelector("#brandSealBtn .isl")||D.querySelector("#hxSeal .isl");if(!src)return null;
   var c=src.cloneNode(true),pre="cu"+(++DL.n)+"_",html;c.className="isl isl-home";c.removeAttribute("style");c.setAttribute("aria-hidden","true");html=c.outerHTML;
   [].forEach.call(c.querySelectorAll("[id]"),function(nd){var id=nd.getAttribute("id"),q=id.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
     html=html.replace(new RegExp('id="'+q+'"',"g"),'id="'+pre+id+'"').replace(new RegExp("url\\(#"+q+"\\)","g"),"url(#"+pre+id+")").replace(new RegExp('href="#'+q+'"',"g"),'href="#'+pre+id+'"');});
-  var w=mk("div");w.innerHTML=html;var isl=w.firstElementChild;isl.style.setProperty("--S","116px");[].forEach.call(isl.querySelectorAll(".isl-tilt,.isl-idle"),function(nd){nd.removeAttribute("style");});
+  var w=mk("div");w.innerHTML=html;var isl=w.firstElementChild;isl.style.setProperty("--S","88px");[].forEach.call(isl.querySelectorAll(".isl-tilt,.isl-idle"),function(nd){nd.removeAttribute("style");});
   var hs=mk("div","hx-seal cu-seal"),k=mk("button","r175-seal"),g=mk("span","r175-glow"),fx=mk("span","r175-fx"),cx=mk("span","cu-fx"),f=0;k.type="button";k.setAttribute("aria-label","Ingenium's seal. Press it for fun.");
   g.setAttribute("aria-hidden","true");cx.appendChild(isl);fx.appendChild(cx);k.appendChild(g);k.appendChild(fx);hs.appendChild(k);
   k.addEventListener("pointermove",function(e){if(e.pointerType!=="mouse"||still())return;var r=isl.getBoundingClientRect();if(!r.width)return;var x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
