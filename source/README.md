@@ -410,15 +410,26 @@ Ingenium 8.02 (27 November 2026): Custodia's dial with Ingenium's own seal, cool
   - The approved pewter dial, refined in its own terms: the bezel finely brushed, its polished rim catching the light from the upper left,
     a crisper lip around the face, finer ticks with a middle tick between the numbers, the numbers a little larger, no knob (her words on the
     knob: "I don't like how ugly and bulky the engine button and the inside dial looks, it looks weird and plastic with the white turn
-    thing"; the seal, smaller, sits in the face), the pointer cut in two facets, the lamps small polished beads ringed with a hairline of light. By night the bezel, the knob
-    and the empty lamps are dark metal and the light is low.
+    thing"; the seal, smaller, sits in the face), the pointer cut in two facets, the lamps small polished beads ringed with a hairline of light. By night the bezel and the
+    empty lamps are dark metal and the light is low.
   - It answers: the dial tilts toward the pointer and a light follows it; the ring turns under the hand, glides a little, and settles on a
     mark with a click; a lamp names its key under the pointer and, pressed, flares once while the dial turns its number under the pointer
     and the key opens below (the head is kept while the parts below are drawn again, so a turn is never cut short); the seal plays a
     flourish; as the page opens the ring turns home once and a key with no way back yet calls twice. Minimal motion keeps it flat and still.
-  - Test: rig/t_802_custodia_dial.js (22 checks: the seal and its layers, nothing running at rest and no frames asked for, the dial's metal
-    by day and by night, the tilt and its light, a lamp's name, its press and its key, the turn by hand and its settling, the seal's press,
-    Minimal motion); rig/t_800_custodia.js still 26/26.
+  - Her words (27 November 2026): "I also want it to be clickable and animated like the rest of the other pages 3D headers." So the dial
+    lifts a little under the pointer and a gleam runs once round its rim as the pointer comes (at most once in four seconds) and as the
+    page opens; a press on the face, right or left of the seal, steps the ring one number that way; a press on the rim makes the dial give
+    and spring back with a gleam. Each moves for a moment and stops: nothing runs at rest.
+  - Her words (27 November 2026): "I also want the faint little purple circle from the engine button to be fixed." The cause was the
+    compass's (r290, 13 and 14 November 2026): the seal swayed in 3D on a clock of its own inside a dial that leans on its own, and its ring
+    lay lower than its star, so the ring slid about (measured: up to 2.2 pixels off the seal's centre). It is held as the compass's and
+    Blend's are: no sway and no tilt of its own, its ring, star and heart at Blend's heights; measured after, 0.02 pixels at most.
+  - The centre: her choice on the live preview (27 November 2026), "Build the current Custodia's dial into the app with the \"As before\"
+    look, we can come back to it later": the plain pearl face, the seal within its fine engraved ring. (A sunken well and a collar round
+    the seal were tried on the way and taken out at her word, never released.)
+  - Test: rig/t_802_custodia_dial.js (29 checks: the seal and its layers, nothing running at rest and no frames asked for, the dial's metal
+    by day and by night, the tilt, the lift and the light, a lamp's name, its press and its key, the turn by hand and its settling, the press
+    on the face and on the rim, the gleam, the seal's press, its purple ring held in step, Minimal motion); rig/t_800_custodia.js still 26/26.
 
 Ingenium 8.01 (27 November 2026): the Guides of the Gift and Demo editions name only the pages those editions have.
 

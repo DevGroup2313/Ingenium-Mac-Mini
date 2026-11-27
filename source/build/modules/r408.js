@@ -7,9 +7,9 @@
    sign-in, a hint; r197); the Cloud's passphrase (r255), a backup's password (r143), the owner key's password (PermitCore) and the
    reading key's password (r357) had none: forgotten, they locked their thing for good.
    Custodia (Latin: safekeeping), a page of its own in the side bar, before Settings:
-   - its head: a combination dial in pewter, Ingenium's own seal at its knob (8.02: Home's seal in its layers, pressed as on Home; the
+   - its head: a combination dial in pewter, Ingenium's own seal at its heart (8.02: Home's seal in its layers, pressed as on Home; the
      bezel finely brushed with a polished rim, finer ticks with a middle tick between the numbers, the pointer cut in two facets, the knob taken away so the seal sits in
-     the face within a fine engraved ring); around it a bead for each key, violet when it has a way back, amber when it has none yet (pressed, the dial turns
+     the face within a fine engraved ring, its thin purple ring held in step with it); around it a bead for each key, violet when it has a way back, amber when it has none yet (pressed, the dial turns
      its number under the pointer and the key opens). It tilts toward the pointer and its light follows; the ring turns under the hand;
      nothing moves by itself but the seal's breath;
    - Your keys: a tag for each key this copy holds (the owner key and the reading key in the master edition alone; GitHub only where
@@ -55,7 +55,7 @@ body[data-theme="night"] .cu-key:not(.primary){color:#e9defc;background:linear-g
 .cu-key svg{width:16px;height:16px}
 #cuHead .cu-say{position:absolute;left:40px;bottom:24px;z-index:6;max-width:470px;font:italic 500 16px/1.4 var(--c-serif);color:var(--c-ink3)}
 #cuHead .cu-say b{font-style:normal;font-weight:600;color:var(--c-ink1)}
-/* the dial: a combination dial in pewter, its knob with Ingenium's star */
+/* the dial: a combination dial in pewter, Ingenium's seal at its heart */
 #cuHead .cu-dialbox{position:absolute;right:78px;top:50%;width:380px;height:380px;margin-top:-190px}
 /* the dial: a combination dial in pewter, as approved; 8.02 refines it in its own terms: a finely brushed bezel whose polished rim catches
    the light, a crisper lip around the face, finer ticks with a middle tick between the numbers, the pointer cut in two
@@ -201,21 +201,41 @@ body[data-theme="night"] .cu-err{color:#f08a95}
    wanted it to look more defined, refined, elegant and elevated without you copying the compass' literal design". What heated: the ring
    turned for ever (a 16 second round) and the amber lamps pulsed their glow for ever (a glow that changes is painted again on every frame).
    Now nothing moves by itself but the seal's own breath, as on every page: the plate tilts toward the pointer and its light follows it, the
-   ring turns under her hand and to a lamp she presses, once as the page opens; the knob's well holds Ingenium's own seal, upright; by night
+   ring turns under her hand and to a lamp she presses, once as the page opens; Ingenium's own seal sits in the face within a fine engraved ring, upright; by night
    the metal is dark and its light low. The dial keeps its approved look, refined in its own terms (see the dial's rules above). */
 #cuHead .cu-dialbox{perspective:1100px;--k:1}
 .cu-tilt{position:absolute;left:50%;top:50%;width:380px;height:380px;margin:-190px 0 0 -190px}
 .cu-tilt{transform:scale(var(--k,1)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .5s cubic-bezier(.2,.8,.2,1)}
 .cu-dialbox.live .cu-tilt{transition:transform .14s linear}
+.cu-dialbox.live .cu-tilt{transform:scale(calc(var(--k,1)*1.015)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
+.cu-tilt.press{transform:scale(calc(var(--k,1)*.982)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))!important;transition:transform .12s ease!important}
+.cu-dial{transition:box-shadow .35s ease}
+.cu-dialbox.live .cu-dial{box-shadow:0 3px 0 #8d879b,0 6px 0 #7b7589,0 20px 30px rgba(40,22,68,.28),0 40px 70px rgba(40,22,68,.2),inset 0 0 0 1px rgba(255,255,255,.8),0 0 0 .6px rgba(60,50,80,.4)}
+body[data-theme="night"] .cu-dialbox.live .cu-dial{box-shadow:0 3px 0 #2c273a,0 6px 0 #1d1928,0 20px 30px rgba(0,0,0,.6),0 40px 70px rgba(0,0,0,.5),inset 0 0 0 1px rgba(214,200,244,.26),0 0 0 .6px rgba(0,0,0,.6)}
+.cu-gleam{position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:2;opacity:0;
+  background:conic-gradient(from 0deg,rgba(255,255,255,0) 0deg,rgba(255,255,255,.95) 9deg,rgba(255,255,255,0) 20deg,rgba(255,255,255,0) 360deg);
+  -webkit-mask:radial-gradient(circle closest-side,transparent calc(100% - 22px),#000 calc(100% - 21px));mask:radial-gradient(circle closest-side,transparent calc(100% - 22px),#000 calc(100% - 21px))}
+.cu-gleam.go{animation:cuGleam 1.4s cubic-bezier(.4,0,.2,1) 1}
+@keyframes cuGleam{0%{opacity:0;transform:rotate(-40deg)}14%{opacity:1}84%{opacity:1}100%{opacity:0;transform:rotate(320deg)}}
+body[data-theme="night"] .cu-gleam{background:conic-gradient(from 0deg,rgba(214,200,244,0) 0deg,rgba(214,200,244,.6) 9deg,rgba(214,200,244,0) 20deg,rgba(214,200,244,0) 360deg)}
 .cu-sheen{position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:3;opacity:0;transition:opacity .4s ease;
   background:radial-gradient(circle at var(--lx,32%) var(--ly,24%),rgba(255,255,255,.58),rgba(255,255,255,.14) 22%,rgba(255,255,255,0) 46%)}
 .cu-dialbox.live .cu-sheen{opacity:1}
 body[data-theme="night"] .cu-sheen{background:radial-gradient(circle at var(--lx,32%) var(--ly,24%),rgba(214,196,250,.26),rgba(214,196,250,.07) 24%,rgba(214,196,250,0) 48%)}
 .cu-sealbox{position:absolute;left:50%;top:50%;width:88px;height:88px;margin:-44px 0 0 -44px;z-index:4;border-radius:50%}
+/* 8.02: the seal set into the face within a fine engraved ring, a shallow seat under it: the look she chose as "As before" on the live
+   preview (27 November 2026: "Build the current Custodia's dial into the app with the \"As before\" look, we can come back to it later") */
 .cu-sealbox::before{content:"";position:absolute;inset:-11px;border-radius:50%;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(60,50,80,.26),0 0 0 1px rgba(255,255,255,.8)}
 .cu-sealbox::after{content:"";position:absolute;inset:-5px;border-radius:50%;pointer-events:none;box-shadow:inset 0 1px 3px rgba(40,22,68,.16)}
 body[data-theme="night"] .cu-sealbox::before{box-shadow:inset 0 0 0 1px rgba(0,0,0,.55),0 0 0 1px rgba(214,200,244,.14)}
 body[data-theme="night"] .cu-sealbox::after{box-shadow:inset 0 1px 3px rgba(0,0,0,.45)}
+/* the seal's thin purple ring, held in step. Her words (27 November 2026): "I also want the faint little purple circle from the engine button
+   to be fixed." The cause is the compass's (r290, 13 and 14 November 2026): the seal swayed in 3D on a clock of its own inside a dial that
+   leans on its own, and its ring lay lower than its star, so the ring slid about. So it is held as the compass's and Blend's are: no sway
+   and no tilt of its own, its ring, star and heart at Blend's heights; it moves only with the dial. */
+.cu-sealbox .isl .isl-ring{--fz:.08;--fk:.98}.cu-sealbox .isl .isl-star{--fz:.17;--fk:.9575}.cu-sealbox .isl .isl-heart{--fz:.3;--fk:.925}
+.cu-sealbox .isl .isl-idle{animation:none !important}
+.cu-sealbox .isl .isl-tilt{transform:none !important}
 .cu-sealbox .hx-seal{position:absolute;inset:0;width:100%;height:100%;margin:0;transform:none}
 .cu-sealbox .r175-seal{position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:50%;background:transparent;box-shadow:none;cursor:pointer}
 .cu-sealbox .r175-seal:focus-visible{outline:2.5px solid var(--c-acc);outline-offset:4px}
@@ -334,11 +354,11 @@ function head(keys){var h=mk("div");h.id="cuHead";var w=mk("div","cu-words");w.a
   var ks=mk("div","cu-keys"),a=mk("button","cu-key primary");a.type="button";a.innerHTML=svg(I.shield)+"Give every key a way back";a.onclick=function(){var k=keys.filter(function(x){return !x.none&&!x.ok;})[0];if(!k){toast("Every key has a way back.");return;}heard();open(k.k,true);};ks.appendChild(a);
   var b=mk("button","cu-key");b.type="button";b.innerHTML=svg(I.sheet)+"My recovery sheet";b.onclick=sheetStart;ks.appendChild(b);w.appendChild(ks);h.appendChild(w);
   var say=mk("div","cu-say");say.innerHTML="Each lamp around the dial is one of your keys. <b>Violet</b> has a way back; <b>amber</b> has none yet. Press a lamp to dial its key.";h.appendChild(say);
-  /* 8.02: the dial in a tilting plate; the ring turns under her hand; Ingenium's own seal in the knob's well, upright, pressed as on Home */
+  /* 8.02: the dial in a tilting plate; the ring turns under her hand; Ingenium's own seal in the face, upright, pressed as on Home */
   var box=mk("div","cu-dialbox"),tilt=mk("div","cu-tilt"),dial=mk("div","cu-dial"),turn=mk("div","cu-turn");dial.appendChild(mk("div","cu-face"));
   turn.appendChild(mk("div","cu-ticks"));turn.appendChild(mk("div","cu-ticks mid"));turn.appendChild(mk("div","cu-ticks big"));
   for(var n=0;n<100;n+=10){var a2=n*3.6,s=mk("span","cu-num",String(n));s.style.transform="rotate("+a2+"deg) translateY(-122px)";turn.appendChild(s);}
-  turn.style.transform="rotate("+DL.rot.toFixed(2)+"deg)";dial.appendChild(turn);dial.appendChild(mk("div","cu-sheen"));tilt.appendChild(dial);
+  turn.style.transform="rotate("+DL.rot.toFixed(2)+"deg)";dial.appendChild(turn);dial.appendChild(mk("div","cu-gleam"));dial.appendChild(mk("div","cu-sheen"));tilt.appendChild(dial);
   var sb=mk("div","cu-sealbox"),se=sealKey();if(se)sb.appendChild(se);tilt.appendChild(sb);var mkk=mk("div","cu-mark");mkk.appendChild(mk("i"));tilt.appendChild(mkk);var lab=mk("div","cu-lab");lab.setAttribute("aria-hidden","true");
   keys.forEach(function(x,i){var t=(-90+i*(360/keys.length)+22)*Math.PI/180,l=mk("button","cu-lamp "+(x.none?"none":x.ok?"ok":"warn"));l.type="button";l.style.left=(190+201*Math.cos(t)-7)+"px";l.style.top=(190+201*Math.sin(t)-7)+"px";
     l.setAttribute("aria-label",x.name+": "+(x.none?x.st:x.ok?"has a way back":"no way back yet"));l.setAttribute("data-key",x.k);l.style.border="0";l.style.padding="0";l.style.cursor="pointer";
@@ -391,17 +411,24 @@ function wireDial(box,turn){var raf=0,px=0,py=0,drag=null;
   function ang(e){var r=box.getBoundingClientRect();return Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2))*180/Math.PI;}
   function clicks(){var s=Math.floor(DL.rot/36);if(s!==DL.last){DL.last=s;heard();}}
   function snap(){var to=Math.round(DL.rot/3.6)*3.6;DL.rot=to;turn.style.transition="transform .2s cubic-bezier(.3,1.4,.5,1)";turn.style.transform="rotate("+to.toFixed(2)+"deg)";setTimeout(function(){turn.style.transition="";},220);}
-  turn.addEventListener("pointerdown",function(e){if(e.button!==0)return;clearTimeout(DL.tt);drag={a:ang(e),t:performance.now(),v:0,id:e.pointerId};turn.style.transition="none";turn.classList.add("held");try{turn.setPointerCapture(e.pointerId);}catch(x){}});
-  turn.addEventListener("pointermove",function(e){if(!drag||e.pointerId!==drag.id)return;var a=ang(e),d=a-drag.a;if(d>180)d-=360;if(d<-180)d+=360;drag.a=a;
+  turn.addEventListener("pointerdown",function(e){if(e.button!==0)return;clearTimeout(DL.tt);drag={a:ang(e),t:performance.now(),v:0,id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};turn.style.transition="none";turn.classList.add("held");try{turn.setPointerCapture(e.pointerId);}catch(x){}});
+  turn.addEventListener("pointermove",function(e){if(!drag||e.pointerId!==drag.id)return;if(!drag.moved&&Math.abs(e.clientX-drag.x)+Math.abs(e.clientY-drag.y)<5)return;drag.moved=true;var a=ang(e),d=a-drag.a;if(d>180)d-=360;if(d<-180)d+=360;drag.a=a;
     var t=performance.now(),dt=Math.max(8,t-drag.t);drag.t=t;drag.v=d/dt*1000;DL.rot+=d;turn.style.transform="rotate("+DL.rot.toFixed(2)+"deg)";clicks();});
-  function end(e){if(!drag)return;var v=drag.v;drag=null;turn.classList.remove("held");try{turn.releasePointerCapture(e.pointerId);}catch(x){}
+  function end(e){if(!drag)return;var v=drag.v,moved=drag.moved;drag=null;turn.classList.remove("held");try{turn.releasePointerCapture(e.pointerId);}catch(x){}
+    if(!moved&&e.type==="pointerup"){var rb=box.getBoundingClientRect();turnTo(turn,DL.rot+(e.clientX>=rb.left+rb.width/2?36:-36),still()?0:620);return;}
     if(still()||Math.abs(v)<60){snap();return;}var t0=performance.now(),last=t0;
     (function glide(now){var dt=Math.min(.05,(now-last)/1000);last=now;v*=Math.pow(.05,dt);DL.rot+=v*dt;turn.style.transform="rotate("+DL.rot.toFixed(2)+"deg)";clicks();
       if(Math.abs(v)>30&&now-t0<1000)requestAnimationFrame(glide);else snap();})(t0);}
-  turn.addEventListener("pointerup",end);turn.addEventListener("pointercancel",end);}
+  turn.addEventListener("pointerup",end);turn.addEventListener("pointercancel",end);
+  var dial=box.querySelector(".cu-dial"),tilt=box.querySelector(".cu-tilt");
+  if(dial)dial.addEventListener("pointerdown",function(e){if(e.target!==dial||e.button!==0)return;heard();if(still())return;tilt.classList.remove("press");void tilt.offsetWidth;tilt.classList.add("press");
+    setTimeout(function(){tilt.classList.remove("press");},150);gleam(box);});
+  box.addEventListener("pointerenter",function(e){if(e.pointerType==="mouse")gleam(box);});}
+/* a gleam of light goes once round the bezel: as the pointer comes, at most once in four seconds, and as the page opens */
+function gleam(box){var g=box&&box.querySelector(".cu-gleam"),t=Date.now();if(!g||still()||t-(DL.gl||0)<4000)return;DL.gl=t;g.classList.remove("go");void g.offsetWidth;g.classList.add("go");setTimeout(function(){g.classList.remove("go");},1500);}
 /* as the page opens: the ring turns home once, and a lamp with no way back yet calls twice */
 function settle(){var box=D.querySelector("#cuHead .cu-dialbox"),turn=box&&box.querySelector(".cu-turn");if(!turn||still())return;
-  DL.rot=-48;turn.style.transition="none";turn.style.transform="rotate(-48deg)";void turn.offsetWidth;turnTo(turn,0,1300);
+  DL.rot=-48;turn.style.transition="none";turn.style.transform="rotate(-48deg)";void turn.offsetWidth;turnTo(turn,0,1300);DL.gl=0;setTimeout(function(){gleam(box);},700);
   [].forEach.call(box.querySelectorAll(".cu-lamp.warn"),function(l){l.classList.remove("hello");void l.offsetWidth;l.classList.add("hello");setTimeout(function(){l.classList.remove("hello");},2400);});}
 /* ---------- the board of key tags ---------- */
 function board(keys){var b=mk("section");b.id="cuBoard";var bh=mk("div","cu-bh");bh.appendChild(mk("h3",null,"Your keys"));bh.appendChild(mk("span",null,"press one to see its ways back"));b.appendChild(bh);

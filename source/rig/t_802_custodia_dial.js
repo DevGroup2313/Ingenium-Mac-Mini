@@ -71,6 +71,24 @@ const rot = (t) => { const m = /matrix\(([^)]+)\)/.exec(t || ''); if (!m) return
   check(moved > 20, 'dragged, the ring turns with the hand', { before, turned });
   check(onTick, 'let go, it settles on a mark', turned);
 
+  // a click on the face (not a drag) steps the ring ten numbers toward that side
+  const r1 = rot(await p.evaluate(() => getComputedStyle(document.querySelector('#cuHead .cu-turn')).transform));
+  await p.mouse.click(c.x + 104, c.y + 10); await sleep(900);
+  const r2 = rot(await p.evaluate(() => getComputedStyle(document.querySelector('#cuHead .cu-turn')).transform));
+  const step = (((r2 - r1) % 360) + 540) % 360 - 180;
+  check(Math.abs(step - 36) < 1, 'a click on the right of the face steps the ring ten numbers clockwise', { r1, r2, step });
+  // the bezel presses in and springs back; a gleam goes round it
+  await p.mouse.move(c.x - 182, c.y + 12); await p.mouse.down();
+  const pressed0 = await p.evaluate(() => ({ press: document.querySelector('#cuHead .cu-tilt').classList.contains('press'), gleam: document.querySelector('#cuHead .cu-gleam').classList.contains('go') }));
+  await p.mouse.up(); await sleep(400);
+  const pressed1 = await p.evaluate(() => document.querySelector('#cuHead .cu-tilt').classList.contains('press'));
+  check(pressed0.press && !pressed1, 'the bezel presses in and springs back', { pressed0, pressed1 });
+  await sleep(4200); await p.mouse.move(c.x + 400, c.y); await sleep(200); await p.mouse.move(c.x + 60, c.y - 140, { steps: 4 }); await sleep(120);
+  const gl = await p.evaluate(() => ({ go: document.querySelector('#cuHead .cu-gleam').classList.contains('go'), lift: getComputedStyle(document.querySelector('#cuHead .cu-tilt')).transform }));
+  check(gl.go, 'a gleam goes once round the bezel as the pointer comes', gl);
+  await sleep(1800);
+  const after2 = await p.evaluate(() => { const h = document.getElementById('cuHead'); return document.getAnimations().filter((a) => a.playState === 'running' && a.effect && a.effect.target && h.contains(a.effect.target) && !a.effect.target.closest('.isl')).length; });
+  check(after2 === 0, 'and when it has gone round, nothing runs again until the pointer asks', after2);
   // the seal presses as on Home: a flourish, and nothing opens
   const sealAt = await p.evaluate(() => { const r = document.querySelector('#cuHead .cu-sealbox').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, page: document.querySelector('.section.active').id }; });
   await p.mouse.click(sealAt.x, sealAt.y); await sleep(250);
@@ -95,6 +113,16 @@ const rot = (t) => { const m = /matrix\(([^)]+)\)/.exec(t || ''); if (!m) return
   check(night.dial < 0.5 && night.none < 0.6, 'by night the bezel and the empty lamps are dark metal, with nothing bright white', night);
   await p.screenshot({ path: pics + '/2_night.png', clip: { x: 0, y: 0, width: 1440, height: 760 } });
   await p.evaluate(() => { document.body.setAttribute('data-theme', 'day'); }); await sleep(400);
+
+  // the seal's thin purple ring stays in step with the seal (her words, 27 November 2026: "the faint little purple circle from the engine
+  // button to be fixed"): no sway of its own inside the dial, the ring on the seal's centre
+  const ringDrift = await p.evaluate(async () => { const s = document.querySelector('#cuHead .cu-sealbox .isl'); if (!s) return { err: 'no seal' };
+    const c = (el) => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }; let m = 0;
+    for (let i = 0; i < 12; i++) { const a = c(s.querySelector('.isl-base')), b = c(s.querySelector('.isl-ring > svg')); m = Math.max(m, Math.hypot(a[0] - b[0], a[1] - b[1])); await new Promise((r) => setTimeout(r, 200)); }
+    const sway = document.getAnimations().some((x) => x.animationName === 'islSway' && x.effect && x.effect.target && x.effect.target.closest && x.effect.target.closest('.cu-sealbox'));
+    return { max: +m.toFixed(3), sway }; });
+  check(ringDrift.max < 0.3, "the seal's thin purple ring stays on the seal's centre", ringDrift);
+  check(ringDrift.sway === false, 'the seal has no sway of its own inside the dial: it moves only with the dial', ringDrift);
 
   // Minimal motion: the plate stays flat under the pointer
   await p.evaluate(() => document.body.setAttribute('data-motion', 'minimal')); await sleep(200);

@@ -282,7 +282,8 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
   ["8.02", "Custodia's dial carries Ingenium's own seal, set into its face within a fine engraved ring, and is refined: its pewter finely brushed with a polished rim, finer ticks, a cut pointer and small polished beads for its lamps; by night it is dark metal, its light low."],
-  ["8.02", "Custodia's dial answers you: it tilts toward the pointer and its light follows; turn its ring by hand; press a lamp and the dial turns to it and opens its key; press the seal for a flourish, as on Home."],
+  ["8.02", "Custodia's dial answers you: it leans toward the pointer and lifts a little, its light following, and a gleam runs round its rim; turn its ring by hand; press the face right or left of the seal and the ring steps one number that way; press the rim and it gives and springs back; press a lamp and the dial turns to it and opens its key; press the seal for a flourish, as on Home."],
+  ["8.02", "The thin purple circle in Custodia's seal stays in step with the seal (it drifted about as the seal swayed on its own); the seal now moves only with the dial, as on the compass."],
   ["8.02", "Custodia runs cool: nothing on it moves by itself any more (its ring turned and its lamps pulsed without end, which kept your device working)."],
   ["8.01", "The Guide's What is new names only the pages your copy of Ingenium has."],
   ["8.00", "Custodia, a page of its own before Settings: every password and key Ingenium keeps for you, each with its ways back, so that you are never locked out."],
