@@ -412,7 +412,14 @@ Ingenium 8.03 (27 November 2026): Adamas, the diamond's holder drawn sharp at th
     draws fewer frames at rest (its graphics chip busy half the time at most).
   - The outline smoothed: a ray that passes the case within a pixel covers the rest of that pixel (its nearest approach, measured as the
     walk goes), so the outline is a fine edge, not steps.
-  - Test: rig/t_803_adamas_sharp.js.
+  - Kept as light to open as before: the speed test is drawn at the size it had (its result scaled to the true ratio), and the holder is
+    coloured from one place in the shader (a second call, tried on the way, doubled what the browser compiles: 5 s instead of 2 on a
+    processor four times slower). A browser that draws in software (SwiftShader, llvmpipe, Windows' Basic Render Driver) ends on the
+    still stone whatever its speed test says, as it would draw with the processor itself.
+  - Tests: rig/t_803_adamas_sharp.js (13 checks; on 8.02 it fails 6 of 10 of its first checks: a 650 by 530 drawing stretched into
+    1040 by 848, edges 16.6 against 42.1). rig/t_740_adamas.js 9/9 (8.02 here: 8/9, the page held 4.9 s against 4.5). rig/t_722_adamas_pace.js
+    expects 15 a second at rest, worked out from the page's own frames, and chooses the scene by hand; its check of 10 a second while
+    Ingenium is not the window in use fails on this machine for 8.02 as well (5.7), its timers being slow here.
 
 Ingenium 8.02 (27 November 2026): Custodia's dial with Ingenium's own seal, cool at rest, deep by night, moving under the pointer, refined in its own look.
 

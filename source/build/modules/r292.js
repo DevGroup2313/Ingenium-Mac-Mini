@@ -374,17 +374,18 @@ var Diamond=(function(){
   "  float glow=exp(-max(0.0,f-0.07)*9.0)*step(0.05,f);float aft=exp(-max(0.0,f-0.09)*12.0)*step(0.03,f);float lit=glow;",
   "  float A=uL.x;vec3 dA=vec3(cos(A),0.0,sin(A)),tg=vec3(-dA.z,0.0,dA.x);vec3 E=uDC+dA*0.30+vec3(0.0,0.24,0.0),P1=uDC-dA*0.05+vec3(0.0,-0.30,0.0),P2=uDC-dA*0.34+vec3(0.0,-0.05,0.0);",
   "  vec3 col=vec3(0.0);float a=0.0;float th=1e9;",
-  "  if(hs>0.5&&(ts<tp||HCV<0.999)){col=sc;a=1.0;th=ts;col*=1.0+mix(0.22,0.46,uN)*glow;",
+  "  bool sw=hs>0.5&&(ts<tp||HCV<0.999);vec3 hcc=vec3(0.0);if(!sw&&tp<1e8){vec3 hc=holderCol(pp,pn,rdL,part,lit);hcc=uN>0.5?tm(hc):min(hc,vec3(1.0));}",
+"  if(sw){col=sc;a=1.0;th=ts;col*=1.0+mix(0.22,0.46,uN)*glow;",
   "    float s1=clamp((f-0.028)/0.012,0.0,1.0),s2=clamp((f-0.040)/0.012,0.0,1.0);float on1=step(0.026,f)*step(f,0.075),on2=step(0.038,f)*step(f,0.085);",
   "    vec3 Xi=uDC-dA*0.55+vec3(0.0,-0.42,0.0);if(f<0.7)col+=vec3(1.0,0.96,1.0)*beam(ro,rd,E,Xi,0.022,1e9,s1,0.30,0.0,1.2*on1);",
   "    col=fam(uCd>0.5?1.0-exp(-col*1.30):tm(col));}",
-  "  else if(tp<1e8&&HCV>0.999){vec3 hc=holderCol(pp,pn,rdL,part,lit);col=uN>0.5?tm(hc):min(hc,vec3(1.0));a=1.0;th=tp;}",
+  "  else if(tp<1e8&&HCV>0.999){col=hcc;a=1.0;th=tp;}",
   "  else{if(uBG<0.5){vec4 au=aurora(v);float ai=uN>0.5?0.95:1.0;col=au.rgb*ai;a=clamp(au.a*ai,0.0,1.0);}",
   "    if(uN<0.5&&uBG<0.5){vec2 wc=(v-vec2(0.50,0.52))*vec2(uAsp,1.0);float wg=exp(-dot(wc,wc)/0.34);vec3 wcol=mix(vec3(1.0,0.70,0.86),vec3(0.70,0.60,1.0),clamp(v.x*0.8+v.y*0.3,0.0,1.0));col+=wcol*wg*0.50;a=max(a,wg*0.50);vec2 gc=(v-vec2(0.50,0.60))*vec2(uAsp,1.0);float gg=exp(-dot(gc,gc)/0.045);col+=vec3(0.70,0.50,1.0)*gg*0.34;a=max(a,gg*0.34);",
   "      vec2 fc=(v-vec2(0.52,0.22))*vec2(uAsp,1.6);float fg=exp(-dot(fc,fc)/0.12);col+=vec3(0.78,0.62,1.0)*fg*0.34;a=max(a,fg*0.34);}",
   /* the holder's own soft shadow beneath it, so it seems to float */
   "    if(rd.y<0.0){float tf=(-0.37-ro.y)/rd.y;vec3 f=ro+rd*tf;float r=length(f.xz);float sa=mix(0.20,0.42,uN)*exp(-pow(max(r-1.30,0.0)/0.42,2.0))*smoothstep(2.6,1.8,r);vec3 scl=uN>0.5?vec3(0.0):vec3(0.20,0.15,0.34)*sa;col=col*(1.0-sa)+scl;a=a+sa*(1.0-a);}col=aurx(col,v.x+uT*0.004);",
-"    if(tp<1e8){vec3 hc=holderCol(pp,pn,rdL,part,lit);vec3 hcc=uN>0.5?tm(hc):min(hc,vec3(1.0));col=mix(col,hcc,HCV);a=mix(a,1.0,HCV);}}",
+"    if(tp<1e8){col=mix(col,hcc,HCV);a=mix(a,1.0,HCV);}}",
   /* the ray in, the three fans out (the falling one glances off the holder), each with its pulse and a quick afterglow, then gone */
   /* her words (14 November 2026): "I want only or two rays shooting through the diamond and at diagonal or opposite angles so that it looks
      more natural and enhances the sparkles of the diamond without ruining the look"; the fans that bounced off "like a lightning bolt" are
@@ -406,6 +407,9 @@ var Diamond=(function(){
   function sh(type,src){var s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!PEXT&&!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s;}
   function init(){try{gl=cv.getContext("webgl",{premultipliedAlpha:true,alpha:true,antialias:false,powerPreference:"low-power"})||cv.getContext("experimental-webgl");}catch(e){gl=null;}
     if(!gl)return false;try{PEXT=gl.getExtension("KHR_parallel_shader_compile");}catch(e){PEXT=null;}
+    /* 8.03: a browser that draws in software (no graphics chip at work: SwiftShader, llvmpipe, Windows' Basic Render Driver) draws with the
+       processor itself, hot and slow; whatever its speed test says, it ends on the still stone (below, in decide) */
+    try{var ri=gl.getExtension("WEBGL_debug_renderer_info"),rn=String((ri?gl.getParameter(ri.UNMASKED_RENDERER_WEBGL):"")||gl.getParameter(gl.RENDERER)||"");SOFT=/swiftshader|llvmpipe|softpipe|basic render|software/i.test(rn);}catch(e){SOFT=false;}
     try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FS));gl.linkProgram(pr);}catch(e){W.__diamondErr=String(e);return false;}
     if(PEXT){var done=false;try{done=gl.getProgramParameter(pr,PEXT.COMPLETION_STATUS_KHR);}catch(e){done=true;}
       if(!done){PENDING=true;(function poll(){if(gl.isContextLost()){PENDING=false;goStill("lost");return;}var d=true;try{d=gl.getProgramParameter(pr,PEXT.COMPLETION_STATUS_KHR);}catch(e){}
@@ -741,7 +745,7 @@ var Diamond=(function(){
      frames a second at most; beyond, or when the graphics card is lost, or when the app stopped while the scene was being tried (a mark
      kept on this device until three frames have been drawn), the stone is shown still, as its colours' panel draws it, and the sky behind
      it is not drawn. localStorage "ing.gpu.diamond": "full" or "still" chooses by hand (the tests use it). */
-  var GPU={st:"",n:0,ms:0,est:0,good:0,why:""},PX1=new Uint8Array(4),PQ=0.35,SLOW0=1;  /* 8.03: SLOW0, the fewest frames a chip that only just affords the true ratio keeps to at rest (its graphics chip busy half the time at most) */
+  var GPU={st:"",n:0,ms:0,est:0,good:0,why:""},PX1=new Uint8Array(4),PQ=0.35,SLOW0=1,SOFT=false;  /* 8.03: SLOW0, the fewest frames a chip that only just affords the true ratio keeps to at rest (its graphics chip busy half the time at most) */
   function trying(on){try{if(on)localStorage.setItem("ing.diamond.trying","1");else localStorage.removeItem("ing.diamond.trying");}catch(e){}}
   /* 7.75 (her words, 24 November 2026: "The diamond is blurred in the background, and the holder is missing from view in the Guided Tour
      section of the Adamas page ... it ruins the entire 3D visuals of the tour page"). Read in the code: the still stone is drawn from
@@ -754,11 +758,12 @@ var Diamond=(function(){
      a moment later (the tour's card and a page that has just opened can slow the first frames) before the stone is shown still. */
   function seenOk(){try{return !!localStorage.getItem("ing.gpu.diamond.ok");}catch(e){return false;}}
   var REPROBED=false;
-  function decide(){var full=GPU.ms/Math.max(1,GPU.n-1)/(PQ*PQ);GPU.est=Math.round(full);
+  function decide(){var pq=PQ*Math.min(1.25,dpr())/dpr(),full=GPU.ms/Math.max(1,GPU.n-1)/(pq*pq);GPU.est=Math.round(full);
     /* 8.03: measured at the true ratio now (full); c is what the same frame costs at the ratio drawn before 8.03 (at most 1.25), and the
        tiers keep their old limits in it, so no chip does worse than before: a chip that cannot draw the true ratio within the budget draws
        as many pixels as the budget allows (the square root of the budget over the cost), never fewer than it drew before */
     var fq=Math.sqrt(55/full),q0=Math.min(1.25,dpr())/dpr(),c=full*q0*q0;
+    if(SOFT){goStill("slow");return;}
     if(c>900&&!REPROBED){REPROBED=true;GPU.n=0;GPU.ms=0;return;}   /* 7.75: once more, a moment later, before the stone is shown still */
     if(full<=55){q=1;GPU.st="full";SLOW0=Math.max(1,Math.min(1.6,full/33));SLOW=Math.max(SLOW,SLOW0);}else if(c<=220){q=Math.max(0.6*q0,Math.min(1,fq));GPU.st="lite";SLOW=Math.max(SLOW,1.25);}
     else if(c<=900){q=Math.max(0.5*q0,Math.min(1,fq));GPU.st="low";SLOW=2;}else{goStill("slow");return;}size();}
@@ -781,7 +786,7 @@ var Diamond=(function(){
       if(crashed&&force!=="still"&&seenOk()){var re="";try{re=localStorage.getItem("ing.diamond.retried")||"";localStorage.setItem("ing.diamond.retried","1");}catch(e){}if(!re)crashed=false;}
       if(force==="still"||(crashed&&force!=="full")){GPU.st="still";ok=false;setTimeout(function(){goStill(crashed?"stopped":"chosen");},0);return;}
       if(force==="full"){GPU.st="full";return;}
-      GPU.st="probe";q=PQ;size();trying(true);})();try{bgInit(host.closest?host.closest(".skh"):null);}catch(e){BG.ok=false;}
+      GPU.st="probe";q=PQ*Math.min(1.25,dpr())/dpr();size();trying(true);  /* 8.03: the speed test at the size it had before (its frames as short), its result scaled to the true ratio below */})();try{bgInit(host.closest?host.closest(".skh"):null);}catch(e){BG.ok=false;}
     function at(e){var r=cv.getBoundingClientRect();return {x:(e.clientX-r.left)/r.width*W0,y:(e.clientY-r.top)/r.height*H0};}
     var C=proj([0,1.22,0]);
     function hitPart(p){var sx=((p.x/W0)*2-1)*(W0/H0)*TAN,sy=((1-p.y/H0)*2-1)*TAN,d=nrm([CR[0]*sx+CU[0]*sy+CF[0],CR[1]*sx+CU[1]*sy+CF[1],CR[2]*sx+CU[2]*sy+CF[2]]);

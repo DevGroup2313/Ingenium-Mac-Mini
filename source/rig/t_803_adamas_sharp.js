@@ -43,6 +43,9 @@ let ok = 0, bad = 0; const check = (c, m, x) => { if (c) { ok++; console.log('PA
   check(/c=full\*q0\*q0/.test(src) && /c<=220/.test(src) && /c<=900/.test(src) && /c>900&&!REPROBED/.test(src), 'the graphics measurement keeps its tiers in what a frame cost at the old ratio, so no chip does worse than before');
   check(/SLOW0=Math\.max\(1,Math\.min\(1\.6,full\/33\)\)/.test(src) && /busy\?33:66/.test(src), 'it keeps cool by frames: 15 a second at rest, fewer where a chip only just affords the true ratio');
   check(/HCV=1\.0-mk/.test(src), 'the holder\'s outline is smoothed within a pixel');
+  check(/q=PQ\*Math\.min\(1\.25,dpr\(\)\)\/dpr\(\)/.test(src) && /pq=PQ\*Math\.min\(1\.25,dpr\(\)\)\/dpr\(\)/.test(src), 'the speed test is drawn at its old size, so opening Adamas holds the page no longer than before');
+  check((src.match(/holderCol\(pp,pn,rdL,part,lit\)/g) || []).length === 1, 'the holder is coloured from one place in the shader (a second would double what the browser compiles)');
+  check(/if\(SOFT\)\{goStill\("slow"\);return;\}/.test(src) && /swiftshader\|llvmpipe/.test(src), 'a browser that draws in software ends on the still stone');
   check(errs.length === 0, 'no error on the page', errs.slice(0, 3));
   console.log('\n' + ok + ' passed, ' + bad + ' failed'); await b.close(); process.exit(bad ? 1 : 0);
 })();
