@@ -13,11 +13,11 @@
 /* Ingenia's own rule for its seals (r263: a block of automatic height, under a drop shadow) gives way here: a shadow over the layers would
    press them flat, and the layers stand inside the logo's own square */
 #page-folders .ig-ls,#page-folders.fd-on .ig-ls.fd-seal{position:relative;display:inline-block !important;width:var(--S,56px) !important;height:var(--S,56px) !important;max-width:none !important;
-  perspective:calc(var(--S,56px) * 4);--rx:0deg;--ry:0deg;--lift:0px;--sc:1;flex:0 0 auto;vertical-align:middle;filter:none !important;border-radius:0 !important;background:none !important}
+  perspective:calc(var(--S,56px) * 7);--rx:0deg;--ry:0deg;--lift:0px;--sc:1;flex:0 0 auto;vertical-align:middle;filter:none !important;border-radius:0 !important;background:none !important}
 #page-folders .ig-ls-tilt{position:absolute;inset:0;display:block;transform-style:preserve-3d;transform:rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--lift)) scale(var(--sc));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
-#page-folders .ig-ls-idle{position:absolute;inset:0;display:block;transform-style:preserve-3d;animation:igSway 7s ease-in-out infinite}
-@keyframes igSway{0%,100%{transform:rotateY(-18deg) rotateX(5deg)}50%{transform:rotateY(18deg) rotateX(-5deg)}}
-#page-folders .ig-ls-l{position:absolute;inset:0;width:100%;height:100%;display:block;max-width:none;pointer-events:none;backface-visibility:hidden;transform:translateZ(calc(var(--S,56px) * var(--z) * var(--igz,1))) scale(calc(1 - var(--z) / 4))}
+#page-folders .ig-ls-idle{position:absolute;inset:0;display:block;transform-style:preserve-3d;animation:igSway 11s ease-in-out infinite}
+@keyframes igSway{0%,100%{transform:rotateX(5deg) rotateY(-7deg)}50%{transform:rotateX(-4deg) rotateY(7deg)}}
+#page-folders .ig-ls-l{position:absolute;inset:0;width:100%;height:100%;display:block;max-width:none;pointer-events:none;backface-visibility:hidden;transform:translateZ(calc(var(--S,56px) * var(--z) * var(--igz,1))) scale(calc(1 - var(--z) * var(--igz,1) / 7))}
 #page-folders .ig-ls-l.side{transform:translateZ(calc(var(--S,56px) * -.03)) translateY(2.5%) scale(1.0075)}
 #page-folders .ig-ls-cast{position:absolute;left:14%;right:14%;bottom:-9%;height:14%;border-radius:50%;display:block;background:radial-gradient(closest-side,rgba(42,20,80,.26),rgba(42,20,80,0));filter:blur(1.5px);transform:translateZ(calc(var(--S,56px) * -.08))}
 body[data-theme="night"] #page-folders .ig-ls-cast{background:radial-gradient(closest-side,rgba(0,0,0,.5),rgba(0,0,0,0))}
@@ -46,6 +46,27 @@ body[data-motion="minimal"] #page-folders .ig-ls-idle{animation:none}
 body[data-motion="minimal"] #page-folders .ig-ls-tilt{transform:none !important}
 @media (prefers-reduced-motion:reduce){#page-folders .ig-ls-idle{animation:none}#page-folders .ig-ls-tilt{transition:none}}
 #page-folders .ig-ls.down .ig-ls-tilt{transition-duration:.08s}
+/* 8.04: weighted, as the doors draw them. Her words (27 November 2026): "All of the apps logos look flat and one dimensional on the Ingenia folder pages, especially Clavis
+   which even folds and bends while animated. I HATE THAT. There is also this small and light purple shadow that moves with the apps'
+   logos which adds to enhanced flat and 1D look of the logo animated buttons. I want that all to be fixed and for all of the apps logos
+   especially Clavis' look proper and like truly 3D weighted animated buttons like they all do on their introduction doors."
+   Found: each logo was flat layers 18 degrees each way under a deep perspective (Clavis, The Forge, Carpe Diem and Ingenium had no rim,
+   so their faces were paper-thin), two of the presses turned it a full round sideways (twirl, flip: r402), which showed its flat layers
+   edge on, and a blurred violet oval swam beneath it. Now: the door's sway, a lean of 12 degrees at most, a shallower perspective, a rim
+   of four layers behind the face where a logo has none, each raised layer casting its own small shadow on the one below, and a soft
+   shadow of the plate itself beneath it, neutral, never violet. */
+#page-folders .ig-ls-l.rim{filter:brightness(var(--b,.8)) saturate(.85)}
+body[data-theme="night"] #page-folders .ig-ls-l.rim{filter:brightness(calc(var(--b,.8) * .8)) saturate(.85)}
+#page-folders .ig-ls-l:not(.rim):not(.side){filter:drop-shadow(0 calc(var(--S,56px) * var(--z,0) * .10) calc(var(--S,56px) * var(--z,0) * .14) rgba(20,14,30,.24))}
+body[data-theme="night"] #page-folders .ig-ls-l:not(.rim):not(.side){filter:drop-shadow(0 calc(var(--S,56px) * var(--z,0) * .10) calc(var(--S,56px) * var(--z,0) * .14) rgba(0,0,0,.5))}
+#page-folders .ig-ls-cast{left:3%;right:3%;top:3%;bottom:3%;height:auto;border-radius:50%;background:none !important;filter:none;transform:translateZ(calc(var(--S,56px) * -.06));
+  box-shadow:0 calc(var(--S,56px) * .05) calc(var(--S,56px) * .09) rgba(20,14,30,.22),0 calc(var(--S,56px) * .13) calc(var(--S,56px) * .22) rgba(20,14,30,.12)}
+body[data-theme="night"] #page-folders .ig-ls-cast{box-shadow:0 calc(var(--S,56px) * .05) calc(var(--S,56px) * .09) rgba(0,0,0,.55),0 calc(var(--S,56px) * .13) calc(var(--S,56px) * .22) rgba(0,0,0,.38)}
+#page-folders .ig-ls.flat .ig-ls-cast,#page-folders .ig-ls.obj .ig-ls-cast{display:none}
+/* an object (Clavis's astrolabe) casts the shadow of its own outline, and its parts stand closer, so they stay in register as it sways */
+#page-folders .ig-ls.obj{--igz:.6}
+#page-folders .ig-ls.obj .ig-ls-l.face{filter:drop-shadow(0 calc(var(--S,56px) * .03) calc(var(--S,56px) * .035) rgba(20,14,30,.32)) drop-shadow(0 calc(var(--S,56px) * .08) calc(var(--S,56px) * .1) rgba(20,14,30,.14))}
+body[data-theme="night"] #page-folders .ig-ls.obj .ig-ls-l.face{filter:drop-shadow(0 calc(var(--S,56px) * .03) calc(var(--S,56px) * .035) rgba(0,0,0,.6)) drop-shadow(0 calc(var(--S,56px) * .08) calc(var(--S,56px) * .1) rgba(0,0,0,.35))}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p378"]="started";}catch(_){}
 /* R378 · Ingenia's app logos, as Lector's and Fabrica's: see the note at the top of its styles. window.IngFolderLogos: {paint(), made()} */
@@ -62,11 +83,15 @@ function mine(k){try{if(!W.IngAppLogo||typeof IngAppLogo.own!=="function")return
 function sizeOf(e){var w=parseFloat(e.style.width)||e.width||0;if(!w){var r=e.getBoundingClientRect();w=r.width;}return Math.max(18,Math.round(w||56));}
 function h(tag,cls){var e=D.createElement(tag);if(cls)e.className=cls;return e;}
 /* Fabrica's sealEl, made for Ingenia: the seal in its layers, each at its depth, its edge and its cast; or, for a logo of her own, that logo */
+/* 8.04: objects, not plates, as Clavis's own door draws its astrolabe (its seal options, sopt-free): no rim and no plate's shadow */
+var OBJ={clavis:1};
 function make(k,size){var L=W.LX7_LAYERS||{},key=night()&&L[k+"N"]?k+"N":k,ls=L[key],own=mine(k);
   var root=h("span","ig-ls fd-seal");root.setAttribute("aria-hidden","true");root.setAttribute("data-fd-seal",k);root.setAttribute("data-ig",key+(own?":own":""));root.style.setProperty("--S",size+"px");
   var tilt=h("span","ig-ls-tilt"),idle=h("span","ig-ls-idle");idle.style.animationDelay=(-delayOf(k))+"s";idle.appendChild(h("i","ig-ls-cast"));
   if(own||!ls){root.classList.add("flat");var im=new Image();im.src=own||"";im.alt="";im.className="ig-ls-l";idle.appendChild(im);}
-  else ls.forEach(function(L1){var im=new Image();im.src=L1.src;im.alt="";im.className="ig-ls-l"+(L1.side?" side":"");im.style.setProperty("--z",String(L1.z));idle.appendChild(im);});
+  else{var obj=OBJ[String(k).replace(/N$/,"")]===1,rim=!obj&&ls.filter(function(L1){return L1.z<0;}).length<3,face=ls.filter(function(L1){return !L1.side&&L1.z===0;})[0];if(obj)root.classList.add("obj");
+    if(rim&&face)[[-.012,.84],[-.024,.76],[-.036,.68],[-.048,.6]].forEach(function(R){var im=new Image();im.src=face.src;im.alt="";im.className="ig-ls-l rim";im.style.setProperty("--z",String(R[0]));im.style.setProperty("--b",String(R[1]));idle.appendChild(im);});
+    ls.forEach(function(L1){var im=new Image();im.src=L1.src;im.alt="";im.className="ig-ls-l"+(L1.side?" side":"")+(L1===face?" face":"");im.style.setProperty("--z",String(L1.z));idle.appendChild(im);});}
   tilt.appendChild(idle);root.appendChild(tilt);return root;}
 var busy=false;
 function paint(){var pg=page();if(!pg||busy)return 0;var L=W.LX7_LAYERS||{},n=0;busy=true;
@@ -86,7 +111,7 @@ function off(except){var pg=page();if(!pg)return;[].forEach.call(pg.querySelecto
 function wire(){var pg=page();if(!pg||pg.__r378)return;pg.__r378=1;
   pg.addEventListener("pointermove",function(e){var ls=lsOf(e);off(ls);if(!ls||e.pointerType==="touch")return;var r=ls.getBoundingClientRect();if(!r.width)return;
     var px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;ls.classList.add("hov");
-    ls.style.setProperty("--ry",(clamp(px,-.8,.8)*30).toFixed(1)+"deg");ls.style.setProperty("--rx",(-clamp(py,-.8,.8)*24).toFixed(1)+"deg");},{passive:true});
+    ls.style.setProperty("--ry",(clamp(px,-.8,.8)*15).toFixed(1)+"deg");ls.style.setProperty("--rx",(-clamp(py,-.8,.8)*15).toFixed(1)+"deg");},{passive:true});
   pg.addEventListener("pointerleave",function(){off(null);});
   pg.addEventListener("pointerdown",function(e){var ls=lsOf(e);if(ls)ls.classList.add("down");},{passive:true});
   pg.addEventListener("pointerup",function(){[].forEach.call(pg.querySelectorAll(".ig-ls.down"),function(x){x.classList.remove("down");knock(x);});},{passive:true});

@@ -30,19 +30,20 @@ body[data-theme="night"] #page-folders .ig-ls.ig-key .r402-glow{background:radia
 @keyframes r402up{0%{translate:0 calc(var(--S,84px) * .08);scale:.9}55%{translate:0 calc(var(--S,84px) * -.05);scale:1.05}100%{translate:0 0;scale:1}}
 /* the flourishes, on the whole seal */
 #page-folders .ig-ls.ig-key.r402-f.r402-hop{animation:r402hop .78s cubic-bezier(.3,.8,.4,1),igSeat .9s cubic-bezier(.2,.9,.25,1)}
-#page-folders .ig-ls.ig-key.r402-f.r402-twirl{animation:r402twirl .85s cubic-bezier(.35,.9,.3,1),igSeat .9s cubic-bezier(.2,.9,.25,1)}
+/* 8.04: no press turns it sideways any more (twirl and flip showed its layers edge on: "folds and bends"); the door's knock and a lift of its layers instead */
+#page-folders .ig-ls.ig-key.r402-f.r402-knock{animation:r402knock .52s cubic-bezier(.34,1.45,.64,1),igSeat .9s cubic-bezier(.2,.9,.25,1)}
+#page-folders .ig-ls.ig-key.r402-f.r402-lift{animation:r402lift .95s cubic-bezier(.3,.8,.3,1)}
 #page-folders .ig-ls.ig-key.r402-f.r402-spin{animation:r402spin .9s cubic-bezier(.3,.8,.25,1),igSeat .9s cubic-bezier(.2,.9,.25,1)}
 #page-folders .ig-ls.ig-key.r402-f.r402-wobble{animation:r402wobble .75s ease-out,igSeat .9s cubic-bezier(.2,.9,.25,1)}
 #page-folders .ig-ls.ig-key.r402-f.r402-pulse{animation:r402pulse .7s cubic-bezier(.3,1.4,.5,1),igSeat .9s cubic-bezier(.2,.9,.25,1)}
-#page-folders .ig-ls.ig-key.r402-f.r402-flip{animation:r402flip .9s cubic-bezier(.35,.9,.3,1),igSeat .9s cubic-bezier(.2,.9,.25,1)}
 #page-folders .ig-ls.ig-key.r402-f.r402-big{animation:r402big 1.25s cubic-bezier(.25,.8,.25,1),igSeat .9s cubic-bezier(.2,.9,.25,1)}
 #page-folders .ig-ls.ig-key.r402-f .ig-ls-idle{animation-play-state:paused}
 @keyframes r402hop{0%{translate:0 calc(var(--S,84px) * .05);scale:1.06 .9}28%{translate:0 calc(var(--S,84px) * -.2);scale:.95 1.06}55%{translate:0 0;scale:1.08 .9}75%{translate:0 calc(var(--S,84px) * -.04);scale:.98 1.02}100%{translate:0 0;scale:1}}
-@keyframes r402twirl{0%{rotate:y 0deg}100%{rotate:y 360deg}}
+@keyframes r402knock{0%{scale:.93}42%{scale:1.07}72%{scale:.995}100%{scale:1}}
+@keyframes r402lift{0%{--igz:1;translate:0 0}35%{--igz:1.9;translate:0 calc(var(--S,84px) * -.07)}70%{--igz:.85;translate:0 0}100%{--igz:1;translate:0 0}}
 @keyframes r402spin{0%{rotate:0deg;scale:1}40%{scale:1.06}100%{rotate:360deg;scale:1}}
 @keyframes r402wobble{0%{rotate:0deg}18%{rotate:-13deg}36%{rotate:10deg}54%{rotate:-6deg}72%{rotate:3deg}100%{rotate:0deg}}
 @keyframes r402pulse{0%{scale:1}30%{scale:1.13}60%{scale:.97}100%{scale:1}}
-@keyframes r402flip{0%{rotate:x 0deg}100%{rotate:x 360deg}}
 @keyframes r402big{0%{rotate:0deg;scale:1}25%{scale:1.1}100%{rotate:720deg;scale:1}}
 #page-folders .ig-ls.ig-key.r402-pulse .r402-glow,#page-folders .ig-ls.ig-key.r402-big .r402-glow,#page-folders .ig-ls.ig-key.r402-stone .r402-glow{animation:r402glow .9s ease-out}
 @keyframes r402glow{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
@@ -62,14 +63,14 @@ body[data-motion="minimal"] #page-folders .ig-ls.ig-key{transition:none}
 (function r402(){
 "use strict";
 if(window.IngAppKeyPress)return;
-var W=window,D=document,ALL=["hop","twirl","spin","wobble","pulse","flip"],ING=["star","hop","ringp","wobble","twirl","stone"],last={},downAt=0,HELD=null;
+var W=window,D=document,ALL=["hop","knock","spin","wobble","pulse","lift"],ING=["star","hop","ringp","wobble","knock","stone"],last={},downAt=0,HELD=null;
 function minimal(){try{return D.body.getAttribute("data-motion")==="minimal";}catch(e){return false;}}
 function page(){return D.getElementById("page-folders");}
 function deco(k){if(!k.querySelector(":scope > .r402-glow")){var g=D.createElement("span");g.className="r402-glow";k.appendChild(g);}
 }
 function pick(k){var ing=k.getAttribute("data-fd-seal")==="ingenium",set=ing?ING:ALL,id=k.getAttribute("data-fd-seal")||"app",prev=last[id],n;
   do{n=set[Math.floor(Math.random()*set.length)];}while(n===prev&&set.length>1);last[id]=n;return n;}
-var CLS=["r402-f","r402-hop","r402-twirl","r402-spin","r402-wobble","r402-pulse","r402-flip","r402-big","r402-star","r402-ringp","r402-stone","r402-up"];
+var CLS=["r402-f","r402-hop","r402-knock","r402-spin","r402-wobble","r402-pulse","r402-lift","r402-big","r402-star","r402-ringp","r402-stone","r402-up"];
 function clear(k){CLS.forEach(function(c){k.classList.remove(c);});}
 function play(k,held){if(!k||minimal())return null;deco(k);clear(k);void k.offsetWidth;
   var n=held?"big":pick(k),cls=["r402-f"],ing=k.getAttribute("data-fd-seal")==="ingenium";

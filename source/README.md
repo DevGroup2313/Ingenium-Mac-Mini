@@ -395,6 +395,30 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.04 (27 November 2026): Ingenia's app logos, weighted 3D buttons as their own doors draw them; Clavis's astrolabe on its own.
+
+- Her words (27 November 2026): "All of the apps logos look flat and one dimensional on the Ingenia folder pages, especially Clavis which
+  even folds and bends while animated. I HATE THAT. There is also this small and light purple shadow that moves with the apps' logos which
+  adds to enhanced flat and 1D look of the logo animated buttons. I want that all to be fixed and for all of the apps logos especially
+  Clavis' look proper and like truly 3D weighted animated buttons like they all do on their introduction doors." Then, shown a first
+  picture: "Please remove the rounded 3D purple thing behind Clavis' logo, also the logo is distorted and looks really weird."
+  `r378.js`, `r402.js`:
+  - Found, against Clavis's own door (its seal3d: a sway of 7 degrees each way over 11 seconds, a lean of 12 at most, layers at real
+    depths each with its own drop shadow, an astrolabe drawn as an object with no round shadow): each logo swayed 18 degrees each way
+    under a perspective of four times its size and leant up to 24; Clavis, The Forge, Carpe Diem and Ingenium had no rim, so their faces
+    were paper thin; two presses (twirl, flip) turned the logo a full round sideways and showed its flat layers edge on; and a blurred
+    violet oval swam beneath it.
+  - Now: the door's sway and lean; a perspective of seven times its size, each raised layer's size correction matched to it (1 - z/7;
+    a first attempt kept the old 1 - z/4 and drew the raised layers small: "distorted"), so every layer is drawn the size of the face;
+    a rim of four layers behind the face of a round logo that has fewer than three (Inkwell's thin edge included); each raised layer
+    casting its own small shadow; beneath a round logo the soft shadow of its plate, neutral, never violet; no press turns it
+    sideways: the door's knock and a lift of its layers take the places of twirl and flip.
+  - Clavis's astrolabe is an object, not a plate (its face fills a quarter of its disc; every other logo's fills it): no rim and no round
+    shadow (the first attempt's plate shadow drew the outline of a plate it does not have: "the rounded 3D purple thing"), the shadow of
+    its own outline instead, and its parts closer together so they stay in register as it sways.
+  - Test: rig/t_804_ingenia_weight.js (44 checks on the six apps' folder pages); rig/t_779_ingenia_logos.js 8/8 and
+    rig/t_797_logo_press.js 11/11 still.
+
 Ingenium 8.03 (27 November 2026): Adamas, the diamond's holder drawn sharp at the screen's true pixel ratio, its outline smoothed.
 
 - Her words (27 November 2026): "The diamon holder of the Adamas page looks blurry and unrefined. I have been asking for this to be fixed
