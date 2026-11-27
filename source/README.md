@@ -395,6 +395,13 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.01 (27 November 2026): the Guides of the Gift and Demo editions name only the pages those editions have.
+
+- The editions tests on 8.00 (run after its push) found the Guide's What is new naming Fabrica (7.97's line of the little hand, 7.89's
+  cool running) and Vocatio (7.94) in the Gift and Demo editions, which have neither. `r222.js`: those lines are marked "fabrica" and
+  "career", as such lines are, and 7.89's has a "nofabrica" twin without Fabrica's tree. rig/t_627_editions.js, run on a Gift edition
+  built from these sources, finds no such line. editions/README.txt lists Memoria and Custodia among each edition's pages.
+
 Ingenium 8.00 (27 November 2026): Custodia, every key and its ways back; sort keys beside Your apps and Your models.
 
 - Her words (26 November 2026): "I want Ingenium to have a recovery system for the passwords and key terms and keys, so that I am not
