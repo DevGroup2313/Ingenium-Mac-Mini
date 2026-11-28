@@ -21,6 +21,30 @@
    8.00 (27 November 2026): the switch Learn from my folders names Fabrica only where the copy has Fabrica (the editions tests found the
    Gift and Demo editions naming it, from this card, which the atlas, r406, keeps unseen). */
 .kn-card{display:grid;gap:12px}
+#knAsk{position:fixed;right:max(84px,calc(env(safe-area-inset-right,0px) + 84px));bottom:max(22px,env(safe-area-inset-bottom,0px));z-index:9400;width:min(400px,calc(100vw - 32px));
+  background:var(--card,#fff);color:var(--ink-1,#221a2e);border-radius:20px;padding:16px 16px 12px;font:14px/1.45 var(--sans,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 0 0 1px rgba(var(--fam-rgb,42,20,80),.08),0 2px 0 rgba(var(--fam-rgb,42,20,80),.10),0 10px 24px rgba(var(--fam-rgb,42,20,80),.14),0 28px 56px rgba(var(--fam-rgb,42,20,80),.12);
+  animation:knAskIn .4s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes knAskIn{0%{opacity:0;transform:translateY(14px) scale(.98)}100%{opacity:1;transform:none}}
+@media (max-width:760px){#knAsk{left:16px;right:16px;width:auto}}
+@media (prefers-reduced-motion:reduce){#knAsk{animation:none}}
+#knAsk h4{margin:0 26px 4px 0;font:600 17px/1.25 var(--serif,"Home Cormorant","Cormorant Garamond",Georgia,serif);color:var(--ink-1,#221a2e)}
+#knAsk p{margin:0 0 10px;color:var(--ink-2,#4a4358);font-size:13.5px}
+#knAsk .ka-x{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;border:0;background:var(--card-lo,#f4f0fa);color:var(--ink-2);font:600 18px/1 inherit;cursor:pointer;
+  box-shadow:0 1px 0 rgba(var(--fam-rgb,42,20,80),.12),0 3px 6px rgba(var(--fam-rgb,42,20,80),.10);transition:transform .2s cubic-bezier(.2,.9,.3,1.3)}
+#knAsk .ka-x:hover{transform:translateY(-1px)}#knAsk .ka-x:active{transform:translateY(1px)}
+#knAsk .ka-list{display:grid;gap:6px;margin:0 0 12px;max-height:240px;overflow:auto;scrollbar-width:none}
+#knAsk .ka-list::-webkit-scrollbar{display:none}
+#knAsk .ka-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--card-lo,#faf8fc);cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(var(--fam-rgb,42,20,80),.07),0 1px 0 rgba(var(--fam-rgb,42,20,80),.08);transition:transform .2s cubic-bezier(.2,.9,.3,1.3),box-shadow .2s}
+#knAsk .ka-row:hover{transform:translateY(-1px);box-shadow:inset 0 0 0 1px rgba(var(--fam-rgb,42,20,80),.09),0 3px 0 rgba(var(--fam-rgb,42,20,80),.08),0 8px 14px rgba(var(--fam-rgb,42,20,80),.08)}
+#knAsk .ka-row input{accent-color:var(--accent);width:18px;height:18px;flex:none;margin:0}
+#knAsk .ka-logo{width:26px;height:26px;flex:none;display:grid;place-items:center;font-weight:700;color:var(--accent)}
+#knAsk .ka-logo img,#knAsk .ka-logo svg{width:26px;height:26px;display:block}
+#knAsk .ka-name{flex:1;font-weight:600;color:var(--ink-1)}
+#knAsk .ka-n{font-size:12px;color:var(--ink-3,#6c6579)}
+#knAsk .ka-keys{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+#knAsk .ka-foot{margin-top:8px;font-size:11.5px;color:var(--ink-3,#6c6579)}
 .kn-sec{display:grid;gap:8px}
 .kn-sec>h4{margin:6px 0 0;font:600 12px/1.2 var(--sans,system-ui,sans-serif);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
 .kn-chips{display:flex;flex-wrap:wrap;gap:8px}
@@ -67,7 +91,8 @@ function norm(s){return String(s||"").trim().toLowerCase().replace(/\s+/g," ");}
 function hash(s){var h=5381;s=norm(s);for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36);}
 /* ---------- the store ---------- */
 function K(){var s=W.state;if(!s.know||typeof s.know!=="object")s.know={};var k=s.know;k.facts=Array.isArray(k.facts)?k.facts:[];k.seen=k.seen||{};k.dropped=k.dropped||{};k.undo=k.undo||{};
-  k.opts=k.opts||{};if(k.opts.learn==null)k.opts.learn=true;if(k.opts.ask==null)k.opts.ask=true;if(k.opts.auto==null)k.opts.auto=true;return k;}
+  k.opts=k.opts||{};if(k.opts.learn==null)k.opts.learn=true;if(k.opts.ask==null)k.opts.ask=true;if(k.opts.auto==null)k.opts.auto=true;if(k.opts.askFolders==null)k.opts.askFolders=true;
+  k.fask=k.fask&&typeof k.fask==="object"?k.fask:{until:0,skip:{},seen:""};k.fask.skip=k.fask.skip||{};return k;}
 function apps(){try{return W.IngFolders&&IngFolders.folders?IngFolders.folders():[];}catch(e){return [];}}
 function appKey(name){return "app:"+norm(name);}
 function appOf(about){var n=String(about||"").replace(/^app:/,"");var A=apps();for(var i=0;i<A.length;i++)if(norm(A[i].name)===n)return A[i];return null;}
@@ -109,10 +134,53 @@ function learn(){var k=K();if(!k.opts.learn)return 0;var n=0;
 var lastKey=Date.now();D.addEventListener("keydown",function(){lastKey=Date.now();},true);D.addEventListener("pointerdown",function(){lastKey=Date.now();},true);
 function busy(){try{if(W.ingModelInUse&&W.ingModelInUse(180000))return true;  /* 7.94 (r397): nothing else using the model for three minutes */
   return !!(W.IngFolders&&IngFolders.run&&IngFolders.run.busy);}catch(e){return true;}}
-function autoTick(){var k=K();if(!k.opts.auto||D.hidden||Date.now()-lastKey<180000||busy())return;
-  var p=apps().filter(function(x){try{return IngFolders.unread(x).length>0&&!(k.undo[x.id]&&Date.now()-k.undo[x.id].at<600000);}catch(e){return false;}})[0];if(!p)return;
-  var a=p.app||{};k.undo[p.id]={brief:a.brief||"",decisions:(a.decisions||[]).slice(),open:(a.open||[]).slice(),briefAt:a.briefAt||0,at:Date.now(),done:false};save();
-  Promise.resolve(IngFolders.bringUp(p)).then(function(r){var u=k.undo[p.id];if(r&&u){u.done=true;u.doneAt=Date.now();}else delete k.undo[p.id];save();learn();soon();},function(){delete k.undo[p.id];save();});}
+/* 8.14 (28 November 2026). Her words: "I also want you to have Ingenium ask me if I want to have the models start writing and updating
+   Ingenia's apps' folders instead of automatically having the model start writing without me knowing. I want to be able to pick and choose."
+   So, with "Ask me first" on (the default), nothing is written until she says so: when she has been away from the keyboard for three
+   minutes and folders have conversations not yet read, a raised card asks, naming each such folder (its app's own logo, its name, how many
+   new conversations), each with its own tick. Update the ones I picked brings them up to date one at a time with her chosen model, the card
+   saying which folder is being written and offering Stop; Not now asks again in two hours, or sooner if a new conversation arrives; a folder
+   she leaves unticked is not asked about again until it has something new. Off, the folders are brought up to date by themselves as before. */
+function sigOf(p){try{return IngFolders.unread(p).map(function(c){return c.id;}).join(",");}catch(e){return "";}}
+function dueFolders(){var k=K();return apps().filter(function(x){try{return IngFolders.unread(x).length>0&&!(k.undo[x.id]&&Date.now()-k.undo[x.id].at<600000);}catch(e){return false;}});}
+function autoTick(){var k=K();if(!k.opts.auto||D.hidden||Date.now()-lastKey<180000||busy()||QUEUE)return;
+  var due=dueFolders();if(!due.length)return;
+  if(k.opts.askFolders!==false){askFolders(due);return;}
+  bring(due[0]);}
+function bring(p){var k=K(),a=p.app||{};k.undo[p.id]={brief:a.brief||"",decisions:(a.decisions||[]).slice(),open:(a.open||[]).slice(),briefAt:a.briefAt||0,at:Date.now(),done:false};save();
+  return Promise.resolve(IngFolders.bringUp(p)).then(function(r){var u=k.undo[p.id];if(r&&u){u.done=true;u.doneAt=Date.now();}else delete k.undo[p.id];save();learn();soon();return r;},function(){delete k.undo[p.id];save();return null;});}
+var QUEUE=null,ASK=null;
+function askFolders(due){var k=K(),f=k.fask,all=due.map(function(p){return p.id+":"+sigOf(p);}).join("|");
+  var fresh=due.filter(function(p){return f.skip[p.id]!==sigOf(p);});if(!fresh.length)return;
+  if(Date.now()<f.until&&all===f.seen)return;
+  if(ASK&&ASK.isConnected)return;paintAsk(fresh);}
+function modelWord(){try{var o=W.IngLector&&IngLector.plan?IngLector.plan():null;if(o&&(o.cloud||o.link)&&typeof W.lxCloudName==="function")return W.lxCloudName();if(o&&o.chosen)return o.chosen.customName||o.chosen.name||"your model";}catch(e){}return "your model";}
+function askEl(){if(ASK&&ASK.isConnected)return ASK;ASK=mk("div");ASK.id="knAsk";ASK.setAttribute("role","dialog");ASK.setAttribute("aria-label","Bring your apps' folders up to date?");D.body.appendChild(ASK);return ASK;}
+function logo(name){var w=mk("span","ka-logo");try{var e=W.IngAppLogo&&IngAppLogo.el?IngAppLogo.el(name,26):null;if(e)w.appendChild(e);else w.textContent=String(name||"?").charAt(0);}catch(e){w.textContent=String(name||"?").charAt(0);}return w;}
+function paintAsk(list){var A=askEl();A.innerHTML="";var x=mk("button","ka-x","×");x.type="button";x.setAttribute("aria-label","Not now");x.onclick=notNow;A.appendChild(x);
+  A.appendChild(mk("h4",null,"Bring your apps' folders up to date?"));
+  A.appendChild(mk("p",null,"New conversations wait in "+(list.length===1?"this folder":"these folders")+". "+modelWord()+" can read them and write each folder's notes, one at a time. Nothing is written until you say so; tick the ones you want."));
+  var L=mk("div","ka-list");list.forEach(function(p){var n=0;try{n=IngFolders.unread(p).length;}catch(e){}var l=mk("label","ka-row"),cb=mk("input");cb.type="checkbox";cb.checked=true;cb.value=p.id;
+    l.appendChild(cb);l.appendChild(logo(p.name));var t=mk("span","ka-name",p.name);l.appendChild(t);l.appendChild(mk("span","ka-n",n+" new"));L.appendChild(l);});A.appendChild(L);
+  var ks=mk("div","ka-keys"),no=mk("button","btn","Not now"),go=mk("button","btn primary","Update the ones I picked");no.type=go.type="button";
+  no.onclick=notNow;go.onclick=function(){var ids={},k=K(),f=k.fask;[].forEach.call(L.querySelectorAll("input"),function(cb){if(cb.checked)ids[cb.value]=1;});
+    list.forEach(function(p){if(!ids[p.id])f.skip[p.id]=sigOf(p);else delete f.skip[p.id];});save();
+    var pick=list.filter(function(p){return ids[p.id];});if(!pick.length){hideAsk();return;}runQueue(pick);};
+  L.addEventListener("change",function(){var any=[].some.call(L.querySelectorAll("input"),function(cb){return cb.checked;});go.disabled=!any;});
+  ks.appendChild(no);ks.appendChild(go);A.appendChild(ks);
+  A.appendChild(mk("div","ka-foot","Memoria, How it is kept: the switch to ask first or not."));}
+function notNow(){var k=K(),f=k.fask;f.until=Date.now()+2*3600000;f.seen=dueFolders().map(function(p){return p.id+":"+sigOf(p);}).join("|");save();hideAsk();}
+function hideAsk(){if(ASK){ASK.remove();ASK=null;}}
+function runQueue(list){QUEUE={list:list.slice(),i:0,stop:false};next();}
+function next(){var Q=QUEUE;if(!Q)return;if(Q.stop||Q.i>=Q.list.length){QUEUE=null;hideAsk();return;}
+  var p=Q.list[Q.i];paintRun(p,Q.i+1,Q.list.length);
+  /* she asked for it: it goes as soon as nothing else is using the model, not after three quiet minutes */
+  var inUse=W.ingModelInUse?W.ingModelInUse(0):"";if(inUse||(W.IngFolders&&IngFolders.run&&IngFolders.run.busy)){setTimeout(next,4000);return;}
+  bring(p).then(function(){if(QUEUE===Q){Q.i++;next();}});}
+function paintRun(p,i,n){var A=askEl();A.innerHTML="";A.appendChild(mk("h4",null,"Writing "+p.name+"'s folder"+(n>1?" ("+i+" of "+n+")":"")));
+  A.appendChild(mk("p",null,modelWord()+" is reading its new conversations and writing the folder's notes. The notes as they were are kept, and the folder offers Undo."));
+  var ks=mk("div","ka-keys"),st=mk("button","btn","Stop");st.type="button";st.onclick=function(){stopQueue();};ks.appendChild(st);A.appendChild(ks);}
+function stopQueue(){if(QUEUE)QUEUE.stop=true;try{if(W.IngFolders&&IngFolders.run&&IngFolders.run.busy){IngFolders.run.stop=true;if(W.Engine&&Engine.abort)Engine.abort();if(typeof W.cloudAbort==="function")cloudAbort();}}catch(e){}QUEUE=null;hideAsk();}
 function undo(p){var k=K(),u=k.undo[p.id];if(!u)return;var a=p.app;a.brief=u.brief;a.decisions=u.decisions;a.open=u.open;a.briefAt=u.briefAt;delete k.undo[p.id];save();try{IngFolders.paint();}catch(e){}soon();}
 /* ---------- used everywhere: a chat draws the facts that fit; a chat in an app's folder, all of that app's ---------- */
 function toks(t){return (String(t||"").toLowerCase().match(/[a-z0-9À-ɏ]{3,}/g)||[]);}
@@ -179,7 +247,7 @@ function paintRoom(){var c=roomCard();if(!c)return;var k=K(),A=apps(),W1=waiting
   fi.addEventListener("input",find);find();
   A.forEach(function(p){var ab=appKey(p.name),L=of(ab,"kept");var s=mk("div","kn-sec");s.setAttribute("data-kn-about",ab);s.appendChild(mk("h4",null,p.name));var ul=mk("ul","kn-list");L.forEach(function(f){ul.appendChild(row(f));});
     if(!L.length)ul.appendChild(mk("li","small muted","Nothing kept yet."));s.appendChild(ul);s.appendChild(adder(ab,"A fact about "+p.name));c.appendChild(s);});
-  var sw=mk("div","kn-sec");sw.appendChild(mk("h4",null,"How it is kept"));[["learn",D.getElementById("page-fabrica")?"Learn from my folders and from Fabrica":"Learn from my folders"],["ask","Ask me before keeping what it learns"],["auto","Bring my folders up to date by themselves while I am away from the keyboard"]].forEach(function(x){
+  var sw=mk("div","kn-sec");sw.appendChild(mk("h4",null,"How it is kept"));[["learn",D.getElementById("page-fabrica")?"Learn from my folders and from Fabrica":"Learn from my folders"],["ask","Ask me before keeping what it learns"],["auto","Bring my folders up to date by themselves while I am away from the keyboard"],["askFolders","Ask me first, and let me pick the folders, before a model writes in my apps' folders"]].forEach(function(x){
     var l=mk("label","kn-sw"),cb=mk("input");cb.type="checkbox";cb.id="knOpt-"+x[0];cb.checked=!!k.opts[x[0]];cb.onchange=function(){k.opts[x[0]]=cb.checked;save();};l.appendChild(cb);l.appendChild(D.createTextNode(x[1]));sw.appendChild(l);});c.appendChild(sw);
   if(FOCUS){var t=c.querySelector('[data-kn-about="'+FOCUS+'"]');FOCUS="";if(t)setTimeout(function(){try{t.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){}},60);}}
 function open(about){FOCUS=about||"";try{W.IngChatMemory.open();}catch(e){try{W.go("settings");}catch(_){}}setTimeout(paintRoom,120);}
@@ -188,7 +256,8 @@ var T0=0;function soon(){if(T0)return;T0=setTimeout(function(){T0=0;try{paintRoo
 function watch(){var mem=D.getElementById("memRoomCard");if(mem&&!mem.__r390){mem.__r390=1;paintRoom();}}
 (function start(){var n=0;(function w(){if(W.__ingReady===true&&W.IngFolders&&W.state){K();bridge();wrapMem();wrapFolder();wrapMsg();learn();try{IngFolders.paint();}catch(e){}
       setInterval(function(){try{bridge();learn();watch();autoTick();}catch(e){}},20000);setInterval(watch,1500);return;}if(++n<400)setTimeout(w,500);})();})();
-W.IngKnow={add:add,keep:keep,drop:drop,edit:edit,of:of,waiting:waiting,fit:fit,learn:learn,open:open,undo:undo,autoTick:autoTick,store:K,appKey:appKey,clash:clash,paint:paintRoom};
+W.IngKnow={add:add,keep:keep,drop:drop,edit:edit,of:of,waiting:waiting,fit:fit,learn:learn,open:open,undo:undo,autoTick:autoTick,store:K,appKey:appKey,clash:clash,paint:paintRoom,
+  askFolders:function(){var d=dueFolders();if(d.length)paintAsk(d);return d.length;},stopFolders:stopQueue,queue:function(){return QUEUE;}};
 })();
 ;try{window.__ingParts["p390"]="running";}catch(_){}
 </script>

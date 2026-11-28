@@ -130,6 +130,13 @@ body[data-theme="night"] #ingEngine .pk:hover{background:linear-gradient(rgba(18
 #ingEngine .plate.ok{color:var(--l-ok)}#ingEngine .plate.ld{color:#b8701a}#ingEngine .plate.rec{color:var(--l-acc)}
 #ingEngine .ie-keys{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 16px 4px}
 #ingEngine .ie-keys.ie-keys-top{margin:10px 16px 6px}
+#ingEngine .ie-stop{display:inline-flex;align-items:center;gap:8px}
+#ingEngine .ie-stop i{width:10px;height:10px;border-radius:2.5px;background:currentColor;flex:none}
+#ingEngine .ie-stop:not(:disabled){color:#9b2c3c}
+html body[data-theme="night"] #ingEngine .ie-stop:not(:disabled){color:#f0a0ac}
+#ingEngine .ie-stop:disabled{opacity:.55}
+#ingEngine .ie-writing{flex:1 1 100%;font-size:12.5px;color:var(--l-ink3,#6c6579);min-height:0}
+#ingEngine .ie-writing:empty{display:none}
 #ingEngine .ie-r{display:grid;grid-template-columns:74px 1fr 80px;align-items:center;gap:10px;margin:8px 18px 0}
 #ingEngine .ie-r label,#ingEngine .ie-r .l{font:600 12.5px/1.2 var(--l-sans);color:var(--l-ink2)}
 #ingEngine .ie-r output{font:600 13px/1 var(--l-sans);font-variant-numeric:tabular-nums;text-align:right;color:var(--l-ink1)}
@@ -238,7 +245,29 @@ function keysRow(){var L=lent(),l=loaded(),s=st(),ch=chosen();
   ld.onclick=function(){click();try{loadActiveModel();}catch(e){}paintSoon();};
   ul.onclick=function(){click();try{Promise.resolve(Engine.unload()).then(function(){try{renderEngineCtl();renderModels();}catch(e){}paint();});}catch(e){}};
   mn.onclick=function(){close();try{go("models");}catch(e){}};
-  if(l&&!L){ks.appendChild(ul);ks.appendChild(ld);}else{ks.appendChild(ld);ks.appendChild(ul);}ks.appendChild(mn);return ks;}
+  if(l&&!L){ks.appendChild(ul);ks.appendChild(ld);}else{ks.appendChild(ld);ks.appendChild(ul);}
+  /* 8.14: her words (28 November 2026): "I want to be able to stop the model from writing straight from the Engine panel in the same
+     location where I can load and unload the models." Stop writing stands beside Load and Unload; it stops whatever the model is
+     writing (a reply in Chat or Code, Lector, Vocatio, Concordia, a folder being brought up to date, a chat being noted), here or on
+     the computer that lends it, and says what it was writing. */
+  var sw=mk("button","k ie-stop");sw.type="button";sw.innerHTML='<i aria-hidden="true"></i><span>Stop writing</span>';sw.onclick=function(){click();var w=W.ingStopWriting();stopLine(w?"Stopped: "+w+".":"Nothing was being written.");setTimeout(paintSoon,600);};
+  ks.appendChild(sw);ks.appendChild(mn);var ln=mk("div","ie-writing");ln.id="ieWriting";ks.appendChild(ln);stopState(sw,ln);return ks;}
+function writer(){var w="";try{w=W.ingModelInUse?W.ingModelInUse(0):"";}catch(e){}try{if(!w&&W.Engine&&Engine.status==="busy")w="a reply";}catch(e){}return w;}
+function stopState(sw,ln){var w=writer();sw=sw||(P&&P.querySelector(".ie-stop"));ln=ln||(P&&P.querySelector("#ieWriting"));if(!sw)return;
+  sw.disabled=!w;sw.title=w?"Stops the model now: it is writing for "+w:"The model is not writing anything now";
+  if(ln&&!ln.__said){var t=w?"Writing now: "+w+".":"";if(ln.textContent!==t)ln.textContent=t;}}
+function stopLine(t){var ln=P&&P.querySelector("#ieWriting");if(!ln)return;ln.textContent=t;ln.__said=1;setTimeout(function(){if(ln)ln.__said=0;},4000);}
+W.ingStopWriting=function(){var w=writer();
+  try{if(typeof W.chatStop==="function")W.chatStop();}catch(e){}
+  try{if(typeof W.blendStop==="function")W.blendStop();}catch(e){}
+  try{if(W.LX&&(LX.busy||LX.inFlight)){LX.stop=true;if(typeof W.lxPause==="function")W.lxPause();}}catch(e){}
+  try{var R=W.IngCareer&&IngCareer.ui&&IngCareer.ui.RUN;if(R&&R.busy){if(typeof R.cancel==="function")R.cancel();else R.stop=true;}}catch(e){}
+  try{if(W.IngKnow&&IngKnow.stopFolders)IngKnow.stopFolders();}catch(e){}
+  try{if(W.IngFolders&&IngFolders.run&&IngFolders.run.busy)IngFolders.run.stop=true;}catch(e){}
+  try{if(W.Engine&&typeof Engine.abort==="function")Engine.abort();}catch(e){}
+  try{if(typeof W.cloudAbort==="function")W.cloudAbort();}catch(e){}
+  return w;};
+setInterval(function(){if(P)try{stopState();}catch(e){}},1000);
 function paint(){if(!P)return;var b=$("ieBody"),keep=b.scrollTop;b.innerHTML="";
   b.appendChild(stateCard());
   b.appendChild(keysRow());

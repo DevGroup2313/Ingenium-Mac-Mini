@@ -173,19 +173,20 @@ function parseNotes(t){var out={summary:"",decisions:[],open:[],how:[]},mode="",
 function bringUp(p){if(RUN.busy){say("Ingenium is already bringing a folder up to date.");return Promise.resolve(null);}
   if(!modelReady()){say("A model is needed to bring the summary up to date: get one on the Models page, or choose your connected model in Lector or Vocatio.");return Promise.resolve(null);}
   var todo=unread(p);if(!todo.length){say("Nothing new to read: the summary is up to date.");return Promise.resolve(null);}
-  RUN.busy=true;RUN.of=p.id;RUN.what="Reading "+todo.length+" conversation"+(todo.length===1?"":"s")+"…";paint();
+  RUN.busy=true;RUN.stop=false;RUN.of=p.id;RUN.what="Reading "+todo.length+" conversation"+(todo.length===1?"":"s")+"…";paint();
   var R=room(),per=Math.max(2400,Math.floor(R*0.7/Math.min(todo.length,6))),batches=[],cur=[],size=0,kept=0;
   return Promise.all(todo.map(function(c){return msgsOf(c).then(function(ms){return {c:c,t:convText(c,ms,per)};});})).then(function(xs){
       xs.forEach(function(x){if(size+x.t.length>R*0.7&&cur.length){batches.push(cur);cur=[];size=0;}cur.push(x);size+=x.t.length;});if(cur.length)batches.push(cur);
       var q=Promise.resolve();batches.forEach(function(b,i){q=q.then(function(){RUN.what="Reading part "+(i+1)+" of "+batches.length+" ("+b.length+" conversation"+(b.length===1?"":"s")+")…";paint();
-        return ask([{role:"system",content:sysText()},{role:"user",content:userText(p,b.map(function(x){return x.t;}).join("\n\n"),i===batches.length-1)}],1800).then(function(t){var n=parseNotes(t);
+        if(RUN.stop)throw new Error("stopped at your word");  /* 8.14: Stop (the Engine panel, the folders' question) ends it between parts */
+        return ask([{role:"system",content:sysText()},{role:"user",content:userText(p,b.map(function(x){return x.t;}).join("\n\n"),i===batches.length-1)}],1800).then(function(t){if(RUN.stop)throw new Error("stopped at your word");var n=parseNotes(t);
           if(!n.summary)throw new Error("the model's answer could not be read as notes; try again, or choose a larger model");
           var a=p.app;a.brief=n.summary.slice(0,CAP.brief);if(n.decisions.length)a.decisions=n.decisions;if(n.open.length||i===batches.length-1)a.open=n.open;
           n.how.forEach(function(x){if(x&&(a.how||"").toLowerCase().indexOf(x.toLowerCase().slice(0,40))<0&&!(a.sugg||[]).some(function(s){return s.toLowerCase()===x.toLowerCase();}))(a.sugg=a.sugg||[]).push(x.slice(0,CAP.item));});
           b.forEach(function(x){a.read[x.c.id]=stamp(x.c);kept++;});a.briefAt=Date.now();a.model=modelName();save();});});});
       return q;})
     .then(function(){RUN.busy=false;RUN.what="";paint();say("The summary of "+p.name+" is up to date: "+kept+" conversation"+(kept===1?"":"s")+" read, once.");return p;},
-      function(e){RUN.busy=false;RUN.what="";paint();say("It could not be finished: "+(e&&e.message||e)+(kept?" ("+kept+" conversation"+(kept===1?"":"s")+" were read and kept.)":""));return null;});}
+      function(e){RUN.busy=false;RUN.stop=false;RUN.what="";paint();say("It could not be finished: "+(e&&e.message||e)+(kept?" ("+kept+" conversation"+(kept===1?"":"s")+" were read and kept.)":""));return null;});}
 
 /* ---------- bringing her work in ---------- */
 function onImported(){var r=sortAll();if(r.n)say(sortWords(r));paint();}

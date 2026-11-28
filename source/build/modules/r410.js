@@ -98,6 +98,23 @@ body.sio-on #profDoor.sio.r344-night .r331-said,body.sio-on #profDoor.sio.r344-n
    place among the layers (just above the desk), so anything that opens over the welcome opens over it as before; nothing about how the
    welcome works changes. */
 #sioStage.welcome{z-index:401}
+#sioStage .sio-orbit{position:absolute;inset:0;z-index:4;pointer-events:none;perspective:2600px;perspective-origin:50% 50%;--sio-r:360px;--sio-tilt:68.8deg;--sio-t:96s}
+#sioStage.nar .sio-orbit{--sio-r:200px;--sio-tilt:50deg}
+#sioStage.nar.welcome .sio-ring.r2{width:400px;height:257px}
+body[data-motion="full"] #sioStage .sio-orbit{--sio-t:72s}
+#sioStage .sio-world{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d;transform:rotateX(var(--sio-tilt))}
+#sioStage .sio-spin,#sioStage .sio-arm,#sioStage .sio-unarm,#sioStage .sio-counter,#sioStage .sio-stand{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d}
+#sioStage .sio-spin{animation:sioOrbit var(--sio-t) linear infinite}
+#sioStage .sio-arm{transform:rotateZ(var(--a,0deg)) translateX(var(--sio-r))}
+#sioStage .sio-unarm{transform:rotateZ(calc(-1 * var(--a,0deg)))}
+#sioStage .sio-counter{animation:sioCounter var(--sio-t) linear infinite}
+#sioStage .sio-stand{transform:rotateX(calc(-1 * var(--sio-tilt)))}
+#sioStage .sio-stand .sio-orb{left:0;top:0;transform:translate(-50%,-46px);pointer-events:auto}
+@keyframes sioOrbit{from{transform:rotateZ(0deg)}to{transform:rotateZ(-360deg)}}
+@keyframes sioCounter{from{transform:rotateZ(0deg)}to{transform:rotateZ(360deg)}}
+#sioStage.sio-hold .sio-spin,#sioStage.sio-hold .sio-counter,body.touring #sioStage .sio-spin,body.touring #sioStage .sio-counter{animation-play-state:paused}
+body[data-motion="minimal"] #sioStage .sio-spin,body[data-motion="minimal"] #sioStage .sio-counter{animation:none}
+@media (prefers-reduced-motion:reduce){#sioStage .sio-spin,#sioStage .sio-counter{animation:none}}
 #sioStage.welcome .sio-sealed{display:none}
 #sioStage.welcome .sio-sub{max-width:62ch;text-wrap:pretty}
 body.sio-on #introDoor.sio{z-index:402;background:transparent !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important;pointer-events:none;
@@ -172,11 +189,26 @@ function stage(){if(ST)return ST;ST=mk("div");ST.id="sioStage";ST.setAttribute("
 function sealIn(){if(SEAL||!ST)return;try{if(typeof W.IngSealKey!=="function")return;SEAL=W.IngSealKey("sio-seal","Ingenium's seal. Press it for fun.",150);var c=ST.querySelector(".sio-centre");c.insertBefore(SEAL,c.firstChild);}catch(e){warn(e);SEAL=null;}}
 function flourish(){try{var k=SEAL&&SEAL.querySelector(".r175-seal");if(k)k.click();}catch(e){}}
 var SLOTS={wide:[[19,44],[81,40],[9,70],[91,68],[31,12],[69,10]],nar:[[16,50],[84,46],[20,84],[80,82],[24,14],[76,12]]};
-function orbs(pp,nar){var sig=pp.list.map(function(p){return p.id+":"+p.name+":"+p.pw;}).join("|")+"/"+(nar?1:0)+"/"+(W.IngOrrery?1:0);if(sig===SIG)return;SIG=sig;
-  ORBS.forEach(function(o){o.remove();});ORBS=[];var sl=SLOTS[nar?"nar":"wide"];
-  pp.list.slice(0,6).forEach(function(p,i){var b=mk("button","sio-orb");b.type="button";b.setAttribute("data-p",p.id);b.style.left=sl[i][0]+"%";b.style.top=sl[i][1]+"%";
+/* 8.14: her words (28 November 2026): "I want the orbs on Ingenium's introduction door to be spinning around the logo engine button and
+   be animated in the same way that the orbs from the Home page of the app are animated and clickable on the introduction door for all
+   editions". So on the welcome the orbs ride an orbit round the seal the way Home's rooms do (r261): a true 3D scene the browser turns
+   by itself (a tilted world, a turning frame, one arm for each orb, a counter-turn so each orb keeps facing her), nearer orbs larger by
+   perspective, along the inner ring; pointing at an orb stops the orbit so it can be pressed; still under Minimal motion and the
+   system's reduced motion. Behind the sign-in's plate and on Who is using Ingenium the orbs keep their places, as the door's own
+   buttons stand on them. */
+var ORBIT=null;
+function orbitOf(){if(ORBIT&&ORBIT.isConnected)return ORBIT;ORBIT=mk("div","sio-orbit");ORBIT.innerHTML='<div class="sio-world"><div class="sio-spin"></div></div>';BOX.appendChild(ORBIT);return ORBIT;}
+function hold(on){if(ST)ST.classList.toggle("sio-hold",!!on);}
+function orbs(pp,nar){var sig=pp.list.map(function(p){return p.id+":"+p.name+":"+p.pw;}).join("|")+"/"+(nar?1:0)+"/"+(W.IngOrrery?1:0)+"/"+(WELCOME?1:0);if(sig===SIG)return;SIG=sig;
+  ORBS.forEach(function(o){var a=o.__arm||o;a.remove();});ORBS=[];var sl=SLOTS[nar?"nar":"wide"],n=Math.min(6,pp.list.length),spin=WELCOME?orbitOf().querySelector(".sio-spin"):null;
+  if(!WELCOME&&ORBIT){ORBIT.remove();ORBIT=null;}hold(false);
+  pp.list.slice(0,6).forEach(function(p,i){var b=mk("button","sio-orb");b.type="button";b.setAttribute("data-p",p.id);
+    if(spin){var arm=mk("div","sio-arm");arm.style.setProperty("--a",(180-i*360/n)+"deg");arm.innerHTML='<div class="sio-unarm"><div class="sio-counter"><div class="sio-stand"></div></div></div>';
+      b.__arm=arm;b.addEventListener("pointerenter",function(){hold(true);});b.addEventListener("pointerleave",function(){hold(false);});b.addEventListener("focus",function(){hold(true);});b.addEventListener("blur",function(){hold(false);});}
+    else{b.style.left=sl[i][0]+"%";b.style.top=sl[i][1]+"%";}
     b.innerHTML=ball(LOOKS[i],p.id===NEWP?"+":initial(p.name))+'<span class="sio-nm">'+esc(p.name)+'</span><span class="sio-st"><i></i><span class="sio-stt"></span></span>';
-    b.addEventListener("click",function(){press(p.id);});BOX.appendChild(b);ORBS.push(b);});}
+    b.addEventListener("click",function(){press(p.id);});
+    if(b.__arm){b.__arm.querySelector(".sio-stand").appendChild(b);spin.appendChild(b.__arm);}else BOX.appendChild(b);ORBS.push(b);});}
 /* an orb pressed beside the sign-in's plate: your own takes you to its password; another opens Who is using Ingenium and chooses it */
 function press(id){var pp=people(),card=lockCard();
   /* 8.12: on the welcome, her orb enters, with one of the seal's flourishes, as Enter does */
@@ -236,6 +268,7 @@ function dressDoor(d,pp){d.classList.add("sio");if(d.getAttribute("aria-label")!
 /* ---------- the orbit laid out for the screen it is on ---------- */
 var K=1;
 function place(card,door,foot){var Wd=W.innerWidth,Hd=W.innerHeight,nar=Wd<760;ST.classList.toggle("nar",nar);var NW=nar?560:1240,n=ORBS.length||1,CH=n<=2?(nar?440:420):n<=4?(nar?560:560):(nar?600:640);
+  if(WELCOME)CH=Math.max(CH,nar?500:480);
   var top=16,bottom=Hd-16;if(card){var cr=card.getBoundingClientRect();if(cr.height)bottom=cr.top-12;}else{var hr=HEAD.getBoundingClientRect();top=hr.bottom+8;
     if(foot){var fr=foot.getBoundingClientRect();if(fr.height)bottom=Math.min(bottom,fr.top-12);}
     var low=door?[].slice.call(door.querySelectorAll(".r350-door,.r331-said")).filter(function(x){return x.textContent.trim();}):[];low.forEach(function(x){var q=x.getBoundingClientRect();if(q.height)bottom=Math.min(bottom,q.top-8);});}

@@ -635,7 +635,14 @@ function setPanel(p){S.panel=p;var tabs=$("fbTabs");if(tabs)[].forEach.call(tabs
   [["apps","fbApps"],["work","fbWork"],["ship","fbShip"]].forEach(function(x){var e=$(x[1]);if(e)e.classList.toggle("show",x[0]===p);});thumbs();}
 function fit(){var root=$("fb");if(!root||!root.offsetParent)return;var r=root.getBoundingClientRect(),se=document.scrollingElement||document.documentElement,top=r.top+(se?se.scrollTop:0);
   setTimeout(splits,0);
-  var hgt=Math.max(420,Math.floor(window.innerHeight-top-12));root.style.setProperty("--f-h",hgt+"px");
+  /* 8.14: her words (28 November 2026): "the whole Fabrica 3 panel view page looks weirdly compacted and compressed, please fix it and
+     restore its original length and size". The frame took the window's height, and since 7.33 the way-finding bar and the next step
+     stand inside it above the panels, so on a smaller window the three panels were pressed down to what was left (as little as 420
+     points for the whole frame), and on a large one to the window less all that stands above them. Now the panels themselves keep the
+     whole window's height, as they had before those came, and never less than 640 points: the frame grows by what stands above the
+     panels, and a window too short for them lets the page scroll instead of squeezing them. */
+  var pn=$("fbPanels"),chrome=0;try{if(pn){var pr=pn.getBoundingClientRect();chrome=Math.max(0,pr.top-r.top);}}catch(e){chrome=0;}
+  var hgt=Math.max(420,Math.ceil(chrome+Math.max(640,Math.floor(window.innerHeight-top-12)-12)));root.style.setProperty("--f-h",hgt+"px");root.style.setProperty("--f-chrome",Math.ceil(chrome)+"px");
   var w=r.width,isOne=w<900,isPhone=w<540,isMid=!isOne&&w<1180;
   if(root.classList.contains("f-one")!==isOne){root.classList.toggle("f-one",isOne);if(isOne)setPanel(S.panel||"apps");}
   root.classList.toggle("f-phone",isPhone);root.classList.toggle("f-mid",isMid);paintFolds();thumbs();}

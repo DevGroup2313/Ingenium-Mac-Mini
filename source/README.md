@@ -395,6 +395,36 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.15 (28 November 2026): the welcome's orbs on their orbit; Stop writing in the Engine panel; the folders ask first; Fabrica's
+panels at their full length. (Numbered 8.15: another session was making an 8.14 at the same time.)
+
+- The welcome door (`r410.js`). Her words: "I want the orbs on Ingenium's introduction door to be spinning around the logo engine button
+  and be animated in the same way that the orbs from the Home page of the app are animated and clickable on the introduction door for all
+  editions". The orbs now ride an orbit round the seal as Home's rooms do (r261): a 3D scene the browser turns by itself (a tilted world,
+  a turning frame, one arm for each orb, a counter-turn so each keeps facing her), nearer orbs larger, along the inner ring; pointing at an
+  orb holds the orbit so it can be pressed; still under Minimal motion and reduced motion; in every edition (r410 is in all of them).
+  Behind the sign-in's plate and on Who is using Ingenium the orbs keep their places, as the door's own buttons stand on them.
+- The Engine panel (`r374.js`). Her words: "I want to be able to stop the model from writing straight from the Engine panel in the same
+  location where I can load and unload the models." Stop writing stands beside Load and Unload: it rests while nothing is written, wakes
+  and says for whom the model is writing (a reply, Lector, Vocatio, Concordia, Ingenia bringing a folder up to date, Memory), and stops
+  it, here or on the computer that lends the model (window.ingStopWriting).
+- The folders ask first (`r390.js`, `r208.js`). Her words: "have Ingenium ask me if I want to have the models start writing and updating
+  Ingenia's apps' folders instead of automatically having the model start writing without me knowing. I want to be able to pick and
+  choose." When she has been away three minutes and folders have new conversations, a raised card names each (its app's logo, its name,
+  how many new), each with its own tick; nothing is written until she presses Update the ones I picked, and then only those, one at a
+  time, the card saying which and offering Stop; Not now asks again in two hours or when something new arrives; a folder she leaves
+  unticked is not asked about again until it has something new. Memoria, How it is kept: "Ask me first, and let me pick the folders",
+  on unless she turns it off. A folder being written stops between its parts at Stop and never keeps a part it was stopped in.
+- Fabrica (`r112.js`, new `r421.js`). Her words: "make the little app logo on the second panel ... near the main button ... clickable and
+  animated when I click and hover it like the rest of the app's engine logo button"; "the g looks clipped"; "the whole Fabrica 3 panel
+  view page looks weirdly compacted and compressed, please fix it and restore its original length and size". The logo at the head of The
+  work is a key: it lifts under the pointer, sinks when pressed, springs back and plays a flourish (held, a full turn), with Ingenium's
+  key sound, and answers Tab and Enter. The panels' titles stand on a line tall enough for their descenders. The way-finding bar and the
+  next step (7.33) stand inside the frame, which was held to the window, so they took their height from the panels (from about 1,160
+  points to 835 on her window): the panels now keep the window's whole height again, and never less than 640 points, the frame growing by
+  what stands above them (r294's header rule too).
+- Tests: rig/t_815_orbit_stop_folders_fabrica.js (19 checks).
+
 Ingenium 8.13 (28 November 2026): a second orb on the welcome orbit; Phaistos's builder.
 
 - The Sign-in Orbit (`r410.js`). Her words, of the 8.12 welcome: "I want a second orb added to the new sign-in for another profile or
