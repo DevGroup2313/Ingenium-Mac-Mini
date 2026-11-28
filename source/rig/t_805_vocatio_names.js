@@ -27,7 +27,7 @@ let pass = 0, fail = 0; const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FA
   await p.screenshot({ path: path.join(OUT, 'tabs_hover.png'), clip: { x: Math.max(0, box.x - 420), y: box.y - 60, width: 840, height: 140 } });
   await p.mouse.move(5, 5, { steps: 3 }); await sleep(350);
   const off = await p.evaluate(() => { const t = document.querySelector('#cs .rm-mean'); return t ? t.classList.contains('on') : false; });
-  ok(!before && on && on.on && on.text === 'candidacies, as for an office in Rome' && !off, 'Petitiones shows its meaning only while the pointer is on it: ' + (on && on.text), { before, on, off });
+  ok(!before && on && on.on && on.text === 'Each application: its posting read against your profile, its drafts and dates' && !off, 'Petitiones shows its meaning only while the pointer is on it: ' + (on && on.text), { before, on, off });
   // each room opens under its Latin name
   const heads = [], left = {};
   const OLD = ['Your mentor', 'Your counsellor', 'your counsellor', 'the counsellor', 'Goals and plan', 'Open Today', 'in Applications', 'under Applications', 'to Applications', 'in Your profile', 'to Your profile', '\u2039 Learn', '\u2039 Your', 'in Your edge', 'Vocatio, Your edge', 'How People works'];

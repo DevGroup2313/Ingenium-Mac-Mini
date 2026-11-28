@@ -35,12 +35,13 @@ const rot = (t) => { const m = /matrix\(([^)]+)\)/.exec(t || ''); if (!m) return
   check(Math.abs(rot(r0)) < 0.6, 'the ring turned home as the page opened', rot(r0));
   await p.screenshot({ path: pics + '/1_day.png', clip: { x: 0, y: 0, width: 1440, height: 760 } });
 
-  // the plate tilts toward the pointer and its light follows; it settles back when the pointer leaves
+  // the plate tilts toward the pointer; since 8.06 no light follows it (her words, 28 November 2026: "I don't like the highlight that
+  // follows the mouse hover it looks really weird"); it settles back when the pointer leaves
   const box = await p.evaluate(() => { const r = document.querySelector('#cuHead .cu-dialbox').getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
   await p.mouse.move(box.x + box.w * 0.85, box.y + box.h * 0.2, { steps: 6 }); await sleep(450);
-  const tilted = await p.evaluate(() => { const b = document.querySelector('#cuHead .cu-dialbox'); return { live: b.classList.contains('live'), rx: b.style.getPropertyValue('--rx'), ry: b.style.getPropertyValue('--ry'), t: getComputedStyle(b.querySelector('.cu-tilt')).transform, sheen: getComputedStyle(b.querySelector('.cu-sheen')).opacity }; });
+  const tilted = await p.evaluate(() => { const b = document.querySelector('#cuHead .cu-dialbox'); return { live: b.classList.contains('live'), rx: b.style.getPropertyValue('--rx'), ry: b.style.getPropertyValue('--ry'), t: getComputedStyle(b.querySelector('.cu-tilt')).transform, sheen: !!b.querySelector('.cu-sheen'), lx: b.style.getPropertyValue('--lx') }; });
   check(tilted.live && parseFloat(tilted.ry) > 2 && parseFloat(tilted.rx) > 2 && tilted.t !== 'none', 'the dial tilts toward the pointer', tilted);
-  check(+tilted.sheen > 0.5, 'its light shows and follows the pointer', tilted.sheen);
+  check(!tilted.sheen && !tilted.lx, 'no light follows the pointer across the dial (8.06)', { sheen: tilted.sheen, lx: tilted.lx });
   await p.mouse.move(box.x + box.w + 160, box.y + box.h / 2, { steps: 4 }); await sleep(700);
   const flat = await p.evaluate(() => { const b = document.querySelector('#cuHead .cu-dialbox'); return { live: b.classList.contains('live'), rx: b.style.getPropertyValue('--rx'), ry: b.style.getPropertyValue('--ry') }; });
   check(!flat.live && parseFloat(flat.rx) === 0 && parseFloat(flat.ry) === 0, 'it settles flat when the pointer leaves', flat);

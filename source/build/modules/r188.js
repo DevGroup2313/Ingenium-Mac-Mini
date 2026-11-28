@@ -469,7 +469,7 @@ body[data-theme="night"] #cs .c-td-facts{border-color:rgba(183,156,230,.16);box-
    first of the preview's five; "The Career Studio" in the eyebrow (A), the arrangement her questionnaire recommended. The meaning shows under a room's name only while the pointer
    or the keyboard is on it. */
 #cs .c-head{position:relative}
-#cs .rm-mean{position:absolute;z-index:30;padding:7px 12px;border-radius:12px;pointer-events:none;opacity:0;transform:translate(-50%,6px);transition:opacity .18s ease,transform .18s ease;white-space:nowrap;
+#cs .rm-mean{position:absolute;z-index:30;padding:7px 12px;border-radius:12px;pointer-events:none;opacity:0;transform:translate(-50%,6px);transition:opacity .18s ease,transform .18s ease;white-space:normal;text-wrap:balance;width:max-content;max-width:min(400px,calc(100% - 24px));box-sizing:border-box;text-align:center;
   font:italic 500 16px/1.2 "Home Cormorant","Cormorant Garamond",Georgia,serif;color:#2a2040;background:linear-gradient(#ffffff,#f6f2fb);
   box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(34,26,46,.08),0 3px 0 rgba(66,40,108,.18),0 8px 16px rgba(40,22,68,.14)}
 #cs .rm-mean.on{opacity:1;transform:translate(-50%,0)}
@@ -3085,7 +3085,7 @@ ICON.mentor='<circle cx="12" cy="12" r="8.5"/><path d="M15.6 8.4l-2.1 5.1-5.1 2.
 function install(){if($("page-career"))return;
   var sec=h("section","section");sec.id="page-career";
   sec.innerHTML='<h1 class="page-title">Vocatio</h1><div id="cs"><div class="c-head"><div><div class="c-hrow"><h1>Vocatio</h1><label class="c-who"><span>Profile</span><select id="csWho" aria-label="Whose profile is open"></select></label></div><p>Your profile, the posts, programmes and grants you are weighing, and what you send. Everything stays on this device.</p></div>'+
-    '<div class="rm-tabs" role="tablist" aria-label="The studio\'s rooms">'+[["today","Diurna","the daily record"],["mentor","Dux","the guide (dux itineris, the guide of a journey)"],["apps","Petitiones","candidacies, as for an office in Rome"],["people","Socii","companions and allies"],["profile","Vita","a life"],["edge","Dotes","gifts, talents"],["goals","Cursus","the course (cursus honorum, the career ladder)"],["learn","Gradus","steps: learning an art one step at a time (Gradus ad Parnassum, the steps to Parnassus)"]].map(function(r){
+    '<div class="rm-tabs" role="tablist" aria-label="The studio\'s rooms">'+[["today","Diurna","Today\'s next step, across your applications and the people you write to"],["mentor","Dux","Your guide through five stages, from what you have to this week\'s steps"],["apps","Petitiones","Each application: its posting read against your profile, its drafts and dates"],["people","Socii","The people you write to, each with a status and a date to follow up"],["profile","Vita","Your CV, your entries and what you want: the facts every draft is written from"],["edge","Dotes","What transfers from your record, your blind spots and what sets you apart"],["goals","Cursus","Your goals with their dated steps, and the paths and roles that suit you"],["learn","Gradus","How each document is built, lesson by lesson, with templates for 25 roles"]].map(function(r){
       return '<button type="button" class="rm-tab" role="tab" data-room="'+r[0]+'" data-mean="'+r[2]+'" aria-label="'+r[1]+', '+r[2]+'" aria-selected="false" tabindex="-1">'+ico(r[0])+'<span>'+r[1]+'</span></button>';}).join("")+'</div></div><div id="csHost"></div></div>';
   var after=$("page-lector")||$("page-blend");if(after&&after.parentNode)after.parentNode.insertBefore(sec,after.nextSibling);else{var mn=D.querySelector(".main");if(!mn)return;mn.appendChild(sec);}
   var who=sec.querySelector("#csWho");if(who)who.addEventListener("change",function(){var v=who.value;if(v==="+manage"){var S=CS();S.ui.room="profile";S.ui.ppart="people";show("work");save();render();return;}switchTo(v);});
@@ -3116,7 +3116,7 @@ IngCareer.ui={h:h,esc:esc,panel:panel,item:item,cbtn:cbtn,chip:chip,empty:empty,
 (function(){var D=document;function head(){return D.querySelector("#cs .c-head");}
   function tip(){var h=head();if(!h)return null;var t=h.querySelector(":scope > .rm-mean");if(!t){t=D.createElement("div");t.className="rm-mean";t.setAttribute("aria-hidden","true");h.appendChild(t);}return t;}
   function show(b){var t=tip(),h=head();if(!t||!h)return;var m=b.getAttribute("data-mean");if(!m)return;var r=b.getBoundingClientRect(),hr=h.getBoundingClientRect();
-    t.textContent=m;t.style.left=(r.left+r.width/2-hr.left)+"px";t.style.top=(r.bottom-hr.top+8)+"px";t.classList.add("on");}
+    t.textContent=m;var x=r.left+r.width/2-hr.left,w=t.offsetWidth||0;x=Math.max(w/2+8,Math.min(hr.width-w/2-8,x));t.style.left=x+"px";t.style.top=(r.bottom-hr.top+8)+"px";t.classList.add("on");}
   function hide(){var t=tip();if(t)t.classList.remove("on");}
   D.addEventListener("pointerover",function(e){var b=e.target&&e.target.closest?e.target.closest("#cs .rm-tab[data-mean]"):null;if(b)show(b);},true);
   D.addEventListener("pointerout",function(e){var b=e.target&&e.target.closest?e.target.closest("#cs .rm-tab[data-mean]"):null;if(b&&!(e.relatedTarget&&b.contains(e.relatedTarget)))hide();},true);

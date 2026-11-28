@@ -218,10 +218,8 @@ body[data-theme="night"] .cu-dialbox.live .cu-dial{box-shadow:0 3px 0 #2c273a,0 
 .cu-gleam.go{animation:cuGleam 1.4s cubic-bezier(.4,0,.2,1) 1}
 @keyframes cuGleam{0%{opacity:0;transform:rotate(-40deg)}14%{opacity:1}84%{opacity:1}100%{opacity:0;transform:rotate(320deg)}}
 body[data-theme="night"] .cu-gleam{background:conic-gradient(from 0deg,rgba(214,200,244,0) 0deg,rgba(214,200,244,.6) 9deg,rgba(214,200,244,0) 20deg,rgba(214,200,244,0) 360deg)}
-.cu-sheen{position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:3;opacity:0;transition:opacity .4s ease;
-  background:radial-gradient(circle at var(--lx,32%) var(--ly,24%),rgba(255,255,255,.58),rgba(255,255,255,.14) 22%,rgba(255,255,255,0) 46%)}
-.cu-dialbox.live .cu-sheen{opacity:1}
-body[data-theme="night"] .cu-sheen{background:radial-gradient(circle at var(--lx,32%) var(--ly,24%),rgba(214,196,250,.26),rgba(214,196,250,.07) 24%,rgba(214,196,250,0) 48%)}
+/* 8.06: no light follows the pointer across the dial (her words, 28 November 2026: "I don't like the highlight that follows the mouse hover
+   it looks really weird"); the dial still leans toward the pointer and lifts a little */
 .cu-sealbox{position:absolute;left:50%;top:50%;width:88px;height:88px;margin:-44px 0 0 -44px;z-index:4;border-radius:50%}
 /* 8.02: the seal set into the face within a fine engraved ring, a shallow seat under it: the look she chose as "As before" on the live
    preview (27 November 2026: "Build the current Custodia's dial into the app with the \"As before\" look, we can come back to it later") */
@@ -260,7 +258,6 @@ body[data-theme="night"] .cu-lamp.none{background:radial-gradient(circle at 35% 
 .cu-lab.on{opacity:1;transform:translate(-50%,var(--ty,18px))}
 body[data-theme="night"] .cu-lab{background:rgba(32,25,48,.97);box-shadow:0 0 0 1px rgba(205,184,240,.16),0 8px 18px rgba(0,0,0,.45)}
 body[data-motion="minimal"] .cu-tilt{transform:scale(var(--k,1))!important}
-body[data-motion="minimal"] .cu-sheen{display:none}
 @media (prefers-reduced-motion:reduce){#page-custodia *{animation:none!important;transition:none!important}}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p408"]="started";}catch(_){}
@@ -358,7 +355,7 @@ function head(keys){var h=mk("div");h.id="cuHead";var w=mk("div","cu-words");w.a
   var box=mk("div","cu-dialbox"),tilt=mk("div","cu-tilt"),dial=mk("div","cu-dial"),turn=mk("div","cu-turn");dial.appendChild(mk("div","cu-face"));
   turn.appendChild(mk("div","cu-ticks"));turn.appendChild(mk("div","cu-ticks mid"));turn.appendChild(mk("div","cu-ticks big"));
   for(var n=0;n<100;n+=10){var a2=n*3.6,s=mk("span","cu-num",String(n));s.style.transform="rotate("+a2+"deg) translateY(-122px)";turn.appendChild(s);}
-  turn.style.transform="rotate("+DL.rot.toFixed(2)+"deg)";dial.appendChild(turn);dial.appendChild(mk("div","cu-gleam"));dial.appendChild(mk("div","cu-sheen"));tilt.appendChild(dial);
+  turn.style.transform="rotate("+DL.rot.toFixed(2)+"deg)";dial.appendChild(turn);dial.appendChild(mk("div","cu-gleam"));tilt.appendChild(dial);
   var sb=mk("div","cu-sealbox"),se=sealKey();if(se)sb.appendChild(se);tilt.appendChild(sb);var mkk=mk("div","cu-mark");mkk.appendChild(mk("i"));tilt.appendChild(mkk);var lab=mk("div","cu-lab");lab.setAttribute("aria-hidden","true");
   keys.forEach(function(x,i){var t=(-90+i*(360/keys.length)+22)*Math.PI/180,l=mk("button","cu-lamp "+(x.none?"none":x.ok?"ok":"warn"));l.type="button";l.style.left=(190+201*Math.cos(t)-7)+"px";l.style.top=(190+201*Math.sin(t)-7)+"px";
     l.setAttribute("aria-label",x.name+": "+(x.none?x.st:x.ok?"has a way back":"no way back yet"));l.setAttribute("data-key",x.k);l.style.border="0";l.style.padding="0";l.style.cursor="pointer";
@@ -400,11 +397,10 @@ function turnTo(turn,target,ms){var d=((target-DL.rot)%360+540)%360-180;if(Math.
 /* a lamp pressed: it flares once, the ring dials its number under the mark, and its key opens below */
 function lampPress(box,l,x,i,n){heard();var turn=box.querySelector(".cu-turn");l.classList.remove("pop");void l.offsetWidth;l.classList.add("pop");setTimeout(function(){l.classList.remove("pop");},700);
   if(turn)turnTo(turn,-Math.round(i*(100/n))*3.6,still()?0:950);setTimeout(function(){open(x.k,true);},still()?0:560);}
-/* the plate tilts toward the pointer and its light follows it (a mouse only; one drawing a frame, and only while it moves); the ring turns
+/* the plate tilts toward the pointer (a mouse only; one drawing a frame, and only while it moves); the ring turns
    under her hand, glides on a little when let go, and settles on a number with a click */
 function wireDial(box,turn){var raf=0,px=0,py=0,drag=null;
   function frame(){raf=0;if(!drag&&!box.classList.contains("live"))return;var r=box.getBoundingClientRect();if(!r.width)return;var x=(px-r.left)/r.width,y=(py-r.top)/r.height;
-    box.style.setProperty("--lx",(x*100).toFixed(1)+"%");box.style.setProperty("--ly",(y*100).toFixed(1)+"%");
     if(!drag){box.style.setProperty("--rx",(-(y-.5)*14).toFixed(2)+"deg");box.style.setProperty("--ry",((x-.5)*16).toFixed(2)+"deg");}}
   box.addEventListener("pointermove",function(e){if((e.pointerType!=="mouse"&&!drag)||still())return;px=e.clientX;py=e.clientY;box.classList.add("live");if(!raf)raf=requestAnimationFrame(frame);},{passive:true});
   box.addEventListener("pointerleave",function(){if(drag)return;if(raf){cancelAnimationFrame(raf);raf=0;}box.classList.remove("live");box.style.setProperty("--rx","0deg");box.style.setProperty("--ry","0deg");});

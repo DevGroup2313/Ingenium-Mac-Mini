@@ -417,7 +417,7 @@ var ogo=W.go;if(typeof ogo==="function"){W.go=function(p){var r=ogo.apply(this,a
 try{lectorAdvise();}catch(e){}
 W.IngCounsel={picture:picture,paint:paint,stages:STAGES,state:CN,next:nextStage,done:stDone,go:go1,take:takeFiles,build:buildRecord,runGo:runGo,week:buildWeek,letWork:letWork,todayText:todayText,summary:summaryText,chips:CHIPS,keepAll:keepAllFound,looksCv:looksCv};
 /* the room's tab takes the counsellor's name (r188 names it Your mentor while this part is held out of a build) */
-try{var tb=D.querySelector('#cs .rm-tabs [data-room="mentor"] span');if(tb)tb.textContent="Dux";var tbb=tb&&tb.parentNode;if(tbb){tbb.removeAttribute("title");tbb.setAttribute("data-mean","the guide (dux itineris, the guide of a journey)");tbb.setAttribute("aria-label","Dux, the guide (dux itineris, the guide of a journey)");}  /* 8.05: Dux, her name for it; its meaning on hover (r188) */}catch(e){}
+try{var tb=D.querySelector('#cs .rm-tabs [data-room="mentor"] span');if(tb)tb.textContent="Dux";var tbb=tb&&tb.parentNode;if(tbb){tbb.removeAttribute("title");tbb.setAttribute("data-mean","Your guide through five stages, from what you have to this week\'s steps");tbb.setAttribute("aria-label","Dux, Your guide through five stages, from what you have to this week\'s steps");}  /* 8.05: Dux, her name for it; its meaning on hover (r188) */}catch(e){}
 try{if(CS().ui.room==="mentor"&&D.getElementById("page-career")&&D.getElementById("page-career").classList.contains("active"))render();}catch(e){}
 try{window.__ingParts["p283"]="running";}catch(_){}
 })();

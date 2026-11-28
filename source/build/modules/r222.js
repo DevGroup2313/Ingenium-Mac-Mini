@@ -169,7 +169,7 @@ var S={
     b:"Bring in Claude's export (its chats and projects), Claude Code's sessions on this computer (in the computer app), a conversation pasted from Claude Code on the web or from Ollama, and an Ollama Modelfile as a way of working. Each is read on this device; each conversation is sorted into the folder of the app it names, and any can be moved."},
   career1:{r222:1,chap:"Vocatio",sub:"Applications and people",go:function(){goPage("career");},ring:"#page-career .rm-tabs",
     t:"🧭 Applications and your path",
-    b:"Vocatio helps with applications for jobs, PhD places, fellowships and grants. Petitiones, your applications, keeps each one with its documents and dates; Socii, your companions and allies, keeps the supervisors, referees, recruiters and hiring managers you write to, each with a status and a date to follow up; Diurna, the daily record, shows the single most urgent step.",
+    b:"Vocatio helps with applications for jobs, PhD places, fellowships and grants. Petitiones keeps each application with its documents and dates; Socii keeps the supervisors, referees, recruiters and hiring managers you write to, each with a status and a date to follow up; Diurna shows the single most urgent step.",
     tip:"One step at a time: the rest waits, folded, until you ask for it."},
   career2:{r222:1,chap:"Vocatio",go:function(){goPage("career");},ring:"#csWork",
     t:"🔗 A posting from its link",
@@ -281,6 +281,9 @@ function help(){var P=W.IngHelp&&IngHelp.pages;if(!P||typeof P!=="object")return
 
 /* ================= 5. the Guide: what is new, Folders, the Career Studio, the models ================= */
 var NEW=[
+  ["8.06", "Vocatio: the meaning shown under each room's name now says what the room does, not what its Latin word means: Petitiones, each application with its posting read against your profile, its drafts and dates; Socii, the people you write to, each with a status and a date to follow up; and so on for all eight. A long meaning wraps onto two even lines and stays on the page.", "career"],
+  ["8.06", "Ingenia: Clavis's astrolabe casts no shadow on its folder page any more (as it swayed, the shadows of its raised parts fell across its pale face and greyed it). Its depth, its sway, its lean and its presses are as they were.", "master"],
+  ["8.06", "Custodia: no light follows the pointer across the dial any more. The dial still leans toward the pointer and lifts a little."],
   ["8.05", "Vocatio's rooms have Latin names, as Ingenium's pages do: Diurna (Today), Dux (the guide, once Your mentor), Petitiones (Applications), Socii (People), Vita (Your profile), Dotes (Your edge), Cursus (Goals and plan) and Gradus (Learn). Rest the pointer on a name, or reach it with the keyboard, and its meaning shows beneath it. Every sentence that sends you to a room names it so. The head reads The Career Studio, The compass of your path, and its key is Dux.", "career"],
   ["8.04", "Ingenia: each app's logo is a weighted 3D button, as on its own door: a rim behind its face, a slow, gentle sway, a lean of twelve degrees at most, each raised part casting its own small shadow, and a soft shadow of its own beneath it, never violet; no press turns it sideways any more. Clavis's astrolabe stands on its own, as on its door, with no plate behind it.", "master"],
   ["8.03", "Adamas: the diamond's holder is drawn at your screen's true sharpness again, so its engraving, its turned lines, its knurled foot and every edge come through, and its outline is smoothed; it stays cool by drawing fewer frames a second, never by stretching a smaller picture."],

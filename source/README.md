@@ -395,6 +395,29 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.06 (28 November 2026): three fixes at her word: Vocatio's meanings say what each room does; no shadow over Clavis's
+astrolabe; no light following the pointer on Custodia's dial.
+
+- Vocatio (`r188.js`, `r283.js`, `r222.js`). Her words (28 November 2026): "For the Petitiones pointer english definition mentions Rome, I
+  want that reworded and please remove the Rome mention. I want all of them to be reworded to actually reflect the Vocatio page and its
+  functions, I don't just want literal definitions for the Latin names on the page."
+  - Each room's meaning, under the pointer and in its spoken name, now says what the room does: Diurna, today's next step across the
+    applications and the people written to; Dux, the guide through five stages; Petitiones, each application with its posting read
+    against the profile, its drafts and dates; Socii, the people written to, each with a status and a date to follow up; Vita, the CV,
+    the entries and what is wanted, the facts every draft is written from; Dotes, what transfers, the blind spots and what sets one
+    apart; Cursus, the goals with their dated steps and the paths and roles that suit; Gradus, how each document is built, lesson by
+    lesson, with templates for 25 roles. No literal gloss of the Latin is left, in the tabs or in the guided tour.
+  - The label wraps onto two balanced lines when it is long (at most 400 points wide) and is kept inside the head at either end of the row.
+- Ingenia (`r378.js`). Her words: "There is a heavy blurry shadow over the Clavis logo on the Ingenia folder page, please remove it but keep
+  the look and animation of the Clavis logo button intact." Found: as the astrolabe swayed, the shadows of its raised parts (and the two
+  shadows 8.04 gave its outline) fell across its pale face and greyed it by day, and haloed it by night. Now none of its layers casts a
+  shadow; its depth, sway, lean and presses are untouched.
+- Custodia (`r408.js`). Her words: "I like the dial from the Custodia page but I don't like the highlight that follows the mouse hover it
+  looks really weird, please fix it." The light that followed the pointer across the dial (its sheen) is gone; the dial still leans toward
+  the pointer and lifts a little.
+- Test: rig/t_806_fixes.js (11 checks); rig/t_805_vocatio_names.js 9/9, rig/t_802_custodia_dial.js 29/29 and rig/t_804_ingenia_weight.js
+  44/44, each updated for these changes.
+
 Ingenium 8.05 (27 November 2026): Vocatio's rooms named in Latin, each with its meaning under the pointer.
 
 - Her choices in the questionnaire (27 November 2026), then her approval of the live preview: Latin names for Vocatio's rooms, as

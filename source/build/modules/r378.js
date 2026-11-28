@@ -65,8 +65,10 @@ body[data-theme="night"] #page-folders .ig-ls-cast{box-shadow:0 calc(var(--S,56p
 #page-folders .ig-ls.flat .ig-ls-cast,#page-folders .ig-ls.obj .ig-ls-cast{display:none}
 /* an object (Clavis's astrolabe) casts the shadow of its own outline, and its parts stand closer, so they stay in register as it sways */
 #page-folders .ig-ls.obj{--igz:.6}
-#page-folders .ig-ls.obj .ig-ls-l.face{filter:drop-shadow(0 calc(var(--S,56px) * .03) calc(var(--S,56px) * .035) rgba(20,14,30,.32)) drop-shadow(0 calc(var(--S,56px) * .08) calc(var(--S,56px) * .1) rgba(20,14,30,.14))}
-body[data-theme="night"] #page-folders .ig-ls.obj .ig-ls-l.face{filter:drop-shadow(0 calc(var(--S,56px) * .03) calc(var(--S,56px) * .035) rgba(0,0,0,.6)) drop-shadow(0 calc(var(--S,56px) * .08) calc(var(--S,56px) * .1) rgba(0,0,0,.35))}
+/* 8.06: Clavis's astrolabe casts no shadow, from its face or from its raised parts. Her words (28 November 2026): "There is a heavy blurry
+   shadow over the Clavis logo on the Ingenia folder page, please remove it but keep the look and animation of the Clavis logo button
+   intact." As it swayed, the shadows of its raised parts fell across its pale face and greyed it; its depth, sway, lean and presses stay. */
+#page-folders .ig-ls.obj .ig-ls-l,body[data-theme="night"] #page-folders .ig-ls.obj .ig-ls-l{filter:none !important}
 </style>
 <script>try{(window.__ingParts=window.__ingParts||{})["p378"]="started";}catch(_){}
 /* R378 · Ingenia's app logos, as Lector's and Fabrica's: see the note at the top of its styles. window.IngFolderLogos: {paint(), made()} */
