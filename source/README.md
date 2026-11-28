@@ -395,6 +395,29 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.08 (28 November 2026): the Sign-in Orbit; Winter: Snowy pines and Winter cabin.
+
+- The Sign-in Orbit (new `r410.js`; the seal key lent by `r290.js` as `IngSealKey`). Of the live preview (source/previews/sign_in_orbit):
+  "This looks much better."; "I want the logo button to be clickable on the Sign-in Orbit"; "I approve of the previews, please commit and
+  push it everywhere". The sign-in's door (r197) and Who is using Ingenium (r331, with r344's Signed out and r350's practice studio) stand
+  on the orbit: a soft violet ground with its stars, two fine rings, the date in Latin; Ingenium's seal at the heart as the pressable key
+  it is on Home; each profile an orb (Home's sphere, r261), its initial on it, its name and how it opens beneath. The sign-in's own card
+  is the plate at the foot, greeting by the user name the sign-in was set up with and saying when the desk was locked; its fields, keys
+  and ways back in are the very ones r197 draws and handles, so nothing about signing in changes. On Who is using Ingenium the profile
+  door's own buttons are dressed as the orbs. Asked over the open page (turning the sign-in on, a new password) the door keeps its card.
+  The plate adds a short record: when this device last signed in and any wrong password since, and the record of sign-ins (times only,
+  kept on this device outside the seal, localStorage "ingenium_signin_log", so that it can show before signing in).
+- Winter (new `r411.js`). Her words (28 November 2026): "I want more winter sounds added to the nature sounds of Ingenium, I want to hear
+  some snow sounds as well. I want more nature sounds added to the app in general". Six samples were made with r295's kit to the measure
+  of the places she loves (source/previews/winter_sounds); her word: "For the Winter Sounds, I like Snowy pines and Winter cabin, I hate
+  the Fresh snow one." So Snowy pines (a soft wind in snowy pines, falling nearly still between its gusts; snow slipping from a branch,
+  landing below, powder sifting after; crows far off once) and Winter cabin (a fire in the hearth, softer than Campfire and in a room; the
+  wind outside, through the walls; fine snow brushing the window as it rises) join Noel in Winter. Rain on a tent is being made again;
+  Lake shore and Night woods wait for her word.
+- Tests: rig/t_808_signin_orbit.js (14 checks: protected, locked, the orbit, the seal key, her orb, the plate, nothing covered, a wrong
+  password and the record, by night, on a phone, signed in again); rig/t_808_winter_sounds.js (7 checks); rig/t_754_sign_out.js 25/25
+  (its night checks read the orbit's night ground where there is no card); rig/t_807_cloud_room.js 22/22 (the room as in 8.07).
+
 Ingenium 8.07 (28 November 2026): Custodia's seal struck into its dial; Memoria's Ingenium Cloud room raised, its drawing refined.
 
 - Custodia (`r408.js`). Her words (28 November 2026): "I also want you to sink in the logo button in the middle of the dial, I want it to
