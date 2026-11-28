@@ -1,0 +1,26 @@
+/* ============ PHAISTOS: its own look (28 November 2026) ============
+   The white and lemon mist she loved ("I love this look ... I want this look to be the working base of how I want Phastos to look"),
+   its yellow softer and a true yellow ("cool down and reduce the intensity of the yellow"; "This looks more like a greenish colour than it
+   does a yellow colour, please fix it"): hue 50 to 52, the red always above the green; plain dark grey lettering; no wash of shading. */
+html body{background:var(--bg) !important;background-image:none !important}
+h1,h2,h3,.page-title{letter-spacing:-.01em}
+html body::before,html body::after{background-image:none !important}
+.topbar{background:var(--ph-top) !important;background-image:none !important;border-bottom:1px solid rgba(48,48,40,.10) !important;box-shadow:none !important}
+.topbar .brand>*:not(.ph-brand){display:none !important}
+.topbar .brand{gap:0 !important;background:none !important;box-shadow:none !important}
+.ph-brand{display:inline-flex;align-items:center;gap:9px}
+.ph-brand .phl{width:46px;height:46px;margin:-7px 0 -7px -4px}
+.ph-word{height:19px;width:auto;fill:var(--ph-word);display:block}
+.dock{background:var(--ph-side) !important;background-image:none !important}
+.dock .nav-btn{font-size:15.5px !important;padding:10px 14px !important;border-radius:14px !important;margin:3px 0 !important;font-weight:500;color:var(--ink-1) !important}
+.dock .nav-btn.active{background:var(--ph-keyhi) !important;color:var(--ph-keyink) !important;font-weight:600 !important;
+  box-shadow:0 2px 0 var(--ph-edge),0 5px 12px rgba(48,48,40,.10) !important}
+.dock .nav-btn.active::before,.dock .nav-btn.active::after{display:none !important}
+.dock .nav-btn:not(.active):hover{background:rgba(255,255,255,.45) !important}
+.dock .grp-label{color:var(--ink-3) !important;font-weight:700 !important;letter-spacing:.16em !important}
+.btn.primary,.btn.pri,button.primary,.ph-keyfix{background:var(--ph-key) !important;background-image:none !important;color:var(--ph-keyink) !important;
+  border:1px solid var(--ph-edge) !important;box-shadow:0 2px 0 var(--ph-edge),0 5px 12px rgba(48,48,40,.12) !important;text-shadow:none !important}
+.ph-keyfix svg,.btn.primary svg{color:var(--ph-keyink) !important}
+a,.link{color:var(--ink-1)}
+.card{border-radius:20px !important}
+#page-guide .gd-newkey{display:none !important}

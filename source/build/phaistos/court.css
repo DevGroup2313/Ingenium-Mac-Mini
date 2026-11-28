@@ -1,0 +1,72 @@
+/* ============ PHAISTOS · THE COURTYARD: its own sign-in, welcome and Who is using (28 November 2026) ============
+   Her words: "I want for Phaistos to have a sign-in/sign-out system that Ingenium has but redesigned and repurposed for Phaistos. Please
+   give me full and exact parity with Ingenium", then: "Phaistos does not have Ingenium's colour palette or constellation theme design and
+   layout so it needs its own unique sign-in page that is not the same Orbit as Ingenium."
+   So the machinery is Ingenium's own, untouched (the sign-in and its recovery words, locking, signing out, the profiles, the guest's
+   practice studio, the record of sign-ins, the second person), and what is seen is Phaistos's: a sunlit courtyard in soft yellow and
+   white with a fine gold Greek-key frieze above and below; at the top, Phaistos's own logo, raised and pressable, its wordmark, the day
+   in plain words and the greeting; across the middle, each person a raised tablet standing on its solid edge (it rises under the pointer
+   and presses down); at the foot, the plate with the keys. No stars, no rings, no spheres, no seal. */
+#sioStage{background:radial-gradient(120% 70% at 50% -6%,#fffef6 0%,var(--bg,#fbf7e2) 46%,var(--bg-2,#f5ecc8) 100%) !important;color:var(--ink-1,#2e2e29);
+  --sio-ink:#2e2e29;--sio-ink2:#55554d;--sio-ink3:#76766b;--sio-acc:#8a6d1c;--sio-plate:#ffffff;--sio-line:rgba(160,128,40,.22);--sio-rec:rgba(245,236,191,.45)}
+#sioStage.night{background:radial-gradient(120% 70% at 50% -6%,#2b2a22 0%,#1d1d19 50%,#141411 100%) !important;color:#f8f5dc;
+  --sio-ink:#f8f5dc;--sio-ink2:#dedac0;--sio-ink3:#b4b098;--sio-acc:#e9cf7a;--sio-plate:#26261f;--sio-line:rgba(233,207,122,.22);--sio-rec:rgba(233,207,122,.07)}
+#sioStage .sio-stars,#sioStage .sio-ring,#sioStage .sio-centre,#sioStage .sio-date,#sioStage .sio-hello,#sioStage .sio-sub{display:none !important}
+/* the frieze: a running Greek key in fine gold, above and below */
+#sioStage::before,#sioStage::after{content:"";position:absolute;left:0;right:0;height:16px;pointer-events:none;opacity:.7;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='16' viewBox='0 0 22 16'%3E%3Cg fill='none' stroke='%23c4a24c' stroke-width='1.15'%3E%3Cpath d='M0 1.2H22M0 14.8H22'/%3E%3Cpath d='M2.5 12.4V3.6H16.5V10.4H7.5V6.4H12.5'/%3E%3C/g%3E%3C/svg%3E") repeat-x 0 0/22px 16px}
+#sioStage::before{top:max(14px,env(safe-area-inset-top,0px))}
+#sioStage::after{bottom:max(10px,env(safe-area-inset-bottom,0px))}
+#sioStage.night::before,#sioStage.night::after{opacity:.45}
+/* the head: the logo, the wordmark, the day, the greeting and what to do */
+#sioStage .sio-head{top:max(40px,calc(env(safe-area-inset-top,0px) + 30px)) !important}
+#sioStage .phx-mark{display:grid;justify-items:center;gap:8px;margin:0 auto}
+#sioStage .phx-mark .phl{width:96px;height:96px;cursor:pointer;pointer-events:auto}
+#sioStage .phx-mark .phx-word{height:24px;width:auto;fill:var(--sio-ink);display:block}
+#sioStage .phx-day{margin:12px 0 0;font:600 12px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--sio-acc)}
+#sioStage .phx-hello{margin:8px 0 0;font:650 34px/1.12 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,"Helvetica Neue",Arial,sans-serif;letter-spacing:-.015em;color:var(--sio-ink);text-wrap:balance}
+#sioStage .phx-sub{margin:8px auto 0;max-width:60ch;font:400 15.5px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;color:var(--sio-ink2);text-wrap:pretty}
+#sioStage.plate .phx-hello,#sioStage.plate .phx-sub{display:none}
+/* the people: tablets in a row, each standing on its solid edge */
+#sioStage .sio-box{width:auto !important;height:auto !important;min-width:0;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:22px;
+  transform:translate(-50%,-50%) !important;max-width:calc(100vw - 32px)}
+#sioStage .sio-box .sio-orb{position:relative !important;left:auto !important;top:auto !important;transform:none !important}
+.sio-orb{width:178px !important;padding:20px 14px 16px !important;gap:8px !important;border-radius:22px !important;
+  background:linear-gradient(#ffffff,#fffdf4) !important;color:#2e2e29 !important;
+  box-shadow:inset 0 1px 0 #fff,inset 0 0 0 1px rgba(160,128,40,.16),0 4px 0 #e3d39a,0 6px 10px rgba(80,64,20,.10),0 16px 28px rgba(80,64,20,.10) !important;
+  transition:transform .22s cubic-bezier(.34,1.35,.64,1),box-shadow .22s ease,opacity .4s ease !important}
+.sio-orb:hover{transform:translateY(-4px) !important;box-shadow:inset 0 1px 0 #fff,inset 0 0 0 1px rgba(160,128,40,.2),0 6px 0 #e3d39a,0 10px 16px rgba(80,64,20,.12),0 24px 38px rgba(80,64,20,.12) !important}
+.sio-orb:active{transform:translateY(3px) !important;transition-duration:.08s !important;box-shadow:inset 0 1px 0 #fff,inset 0 0 0 1px rgba(160,128,40,.2),0 1px 0 #e3d39a,0 2px 4px rgba(80,64,20,.12) !important}
+.sio-orb.dim{opacity:.94}
+.sio-orb:focus-visible{outline:2.5px solid #8a6d1c !important;outline-offset:4px !important;border-radius:24px !important}
+.sio-ball{width:76px !important;height:76px !important;filter:none !important;border-radius:50%;
+  background:radial-gradient(circle at 36% 30%,#fffdf0 0%,#fbefb6 46%,#ecd27a 100%);box-shadow:inset 0 -3px 6px rgba(150,112,20,.18),inset 0 2px 2px #fff,0 0 0 1.5px #d9bd62,0 3px 0 #c9a648,0 6px 10px rgba(80,64,20,.14)}
+.sio-orb:hover .sio-ball{transform:none !important}
+.sio-ball svg,.sio-ball .sio-css{display:none !important}
+.sio-ball b{font:650 34px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif !important;color:#5a4610 !important;text-shadow:0 1px 0 rgba(255,255,255,.7) !important}
+.sio-orb .sio-nm{font:650 17px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif !important;color:#2e2e29 !important;max-width:150px}
+.sio-orb .sio-st{font:600 12px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif !important;color:#7a6218 !important}
+.sio-orb[data-p="__sio_new"] .sio-ball{background:radial-gradient(circle at 36% 30%,#ffffff 0%,#fdf8e2 60%,#f3e6b2 100%)}
+#sioStage.night .sio-orb,body.sio-on #profDoor.sio.r344-night .sio-orb{background:linear-gradient(#2c2c24,#26261f) !important;color:#f8f5dc !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,240,.06),inset 0 0 0 1px rgba(233,207,122,.18),0 4px 0 #0f0f0c,0 14px 26px rgba(0,0,0,.45) !important}
+#sioStage.night .sio-orb .sio-nm,body.sio-on #profDoor.sio.r344-night .sio-orb .sio-nm{color:#f8f5dc !important}
+#sioStage.night .sio-orb .sio-st,body.sio-on #profDoor.sio.r344-night .sio-orb .sio-st{color:#e9cf7a !important}
+/* Who is using Phaistos: its own buttons stand where the tablets stand, the very same size */
+body.sio-on #profDoor.sio .r331-coin.sio-orb{transform:translate(-50%,-50%) !important}
+body.sio-on #profDoor.sio .r331-coin.sio-orb:hover{transform:translate(-50%,calc(-50% - 4px)) !important}
+body.sio-on #profDoor.sio .r331-coin.sio-orb:active{transform:translate(-50%,calc(-50% + 3px)) !important}
+/* the plate at the foot: the sign-in's card, and the welcome's */
+body.sio-on #ingLockDoor.sio .ild-card,body.sio-on #introDoor.sio .intro-card{background:var(--sio-plate,#fff) !important;border-radius:26px !important;
+  box-shadow:inset 0 1px 0 #fff,inset 0 0 0 1px rgba(160,128,40,.18),0 4px 0 #e3d39a,0 8px 14px rgba(80,64,20,.10),0 26px 48px rgba(80,64,20,.12) !important}
+body[data-theme="night"].sio-on #introDoor.sio .intro-card,body.sio-on #ingLockDoor.sio.ild-night .ild-card{--sio-plate:#26261f;
+  box-shadow:inset 0 0 0 1px rgba(233,207,122,.18),0 4px 0 #0f0f0c,0 14px 28px rgba(0,0,0,.45),0 34px 60px rgba(0,0,0,.4) !important}
+body.sio-on #ingLockDoor.sio .ild-card>h1{font:650 28px/1.15 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif !important;letter-spacing:-.01em !important}
+body.sio-on #introDoor.sio .intro-word,body.sio-on #introDoor.sio .intro-subword,body.sio-on #introDoor.sio .intro-tourline{display:none !important}
+@media (max-width:760px){
+  .sio-orb{width:150px !important;padding:16px 10px 14px !important}
+  .sio-ball{width:62px !important;height:62px !important}
+  #sioStage .sio-box{gap:14px}
+  #sioStage .phx-mark .phl{width:72px;height:72px}
+  #sioStage .phx-hello{font-size:27px}
+}
+@media (prefers-reduced-motion:reduce){.sio-orb{transition:none !important}}

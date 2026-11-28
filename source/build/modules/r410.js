@@ -175,12 +175,18 @@ var SLOTS={wide:[[19,44],[81,40],[9,70],[91,68],[31,12],[69,10]],nar:[[16,50],[8
 function orbs(pp,nar){var sig=pp.list.map(function(p){return p.id+":"+p.name+":"+p.pw;}).join("|")+"/"+(nar?1:0)+"/"+(W.IngOrrery?1:0);if(sig===SIG)return;SIG=sig;
   ORBS.forEach(function(o){o.remove();});ORBS=[];var sl=SLOTS[nar?"nar":"wide"];
   pp.list.slice(0,6).forEach(function(p,i){var b=mk("button","sio-orb");b.type="button";b.setAttribute("data-p",p.id);b.style.left=sl[i][0]+"%";b.style.top=sl[i][1]+"%";
-    b.innerHTML=ball(LOOKS[i],initial(p.name))+'<span class="sio-nm">'+esc(p.name)+'</span><span class="sio-st"><i></i><span class="sio-stt"></span></span>';
+    b.innerHTML=ball(LOOKS[i],p.id===NEWP?"+":initial(p.name))+'<span class="sio-nm">'+esc(p.name)+'</span><span class="sio-st"><i></i><span class="sio-stt"></span></span>';
     b.addEventListener("click",function(){press(p.id);});BOX.appendChild(b);ORBS.push(b);});}
 /* an orb pressed beside the sign-in's plate: your own takes you to its password; another opens Who is using Ingenium and chooses it */
 function press(id){var pp=people(),card=lockCard();
   /* 8.12: on the welcome, her orb enters, with one of the seal's flourishes, as Enter does */
-  if(WELCOME&&!card){var en=$("introEnter");flourish();WGO=Date.now();setTimeout(function(){try{var dd=$("introDoor");if(en&&dd&&!dd.hasAttribute("hidden"))en.click();}catch(e){warn(e);}},300);return;}
+  if(WELCOME&&!card){var en=$("introEnter");
+    /* 8.13: another profile's orb opens that profile, as its button on Who is using Ingenium does (its password, where it has one, is
+       asked as it opens) */
+    if(id!==NEWP&&id!==pp.cur&&pp.list.length>1){flourish();try{if(W.IngProfiles&&typeof IngProfiles.switchTo==="function")IngProfiles.switchTo(id,null);}catch(e){warn(e);}return;}
+    flourish();WGO=Date.now();setTimeout(function(){try{var dd=$("introDoor");if(en&&dd&&!dd.hasAttribute("hidden"))en.click();}catch(e){warn(e);}
+      /* Someone else: the desk opens on Profiles on this device, where a profile is added (Manage profiles, as the profile key's menu has it) */
+      if(id===NEWP)setTimeout(function(){try{if(W.IngProfiles&&typeof IngProfiles.open==="function"){IngProfiles.open();setTimeout(function(){var m=$("profManage");if(m)m.click();},90);}}catch(e){warn(e);}},450);},300);return;}
   if(card){if(id===pp.cur||pp.list.length<2){var f=card.querySelector("#ildPw")||card.querySelector("input:not([type=hidden])");if(f){try{f.focus();}catch(e){}}flourish();return;}
     var e=card.querySelector(".r331-else");if(e){e.click();setTimeout(function(){var c=D.querySelector('#profDoor .r331-coin[data-door="'+String(id).replace(/"/g,"")+'"]');if(c)c.click();},60);}return;}
   var c2=D.querySelector('#profDoor .r331-coin[data-door="'+String(id).replace(/"/g,"")+'"]');if(c2)c2.click();}
@@ -195,8 +201,16 @@ function welcomeName(){var nm="";try{var pp=people();pp.list.forEach(function(p)
   if(!nm)try{nm=typeof W.personaGet==="function"?(W.personaGet().name||""):"";}catch(e){nm="";}
   if(!nm)try{nm=typeof W.lxhAuthor==="function"?(W.lxhAuthor()||""):"";}catch(e){nm="";}
   return String(nm||"").trim().split(/\s+/)[0]||"";}
-function welcomePeople(pp){var me=null;pp.list.forEach(function(p){if(p.id===pp.cur)me=p;});var nm=welcomeName()||"You";
-  return {list:[{id:me?me.id:"owner",name:nm,pw:"none"}],cur:me?me.id:"owner",out:false};}
+/* 8.13: her words: "I want a second orb added to the new sign-in for another profile or user login into my master edition of Ingenium".
+   So every other profile on this device stands on the orbit as its own orb, as in the approved preview (Test Person and Guest); with no
+   other profile yet, the second orb is Someone else, which leads to adding one (the master edition, where its owner keeps the profiles; and
+   an app made from Ingenium that asks for it, window.ING_ORBIT_ADD, as Phaistos does for the two people it is made for) */
+var NEWP="__sio_new";
+function canAdd(){try{return (typeof W.ING_EDITION!=="string"||W.ING_EDITION==="master"||W.ING_ORBIT_ADD===true)&&!!(W.IngProfiles&&typeof IngProfiles.owner==="function"&&IngProfiles.owner());}catch(e){return false;}}
+function welcomePeople(pp){var me=null,others=[];pp.list.forEach(function(p){if(p.id===pp.cur)me=p;else others.push(p);});var nm=welcomeName()||"You";
+  var list=[{id:me?me.id:"owner",name:nm,pw:"none"}].concat(others.slice(0,5).map(function(p){return {id:p.id,name:p.name,pw:p.pw,t:p.t};}));
+  if(list.length<2&&canAdd())list.push({id:NEWP,name:"Someone else",pw:"add"});
+  return {list:list,cur:me?me.id:"owner",out:false};}
 function signOn(){try{return !!(W.IngLock&&typeof IngLock.active==="function"&&IngLock.active());}catch(e){return false;}}
 function nightNow(){var l=$("ingLockDoor"),d=$("profDoor");if(l&&!l.hidden&&l.classList.contains("ild-night"))return true;if(d&&!d.hidden&&d.classList.contains("r344-night"))return true;return D.body.getAttribute("data-theme")==="night";}
 function lockedAt(){try{var t=+sessionStorage.getItem(LOCKK)||0;return t&&Date.now()-t<12*36e5?t:0;}catch(e){return 0;}}
@@ -251,8 +265,8 @@ function tick(){var card=lockCard(),door=profDoor(),pp=people(),intro=(!card&&!d
   var ppl=WELCOME?welcomePeople(pp):pp;
   orbs(ppl,W.innerWidth<760);
   ORBS.forEach(function(b){var id=b.getAttribute("data-p"),p=null;ppl.list.forEach(function(q){if(q.id===id)p=q;});var mine=id===ppl.cur||ppl.list.length<2;
-    b.classList.toggle("dim",WELCOME?!mine:(!plate||!mine));var s=b.querySelector(".sio-stt"),t=WELCOME?(signOn()?"Signed in":"Opens straight away"):plate&&mine?(lockedAt()?"Locked":"Signing in"):(p&&p.pw==="none"?"Opens straight away":"Needs its password");if(s.textContent!==t)s.textContent=t;
-    b.setAttribute("aria-label",(p?p.name:"Profile")+": "+t+(WELCOME?". Press to enter.":""));});
+    b.classList.toggle("dim",WELCOME?!mine:(!plate||!mine));var s=b.querySelector(".sio-stt"),t=WELCOME?(id===NEWP?"Add their profile":mine?(signOn()?"Signed in":"Opens straight away"):(p&&p.pw==="none"?"Opens straight away":"Needs its password")):plate&&mine?(lockedAt()?"Locked":"Signing in"):(p&&p.pw==="none"?"Opens straight away":"Needs its password");if(s.textContent!==t)s.textContent=t;
+    b.setAttribute("aria-label",(p?p.name:"Profile")+": "+t+(WELCOME?(id===NEWP?". Press to add a profile for someone else.":mine?". Press to enter.":". Press to open this profile."):""));});
   if(card)dressCard(card,pp);
   place(plate?card:null,door,WELCOME?intro:null);
   if(door)dressDoor(door,pp);}

@@ -395,6 +395,21 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.13 (28 November 2026): a second orb on the welcome orbit; Phaistos's builder.
+
+- The Sign-in Orbit (`r410.js`). Her words, of the 8.12 welcome: "I want a second orb added to the new sign-in for another profile or
+  user login into my master edition of Ingenium". Every other profile on this device now stands on the welcome orbit as its own orb (its
+  initial, its name and how it opens), as in the approved preview's Test Person and Guest; pressing it opens Ingenium in that profile, as
+  its button on Who is using Ingenium does (its password asked as it opens, where it has one). With no other profile yet, the second orb
+  is Someone else (a plus, "Add their profile"): pressing it opens the desk on Settings, Security, Profiles on this device, where a
+  profile is added (the master edition, where its owner keeps the profiles; and an app made from Ingenium that asks for it with
+  window.ING_ORBIT_ADD, as Phaistos does for the two people it is made for).
+- Phaistos's builder (`build/phaistos`, new): her app for her parents, made from the Gift edition (so nothing of hers in it): its colours,
+  name, icons, layered 3D logo (logos3.py, phl.js), wordmark, pages and Guide, and its own sign-in, the Courtyard (court.css): Ingenium's
+  sign-in, sign-out, profiles, guest, record and second person, drawn as Phaistos's own. `python3 build/phaistos/make_phaistos.py <gift>
+  <out> [logo]`; `node build/phaistos/make_icons.js <logo> <folder>` draws its icons.
+- Tests: rig/t_813_second_orb.js (8 checks).
+
 Ingenium 8.12 (28 November 2026): the welcome on the Sign-in Orbit; the other editions free of Lakay's name.
 
 - The Sign-in Orbit (`r410.js`). Her words, with a picture of the welcome card: "Ingenium still does not have the sphere sign-in Orbit
