@@ -12,6 +12,7 @@
      Not this); with asking off they are kept at once. What she leaves out is not suggested again.
    - Folders bring themselves up to date: when Ingenium is open and she has not typed for three minutes, a folder with conversations not
      yet read is brought up to date with her chosen model, one at a time; the notes as they were are kept, and the folder offers Undo.
+     From 8.14 it asks first: the folders waiting are offered to her, she picks the ones to bring up to date (modules/r421.js).
    - Used everywhere: a chat draws the facts that fit what is asked (hers first), and a chat in an app's folder all of that app's facts;
      under the reply, Used N facts lists them.
    - Seen in two places: Settings, Your data, Memory (Waiting for you, Find a fact, each app's facts, the switches) and each app's folder
@@ -109,10 +110,17 @@ function learn(){var k=K();if(!k.opts.learn)return 0;var n=0;
 var lastKey=Date.now();D.addEventListener("keydown",function(){lastKey=Date.now();},true);D.addEventListener("pointerdown",function(){lastKey=Date.now();},true);
 function busy(){try{if(W.ingModelInUse&&W.ingModelInUse(180000))return true;  /* 7.94 (r397): nothing else using the model for three minutes */
   return !!(W.IngFolders&&IngFolders.run&&IngFolders.run.busy);}catch(e){return true;}}
+/* 8.14: it asks first (her words, 28 November 2026: "I also want you to have Ingenium ask me if I want to have the models start writing and
+   updating Ingenia's apps' folders instead of automatically having the model start writing without me knowing. I want to be able to pick
+   and choose."). After three quiet minutes, the folders with conversations not read yet are offered to her (modules/r421.js, IngAskUp):
+   she ticks the ones the model may bring up to date, or says Not now; nothing is read or written before she chooses. Without the offer's
+   card, nothing is written at all. A folder she chose is brought up to date as before: its notes kept for Undo, one at a time. */
+function upOne(p){var k=K(),a=p.app||{};k.undo[p.id]={brief:a.brief||"",decisions:(a.decisions||[]).slice(),open:(a.open||[]).slice(),briefAt:a.briefAt||0,at:Date.now(),done:false};save();
+  return Promise.resolve(IngFolders.bringUp(p)).then(function(r){var u=k.undo[p.id];if(r&&u){u.done=true;u.doneAt=Date.now();}else delete k.undo[p.id];save();learn();soon();return r;},function(e){delete k.undo[p.id];save();soon();throw e;});}
+function waitingUp(){var k=K();return apps().filter(function(x){try{return IngFolders.unread(x).length>0&&!(k.undo[x.id]&&Date.now()-k.undo[x.id].at<600000);}catch(e){return false;}});}
 function autoTick(){var k=K();if(!k.opts.auto||D.hidden||Date.now()-lastKey<180000||busy())return;
-  var p=apps().filter(function(x){try{return IngFolders.unread(x).length>0&&!(k.undo[x.id]&&Date.now()-k.undo[x.id].at<600000);}catch(e){return false;}})[0];if(!p)return;
-  var a=p.app||{};k.undo[p.id]={brief:a.brief||"",decisions:(a.decisions||[]).slice(),open:(a.open||[]).slice(),briefAt:a.briefAt||0,at:Date.now(),done:false};save();
-  Promise.resolve(IngFolders.bringUp(p)).then(function(r){var u=k.undo[p.id];if(r&&u){u.done=true;u.doneAt=Date.now();}else delete k.undo[p.id];save();learn();soon();},function(){delete k.undo[p.id];save();});}
+  var list=waitingUp();if(!list.length)return;
+  if(W.IngAskUp&&typeof IngAskUp.offer==="function"){try{IngAskUp.offer(list);}catch(e){}}}
 function undo(p){var k=K(),u=k.undo[p.id];if(!u)return;var a=p.app;a.brief=u.brief;a.decisions=u.decisions;a.open=u.open;a.briefAt=u.briefAt;delete k.undo[p.id];save();try{IngFolders.paint();}catch(e){}soon();}
 /* ---------- used everywhere: a chat draws the facts that fit; a chat in an app's folder, all of that app's ---------- */
 function toks(t){return (String(t||"").toLowerCase().match(/[a-z0-9À-ɏ]{3,}/g)||[]);}
@@ -150,7 +158,7 @@ function adder(about,label){var w=mk("div","kn-add"),i=mk("input","kn-in");i.typ
   var go=function(){if(add(about,i.value,{k:"her",label:"yours"}))i.value="";};w.appendChild(key("Add a fact",go));i.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();go();}});return w;}
 /* ---------- in an app's folder: what Ingenium knows about it, its links, its timeline ---------- */
 function folderCard(p,host,ui){var ab=appKey(p.name),c=ui&&ui.card?ui.card("What Ingenium knows",null):mk("section","card");c.classList.add("kn-card");c.id="knFolder";c.setAttribute("data-kn-app",p.name);
-  var k=K(),u=k.undo[p.id];if(u&&u.done){var un=mk("div","kn-add");un.appendChild(mk("span","kn-undo","Brought up to date by itself "+day(u.doneAt)+", while you were away from the keyboard."));un.appendChild(key("Undo",function(){undo(p);}));c.appendChild(un);}
+  var k=K(),u=k.undo[p.id];if(u&&u.done){var un=mk("div","kn-add");un.appendChild(mk("span","kn-undo","Brought up to date "+day(u.doneAt)+", as you chose."));  /* 8.14: only ever at her choice now */un.appendChild(key("Undo",function(){undo(p);}));c.appendChild(un);}
   var L=of(ab),ul=mk("ul","kn-list");L.forEach(function(f){ul.appendChild(row(f));});if(!L.length)c.appendChild(mk("p","small muted","Nothing yet. Add what is true of "+p.name+" in your own words; Ingenium also suggests what it learns from this folder and from Fabrica, and asks you first."));c.appendChild(ul);
   c.appendChild(adder(ab,"A fact about "+p.name+", in your words"));
   var lk=mk("div","kn-sec");lk.appendChild(mk("h4",null,"Linked to it"));var lw=mk("div","kn-links");var conv=(W.state.chats||[]).filter(function(x){return x&&x.projectId===p.id;});
@@ -179,7 +187,7 @@ function paintRoom(){var c=roomCard();if(!c)return;var k=K(),A=apps(),W1=waiting
   fi.addEventListener("input",find);find();
   A.forEach(function(p){var ab=appKey(p.name),L=of(ab,"kept");var s=mk("div","kn-sec");s.setAttribute("data-kn-about",ab);s.appendChild(mk("h4",null,p.name));var ul=mk("ul","kn-list");L.forEach(function(f){ul.appendChild(row(f));});
     if(!L.length)ul.appendChild(mk("li","small muted","Nothing kept yet."));s.appendChild(ul);s.appendChild(adder(ab,"A fact about "+p.name));c.appendChild(s);});
-  var sw=mk("div","kn-sec");sw.appendChild(mk("h4",null,"How it is kept"));[["learn",D.getElementById("page-fabrica")?"Learn from my folders and from Fabrica":"Learn from my folders"],["ask","Ask me before keeping what it learns"],["auto","Bring my folders up to date by themselves while I am away from the keyboard"]].forEach(function(x){
+  var sw=mk("div","kn-sec");sw.appendChild(mk("h4",null,"How it is kept"));[["learn",D.getElementById("page-fabrica")?"Learn from my folders and from Fabrica":"Learn from my folders"],["ask","Ask me before keeping what it learns"],["auto","When I am away from the keyboard, offer to bring my folders up to date; I choose which, and nothing is written before I do"]].forEach(function(x){
     var l=mk("label","kn-sw"),cb=mk("input");cb.type="checkbox";cb.id="knOpt-"+x[0];cb.checked=!!k.opts[x[0]];cb.onchange=function(){k.opts[x[0]]=cb.checked;save();};l.appendChild(cb);l.appendChild(D.createTextNode(x[1]));sw.appendChild(l);});c.appendChild(sw);
   if(FOCUS){var t=c.querySelector('[data-kn-about="'+FOCUS+'"]');FOCUS="";if(t)setTimeout(function(){try{t.scrollIntoView({block:"center",behavior:"smooth"});}catch(e){}},60);}}
 function open(about){FOCUS=about||"";try{W.IngChatMemory.open();}catch(e){try{W.go("settings");}catch(_){}}setTimeout(paintRoom,120);}
@@ -188,7 +196,7 @@ var T0=0;function soon(){if(T0)return;T0=setTimeout(function(){T0=0;try{paintRoo
 function watch(){var mem=D.getElementById("memRoomCard");if(mem&&!mem.__r390){mem.__r390=1;paintRoom();}}
 (function start(){var n=0;(function w(){if(W.__ingReady===true&&W.IngFolders&&W.state){K();bridge();wrapMem();wrapFolder();wrapMsg();learn();try{IngFolders.paint();}catch(e){}
       setInterval(function(){try{bridge();learn();watch();autoTick();}catch(e){}},20000);setInterval(watch,1500);return;}if(++n<400)setTimeout(w,500);})();})();
-W.IngKnow={add:add,keep:keep,drop:drop,edit:edit,of:of,waiting:waiting,fit:fit,learn:learn,open:open,undo:undo,autoTick:autoTick,store:K,appKey:appKey,clash:clash,paint:paintRoom};
+W.IngKnow={add:add,keep:keep,drop:drop,edit:edit,of:of,waiting:waiting,fit:fit,learn:learn,open:open,undo:undo,autoTick:autoTick,upOne:upOne,waitingUp:waitingUp,store:K,appKey:appKey,clash:clash,paint:paintRoom};
 })();
 ;try{window.__ingParts["p390"]="running";}catch(_){}
 </script>

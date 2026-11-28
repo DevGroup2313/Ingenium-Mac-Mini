@@ -87,22 +87,32 @@ function h(tag,cls){var e=D.createElement(tag);if(cls)e.className=cls;return e;}
 /* Fabrica's sealEl, made for Ingenia: the seal in its layers, each at its depth, its edge and its cast; or, for a logo of her own, that logo */
 /* 8.04: objects, not plates, as Clavis's own door draws its astrolabe (its seal options, sopt-free): no rim and no plate's shadow */
 var OBJ={clavis:1};
-function make(k,size){var L=W.LX7_LAYERS||{},key=night()&&L[k+"N"]?k+"N":k,ls=L[key],own=mine(k);
+/* 8.14: The Offline Project's crest (IngSeal's picture, data-fd-seal "master") becomes a logo like the others (her words, 28 November 2026:
+   "I hate that the Offline Project shield seal does not have any animations on the Ingenia folders page, it just stays there motionless
+   and stiff and is not animated or clickable like the other apps. I want you to make the shield logo clickable and animated please"):
+   its picture is the one layer, at the crest's own width and height, so it sways, leans under the pointer and, on the open folder's
+   page, is a key that sinks, springs back and plays its flourish and its own light (modules/r421.js), as every app's logo does. */
+function make(k,size,img){var L=W.LX7_LAYERS||{},key=night()&&L[k+"N"]?k+"N":k,ls=L[key],own=mine(k)||(img?img.getAttribute("src")||"":"");
   var root=h("span","ig-ls fd-seal");root.setAttribute("aria-hidden","true");root.setAttribute("data-fd-seal",k);root.setAttribute("data-ig",key+(own?":own":""));root.style.setProperty("--S",size+"px");
   var tilt=h("span","ig-ls-tilt"),idle=h("span","ig-ls-idle");idle.style.animationDelay=(-delayOf(k))+"s";idle.appendChild(h("i","ig-ls-cast"));
   if(own||!ls){root.classList.add("flat");var im=new Image();im.src=own||"";im.alt="";im.className="ig-ls-l";idle.appendChild(im);}
   else{var obj=OBJ[String(k).replace(/N$/,"")]===1,rim=!obj&&ls.filter(function(L1){return L1.z<0;}).length<3,face=ls.filter(function(L1){return !L1.side&&L1.z===0;})[0];if(obj)root.classList.add("obj");
     if(rim&&face)[[-.012,.84],[-.024,.76],[-.036,.68],[-.048,.6]].forEach(function(R){var im=new Image();im.src=face.src;im.alt="";im.className="ig-ls-l rim";im.style.setProperty("--z",String(R[0]));im.style.setProperty("--b",String(R[1]));idle.appendChild(im);});
     ls.forEach(function(L1){var im=new Image();im.src=L1.src;im.alt="";im.className="ig-ls-l"+(L1.side?" side":"")+(L1===face?" face":"");im.style.setProperty("--z",String(L1.z));idle.appendChild(im);});}
+  if(img){var q=img.getBoundingClientRect(),ch=q.height||parseFloat(img.style.height)||img.height||size,lay=idle.querySelector(".ig-ls-l");root.classList.add("crest");root.style.setProperty("--S",Math.round(ch)+"px");
+    /* its width from the picture's own proportions, once known (a crest stands taller than it is wide) */
+    var ar=function(w,hh){if(w&&hh)root.style.setProperty("--ar",(w/hh).toFixed(4));};ar(img.naturalWidth,img.naturalHeight);
+    if(lay){if(lay.complete&&lay.naturalWidth)ar(lay.naturalWidth,lay.naturalHeight);else lay.addEventListener("load",function(){ar(lay.naturalWidth,lay.naturalHeight);});}}
   tilt.appendChild(idle);root.appendChild(tilt);return root;}
 var busy=false;
 function paint(){var pg=page();if(!pg||busy)return 0;var L=W.LX7_LAYERS||{},n=0;busy=true;
   try{[].forEach.call(pg.querySelectorAll(".fd-seal"),function(e){var k=e.getAttribute("data-fd-seal");if(!k||k==="app"||e.classList.contains("fd-wm"))return;
-      if(!L[k]&&!mine(k))return;
+      var crest=k==="master"&&e.tagName==="IMG"&&!!e.getAttribute("src");  /* 8.14 */
+      if(!L[k]&&!mine(k)&&!crest)return;
       var want=(night()&&L[k+"N"]?k+"N":k)+(mine(k)?":own":"");if(e.classList.contains("ig-ls")&&e.getAttribute("data-ig")===want)return;
-      var nw=make(k,sizeOf(e));if(e.classList.contains("ig-ls"))nw.style.setProperty("--S",e.style.getPropertyValue("--S"));
+      var nw=make(k,sizeOf(e),crest?e:null);if(e.classList.contains("ig-ls"))nw.style.setProperty("--S",e.style.getPropertyValue("--S"));
       /* the open folder's own logo is a key of its own: it answers the pointer and the keyboard */
-      if(e.closest(".fd-oh")){nw.classList.add("ig-key");nw.setAttribute("role","button");nw.removeAttribute("aria-hidden");nw.setAttribute("aria-label",(nameOf(k)||"The app")+"'s logo");nw.title=(nameOf(k)||"The app")+"'s logo: press it";nw.tabIndex=0;}
+      if(e.closest(".fd-oh")){var who=crest?"The Offline Project's crest":(nameOf(k)||"The app")+"'s logo";nw.classList.add("ig-key");nw.setAttribute("role","button");nw.removeAttribute("aria-hidden");nw.setAttribute("aria-label",who);nw.title=who+": press it";nw.tabIndex=0;}
       e.replaceWith(nw);n++;});}catch(x){try{console.warn("Ingenia logos:",x);}catch(_){}}
   busy=false;return n;}
 /* the pointer, as on Fabrica: the logo of the folder, tab, card or head under it tilts to follow it and lifts; pressed, it sinks */

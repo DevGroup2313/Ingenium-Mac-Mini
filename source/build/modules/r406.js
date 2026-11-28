@@ -309,7 +309,7 @@ function back(pl){var k=K(),o=(k&&k.opts)||{},fab=hasFabrica(),ph=mk("header","m
   c1.appendChild(mk("h4",null,"How it learns"));
   c1.appendChild(sw(fab?"Learn from my folders and from Fabrica":"Learn from my folders",o.learn!==false,function(v){o.learn=v;}));
   c1.appendChild(sw("Ask me before keeping what it learns",o.ask!==false,function(v){o.ask=v;}));
-  c1.appendChild(sw("Bring my folders up to date by themselves while I am away",o.auto!==false,function(v){o.auto=v;}));
+  c1.appendChild(sw("When I am away, offer to bring my folders up to date; I choose which",o.auto!==false,function(v){o.auto=v;}));  /* 8.14: it asks first (r390, r421) */
   c1.appendChild(mk("p",null,"What it learns waits on the Waiting plate until you keep it, unless you turn asking off."));
   c2.appendChild(mk("h4",null,"Never kept"));var ul=mk("ul","mmb-never");
   var never=["Passwords and codes","Keys of every kind"].concat(folders().some(function(a){return norm(a.name)==="carpe diem";})?["The committee code"]:[]).concat(["Money","Other people's details"]);

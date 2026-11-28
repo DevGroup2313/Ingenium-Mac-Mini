@@ -130,6 +130,15 @@ body[data-theme="night"] #ingEngine .pk:hover{background:linear-gradient(rgba(18
 #ingEngine .plate.ok{color:var(--l-ok)}#ingEngine .plate.ld{color:#b8701a}#ingEngine .plate.rec{color:var(--l-acc)}
 #ingEngine .ie-keys{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 16px 4px}
 #ingEngine .ie-keys.ie-keys-top{margin:10px 16px 6px}
+/* 8.14: Stop writing, first in the row: a raised key like Load and Unload, its words and its square in a deep rose while the model writes */
+#ingEngine .k.ie-stop{display:inline-flex;align-items:center;gap:7px}
+#ingEngine .k.ie-stop svg{width:13px;height:13px;flex:0 0 auto}
+#ingEngine .k.ie-stop:not(:disabled){color:#a3283e;border-color:rgba(163,40,62,.28)}
+#ingEngine .k.ie-stop:not(:disabled) svg{animation:ieStopBeat 1.6s ease-in-out infinite}
+body[data-theme="night"] #ingEngine .k.ie-stop:not(:disabled){color:#f2a0ae;border-color:rgba(242,160,174,.3)}
+@keyframes ieStopBeat{0%,100%{opacity:1}50%{opacity:.55}}
+body[data-motion="minimal"] #ingEngine .k.ie-stop svg{animation:none}
+@media (prefers-reduced-motion:reduce){#ingEngine .k.ie-stop svg{animation:none}}
 #ingEngine .ie-r{display:grid;grid-template-columns:74px 1fr 80px;align-items:center;gap:10px;margin:8px 18px 0}
 #ingEngine .ie-r label,#ingEngine .ie-r .l{font:600 12.5px/1.2 var(--l-sans);color:var(--l-ink2)}
 #ingEngine .ie-r output{font:600 13px/1 var(--l-sans);font-variant-numeric:tabular-nums;text-align:right;color:var(--l-ink1)}
@@ -209,6 +218,7 @@ function stateCard(){var c=mk("div","ie-st");c.id="ieState";c.appendChild(gauge(
   if(L){chip.innerHTML="<i></i>Lent";nm.textContent=L.model||"Its model";fine.textContent="It answers from "+L.name+"; this device keeps its memory free.";}
   else if(s==="loading"){chip.className="chip load";chip.innerHTML="<i></i>Loading";nm.textContent=ch?ch.customName:"The model";fine.textContent="Loading into this device's memory…";}
   else if(s==="error"){chip.className="chip bad";chip.innerHTML="<i></i>Stopped";nm.textContent=ch?ch.customName:"The model";var le="";try{le=Engine.lastError||"";}catch(e){}fine.textContent=le?("It could not load: "+le):"It could not load. Try Load again, or another model.";}
+  else if(l&&writing()){chip.innerHTML="<i></i>Writing";nm.textContent=l.customName;fine.textContent="Writing for "+writing()+". Stop writing, below, halts it at once.";}
   else if(l){chip.innerHTML="<i></i>"+(s==="busy"?"Writing":"Running");nm.textContent=l.customName;fine.textContent=(l===ch?"Loaded and ready, for every page.":"Loaded for a page's work; "+(ch?ch.customName:"your model")+" is the app's model.")+(M&&gb(l)?" Its file is about "+gb(l).toFixed(1)+" GB of this device's "+Math.round(M)+" GB.":"");}
   else{chip.className="chip off";chip.innerHTML="<i></i>Resting";nm.textContent="No model loaded";fine.textContent=ch?("Pages load "+ch.customName+" when they need it, or press Load."):"Choose a model below.";}
   r.appendChild(chip);r.appendChild(nm);r.appendChild(fine);c.appendChild(r);
@@ -230,15 +240,35 @@ function chooseLent(c,model){try{IngLend.use(c.id,model);}catch(e){}setTimeout(p
 /* 7.97: Load and Unload stand right under the card that names the model, first of all (her words, 26 November 2026: "The unload button
    is far too low on the Engine panel, it needs to be one of the first option I see next to the model so that I can click to unload it
    with ease instead of having to scroll and search for it"); before, they came after the whole list of models. Unload names the model. */
-function keysRow(){var L=lent(),l=loaded(),s=st(),ch=chosen();
-  var ks=mk("div","ie-keys ie-keys-top"),ld=mk("button","k pri","Load"),ul=mk("button","k ie-unload",l&&!L?"Unload "+(l.customName||l.name||"the model"):"Unload"),mn=mk("button","lnk","Your models, in Mentes");ld.type=ul.type=mn.type="button";
+/* 8.14: the model stops writing from here (her words, 28 November 2026: "I want to be able to stop the model from writing straight from the
+   Engine panel in the same location where I can load and unload the models"). Stop writing stands in their row, right after Unload and
+   Load (which stay first, as 7.97 put them at her word), and says
+   for whom the model writes (r397's ingModelInUse: Lector, Vocatio, Ingenia, Memory or a reply). Pressed, every page that writes with the
+   model is stopped as its own Stop key would stop it (Lector pauses, Vocatio and Concordia stop, the reply ends), then the engine and a lent
+   or cloud model are told to stop at once. Nothing is lost: what was written so far stays where it was going. */
+function writing(){try{if(typeof W.ingModelInUse==="function"){var w=W.ingModelInUse(0);if(w)return w;}}catch(e){}try{if(Engine.status==="busy")return "a reply";}catch(e){}return "";}
+function stopAll(){
+  try{if(W.LX&&LX.busy&&typeof lxPause==="function")lxPause();}catch(e){}
+  try{var R=W.IngCareer&&IngCareer.ui&&IngCareer.ui.RUN;if(R&&R.busy){R.stop=true;if(R.req)R.req.__stopped=true;}}catch(e){}
+  try{if(typeof blendStop==="function")blendStop();}catch(e){}
+  try{if(typeof chatStop==="function")chatStop();}catch(e){}
+  try{if(W.LX&&LX.cloudAb&&typeof LX.cloudAb.abort==="function")LX.cloudAb.abort();}catch(e){}
+  try{if(typeof cloudAbort==="function")cloudAbort();}catch(e){}
+  try{Engine.abort();}catch(e){}}
+W.IngStopWriting=stopAll;
+function keysRow(){var L=lent(),l=loaded(),s=st(),ch=chosen(),wr=writing();
+  var ks=mk("div","ie-keys ie-keys-top"),sp=mk("button","k ie-stop"),ld=mk("button","k pri","Load"),ul=mk("button","k ie-unload",l&&!L?"Unload "+(l.customName||l.name||"the model"):"Unload"),mn=mk("button","lnk","Your models, in Mentes");ld.type=ul.type=mn.type="button";
   if(ch&&!(l&&l.id===ch.id))ld.textContent="Load "+(ch.customName||ch.name||"the model");
   ld.disabled=!!L||!ch||s==="loading"||!!(l&&ch&&l.id===ch.id);ul.disabled=s==="loading"||!(l&&!L);
   ul.title="Frees the memory the model holds; Load brings it back";
   ld.onclick=function(){click();try{loadActiveModel();}catch(e){}paintSoon();};
   ul.onclick=function(){click();try{Promise.resolve(Engine.unload()).then(function(){try{renderEngineCtl();renderModels();}catch(e){}paint();});}catch(e){}};
   mn.onclick=function(){close();try{go("models");}catch(e){}};
-  if(l&&!L){ks.appendChild(ul);ks.appendChild(ld);}else{ks.appendChild(ld);ks.appendChild(ul);}ks.appendChild(mn);return ks;}
+  sp.type="button";sp.innerHTML='<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="3.5" width="9" height="9" rx="2" fill="currentColor"/></svg><span>Stop writing</span>';
+  sp.disabled=!wr;sp.title=wr?("The model is writing for "+wr+". Stop it now; what it wrote so far is kept"):"Nothing is writing with the model now";
+  sp.setAttribute("aria-label",wr?("Stop writing: the model is writing for "+wr):"Stop writing (nothing is writing now)");
+  sp.onclick=function(){click();stopAll();sp.disabled=true;sp.lastChild.textContent="Stopping…";setTimeout(paint,700);setTimeout(paint,2000);};
+  if(l&&!L){ks.appendChild(ul);ks.appendChild(ld);}else{ks.appendChild(ld);ks.appendChild(ul);}ks.appendChild(sp);ks.appendChild(mn);WR=wr;return ks;}
 function paint(){if(!P)return;var b=$("ieBody"),keep=b.scrollTop;b.innerHTML="";
   b.appendChild(stateCard());
   b.appendChild(keysRow());
@@ -275,7 +305,9 @@ function paintSoon(){if(T)return;T=setTimeout(function(){T=0;paint();},120);}
 function pill(){return $("enginePill");}
 function place(){if(!P)return;var k=pill(),r=k?k.getBoundingClientRect():{left:innerWidth-500,bottom:56},w=Math.min(480,innerWidth-24);
   P.style.left=Math.max(12,Math.min(r.left,innerWidth-w-12))+"px";P.style.top=Math.round(r.bottom+10)+"px";P.style.maxHeight=Math.max(260,innerHeight-r.bottom-24)+"px";}
-function open(){if(P){paint();return;}build();paint();var k=pill();if(k)k.setAttribute("aria-expanded","true");
+var WR="",WT=0;  /* 8.14: whom the model wrote for at the last paint; the panel paints again when that changes */
+function follow(){clearInterval(WT);WT=setInterval(function(){if(!P){clearInterval(WT);return;}if(writing()!==WR)paintSoon();},800);}
+function open(){if(P){paint();return;}build();paint();follow();var k=pill();if(k)k.setAttribute("aria-expanded","true");
   setTimeout(function(){D.addEventListener("pointerdown",outside,true);},0);}
 function close(){if(!P)return;P.remove();P=null;var k=pill();if(k)k.setAttribute("aria-expanded","false");D.removeEventListener("pointerdown",outside,true);}
 function outside(e){if(!P)return;var t=e.target;if(P.contains(t))return;var k=pill();if(k&&k.contains(t))return;

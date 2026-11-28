@@ -1,4 +1,5 @@
 // Ingenium 7.77: the Engine panel, one model for all of Ingenium (modules/r374.js).
+// 8.14: Load and Unload name the model since 7.97 ("Unload Velox"), so the keys are found by their first word.
 // Her words (24 November 2026): "I should be able to click on the "Engine" button from the top bar and be able to select to unload the
 // model and other options for the models"; "it should all be folded into and added to the Engine button and give it its own panel when
 // you click on it and it operates for the entire app".
@@ -36,10 +37,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   ok(c.plan === 'm-mid', 'Lector, Vocatio, Ingenia and Fabrica write with it (Lector\'s plan takes the app\'s model)', c);
   ok(c.inUse.length === 1 && /middle/.test(c.inUse[0]), 'the panel marks it In use', c.inUse);
   // 3. Unload, then Load
-  await p.evaluate(() => [...document.querySelectorAll('#ingEngine .k')].find(x => x.textContent === 'Unload').click()); await sleep(500);
+  await p.evaluate(() => [...document.querySelectorAll('#ingEngine .k')].find(x => /^Unload\b/.test(x.textContent.trim())).click()); await sleep(500);
   const u = await p.evaluate(() => ({ engine: Engine.modelId, chip: document.querySelector('#ingEngine .chip').textContent, active: state.activeModelId }));
   ok(u.engine == null && /Resting/.test(u.chip) && u.active === 'm-mid', 'Unload empties the engine; the choice stays', u);
-  await p.evaluate(() => [...document.querySelectorAll('#ingEngine .k')].find(x => x.textContent === 'Load').click()); await sleep(800);
+  await p.evaluate(() => [...document.querySelectorAll('#ingEngine .k')].find(x => /^Load\b/.test(x.textContent.trim())).click()); await sleep(800);
   ok(await p.evaluate(() => Engine.modelId === 'm-mid'), 'Load loads the chosen model again');
   // 4. Reply, Memory and Effort through the one record
   await p.evaluate(() => [...document.querySelectorAll('#ingEngine .ie-eff .k')].find(x => x.textContent === 'Extra').click()); await sleep(300);

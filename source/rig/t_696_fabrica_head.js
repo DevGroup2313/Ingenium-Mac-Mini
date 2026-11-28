@@ -30,7 +30,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
         says: h && (h.querySelector('.skh-says') || {}).textContent, hint: h && h.querySelector('.skh-hint').textContent, steps: row ? [...row.querySelectorAll('.sks-step')].map(s => s.querySelector('b').textContent + (s.getAttribute('aria-current') ? '*' : '')) : [],
         ownTitle: vis(fh && fh.querySelector('h1')), ownSteps: vis(document.getElementById('fbSteps')), back: !!document.getElementById('fbHome'), state: IngTree.state() }; });
     ok(h0.part === 'running' && h0.on && h0.head && h0.before && h0.rowBefore, 'Fabrica opens on the header Lector and Vocatio wear, the four steps under it, its three panels below (p294)', h0);
-    ok(h0.eyebrow === 'IngeniumFabrica · the tree of your versions' && h0.title === 'Fabrica' && JSON.stringify(h0.keys) === '[["New app",true],["Bring one in",false]]' && /the tree to still it/.test(h0.hint),
+    ok(/^(IngeniumFabrica · )?the tree of your versions$/i.test(h0.eyebrow) /* 8.14: since r302 the eyebrow no longer repeats the app's and the page's names */ && h0.title === 'Fabrica' && JSON.stringify(h0.keys) === '[["New app",true],["Bring one in",false]]' && /the tree to still it/.test(h0.hint),
       'its words and keys: the eyebrow, the title, New app and Bring one in, the hint', h0);
     ok(JSON.stringify(h0.steps.map(s => s.replace('*', ''))) === '["Change","Keep","Test","Ship"]' && h0.steps.filter(s => /\*$/.test(s)).length <= 1, 'the four steps, as Fabrica\'s own stand', h0.steps);
     ok(!h0.ownTitle && !h0.ownSteps && h0.back, 'Fabrica\'s own title row gives way to the header; its Back to the work key stays', h0);
@@ -96,8 +96,10 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await p.screenshot({ path: path.join(OUT, 'quill_night.png') });
     ok(JSON.stringify(day) !== JSON.stringify(nite) && nite[0] < day[0], 'by night the plinth and the tree are drawn again in the night\'s metal', { day, nite });
     // the panels keep the window's height under the header
-    const fh = await p.evaluate(() => ({ h: document.getElementById('fb').offsetHeight, ih: innerHeight }));
-    ok(Math.abs(fh.h - Math.max(420, fh.ih - 74)) <= 2, 'the three panels keep the window\'s height under the header', fh);
+    // 8.14: since 7.33 the path bar and the Next card (r315) stand inside the frame, above the panels; the panels themselves now keep the
+    // window's height under the header (her words, 28 November 2026: "restore its original length and size"), the frame growing by those two
+    const fh = await p.evaluate(() => ({ h: document.getElementById('fbPanels').offsetHeight, frame: document.getElementById('fb').offsetHeight, ih: innerHeight }));
+    ok(Math.abs(fh.h - (Math.max(420, fh.ih - 74) - 12)) <= 4, 'the three panels keep the window\'s height under the header', fh);
     // 7.06: an app opened as she opens it, by pressing its card in Your apps (Fabrica's own paint, never the exported one): the header follows
     await p.setViewportSize({ width: 1440, height: 1000 }); await p.evaluate(() => { state.theme = 'day'; applyTheme(); }); await sleep(600);
     await p.evaluate(async () => { const enc = s => new TextEncoder().encode(s); const r = await IngRepo.fromFiles([{ path: 'index.html', data: enc('<!doctype html><title>Ledger</title>') }], { name: 'ledger' });

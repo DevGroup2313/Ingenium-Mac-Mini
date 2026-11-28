@@ -395,6 +395,41 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.14 (28 November 2026): the Engine's Stop writing; Ingenia asks before the model writes; Fabrica's seal, title and panels; the crest; no rings.
+
+Her words (28 November 2026): "I want to be able to stop the model from writing straight from the Engine panel in the same location where I
+can load and unload the models. I also want you to have Ingenium ask me if I want to have the models start writing and updating Ingenia's
+apps' folders instead of automatically having the model start writing without me knowing. I want to be able to pick and choose." With it,
+on Fabrica, Ingenia and the logos (all of it kept in `r421.js`'s note).
+- The Engine panel (`r374.js`): Stop writing stands in the row with Load and Unload, right after them (they stay first, as 7.97 put
+  them). It wakes when the model writes for any page
+  (r397's ingModelInUse names whom: Lector, Vocatio, Ingenia, Memory or a reply) and says so; pressed, each page that writes is stopped as
+  its own Stop key would (Lector pauses, Vocatio and Concordia stop, the reply ends), then the engine and a lent or cloud model. What was
+  written so far is kept. The state card says "Writing for Lector" (or whom) while it writes.
+- Ingenia asks first (`r390.js`, `r421.js`): after three quiet minutes, the folders with conversations not read yet are offered in a card
+  (each with its logo and how many wait); she ticks the ones the model may read and write into, presses Bring them up to date, or Not now,
+  or Don't offer again. Nothing is read or written before she chooses; a folder she leaves is not offered again until more of its
+  conversations wait (or half a day has passed). Those she chose are brought up to date one at a time, each with Undo, with a Stop key while
+  it reads. The switch in Memoria now says what it does: "When I am away from the keyboard, offer to bring my folders up to date; I choose
+  which, and nothing is written before I do".
+- No rings (`r421.js`): r378's four copies of each logo's face behind it (its "rim") were each a little larger than the face; as the logo
+  sprang back after a press (r402) they showed all round it as a ring, blue for Carpe Diem and The Forge, violet for Ingenium. They are
+  no longer drawn; everything else of the logos and their presses is as it was.
+- The Offline Project's crest (`r378.js`, `r421.js`): a logo like the others now, at its own proportions: it sways, leans under the
+  pointer and, on its folder's page, is a key (role button, Enter and Space) that sinks, springs back, sounds and plays r402's flourishes,
+  with a light that passes over its enamel at each press.
+- Fabrica (`r421.js`): the work panel's title had a 15 px line under 15 px letters with its overflow hidden, which cut the g of Ingenium;
+  its line is 1.3 times its size now. The seal beside it is a key with the seal key's press, spring and flourishes and Ingenium's key sound.
+  The three panels have their full height again: since 7.33 the path bar and the Next card (r315) stood inside the frame of fixed height
+  and took about 200 px from the panels (612 px in a 900 px window); the frame now grows by exactly what they take (815 px again).
+- Fabrica's run rows (Care, its actions), stiff since they were made (rig/t_733 found them so on 8.13 too) and on show now that the
+  panels are tall again, lift under the pointer as r315's cards do.
+- Checked on the page: rig/t_814_requests.js, 17 checks (the Stop key's place, its waking and its stop; the offer, her choice and
+  nothing written otherwise; no rim; the crest a key that sinks, springs and shines; the title whole; the seal a key; the panels'
+  height). Run again on the 8.14 page: t_797_engine 5, t_777_engine 14 (brought up to date: since 7.97 Load and Unload name the model),
+  t_788_know 10, t_797_logo_press 11, t_779_ingenia_logos 8, t_804_ingenia_weight 44, t_696_fabrica_head 19 (brought up to date: the
+  panels' own height, and r302's eyebrow), t_733_fabrica_way 15 (its runs now lift), t_743_fabrica 10, t_fabrica_narrow 4, t_794_memoria 9, t_799_atlas 41.
+
 Ingenium 8.13 (28 November 2026): a second orb on the welcome orbit; Phaistos's builder.
 
 - The Sign-in Orbit (`r410.js`). Her words, of the 8.12 welcome: "I want a second orb added to the new sign-in for another profile or
