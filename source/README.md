@@ -395,6 +395,26 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.09 (28 November 2026): the Cloud room's links carry waves of signal; nature sounds: Winter made again, Night woods, Rain on a
+tent, Lake shore.
+
+- Memoria, Ingenium Cloud (`r409.js`). Her words: "I just wanted to show the animated connection wireless connection signal links going from
+  the mac mini's orb to the other two orbs" (the 8.07 shooting stars, and a later trial of stars passing through the small spheres, were not
+  what she meant: "This looks bad, like really bad, I hate it"). From the keeper a link runs to each small sphere, from just outside one rim to
+  just outside the other, drawn from where the spheres appear, so it stays attached as the scene leans; the preview offered three ways of
+  drawing the signal; her choice: "I choose the waves look for the Ingenium Cloud preview". So waves of signal leave the keeper along each
+  link, fanning away from its name, and each small sphere answers with a ring; before the Cloud is set up the links stand faint and still;
+  nothing runs under Minimal motion or reduced motion.
+- Nature sounds (`r411.js`). Her words on the 8.08 pair: "All of the Winter Sounds sound primitive and a bit worse please redo it." Snowy
+  pines and Winter cabin are made again: wind through a state-variable filter whose middle rises with the gusts (and, in the pines, drifts
+  across the trees); snow that lets go of a branch, falls without a sound, lands with a muffled thump and sifts; flames that flicker, sap
+  that hisses, a soft howl outside; both in a smooth eight-line delay network in place of the small echo's metallic ring; slow curves worked
+  out every 16 samples so each is made in about two seconds. Night woods ("I like the Night woods sound from the preview, please add it to
+  the app"), Rain on a tent made again without the low falling notes that made it sound like drowning, and Lake shore join Night, Rain and
+  Water. Her word on the last samples (source/previews/winter_sounds): "I approve of the previews, please commit and push it everywhere".
+- Tests: rig/t_807_cloud_room.js (the waves, the links attached, faint and still before set up, nothing under Minimal motion);
+  rig/t_809_nature_sounds.js (11 checks, formerly t_808_winter_sounds.js).
+
 Ingenium 8.08 (28 November 2026): the Sign-in Orbit; Winter: Snowy pines and Winter cabin.
 
 - The Sign-in Orbit (new `r410.js`; the seal key lent by `r290.js` as `IngSealKey`). Of the live preview (source/previews/sign_in_orbit):

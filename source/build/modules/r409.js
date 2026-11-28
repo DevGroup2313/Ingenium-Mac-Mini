@@ -39,7 +39,8 @@
 body[data-theme="night"] #cloudCard.clx-room .clx-fig,#cloudCard.clx-room.night .clx-fig{--cf-pearl:#e4d9f8;background:radial-gradient(ellipse 80% 90% at 50% 40%,rgba(160,120,240,.12),rgba(160,120,240,0) 72%)}
 #cloudCard.clx-room .clx-scene{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(var(--cf-rx,0deg)) rotateY(var(--cf-ry,0deg));transition:transform .5s cubic-bezier(.2,.8,.2,1)}
 #cloudCard.clx-room .clx-fig.leaning .clx-scene{transition:transform .12s linear}
-#cloudCard.clx-room .clx-links{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#cloudCard.clx-room .clx-links{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:1}
+#cloudCard.clx-room .clx-scene{z-index:2}
 /* by night, a few stars, as on Home and Vesta */
 #cloudCard.clx-room .clx-stars{position:absolute;inset:0;pointer-events:none;display:none}
 body[data-theme="night"] #cloudCard.clx-room .clx-stars,#cloudCard.clx-room.night .clx-stars{display:block}
@@ -105,18 +106,27 @@ body[data-theme="night"] #cloudCard.clx-room .clx-orb.far .clx-oxo,#cloudCard.cl
 #cloudCard.clx-room .clx-figsay.said{color:var(--mr-acc)}
 @media (prefers-reduced-motion:reduce){#cloudCard.clx-room .clx-fig *{animation:none !important;transition:none !important}}
 body[data-motion="minimal"] #cloudCard.clx-room .clx-fig *{animation:none !important}
-/* the shooting stars (her words, 28 November 2026: "By rays I meant shooting stars or a thin sparkling rays of light going back in forth to
-   keep in theme with the rest of the app"): the app's own sparkle (Home's and Adamas's four-pointed star, white, softly glowing) running
-   between the spheres, a hair-thin trail fading behind it, a few tiny twinkles left on its way; one at a time, back and forth */
-#cloudCard.clx-room .clx-links .trail{fill:none;stroke-linecap:round;pointer-events:none}
-#cloudCard.clx-room .clx-links .trail.t1{stroke:#b996f2;stroke-width:1;opacity:.45}
-#cloudCard.clx-room .clx-links .trail.t0{stroke:#ffffff;stroke-width:1.3;filter:drop-shadow(0 0 1.2px rgba(150,110,240,.9))}
-#cloudCard.clx-room .clx-links .shead{pointer-events:none;filter:drop-shadow(0 0 1.5px #ffffff) drop-shadow(0 0 4px rgba(170,130,250,.95)) drop-shadow(0 0 8px rgba(150,110,240,.6))}
-#cloudCard.clx-room .clx-links .shead path{fill:#ffffff}
-#cloudCard.clx-room .clx-links .mote{fill:#ffffff;pointer-events:none;filter:drop-shadow(0 0 2px rgba(170,130,250,.95))}
-body[data-theme="night"] #cloudCard.clx-room .clx-links .trail.t1,#cloudCard.clx-room.night .clx-links .trail.t1{stroke:#e6dcff;opacity:.4}
-body[data-theme="night"] #cloudCard.clx-room .clx-links .shead,#cloudCard.clx-room.night .clx-links .shead{filter:drop-shadow(0 0 1.5px #ffffff) drop-shadow(0 0 5px rgba(255,255,255,.9)) drop-shadow(0 0 10px rgba(200,170,255,.7))}
-body[data-theme="night"] #cloudCard.clx-room .clx-links .mote,#cloudCard.clx-room.night .clx-links .mote{filter:drop-shadow(0 0 2px rgba(255,255,255,.95))}
+/* the links (her words, 28 November 2026: "I just wanted to show the animated connection wireless connection signal links going from the mac
+   mini's orb to the other two orbs"): from the sphere that keeps the Cloud to each of the other two, attached to both; a wireless signal travels
+   along each while the Cloud is on; faint and still before it is set up */
+#cloudCard.clx-room .clx-links .lk-track{fill:none;stroke-linecap:round;stroke:#8e6ad6;stroke-width:1.7;stroke-dasharray:.1 5.6;opacity:.6}
+#cloudCard.clx-room .clx-fig[data-look="signal"]:not([data-s="off"]) .clx-links .lk-track{animation:clxFlow 1.15s linear infinite;animation-play-state:var(--clx-run,running)}
+@keyframes clxFlow{to{stroke-dashoffset:-5.7}}
+#cloudCard.clx-room .clx-fig[data-look="waves"] .clx-links .lk-track,#cloudCard.clx-room .clx-fig[data-look="beads"] .clx-links .lk-track{opacity:.38}
+#cloudCard.clx-room .clx-fig[data-s="off"] .clx-links .lk-track{opacity:.28}
+#cloudCard.clx-room .clx-links .lk-pulse{fill:none;stroke:#ffffff;stroke-width:2.2;stroke-linecap:round;filter:drop-shadow(0 0 1.5px #ffffff) drop-shadow(0 0 4px rgba(150,110,240,.95))}
+#cloudCard.clx-room .clx-links .lk-halo{fill:none;stroke:#b393f0;stroke-width:6;stroke-linecap:round;opacity:.35;filter:blur(1.6px)}
+#cloudCard.clx-room .clx-links .lk-wave{fill:none;stroke:#8e6ad6;stroke-width:1.7;stroke-linecap:round;filter:drop-shadow(0 0 2px rgba(150,110,240,.6))}
+#cloudCard.clx-room .clx-links .lk-bead{fill:#ffffff;filter:drop-shadow(0 0 1.5px #ffffff) drop-shadow(0 0 3.5px rgba(150,110,240,.95))}
+body[data-theme="night"] #cloudCard.clx-room .clx-links .lk-track,#cloudCard.clx-room.night .clx-links .lk-track{stroke:#cdb6f7}
+body[data-theme="night"] #cloudCard.clx-room .clx-links .lk-wave,#cloudCard.clx-room.night .clx-links .lk-wave{stroke:#dccbff;filter:drop-shadow(0 0 2.5px rgba(210,190,255,.75))}
+body[data-theme="night"] #cloudCard.clx-room .clx-links .lk-halo,#cloudCard.clx-room.night .clx-links .lk-halo{stroke:#d6c4ff;opacity:.3}
+/* a small sphere receives the signal: a soft ring widens round it */
+#cloudCard.clx-room .clx-orb::before{content:"";position:absolute;left:50%;top:calc(var(--S) / 2);width:calc(var(--S) * .7);height:calc(var(--S) * .7);margin:calc(var(--S) * -.35) 0 0 calc(var(--S) * -.35);border-radius:50%;
+  border:1.5px solid rgba(142,106,214,.75);opacity:0;pointer-events:none}
+body[data-theme="night"] #cloudCard.clx-room .clx-orb::before,#cloudCard.clx-room.night .clx-orb::before{border-color:rgba(214,196,255,.8)}
+#cloudCard.clx-room .clx-orb.rcv::before{animation:clxRcv .9s ease-out}
+@keyframes clxRcv{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.85)}}
 #cloudCard.clx-room .clx-glint{position:absolute;left:41%;top:37%;width:calc(var(--S) * .24);height:calc(var(--S) * .24);margin:calc(var(--S) * -.12) 0 0 calc(var(--S) * -.12);pointer-events:none;opacity:0;
   filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px rgba(255,255,255,.9));transform:scale(0) rotate(0deg)}
 #cloudCard.clx-room .clx-glint svg{display:block;width:100%;height:100%}
@@ -246,29 +256,28 @@ function counters(C,on,nc){var w=mk("div","mr-counts");
 /* ---------- the Cloud's figure: the approved drawing, refined. Her words (28 November 2026): "I want you to make the little drawing more 3D
    and animated, I want it to be clickable and interactive like the rest of the app is"; "I didn't want you to change the design of the
    drawing, I just wanted it refined and improved, please only do that"; "There is a white outline around the orbs that cheapen the look,
-   please fix that and match them to the orbs from the Home page ... but make it customised to the Cloud Room page"; "I don't mind the
-   symbols, I just hate the lasers. This is not a science project, this is cheapening the look of the app."
+   please fix that and match them to the orbs from the Home page"; and, of what it should show: "I just wanted to show the animated connection
+   wireless connection signal links going from the mac mini's orb to the other two orbs".
    The same three spheres in the same places and the same line beneath; each sphere made as Home makes its orbs (r261): Home's sphere with
-   no rim line, a pearl mark standing above it at its own depth (the Cloud room's own: a cloud for the computer that keeps it, a laptop
-   for this device, a phone for another), a soft cast shadow, a slow sway in 3D; it tilts toward the pointer, lifts under it and sinks
-   when pressed; on hover it lifts and its mark leans toward the pointer, the sphere itself never turned (her words: "the orbs kind of
-   looks flat and weird when I hover over it"). No line and no beam joins them; while the Cloud is on, shooting stars run between them,
-   back and forth, one at a time (her words: "By rays I meant shooting stars or a thin sparkling rays of light going back in forth to keep
-   in theme with the rest of the app"). Each sphere answers a press (it hops, pulses or wobbles, and sends a shooting star), says what it
-   is and, before the Cloud is set up, opens the step it belongs to. Under Minimal motion or reduced motion nothing moves by itself. ---------- */
+   no rim line, a pearl mark standing above it at its own depth (a cloud for the computer that keeps the Cloud, a laptop for this device, a
+   phone for another), a soft cast shadow, a slow sway; on hover it lifts and its mark leans toward the pointer. From the sphere that keeps
+   the Cloud a link runs to each of the other two, attached to both: while the Cloud is on, a wireless signal travels along it (look
+   "signal": dotted links flowing out of it, a soft light running along them now and then; "waves": waves of signal leaving it for each
+   sphere; "beads": beads of light going to and fro), and each small sphere answers with a soft ring as the signal reaches it. Before the
+   Cloud is set up the links stand faint and still. Each sphere answers a press (it hops, pulses or wobbles, and sends a signal), says what
+   it is in the line beneath and, before the Cloud is set up, opens the step it belongs to. Under Minimal motion or reduced motion nothing
+   moves by itself. ---------- */
 var CF_N=0;
 function cfEsc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
 function cfStill(){try{if(document.body.getAttribute("data-motion")==="minimal")return true;}catch(e){}try{return matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){return false;}}
 /* d: {state:"off"|"on"|"choose", say, keeper:{name,tip,step}, me:{name,tip,step}, far:{name,tip,step}|null}
-   opt: {sphere(look): an SVG string or null, step(n)} */
+   opt: {sphere(look): an SVG string or null, step(n), look: "signal"|"waves"|"beads"} */
 function cfFigure(d,opt){var n=++CF_N,id="cf"+n+"x",f=document.createElement("div"),NS="http://www.w3.org/2000/svg";f.className="clx-fig";f.setAttribute("role","group");
-  f.setAttribute("aria-label","Your Cloud: the computer that keeps it, with this device and your others. Press a sphere.");
-  /* the drawing's two arcs, each way: in, from a device to the keeper; out, from the keeper back */
-  var P={a:{"in":"M62 96 C 92 40, 128 34, 150 62","out":"M150 62 C 128 34, 92 40, 62 96"},b:{"in":"M238 96 C 208 40, 172 34, 150 62","out":"M150 62 C 172 34, 208 40, 238 96"}},hasFar=!!d.far,on=d.state!=="off";
-  var svg='<svg class="clx-links" viewBox="0 0 300 170" aria-hidden="true" focusable="false"><defs><linearGradient id="'+id+'P" gradientUnits="userSpaceOnUse" x1="3" y1="3" x2="21" y2="21">'+
-    '<stop offset="0" style="stop-color:#ffffff"/><stop offset=".42" style="stop-color:#ffffff"/><stop offset="1" style="stop-color:var(--cf-pearl,#dccff4)"/></linearGradient></defs></svg>',
+  f.setAttribute("aria-label","Your Cloud: the computer that keeps it, linked to this device and your others. Press a sphere.");
+  var hasFar=!!d.far,on=d.state!=="off",LOOK=(opt&&opt.look)||"waves";f.setAttribute("data-look",LOOK);
+  var svg='<svg class="clx-links" aria-hidden="true" focusable="false"><defs><linearGradient id="'+id+'P" gradientUnits="userSpaceOnUse" x1="3" y1="3" x2="21" y2="21">'+
+    '<stop offset="0" style="stop-color:#ffffff"/><stop offset=".42" style="stop-color:#ffffff"/><stop offset="1" style="stop-color:var(--cf-pearl,#dccff4)"/></linearGradient></defs><g class="lk-g"></g></svg>',
     stars='<span class="clx-stars" aria-hidden="true">'+[[8,18],[4,58],[29,9],[36,44],[61,13],[66,46],[83,24],[96,62],[47,84],[13,38],[76,8],[57,30]].map(function(q,k){return '<i style="left:'+q[0]+'%;top:'+q[1]+'%;animation-delay:'+(-k*0.7).toFixed(1)+'s"></i>';}).join("")+'</span>';
-  /* the Cloud room's own marks, drawn as Home draws its rooms' marks */
   var MARK={keep:'<path d="M7.6 18.4h9.6a3.7 3.7 0 0 0 .55-7.36 5.4 5.4 0 0 0-10.45 1.3 3.05 3.05 0 0 0 .3 6.06z"/><path d="M12 13.2v3.2M10.6 14.7l1.4-1.5 1.4 1.5"/>',
     me:'<rect x="4.6" y="5.6" width="14.8" height="10" rx="1.4"/><path d="M2.8 18.6h18.4"/>',
     far:'<rect x="7.3" y="3.4" width="9.4" height="17.2" rx="2"/><path d="M11 17.6h2"/>'};
@@ -278,55 +287,88 @@ function cfFigure(d,opt){var n=++CF_N,id="cf"+n+"x",f=document.createElement("di
   function orb(cls,who,look,x,y,i){return '<button type="button" class="clx-orb '+cls+'" data-o="'+i+'" style="left:'+x+';top:'+y+'" aria-label="'+cfEsc(who.name)+'">'+
     '<span class="clx-oxo"><span class="clx-tilt"><span class="clx-idle"><i class="clx-cast"></i><span class="clx-oball">'+ball(look)+'</span>'+
     '<span class="clx-omark"><span class="clx-oico">'+mark(cls)+'</span></span></span></span><span class="clx-glint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+STAR+'" fill="#fff"/></svg></span></span><span class="clx-lab">'+cfEsc(who.name)+'</span></button>';}
-  f.innerHTML=stars+'<div class="clx-scene">'+svg+orb("keep",d.keeper,"bands","50%","38%",0)+orb("me"+(d.me.plain?" plain":""),d.me,"aurora","20%","60%",1)+(hasFar?orb("far",d.far,"dapple","80%","60%",2):"")+'</div>'+
+  f.innerHTML=stars+svg+'<div class="clx-scene">'+orb("keep",d.keeper,"bands","50%","38%",0)+orb("me"+(d.me.plain?" plain":""),d.me,"aurora","20%","60%",1)+(hasFar?orb("far",d.far,"dapple","80%","60%",2):"")+'</div>'+
     '<span class="clx-figsay" role="status" aria-live="polite">'+cfEsc(d.say||"")+'</span>';
-  var SV=f.querySelector(".clx-links"),ORB=[].slice.call(f.querySelectorAll(".clx-orb")),WHO=[d.keeper,d.me,d.far],tipT=0,CY=[0,0,0],LIVE=true,T=0;
+  var SV=f.querySelector(".clx-links"),G=SV.querySelector(".lk-g"),ORB=[].slice.call(f.querySelectorAll(".clx-orb")),WHO=[d.keeper,d.me,d.far],tipT=0,CY=[0,0,0],LIVE=true;
   /* what a pressed sphere says takes the place of the line beneath the drawing for a moment, so nothing covers the spheres */
   function tip(t){var e=f.querySelector(".clx-figsay");if(!e||!t)return;e.classList.add("swap");clearTimeout(tipT);
     setTimeout(function(){e.textContent=t;e.classList.remove("swap");e.classList.add("said");},160);
     tipT=setTimeout(function(){e.classList.add("swap");setTimeout(function(){e.textContent=d.say||"";e.classList.remove("swap","said");},160);},3800);}
-  function flourish(b,cls){b.classList.remove("f-hop","f-wobble","f-pop","f-pulse");void b.offsetWidth;b.classList.add(cls);setTimeout(function(){b.classList.remove(cls);},900);}
-  function glow(i){var b=ORB[i];if(!b)return;b.classList.add("rx");setTimeout(function(){b.classList.remove("rx");},520);}
-  /* a shooting star: the app's sparkle running the arc, a hair-thin trail fading behind it, twinkles left on its way, a glint where it lands */
-  var FLY=null,ORD=hasFar?[["a","in"],["b","out"],["b","in"],["a","out"]]:[["a","in"],["a","out"]],NX=0;
+  function flourish(b,cls){b.classList.remove("f-hop","f-wobble","f-pop","f-pulse");void b.offsetWidth;b.classList.add(cls);setTimeout(function(){b.classList.remove(cls);},900);try{settle(950);}catch(e){}}
   function glint(i){var g=ORB[i]&&ORB[i].querySelector(".clx-glint");if(!g)return;g.classList.remove("on");void g.offsetWidth;g.classList.add("on");setTimeout(function(){g.classList.remove("on");},800);}
-  function mote(x,y){var c=document.createElementNS(NS,"circle");c.setAttribute("cx",x.toFixed(1));c.setAttribute("cy",y.toFixed(1));c.setAttribute("r",(.7+Math.random()*.6).toFixed(2));c.setAttribute("class","mote");SV.appendChild(c);
-    if(!c.animate){c.remove();return;}var a=c.animate([{opacity:0,transform:"scale(.4)"},{opacity:.95,transform:"scale(1.2)",offset:.25},{opacity:0,transform:"scale(.5)"}],{duration:700+Math.random()*500,easing:"ease-out"});
-    c.style.transformBox="fill-box";c.style.transformOrigin="center";a.onfinish=function(){c.remove();};}
-  function shoot(k,dir){if(cfStill()||!SV||FLY||(k==="b"&&!hasFar))return;var d0=P[k][dir],tr=[];
-    [["t1",38],["t0",13]].forEach(function(t){var p=document.createElementNS(NS,"path");p.setAttribute("d",d0);p.setAttribute("class","trail "+t[0]);SV.appendChild(p);tr.push({el:p,L:t[1]});});
-    var len=150;try{len=tr[0].el.getTotalLength();}catch(e){}
-    tr.forEach(function(x){x.el.style.strokeDasharray=x.L+" "+(len+x.L+40);x.el.style.strokeDashoffset=x.L;});
-    var hd=document.createElementNS(NS,"g");hd.setAttribute("class","shead");hd.innerHTML='<path d="'+STAR+'"/>';SV.appendChild(hd);
-    var t0=performance.now(),DUR=1050,shed=-1;FLY=1;
-    function done(){tr.forEach(function(x){x.el.remove();});hd.remove();FLY=null;glint(dir==="in"?0:(k==="a"?1:2));}
-    (function step(now){if(!document.contains(f)){done();return;}var p=Math.min(1,(now-t0)/DUR),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2,h=e*len,
-        fade=Math.min(1,p/.12)*Math.min(1,(1-p)/.16);
-      tr.forEach(function(x){x.el.style.strokeDashoffset=(x.L-h).toFixed(1);x.el.style.opacity=(fade*(x.L>20?.45:1)).toFixed(3);});
-      var pt=tr[0].el.getPointAtLength(Math.min(len,Math.max(0,h))),sc=.3+.22*Math.sin(p*Math.PI);
-      hd.setAttribute("transform","translate("+pt.x.toFixed(1)+","+pt.y.toFixed(1)+") rotate("+(p*140).toFixed(0)+") scale("+sc.toFixed(3)+") translate(-12,-12)");hd.style.opacity=fade.toFixed(3);
-      var q=Math.floor(p*7);if(q>shed&&p>.08&&p<.9){shed=q;if(Math.random()<.8)mote(pt.x+(Math.random()-.5)*3,pt.y+(Math.random()-.5)*3);}
-      if(p<1)requestAnimationFrame(step);else done();})(t0);}
-  /* one at a time, back and forth, now and then; only while the drawing is seen, the Cloud is on, and motion is allowed */
-  function cycle(){clearTimeout(T);if(!on)return;if(LIVE&&!cfStill()&&document.contains(f)&&!document.hidden){var o=ORD[NX++%ORD.length];shoot(o[0],o[1]);}
-    if(document.contains(f)||!T)T=setTimeout(cycle,2300+Math.random()*1500);}
-  f.__live=function(v){LIVE=!!v;};f.__kick=function(){clearTimeout(T);T=setTimeout(cycle,300);};
+  /* a small sphere receives the signal: a soft ring widens round it */
+  function receive(i){var b=ORB[i];if(!b)return;b.classList.remove("rcv");void b.offsetWidth;b.classList.add("rcv");setTimeout(function(){b.classList.remove("rcv");},950);}
+  /* ---------- the links' way: from just outside the keeper's rim to just outside a small sphere's rim, measured from where the spheres
+     appear (as the scene leans toward the pointer, each at its own depth), so the links stay attached to both ---------- */
+  var L=[];
+  function centre(i){var o=ORB[i]&&ORB[i].querySelector(".clx-oxo");if(!o)return null;var fr=f.getBoundingClientRect(),q=o.getBoundingClientRect();if(!q.width)return null;
+    return {x:q.left+q.width/2-fr.left,y:q.top+q.height/2-fr.top,r:q.width*0.33};}
+  function unit(x,y){var l=Math.hypot(x,y)||1;return [x/l,y/l];}
+  function q(p){return p.x.toFixed(1)+" "+p.y.toFixed(1);}
+  function geo(i){var K0=centre(0),M0=centre(i);if(!K0||!M0)return null;var vx=M0.x-K0.x,vy=M0.y-K0.y,len=Math.hypot(vx,vy)||1;
+    if(LOOK==="waves"){var u=unit(vx,vy),a={x:K0.x+u[0]*K0.r*1.12,y:K0.y+u[1]*K0.r*1.12},b={x:M0.x-u[0]*M0.r*1.18,y:M0.y-u[1]*M0.r*1.18};
+      return {K:K0,M:M0,a:a,b:b,d:"M"+q(a)+" L"+q(b),ang:Math.atan2(vy,vx),reach:Math.hypot(b.x-a.x,b.y-a.y)};}
+    /* a gentle arch, as the drawing's own arcs were, a little lower */
+    var ux=-vx/len,uy=-vy/len,nx=uy,ny=-ux;if(ny>0){nx=-nx;ny=-ny;}var H=0.6;
+    var c1={x:M0.x+len*(0.5106*ux+0.439*H*nx),y:M0.y+len*(0.5106*uy+0.439*H*ny)},c2={x:M0.x+len*(0.889*ux+0.361*H*nx),y:M0.y+len*(0.889*uy+0.361*H*ny)};
+    var e=unit(c2.x-K0.x,c2.y-K0.y),s=unit(c1.x-M0.x,c1.y-M0.y),a2={x:K0.x+e[0]*K0.r*1.1,y:K0.y+e[1]*K0.r*1.1},b2={x:M0.x+s[0]*M0.r*1.16,y:M0.y+s[1]*M0.r*1.16};
+    return {K:K0,M:M0,a:a2,b:b2,d:"M"+q(a2)+" C"+q(c2)+", "+q(c1)+", "+q(b2)};}
+  function mkp(cls,dd){var p=document.createElementNS(NS,"path");p.setAttribute("d",dd);p.setAttribute("class",cls);G.appendChild(p);return p;}
+  function lay(){var W=f.clientWidth,H=f.clientHeight;if(!W||!H)return false;SV.setAttribute("viewBox","0 0 "+W+" "+H);
+    [1,2].forEach(function(i,j){if(i===2&&!hasFar)return;var g=geo(i);if(!g)return;var l=L[j];
+      if(!l){l=L[j]={i:i,g:g,track:mkp("lk-track",g.d),len:0};}else{l.g=g;l.track.setAttribute("d",g.d);}try{l.len=l.track.getTotalLength();}catch(e){}});
+    return L.length>0;}
+  /* while the scene leans or settles back, the links are drawn again each frame */
+  var SETTLE=0,sraf=0;function settle(ms){SETTLE=Math.max(SETTLE,performance.now()+(ms||0));if(!sraf)sraf=requestAnimationFrame(function st(t){sraf=0;lay();if(t<SETTLE||f.classList.contains("leaning"))sraf=requestAnimationFrame(st);});}
+  /* ---------- the signal ---------- */
+  var RUN=[];   /* what is travelling now: each {t0,dur,step(p),end()} */
+  function fly(dur,step,end){RUN.push({t0:performance.now(),dur:dur,step:step,end:end});kick();}
+  /* a soft light running along a link, out to a small sphere (or in, from it) */
+  function pulse(k,inward){var l=L[k];if(!l||!l.len)return;var core=mkp("lk-pulse",l.track.getAttribute("d")),halo=mkp("lk-halo",l.track.getAttribute("d")),PL=Math.max(10,l.len*0.16);
+    [core,halo].forEach(function(x){x.style.strokeDasharray=PL+" "+(l.len+PL*2);});
+    fly(1100,function(p){var e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2,h=inward?l.len*(1-e):l.len*e,o=inward?-h:PL-h,fd=Math.min(1,p/.1)*Math.min(1,(1-p)/.12),dd=l.track.getAttribute("d");
+      [core,halo].forEach(function(x){if(x.getAttribute("d")!==dd)x.setAttribute("d",dd);x.style.strokeDashoffset=o.toFixed(1);x.style.opacity=fd.toFixed(3);});},
+      function(){core.remove();halo.remove();if(inward)glint(0);else receive(l.i);});}
+  /* waves of signal leaving the keeper for a small sphere, widening as they go */
+  function waves(k){var l=L[k];if(!l)return;var span=0.30;
+    for(var w=0;w<3;w++)(function(w){setTimeout(function(){var a=document.createElementNS(NS,"path");a.setAttribute("class","lk-wave");G.appendChild(a);
+      /* each wave fans away from the keeper's name beneath it: shorter on the side that faces down */
+      fly(1500,function(p){var g=l.g,R0=Math.hypot(g.a.x-g.K.x,g.a.y-g.K.y),R1=R0+g.reach,r=R0+(R1-R0)*p,sp=span*(0.75+0.5*p),dn=Math.cos(g.ang)<0?-1:1,s1=g.ang-sp*(dn<0?0.3:1),s2=g.ang+sp*(dn>0?0.3:1),
+        x1=g.K.x+r*Math.cos(s1),y1=g.K.y+r*Math.sin(s1),x2=g.K.x+r*Math.cos(s2),y2=g.K.y+r*Math.sin(s2);
+        a.setAttribute("d","M"+x1.toFixed(1)+" "+y1.toFixed(1)+" A"+r.toFixed(1)+" "+r.toFixed(1)+" 0 0 1 "+x2.toFixed(1)+" "+y2.toFixed(1));a.style.opacity=(Math.min(1,p/.15)*Math.min(1,(1-p)/.25)).toFixed(3);},
+        function(){a.remove();if(w===2)receive(l.i);});},w*210);})(w);}
+  /* a train of beads of light, out along a link or back */
+  function beads(k,inward){var l=L[k];if(!l||!l.len)return;var N=5;for(var j=0;j<N;j++)(function(j){var c=document.createElementNS(NS,"circle");c.setAttribute("r",(1.7-j*0.2).toFixed(2));c.setAttribute("class","lk-bead");G.appendChild(c);
+      fly(1500,function(p){var s=Math.max(0,Math.min(1,p*1.25-j*0.06)),pt=l.track.getPointAtLength((inward?1-s:s)*l.len);c.setAttribute("cx",pt.x.toFixed(1));c.setAttribute("cy",pt.y.toFixed(1));
+        c.style.opacity=(s<=0||s>=1?0:Math.min(1,s/.08)*Math.min(1,(1-s)/.1)*(1-j*0.14)).toFixed(3);},
+        function(){c.remove();if(j===0){if(inward)glint(0);else receive(l.i);}});})(j);}
+  function send(k,inward){if(cfStill()||!lay())return;if(LOOK==="waves"){if(inward)beads(k,true);else waves(k);}else if(LOOK==="beads")beads(k,inward);else pulse(k,inward);}
+  var raf=0;function kick(){if(!raf)raf=requestAnimationFrame(frame);}
+  function frame(now){raf=0;if(!document.contains(f)){RUN.forEach(function(x){x.end();});RUN=[];return;}
+    RUN=RUN.filter(function(x){var p=Math.min(1,(now-x.t0)/x.dur);try{x.step(p);}catch(e){}if(p>=1){try{x.end();}catch(e){}return false;}return true;});if(RUN.length)kick();}
+  /* now and then, while the drawing is seen, the Cloud is on and motion is allowed: out to each sphere in turn, and now and then back */
+  var T=0,NX=0;
+  function cycle(){clearTimeout(T);if(!on)return;if(LIVE&&!cfStill()&&document.contains(f)&&!document.hidden){var k=L.length>1?NX%2:0,inward=NX%5===3;NX++;send(k,inward);}
+    if(document.contains(f)||!T)T=setTimeout(cycle,(LOOK==="waves"?2600:2200)+Math.random()*1200);}
+  f.__live=function(v){LIVE=!!v;f.classList.toggle("lk-paused",!v);};f.__kick=function(){clearTimeout(T);T=setTimeout(cycle,300);};
   f.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".clx-orb");if(!b||!f.contains(b))return;var i=+b.getAttribute("data-o"),who=WHO[i]||{},off=!on;
-    if(i===0){flourish(b,["f-pulse","f-pop","f-hop"][CY[0]++%3]);if(!off)shoot(CY[0]%2&&hasFar?"b":"a","out");}
-    else{flourish(b,["f-hop","f-wobble","f-pulse"][CY[i]++%3]);if(!off)shoot(i===2?"b":"a","in");}
+    if(i===0){flourish(b,["f-pulse","f-pop","f-hop"][CY[0]++%3]);if(!off&&lay()){for(var k=0;k<L.length;k++)send(k,false);}}
+    else{flourish(b,["f-hop","f-wobble","f-pulse"][CY[i]++%3]);if(!off&&lay()){var kk=0;L.forEach(function(l,j){if(l.i===i)kk=j;});send(kk,true);}}
     tip(who.tip);if(off&&who.step&&opt.step)setTimeout(function(){opt.step(who.step);},450);});
-  ORB.forEach(function(b){var o=b.querySelector(".clx-oxo");
-    var mk=b.querySelector(".clx-omark");
+  ORB.forEach(function(b){var o=b.querySelector(".clx-oxo"),mk=b.querySelector(".clx-omark");
     b.addEventListener("pointermove",function(e){if(e.pointerType!=="mouse"||cfStill())return;var r=o.getBoundingClientRect(),x=Math.max(-.5,Math.min(.5,(e.clientX-r.left)/r.width-.5)),y=Math.max(-.5,Math.min(.5,(e.clientY-r.top)/r.height-.5)),S=r.width;
       b.classList.add("hover");if(mk){mk.style.setProperty("--mx",(x*S*.16).toFixed(1)+"px");mk.style.setProperty("--my",(y*S*.12).toFixed(1)+"px");}},{passive:true});
     b.addEventListener("pointerleave",function(){b.classList.remove("hover");if(mk){mk.style.setProperty("--mx","0px");mk.style.setProperty("--my","0px");}});
     b.addEventListener("blur",function(){b.classList.remove("hover","down");});});
   f.addEventListener("pointerdown",function(e){var b=e.target.closest&&e.target.closest(".clx-orb");if(!b)return;b.classList.add("down");
     var W=window,up=function(){b.classList.remove("down");W.removeEventListener("pointerup",up,true);W.removeEventListener("pointercancel",up,true);};W.addEventListener("pointerup",up,true);W.addEventListener("pointercancel",up,true);},true);
-  /* the scene leans toward the pointer (a mouse only): the spheres stand at their own depths */
+  /* the scene leans toward the pointer (a mouse only): the spheres stand at their own depths, the links with them */
   f.addEventListener("pointermove",function(e){if(e.pointerType!=="mouse"||cfStill())return;var r=f.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
-    f.classList.add("leaning");f.style.setProperty("--cf-ry",(x*12).toFixed(2)+"deg");f.style.setProperty("--cf-rx",(y*-10).toFixed(2)+"deg");},{passive:true});
-  f.addEventListener("pointerleave",function(){f.classList.remove("leaning");f.style.setProperty("--cf-ry","0deg");f.style.setProperty("--cf-rx","0deg");});
+    f.classList.add("leaning");f.style.setProperty("--cf-ry",(x*12).toFixed(2)+"deg");f.style.setProperty("--cf-rx",(y*-10).toFixed(2)+"deg");settle(200);},{passive:true});
+  f.addEventListener("pointerleave",function(){f.classList.remove("leaning");f.style.setProperty("--cf-ry","0deg");f.style.setProperty("--cf-rx","0deg");settle(700);});
+  /* the links are laid when the drawing is in the page and has its size, and again whenever its size changes */
+  try{new ResizeObserver(function(){lay();}).observe(f);}catch(e){}
+  (function first(n){if(lay()||n>40){f.setAttribute("data-s",d.state);return;}setTimeout(function(){first(n+1);},120);})(0);
   f.setAttribute("data-s",d.state);setTimeout(cycle,900);return f;}
 
 /* the drawing's words, from what r255 keeps (read only) */
@@ -344,7 +386,7 @@ function figData(C,on,nc){var me=C.device,others=devices(C).filter(function(s){r
   return d;}
 var FIG=null,FSIG="";
 function figure(C,on,nc){var d=figData(C,on,nc),sig=JSON.stringify(d);if(FIG&&sig===FSIG)return FIG;
-  FSIG=sig;FIG=cfFigure(d,{sphere:function(look){try{return W.IngOrrery&&IngOrrery.sphere?IngOrrery.sphere(look):null;}catch(e){return null;}},
+  FSIG=sig;FIG=cfFigure(d,{look:"waves",sphere:function(look){try{return W.IngOrrery&&IngOrrery.sphere?IngOrrery.sphere(look):null;}catch(e){return null;}},
     step:function(n){var st=$("cloudCard")&&$("cloudCard").querySelectorAll(".cl-step")[n-1],h=st&&st.querySelector(":scope > h3");if(h&&!st.classList.contains("open"))h.click();}});return FIG;}
 /* ---------- the right column's devices ---------- */
 function devRows(C,on){var g=mk("div","clx-group clx-devgroup"),h=mk("div","mr-ghead");h.appendChild(mk("span","mr-orb g-way"));h.appendChild(D.createTextNode("In your Cloud"));g.appendChild(h);
