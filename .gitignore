@@ -18,3 +18,6 @@ ingenium_diag.txt
 /source/build/ingenium.html
 # release.py page builds the demo edition here first (6.72); release.py editions copies it into editions/
 /source/build/ingenium_demo.html
+# 8.11: and the full and gift editions, which the master page carries as recipes too
+/source/build/ingenium_full.html
+/source/build/ingenium_gift.html

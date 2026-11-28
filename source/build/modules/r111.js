@@ -142,6 +142,10 @@ function onePageFrom(id,snap,page,html){var cache={},missing=[],n=0,big=0;
 /* 6.0: opt.quiet makes the page for another package (an APK, an IPA) without noting a one page made */
 function onePage(id,opt){opt=opt||{};return snapshot(id,opt.ref).then(function(snap){return recipe(id,snap).then(function(rec){var page=mainPage(snap,rec);if(!page)throw new Error("there is no page in this version");
   return readText(id,snap.commit,page).then(function(html){return onePageFrom(id,snap,page,html);}).then(function(r){r.page=page;r.commit=snap.commit;r.bytes=te.encode(r.html);r.recipe=rec;
+    /* 8.11 (modules/r420.js): the edition she chose for this app in Fabrica (Ingenium's Full, Gift or Demo edition, Carpe Diem's Public
+       sample, The Forge's demonstration) is the page every package carries, before it is scrambled, given its door or signed */
+    if(window.IngEditions&&typeof IngEditions.substitute==="function"&&opt.target&&!opt.kept)return IngEditions.substitute(id,r,opt);
+    return r;}).then(function(r){
     if(opt.quiet)return r;
     return IngRepo.setNote(id,snap.commit,"onePage",{at:Date.now(),size:r.bytes.length,inlined:r.inlined,missing:r.missing.length}).then(function(){return r;});});});});}
 

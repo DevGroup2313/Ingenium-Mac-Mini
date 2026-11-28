@@ -77,6 +77,7 @@ def skip_modules(ed):
     out |= {"r353.js"}  # 7.62: the Author Studio raised, the master's alone, as the studio is
     out |= {"r246.js"}  # 6.48: the Offline Project made from her apps in Fabrica, the master's alone (it gathers her four apps)
     out |= {"r268.js"}  # 6.77: the demonstrations the master edition carries for it (her apps' demos), the master's alone
+    out |= {"r420.js"}  # 8.11: every edition of her apps made in Fabrica, from the recipes the master edition alone carries
     out |= {"r275.js"}  # 6.82: puts back the copy of itself an app carried inside the page leaves out; only the master carries the apps
     out |= {"r258.js"}  # 6.65: her build library on the Folders page, the master's alone (it names her apps; modules/r208.js calls it only where it is)
     out |= {"r297.js"}  # 7.07: Ingenium's own rules in Ingenium's folder, the master's alone (her rules for building Ingenium)
@@ -693,6 +694,8 @@ def _no_clavis(ed):
         # Lector's PDF (modules/r109.js), Fabrica (r112), the first start (r120), Home (r147), the library's list (r240), the folders a chat
         # import makes (r258), a repository brought from GitHub (r276) and the one place an app's logo is found (r277)
         ('try{if(window.LIB_NAMES&&LIB_NAMES.clavis&&!NAMES.clavis)NAMES.clavis=LIB_NAMES.clavis;}catch(e){}\n', "", "Lector's PDF without Clavis", 1),
+        # 8.11: Ingenia's logos (r378, 8.04) drew Clavis's astrolabe as an object by its key; the other editions carry no Clavis (rig/t_627_editions)
+        ('var OBJ={clavis:1};', 'var OBJ={};', "Ingenia's logos without Clavis's key", 1),
         ('try{if(window.LIB_NAMES&&LIB_NAMES.clavis&&!APPS.clavis){APPS.clavis={name:LIB_NAMES.clavis,color:"#b8862f"};DELAY.clavis=8.5;}}catch(e){}\n', "",
          "Fabrica without Clavis", 1),
         ('  var order=["cd","forge","inkwell","lakay","clavis","ingenium","offline","offline3"];  /* 7.65: Clavis after Lakay */\n',
@@ -735,6 +738,12 @@ def _no_lakay():
          "the app library without Lakay", 1),
         ('  if(/<meta name="lakay-build"/i.test(head.slice(0,40000))||/<title>\\s*Lakay\\b/i.test(head.slice(0,40000)))return "lakay";\n', "",
          "no Lakay page known by name", 1),
+        # 8.11: nor Fabrica's and Home's lines that add it where the library names it (they did nothing here, but named it in the code;
+        # her rule: "Lakay and Clavis must not appear (in any letters) in the full, gift or demo editions")
+        ('try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!APPS.lakay){APPS.lakay={name:LIB_NAMES.lakay,color:"#5c63c6"};DELAY.lakay=6.8;}}catch(e){}\n', "",
+         "Fabrica without Lakay's line", 1),
+        ('try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!LNAMES.lakay){LNAMES.lakay=LIB_NAMES.lakay;LORDER.push("lakay");}}catch(e){}\n', "",
+         "Home without Lakay's line", 1),
         ('  if(key==="lakay"&&(m=/<meta name="lakay-build" content="(\\d+)"/.exec(s.slice(0,40000))))return m[1];\n', "",
          "no Lakay build number read", 1),
         # 7.65: nor by the library's later reading of a page (the base page's second libDetect)

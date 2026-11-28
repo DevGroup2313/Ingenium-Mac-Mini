@@ -395,6 +395,38 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.11 (28 November 2026): every edition of her apps, for every device, made from the master edition.
+
+- Her words (28 November 2026): "I want all of the editions of all of my apps built into the master edition for all of my devices, not
+  just the master edition. I want full authorship and agency over all of the editions. ... I tried to make the Full edition Windows app
+  from my master edition on my macbook pro and it only showed me one edition and downloaded the master edition only. ... I want to be
+  able to choose between the different editions of all of my apps and devices in Ingenium, not just the master edition."
+- The cause: Fabrica made every package from the version kept, so Ingenium's packages were always the master edition; the master page
+  carried only the Demo edition (as a recipe, for The Offline Project).
+- The master page now carries the Full and Gift editions as recipes too, each in its own slot (`build/demo_recipe.py` SLOTS,
+  `ing-edition-full` and `ing-edition-gift`; `build/tail.py`). `release.py page` builds the Demo, Full and Gift editions first, from the
+  same commits, then the master page with all three recipes (about 0.2 MB for the Gift, 1 MB for the Full), and stops before anything is
+  committed if the page would pass GitHub's 100 MiB; `release.py editions` publishes those very pages, each checked against the
+  fingerprint its slot carries.
+- `r268.js` puts any of the three together and checks it (its fingerprint, its edition's name, no app library, no owner's hand):
+  IngDemos.edition(k), IngDemos.editions().
+- New `r420.js` (the master edition alone): IngEditions. In Fabrica's Ship, under the package line, the app's editions as Fabrica's own
+  keys (Ingenium: Master, Full, Gift, Demo; Carpe Diem: its full edition and its Public sample; The Forge: itself and its demonstration);
+  in Download as an app, the same as the panel's own list. The edition chosen is the page every package carries, for every device (Mac,
+  Windows, iPhone and iPad, Fire and Android, web, one page, kits): `r111.js` (IngShip.onePage) asks before the page is scrambled or
+  signed, and `r349.js` gives an edition made for others no owner's door. The package is named for its edition (Ingenium Full, Ingenium
+  Gift, Ingenium Demo); the Full edition keeps the master's id, so it installs over the master in place and keeps the work on that
+  device; the Gift and Demo editions take ids of their own and never open her work.
+- Windows on GitHub: the Demo edition's installer (Ingenium-Demo-Setup.exe) beside the Full and Gift ones (build-windows.yml,
+  tools/get_editions.py).
+- The other editions no longer name Lakay even in their code: Fabrica's and Home's two lines that added it where the library names it
+  are taken out (`editions.py`, _no_lakay).
+- Built on the other session's 8.08 to 8.10 (the Sign-in Orbit, its r410; the Cloud's waves; the nature sounds), merged; this
+  module is r420, so the two never share a name.
+- Tests: rig/t_811_editions.js (the three editions given back whole and byte for byte as published; each app's choices; Fabrica's keys,
+  the package's name and id, the page every package carries; the panel's list). rig/t_807_cloud_room.js reads the drawing's spheres
+  by their class as r409 names them (clx-oball).
+
 Ingenium 8.10 (28 November 2026): Lake shore and Rain on a tent made again.
 
 - Nature sounds (`r411.js`). Her words on the 8.09 pair: "The Lake shore splash sounds horrible"; "the Rain on a tent sound too harsh and

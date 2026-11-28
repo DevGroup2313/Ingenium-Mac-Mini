@@ -182,8 +182,9 @@ var o1=IngShip.onePage;
 function scrambled(id,x,opt){return W.IngScramble?IngScramble.onePage(id,x,opt):Promise.resolve(x);}
 IngShip.onePage=function(id,opt){opt=opt||{};return o1.apply(IngShip,arguments).then(function(x){if(!wanted(id)||opt.unsigned)return scrambled(id,x,opt);
   return IngRepo.info(id).then(function(info){var name=(x.recipe&&x.recipe.name)||info.name||"this app",ver=String(IngShip._.numberOf(x.html,x.recipe||{})||(x.commit||"").slice(0,7)||"1.0");
-    /* 7.63 (modules/r354.js): an app for its owner alone carries its door, written in before the page is signed, and is never made unsigned */
-    var own=W.IngOwnerOnly&&IngOwnerOnly.wanted(id);
+    /* 7.63 (modules/r354.js): an app for its owner alone carries its door, written in before the page is signed, and is never made unsigned.
+       8.11 (modules/r420.js): an edition made for others (Ingenium's Full, Gift or Demo edition, a demonstration) never carries her door */
+    var own=!(x.edition&&x.edition!=="master")&&W.IngOwnerOnly&&IngOwnerOnly.wanted(id);
     return session(name).then(function(s){if(!s){if(own)throw new Error("Nothing was made: "+name+" opens only with your owner key, and it can only be made signed, with your owner key on this device.");return scrambled(id,x,opt);}
       return scrambled(id,x,opt).then(function(x){var page=own?IngOwnerOnly.door(x.html,{id:id,app:info.slug||"",name:name}):x.html;
       return signPage(page,{s:s,app:info.slug||"",name:name,version:ver}).then(function(sp){

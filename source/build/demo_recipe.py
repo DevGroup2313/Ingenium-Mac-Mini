@@ -36,6 +36,12 @@ import re, json, gzip, base64, hashlib
 
 MIN_REF = 32768
 SLOT = "ing-demo-ingenium"
+# 8.11 (28 November 2026): the Full and Gift editions ride as recipes too, each in a slot of its own. Her words: "I want all of
+# the editions of all of my apps built into the master edition for all of my devices, not just the master edition. I want full
+# authorship and agency over all of the editions ... I tried to make the Full edition Windows app from my master edition on my
+# macbook pro and it only showed me one edition and downloaded the master edition only." Built from the same commits as the
+# master page (release.py page), each is about 0.2 MB (Gift) to 1 MB (Full) in the page.
+SLOTS = {"demo": SLOT, "full": "ing-edition-full", "gift": "ing-edition-gift"}
 TYPE = "ingenium/recipe-gz"
 PRE = "ing-tail:"
 _SCRIPT = re.compile(r'<script\b([^>]*)>(.*?)</script>', re.S)
@@ -65,7 +71,7 @@ def _named(master):
         ident = i.group(1)
         if ident.startswith(PRE):
             ident = ident[len(PRE):]
-        if ident == SLOT:
+        if ident in SLOTS.values():
             continue
         out.setdefault(_sha(body), ident)
     return out
@@ -78,7 +84,8 @@ JS_TYPES = ("", "text/javascript", "application/javascript", "module")
 
 def _sources(master):
     """the parts of the master page a recipe may copy from, in the page's order: its large blocks with an id (read through <id>, as
-    the page reads them, ing-tail:<id> too) and its own code (its scripts and its styles); the demo slot is never one"""
+    the page reads them, ing-tail:<id> too) and its own code (its scripts and its styles); an edition's slot is never one (8.11: the
+    Full, Gift and Demo editions' slots alike, so each recipe holds whatever the others' slots come to hold)"""
     out = []
     for m in _PART.finditer(master):
         kind, attrs, body = m.group(1), m.group(2), m.group(3)
@@ -88,7 +95,7 @@ def _sources(master):
         ident = i.group(1) if i else ""
         if ident.startswith(PRE):
             ident = ident[len(PRE):]
-        if ident == SLOT:
+        if ident in SLOTS.values():
             continue
         ty = _TYPE.search(attrs)
         code = kind == "style" or (ty.group(1).lower() if ty else "") in JS_TYPES
@@ -169,28 +176,29 @@ def block(recipe):
     return base64.b64encode(gzip.compress(raw, compresslevel=9, mtime=0)).decode("ascii"), len(raw)
 
 
-def slot(body="", attrs=""):
-    return '<script id="%s" type="%s"%s>%s</script>' % (SLOT, TYPE, attrs, body)
+def slot(body="", attrs="", ident=SLOT):
+    return '<script id="%s" type="%s"%s>%s</script>' % (ident, TYPE, attrs, body)
 
 
-def embed(master, demo):
-    """the master page (not tailed) with the demo edition's recipe in its slot; the page says so when it has no slot (an edition
-    that carries none)"""
+def embed(master, demo, edition="demo"):
+    """the master page (not tailed) with an edition's recipe in its slot (8.11: the demo edition's, the full edition's or the gift
+    edition's); the page says so when it has no slot (an edition that carries none)"""
+    ident = SLOTS[edition]
     if re.search(r'<script id="' + re.escape(PRE) + r'[^"]+"', master):  # a block already moved to the end (its code may name the prefix)
         raise SystemExit("embed: give the page before its blocks are moved to its end (tail.untail first)")
-    pat = re.compile(r'<script id="%s"[^>]*>[^<]*</script>' % re.escape(SLOT))
+    pat = re.compile(r'<script id="%s"[^>]*>[^<]*</script>' % re.escape(ident))
     if len(pat.findall(master)) != 1:
-        raise SystemExit("embed: the page has no place for the demo edition's recipe (or more than one)")
-    bare = pat.sub(lambda m: slot(), master, count=1)
-    rec = make(demo, bare)
+        raise SystemExit("embed: the page has no place for the %s edition's recipe (or more than one)" % edition)
+    bare = pat.sub(lambda m: slot(ident=ident), master, count=1)
+    rec = make(demo, bare, what="Ingenium's %s edition" % edition)
     again = apply(rec, bare)  # proved here, before it travels
     assert again == demo
     b64, n = block(rec)
     lit = sum(len(p.encode("utf-8")) for p in rec["ops"] if isinstance(p, str))
     runs = [p for p in rec["ops"] if not isinstance(p, str)]
-    print("the demo edition's recipe: %d bytes of its own text and %d runs from %d parts of the page (%d of them blocks with an id) give back %d bytes; carried as %d"
-          % (lit, len(runs), len(rec["srcs"]), sum(1 for s in rec["srcs"] if "id" in s), rec["size"], len(b64)))
-    return pat.sub(lambda m: slot(b64, ' data-bytes="%d" data-version="%s" data-sha256="%s"' % (n, rec["version"], rec["sha256"])), master, count=1), rec
+    print("the %s edition's recipe: %d bytes of its own text and %d runs from %d parts of the page (%d of them blocks with an id) give back %d bytes; carried as %d"
+          % (edition, lit, len(runs), len(rec["srcs"]), sum(1 for s in rec["srcs"] if "id" in s), rec["size"], len(b64)))
+    return pat.sub(lambda m: slot(b64, ' data-bytes="%d" data-version="%s" data-sha256="%s"' % (n, rec["version"], rec["sha256"]), ident), master, count=1), rec
 
 
 # ---------- what differs between two pages, byte for byte ----------

@@ -1841,6 +1841,8 @@ if _bi:
         sys.exit("The Forge's demonstration was made from another Forge than the one carried: run apps/demos/make_demos.py again")
     _apps += '<script type="ingenium/recipe-gz" id="ing-demo-forge" data-bytes="%d">' % len(_raw) + _b64.b64encode(_z).decode("ascii") + '</script>\n'
     _apps += _dr.slot() + "\n"
+    # 8.11: and the Full and Gift editions' slots, filled by release.py with their recipes (modules/r268.js, modules/r420.js)
+    _apps += _dr.slot(ident=_dr.SLOTS["full"]) + "\n" + _dr.slot(ident=_dr.SLOTS["gift"]) + "\n"
 # ---- 6.48 (7 November 2026): what the master edition makes the Offline Project from (modules/r246.js): the hall, the devices'
 #      pictures and the icons drawn from the master seal, written by source/offline_project/master_demo/make_op_data.py into
 #      op_make.json. Only where her apps ride along (the master edition, not the lean copy The Forge carries). ----
@@ -2144,6 +2146,11 @@ out = out.replace(_bm, "/*ING_BOOT_MAP*/" + json.dumps(_script_map(out), separat
 if _dm and os.environ.get("ING_DEMO_PAGE"):
     out, _rec = _dr.embed(_tail.untail(out), open(os.environ["ING_DEMO_PAGE"], encoding="utf-8").read())
     out = _tail.tail(out)
+# 8.11: and the Full and Gift editions a test build is given (ING_FULL_PAGE, ING_GIFT_PAGE), the same way
+for _ek, _ev in (("full", "ING_FULL_PAGE"), ("gift", "ING_GIFT_PAGE")):
+    if _dm and os.environ.get(_ev):
+        out, _rec = _dr.embed(_tail.untail(out), open(os.environ[_ev], encoding="utf-8").read(), _ek)
+        out = _tail.tail(out)
 dest =sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "ingenium.html")
 open(dest, "w", encoding="utf-8").write(out)
 print("built", dest, len(out), "bytes;", len(EDITS), "edits;", len(mods), "modules; the", ED, "edition")

@@ -17,7 +17,8 @@ import re
 
 IDS = ("ing-builtin-cd", "ing-builtin-forge", "ing-builtin-inkwell", "ingenium-kit-bundle", "ingenium-engine-wasm",
        "ingenium-engine-compat-wasm", "ing-eyes", "ing-docfonts",
-       "ing-demo-cd", "ing-demo-forge", "ing-demo-ingenium")  # 6.77: the demonstrations the master edition carries (apps/demos)
+       "ing-demo-cd", "ing-demo-forge", "ing-demo-ingenium",  # 6.77: the demonstrations the master edition carries (apps/demos)
+       "ing-edition-full", "ing-edition-gift")  # 8.11: and the Full and Gift editions' recipes (demo_recipe.SLOTS)
 PRE = "ing-tail:"
 
 

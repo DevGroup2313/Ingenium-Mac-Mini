@@ -862,6 +862,7 @@ window.fbKnown=KNOWN;
 function downloadAsApp(r){if(!window.IngDownload){toast("This copy has no Download as an app.");return;}if(!r||!r.head){toast("Keep a first version first.");return;}var P=pkgOf(r),snap=null;
   IngDownload.open({getHtml:function(){busy("Reading the version you kept…");return IngShip.onePage(r.id,{quiet:true,target:"download"}).then(function(x){unbusy();snap=x;return x.html;},function(e){unbusy();fail(e);return "";});},
     title:P.title,id:P.id,version:P.version||verOf(r)||"",keyId:P.keyId,app:P.app,alias:P.alias,
+    top:function(app,idb){if(window.IngEditions)IngEditions.select(idb,r,{onChange:function(){try{closeModal();}catch(e){}setTimeout(function(){downloadAsApp(r);},80);}});},  /* 8.11 */
     onMade:function(k,name,mime,bytes){if(!snap)return;var kind={kits:"kits",mac:"mac",windows:"win",ipa:"ipa",apk:"apk",web:"web",html:"page"}[k]||"page";
       return keepMade(r,snap.commit,kind,name,mime,bytes).then(function(){return IngRepo.setNote(r.id,snap.commit,NOTE[kind],{at:Date.now(),size:bytes.length,name:name});}).then(function(){return refresh();}).then(paint);}});}
 var KITS=[["fire","Fire tablet"],["iphone","iPhone"],["ipad","iPad"],["mac","MacBook (Intel)"],["macarm","Mac mini (Apple silicon)"],["windows","Windows"]];
@@ -873,6 +874,8 @@ function slugId(r){var s=String(r.slug||r.name||"app").toLowerCase().replace(/[^
 function pkgOf(r){var p=shipPrefs(r),k=appOf(r),K=KNOWN[k]||{};
   return {title:(p.title||r.name||"My app").slice(0,50),id:p.id||K.id||slugId(r),version:p.version||"",keyId:p.keyId||"device",alias:p.alias!=null?p.alias:(K.alias||""),
     and:K.and||["CarpeNative"],ios:K.ios||["CarpeNative","pywebview"],app:k,note:K.note||""};}
+/* 8.11 (modules/r420.js): the edition she chose for this app names the package, its id and its version */
+var pkgOfKept=pkgOf;pkgOf=function(r){var P=pkgOfKept(r);try{if(window.IngEditions)P=IngEditions.pkg(r,P)||P;}catch(e){}return P;};
 function paintShip(){var r=cur(),cb=$("fbChecks");cb.innerHTML="";var n=r?notesOf(r):{},t=n.test,live=S.testing&&r&&S.testing.id===r.id?S.testing:null;
   CHECKS.forEach(function(c,i){var st="",det=c[2],mark="○";var got=live?live.checks.filter(function(x){return x.id===c[0];})[0]:(t?t.checks.filter(function(x){return x.id===c[0];})[0]:null);
     if(live&&!got&&live.checks.length===i)st="run";
@@ -902,7 +905,8 @@ function paintShip(){var r=cur(),cb=$("fbChecks");cb.innerHTML="";var n=r?notesO
     if(window.IngScramble&&IngScramble.lineFor(r.id))pk.appendChild(h("span","r356-line",esc(IngScramble.lineFor(r.id))));  /* 7.67 (modules/r356.js) */
     pk.appendChild(btn("quiet sm","Package details",function(){sheetPackage(r);}));
     if(window.IngAppSign)pk.appendChild(btn("quiet sm","Check a package",function(){IngAppSign.checkFile();}));  /* 7.60 (modules/r349.js) */
-    if(window.IngDownload&&r.head)pk.appendChild(btn("sm","📦 Download as an app…",function(){downloadAsApp(r);}));}
+    if(window.IngDownload&&r.head)pk.appendChild(btn("sm","📦 Download as an app…",function(){downloadAsApp(r);}));
+    if(window.IngEditions){try{IngEditions.row(pk,r);}catch(e){}}}  /* 8.11 (modules/r420.js): which edition every package carries */
   var chosen=r?pref.chosen.filter(targetHere):[],all=r&&chosen.length&&chosen.every(function(k){return !!n[NOTE[k]];});
   var ss=$("fbShipState");ss.className="f-chip"+(all?" ok":"");ss.innerHTML=!r?"":all?'<span class="d"></span>Made':r.head?(tested(r)?"Ready to make":"After its test"):"After a first version";
   var mb=$("fbMakeAll");mb.disabled=!r||!r.head||!!mk||!chosen.length;mb.textContent=mk?"Making…":!chosen.length?"Choose what to make above":(all?"Make the chosen again":"Make the chosen")+" ("+chosen.length+")";mb.className="f-btn pri"+(r&&stepOf(r)==="ship"?" next":"");

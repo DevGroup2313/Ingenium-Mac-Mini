@@ -74,12 +74,18 @@ function inkwell(){return once("inkwell",function(){if(!DM.inkwell)return fail("
 function lean(){return once("lean",function(){return packed("ing-builtin-forge","The lean Forge",DM.forge.base);});}
 
 /* ---------- 2. Ingenium's demo edition, from its recipe ---------- */
-var SLOT="ing-demo-ingenium";
-function carriesIngenium(){var e=el(SLOT);return !!e&&!!(e.getAttribute("data-defer")||e.textContent.trim());}
-function ingenium(){return once("ingenium",function(){
-  if(!carriesIngenium())return fail("This copy carries no demo edition of Ingenium (a test build carries none unless it is given one).");
-  return blockText(SLOT,"Ingenium's demo edition").then(function(t){return gunzip(b64bytes(t.trim()));}).then(function(u8){var rec=JSON.parse(text(u8));u8=null;
-    if(!rec||rec.v!==2||!rec.srcs||!rec.ops)throw new Error("Ingenium's demo edition: its recipe could not be read.");
+/* 8.11: and its full and gift editions, each from its own recipe in its own slot (demo_recipe.SLOTS). Her words (28 November 2026):
+   "I want all of the editions of all of my apps built into the master edition for all of my devices, not just the master edition.
+   I want full authorship and agency over all of the editions." */
+var SLOT="ing-demo-ingenium",ED_SLOTS={demo:SLOT,full:"ing-edition-full",gift:"ing-edition-gift"};
+function carriesIngenium(k){var e=el(ED_SLOTS[k||"demo"]);return !!e&&!!(e.getAttribute("data-defer")||e.textContent.trim());}
+function carriedEditions(){return ["full","gift","demo"].filter(function(k){return carriesIngenium(k);});}
+function ingenium(){return edition("demo");}
+function edition(k){k=k||"demo";if(!ED_SLOTS[k])return fail("Ingenium has no "+k+" edition.");var what="Ingenium's "+k+" edition";
+  return once("ingenium-"+k,function(){
+  if(!carriesIngenium(k))return fail("This copy carries no "+k+" edition of Ingenium (a test build carries none unless it is given one).");
+  return blockText(ED_SLOTS[k],what).then(function(t){return gunzip(b64bytes(t.trim()));}).then(function(u8){var rec=JSON.parse(text(u8));u8=null;
+    if(!rec||rec.v!==2||!rec.srcs||!rec.ops)throw new Error(what+": its recipe could not be read.");
     /* the parts of this page it copies from (demo_recipe.py): a block by its id (fetched first where it is carried for later), and the
        page's own code by its id, or else by its length and fingerprint */
     var bytes=[],codes=null,p=Promise.resolve();
@@ -89,17 +95,19 @@ function ingenium(){return once("ingenium",function(){
       return (function next(){if(i>=c.length)throw stale();var b=enc.encode(c[i++].textContent);return sha(b).then(function(h){return h===s.sha?b:next();});})();}
     rec.srcs.forEach(function(s,i){p=p.then(function(){
       if(!s.id)return byPrint(s);
-      if(!el(s.id))throw new Error("Ingenium's demo edition needs a part this copy's page does not hold ("+s.id+"). The phone and tablet apps leave the engine and the kit store out of their page: make it in the computer app, or from the page in a browser.");
+      if(!el(s.id))throw new Error(what+" needs a part this copy's page does not hold ("+s.id+"). The phone and tablet apps leave the engine and the kit store out of their page: make it in the computer app, or from the page in a browser.");
       /* 7.01: a part may hold only blank space (a style block whose rules were all comments keeps its line break, r158-css): its length is
          what counts, so it is taken as it is, never refused as missing (7.00 could not make the Offline Project for this) */
       return Promise.resolve(typeof W.ingFill==="function"?W.ingFill(s.id):null).then(function(){var tx=el(s.id).textContent;if(tx.length!==s.len)throw stale();return enc.encode(tx);},
         function(x){throw new Error("A part of Ingenium ("+s.id+") could not be read from this copy ("+(x&&x.message||x)+").");});}).then(function(b){bytes[i]=b;});});
     return p.then(function(){var out=new Uint8Array(rec.size),at=0;codes=null;
       rec.ops.forEach(function(op){var b=typeof op==="string"?enc.encode(op):bytes[op[0]].subarray(op[1],op[1]+op[2]);
-        if(at+b.length>out.length)throw new Error("Ingenium's demo edition did not come back whole.");out.set(b,at);at+=b.length;});
-      bytes=null;if(at!==rec.size)throw new Error("Ingenium's demo edition did not come back whole (its size differs).");
-      return sha(out).then(function(h){if(h!==rec.sha256)throw new Error("Ingenium's demo edition did not come back whole (its fingerprint differs).");
-        return {key:"ingenium",u8:out,version:rec.version,edition:"demo",sha256:rec.sha256,what:"Ingenium "+rec.version+" · demo edition"};});});});});}
+        if(at+b.length>out.length)throw new Error(what+" did not come back whole.");out.set(b,at);at+=b.length;});
+      bytes=null;if(at!==rec.size)throw new Error(what+" did not come back whole (its size differs).");
+      return sha(out).then(function(h){if(h!==rec.sha256)throw new Error(what+" did not come back whole (its fingerprint differs).");
+        /* the page must be the edition it is named for, and carry nothing of hers: no app library, no owner's hand, no master edition */
+        if(!has(out,'var ING_EDITION="'+k+'"')||has(out,'id="ing-builtin-')||has(out,'id="ing-tail:ing-builtin-')||has(out,"sg-owner-hand"))throw new Error(what+": this page is not that edition.");
+        return {key:"ingenium",u8:out,version:rec.version,edition:k,sha256:rec.sha256,size:rec.size,what:"Ingenium "+rec.version+" · "+k+" edition"};});});});});}
 
 /* ---------- 3. The Forge's demonstration, made by her recipe ---------- */
 function recipe(){return once("recipe",function(){return packed("ing-demo-forge","The Forge's demonstration",{size:DM.forge.size,sha256:DM.forge.sha256}).then(function(u8){var r=JSON.parse(text(u8));
@@ -163,6 +171,7 @@ function why(four){if(!can())return "This window cannot compress pages (it lacks
   return "";}
 function release(){KEEP={};}
 W.IngDemos={meta:DM,can:can,why:why,plan:plan,page:page,check:check,cd:cd,inkwell:inkwell,ingenium:ingenium,forge:forge,ownPage:ownPage,release:release,
+  edition:edition,editions:carriedEditions,carries:carriesIngenium,
   bytes:{gzip:gzip,gunzip:gunzip,b64:bytesb64,unb64:b64bytes,sha:sha,join:join,find:find}};
 try{W.__ingParts["p268"]="running";}catch(_){}
 })();

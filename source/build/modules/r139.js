@@ -147,6 +147,8 @@ function open(opt){opt=opt||{};
     var idb=box.querySelector(".dl-id");
     function field(label,cls,val,ph){var l=E("label");l.appendChild(document.createTextNode(label));var i=E("input",cls);i.type="text";i.value=val;i.spellcheck=false;i.autocapitalize="off";if(ph)i.placeholder=ph;l.appendChild(i);idb.appendChild(l);return i;}
     var fT=field("Name under the icon","dl-wt",P.title),fI=field("App id","dl-wid",P.id,"com.yourname.myapp"),fV=field("Version","dl-wv",P.version);
+    /* 8.11 (modules/r420.js): an app with editions of its own (Ingenium's Full, Gift and Demo) names the edition first; choosing another opens this again with it */
+    if(typeof opt.top==="function"){try{opt.top(box.querySelector(".dl-app"),idb);}catch(e){}}
     /* 7.26: the publishing name on its plate below these fields (modules/r309.js, as her approved preview); Change turns it into a field */
     var pubPl=window.IngPublisher&&IngPublisher.plate?IngPublisher.plate():null;if(pubPl&&idb.parentNode)idb.parentNode.insertBefore(pubPl.el,idb.nextSibling);
     var kl=E("label");kl.appendChild(document.createTextNode("Signing key (Android)"));var ks=E("select");kl.appendChild(ks);idb.appendChild(kl);

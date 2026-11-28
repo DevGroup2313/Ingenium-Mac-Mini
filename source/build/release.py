@@ -192,9 +192,13 @@ def self_stamp():
 
 
 DEMO_PAGE = os.path.join(H, "ingenium_demo.html")  # 6.77: the demo edition of this release, built by page() before the master page
+# 8.11: the Full and Gift editions too, built by page() from the same commits, so the master page carries every edition as a recipe
+# (demo_recipe.SLOTS) and editions() publishes these very pages. Her words (28 November 2026): "I want all of the editions of all of
+# my apps built into the master edition for all of my devices, not just the master edition."
+ED_PAGES = {"demo": DEMO_PAGE, "full": os.path.join(H, "ingenium_full.html"), "gift": os.path.join(H, "ingenium_gift.html")}
 
 
-def build(out, edition="master", demo=None):
+def build(out, edition="master", demo=None, others=None):
     """The release page of one edition (editions.py: master, full, gift, demo) into out: built, stamped with the version,
     and given the kit store read from the repositories' last commits. Returns the page.
     6.77: demo names the demo edition built just before (the same commits, the same day): the master page is given its recipe
@@ -261,6 +265,13 @@ def build(out, edition="master", demo=None):
             sys.exit("the demo edition given is version %s, not %s" % (rec["version"], vj["v"]))
         if not any(s.get("id") == SLOT for s in rec["srcs"]):
             print("NOTE: the demo edition's kit store differs from this page's, so it is carried whole (were both built from the same commits?)")
+    for ek, ep in sorted((others or {}).items()):  # 8.11: the Full and Gift editions' recipes, proved the same way
+        assert edition == "master", "only the master edition carries the other editions"
+        pg, rec = demo_recipe.embed(pg, open(ep, encoding="utf-8").read(), ek)
+        if rec["version"] != vj["v"]:
+            sys.exit("the %s edition given is version %s, not %s" % (ek, rec["version"], vj["v"]))
+        if not any(s.get("id") == SLOT for s in rec["srcs"]):
+            print("NOTE: the %s edition's kit store differs from this page's, so it is carried whole (were both built from the same commits?)" % ek)
     pg = tail.tail(pg)  # 6.8.1: and at the end of the page again, after its last part
     open(out, "w", encoding="utf-8").write(pg)
     # 7.66: the page's size in bytes as written (UTF-8); len(pg) is the length of its text, a little shorter (7.65's notes gave that)
@@ -270,9 +281,14 @@ def build(out, edition="master", demo=None):
 
 def page():
     """The master edition into the four repositories (the owner's own apps are built from it).
-    6.77: the demo edition is built first, from the same commits, and the master page carries it as a recipe."""
-    build(DEMO_PAGE, "demo")
-    pg = build(os.path.join(H, "ingenium.html"), demo=DEMO_PAGE)
+    6.77: the demo edition is built first, from the same commits, and the master page carries it as a recipe.
+    8.11: the full and gift editions too: the master page carries all three, and editions() publishes these very pages."""
+    for ek in ("demo", "full", "gift"):
+        build(ED_PAGES[ek], ek)
+    pg = build(os.path.join(H, "ingenium.html"), demo=DEMO_PAGE, others={k: ED_PAGES[k] for k in ("full", "gift")})
+    # GitHub keeps no file over 100 MiB: say so here, before anything is committed, rather than at the push
+    if len(pg.encode("utf-8")) > 100 * 1024 * 1024:
+        sys.exit("the master page is %d bytes, more than GitHub keeps in one file (100 MiB)" % len(pg.encode("utf-8")))
     for k, repo in R.items():
         open(os.path.join(repo, "ingenium.html"), "w", encoding="utf-8").write(pg)
     ship_rag()
@@ -346,16 +362,17 @@ def editions():
     vj = json.load(open(os.path.join(H, "version.json")))
     d = os.path.join(R["mini"], "editions")
     names = ["ingenium_%s.html" % e for e in ("full", "gift", "demo")]
-    # 6.77: the demo edition is the very one page() built and the master page carries (its fingerprint is in the page's slot)
+    # 6.77: the demo edition is the very one page() built and the master page carries (its fingerprint is in the page's slot);
+    # 8.11: so are the full and gift editions, each in its own slot. An edition the master page does not carry is built here.
     mp = open(os.path.join(R["mini"], "ingenium.html"), encoding="utf-8").read()
-    slot = re.search(r'<script id="(?:ing-tail:)?%s"[^>]*\bdata-sha256="([0-9a-f]{64})"' % demo_recipe.SLOT, mp)
     for e, n in zip(("full", "gift", "demo"), names):
-        if e == "demo" and slot:
-            if not os.path.exists(DEMO_PAGE) or fingerprint.sha(DEMO_PAGE) != slot.group(1):
-                sys.exit("the demo edition the master page carries is not beside release.py: run release.py page again")
+        slot = re.search(r'<script id="(?:ing-tail:)?%s"[^>]*\bdata-sha256="([0-9a-f]{64})"' % demo_recipe.SLOTS[e], mp)
+        if slot:
+            if not os.path.exists(ED_PAGES[e]) or fingerprint.sha(ED_PAGES[e]) != slot.group(1):
+                sys.exit("the %s edition the master page carries is not beside release.py: run release.py page again" % e)
             import shutil
-            shutil.copyfile(DEMO_PAGE, os.path.join(d, n))
-            print("demo edition: the one the master page carries (%s)" % slot.group(1)[:16])
+            shutil.copyfile(ED_PAGES[e], os.path.join(d, n))
+            print("%s edition: the one the master page carries (%s)" % (e, slot.group(1)[:16]))
         else:
             build(os.path.join(d, n), e)
         t = open(os.path.join(d, n), encoding="utf-8").read()
