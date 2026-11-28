@@ -104,14 +104,17 @@ const NAME = 'Ada Example', PW = 'tide-clock-harbour-41';
   await p.evaluate(() => { window.__pvOld = 1; try { openPresenceMenu(); } catch (e) {} document.getElementById('r344Out').click(); }); await fresh();
   await p.waitForSelector('#profDoor:not([hidden]) .r331-door .r344-door-out', { timeout: 120000 }).catch(() => {}); await p.waitForTimeout(400);
   const n1 = await p.evaluate(() => { const l = document.getElementById('ingLockDoor'), box = document.querySelector('#profDoor .r331-door'), o = document.querySelector('#profDoor .r344-door-out');
-    return { lockNight: !!(l && l.classList.contains('ild-night')), card: box ? getComputedStyle(box).backgroundColor : '', ink: o ? getComputedStyle(o).color : '' }; });
-  ok(n1.lockNight && n1.card === 'rgb(32, 26, 43)' && n1.ink === 'rgb(211, 201, 227)', 'by night (Night chosen, then Sign out): Who is using Ingenium is in the night colours on the night door, never a day card', n1);
+    const st = document.getElementById('sioStage');   /* 8.08 (r410): on the Sign-in Orbit there is no card; the orbit's own night ground stands behind the profiles */
+    return { lockNight: !!(l && l.classList.contains('ild-night')), card: box ? getComputedStyle(box).backgroundColor : '', ink: o ? getComputedStyle(o).color : '', orbit: document.body.classList.contains('sio-on'), orbitNight: !!(st && st.classList.contains('night')), said: st ? (st.querySelector('.sio-hello') || {}).textContent : '' }; });
+  ok(n1.lockNight && ((n1.card === 'rgb(32, 26, 43)' && n1.ink === 'rgb(211, 201, 227)') || (n1.orbit && n1.orbitNight && n1.said === 'Signed out')), 'by night (Night chosen, then Sign out): Who is using Ingenium is in the night colours on the night door, never a day card', n1);
   await p.evaluate(() => { const c = document.querySelector('#profDoor button[data-door="owner"]'); if (c) c.click(); }); await p.waitForTimeout(800);
   const n2 = await p.evaluate(() => { const k = document.querySelector('#ingLockDoor .r331-else'); return k ? getComputedStyle(k).backgroundImage + ' | ' + getComputedStyle(k).color : 'no key'; });
   ok(/rgb\(42, 34, 57\)/.test(n2) && /rgb\(246, 241, 253\)/.test(n2), 'by night, her sign-in\'s "Someone else? Choose a profile" key is in the night colours too', n2);
   await p.evaluate(() => document.querySelector('#ingLockDoor .r331-else').click()); await p.waitForTimeout(600);
-  const n3 = await p.evaluate(() => { const box = document.querySelector('#profDoor:not([hidden]) .r331-door'); return box ? getComputedStyle(box).backgroundColor : 'no door'; });
-  ok(n3 === 'rgb(32, 26, 43)', 'and the profiles that key opens are in the night colours', n3);
+  const n3 = await p.evaluate(() => { const box = document.querySelector('#profDoor:not([hidden]) .r331-door'), st = document.getElementById('sioStage');
+    if (document.body.classList.contains('sio-on') && box) return st && st.classList.contains('night') ? 'orbit by night' : 'orbit by day';   /* 8.08: the profiles stand on the night orbit */
+    return box ? getComputedStyle(box).backgroundColor : 'no door'; });
+  ok(n3 === 'rgb(32, 26, 43)' || n3 === 'orbit by night', 'and the profiles that key opens are in the night colours', n3);
   await p.evaluate(() => { const c = document.querySelector('#profDoor button[data-door="owner"]'); if (c) c.click(); }); await p.waitForTimeout(800);
   await p.fill('#ingLockDoor #ildPw', PW); await p.click('#ingLockDoor #ildGo'); await p.waitForFunction(() => window.__ingReady === true && !document.querySelector('#ingLockDoor:not([hidden]) #ildPw'), null, { timeout: 120000, polling: 500 }); await p.waitForTimeout(2000);
   ok(await p.evaluate(() => document.body.getAttribute('data-theme') === 'night' && state.theme === 'night'), 'signed in again: her desk by night, as she left it');

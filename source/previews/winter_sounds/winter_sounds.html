@@ -1,0 +1,290 @@
+<title>Winter Sounds</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f7f4fb;--card:#ffffff;--ink:#221a2e;--ink2:#51486a;--ink3:#776f8c;--acc:#6a3fb5;--acc2:#5b33a0;--line:rgba(60,35,110,.12);--chip:#efe9f8;--on:#6a3fb5;--onfg:#fff;--warm:#efe8fa;
+  --sh:0 1px 1px rgba(40,22,68,.04),0 4px 10px rgba(40,22,68,.06);--shh:0 2px 2px rgba(40,22,68,.05),0 10px 24px rgba(40,22,68,.12);
+  --serif:"Cormorant Garamond",Cormorant,"Iowan Old Style",Palatino,Georgia,serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#130e1d;--card:#1d1629;--ink:#f2edf9;--ink2:#cdc3df;--ink3:#a297b8;--acc:#c3a8f0;--acc2:#d6c1f6;--line:rgba(205,184,240,.14);--chip:#251d35;--on:#b79ce6;--onfg:#170f24;--warm:#241b34;
+  --sh:0 1px 1px rgba(0,0,0,.3),0 4px 10px rgba(0,0,0,.3);--shh:0 2px 2px rgba(0,0,0,.35),0 10px 24px rgba(0,0,0,.45);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#130e1d;--card:#1d1629;--ink:#f2edf9;--ink2:#cdc3df;--ink3:#a297b8;--acc:#c3a8f0;--acc2:#d6c1f6;--line:rgba(205,184,240,.14);--chip:#251d35;--on:#b79ce6;--onfg:#170f24;--warm:#241b34;
+  --sh:0 1px 1px rgba(0,0,0,.3),0 4px 10px rgba(0,0,0,.3);--shh:0 2px 2px rgba(0,0,0,.35),0 10px 24px rgba(0,0,0,.45);color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px}
+.wrap{max-width:980px;margin:0 auto}
+h1{margin:0;font:600 38px/1.08 var(--serif);text-wrap:balance}
+.lead{margin:10px 0 0;color:var(--ink2);max-width:70ch}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:18px 0 6px}
+.lbl{font:600 11.5px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+.vol{display:flex;align-items:center;gap:10px}
+.vol input{accent-color:var(--acc);width:160px}
+h2{margin:30px 0 4px;font:600 13px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--acc)}
+.sub{margin:0 0 12px;color:var(--ink3);font-size:13.5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.card{position:relative;display:grid;grid-template-columns:52px 1fr;gap:4px 14px;align-items:start;padding:16px 16px 14px;border-radius:18px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line),var(--sh);
+  transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s ease;min-width:0}
+.card:hover{transform:translateY(-2px);box-shadow:inset 0 0 0 1px var(--line),var(--shh)}
+.card.playing{box-shadow:inset 0 0 0 1.5px var(--acc),var(--shh)}
+.ico{grid-row:span 3;width:52px;height:52px;border-radius:15px;display:grid;place-items:center;background:var(--warm);color:var(--acc)}
+.ico svg{width:28px;height:28px}
+.nm{font:600 21px/1.15 var(--serif);margin:2px 0 0;min-width:0}
+.ds{margin:0;color:var(--ink2);font-size:13.5px;line-height:1.45;min-width:0}
+.row{display:flex;align-items:center;gap:10px;margin-top:8px}
+.play{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:12px;padding:9px 15px;font:600 14px/1 var(--sans);cursor:pointer;color:var(--onfg);background:var(--on);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 2px 0 rgba(40,20,80,.35),0 4px 8px rgba(40,20,80,.18);transition:transform .12s ease}
+.play:active{transform:translateY(1px)}
+.play svg{width:14px;height:14px}
+.state{font-size:12.5px;color:var(--ink3)}
+.meter{position:absolute;left:16px;right:16px;bottom:0;height:3px;border-radius:3px;overflow:hidden;opacity:0;transition:opacity .3s}
+.card.playing .meter{opacity:1}
+.meter i{display:block;height:100%;width:30%;background:linear-gradient(90deg,transparent,var(--acc),transparent);animation:mv 2.6s ease-in-out infinite}
+@keyframes mv{0%{transform:translateX(-100%)}100%{transform:translateX(340%)}}
+@media (prefers-reduced-motion:reduce){.meter i{animation:none;width:100%;opacity:.5}.card{transition:none}}
+.note{margin:28px 0 0;padding:14px 16px;border-radius:14px;background:var(--chip);color:var(--ink2);font-size:13.5px;max-width:78ch}
+</style>
+<div class="wrap">
+  <h1>Winter sounds, and more</h1>
+  <p class="lead">Six new places for Ingenium's nature sounds, made the way the ones you love are made: no hiss, a soft bed that moves, and a few real things in it. Press Play to hear one; each is made on this device the first time, so it takes a moment. Then tell me which to keep, and what to change.</p>
+  <div class="bar"><span class="lbl">Volume</span><span class="vol"><input type="range" id="vol" min="0" max="100" value="80" aria-label="Volume"></span></div>
+  <h2>Winter, new</h2><p class="sub">Snow, as you asked to hear it, beside Noel.</p><div class="grid" id="gWinter"></div>
+  <h2>More nature sounds, new</h2><p class="sub">One each for Water, Rain and Night.</p><div class="grid" id="gMore"></div>
+  <h2>To compare</h2><p class="sub">Two you already have and like, as they play in Ingenium now.</p><div class="grid" id="gOld"></div>
+  <p class="note">These play exactly as they would in Ingenium: the same making, the same calm level and the same seamless loop. Nothing is fetched; nothing is stored.</p>
+</div>
+<script>
+(function(){"use strict";var W=window,D=document;var ac=null,mst=null,cur=null,BUF={};
+function ctx(){var C=W.AudioContext||W.webkitAudioContext;if(!C)return null;if(!ac){ac=new C();mst=ac.createGain();mst.gain.value=0.8;var cmp=ac.createDynamicsCompressor();cmp.threshold.value=-18;cmp.ratio.value=2.5;mst.connect(cmp);cmp.connect(ac.destination);}
+  if(ac.state!=="running"){try{ac.resume();}catch(e){}}return ac;}
+/* the app's own kit (modules/r295.js), as it is */
+  function rnd(seed){var s=seed>>>0||1;return function(){s^=s<<13;s^=s>>>17;s^=s<<5;return (s>>>0)/4294967296;};}
+  function biq(type,f,Q,sr){var w=2*Math.PI*f/sr,cs=Math.cos(w),sn=Math.sin(w),al=sn/(2*Q),b0,b1,b2,a0=1+al,a1=-2*cs,a2=1-al;
+    if(type==="lp"){b0=(1-cs)/2;b1=1-cs;b2=b0;}else if(type==="hp"){b0=(1+cs)/2;b1=-(1+cs);b2=b0;}else{b0=al;b1=0;b2=-al;}
+    b0/=a0;b1/=a0;b2/=a0;a1/=a0;a2/=a0;var x1=0,x2=0,y1=0,y2=0;return function(x){var y=b0*x+b1*x1+b2*x2-a1*y1-a2*y2;x2=x1;x1=x;y2=y1;y1=y;return y;};}
+  function pinkGen(r){var b0=0,b1=0,b2=0;return function(){var w=r()*2-1;b0=0.99765*b0+w*0.0990460;b1=0.96300*b1+w*0.2965164;b2=0.57000*b2+w*1.0526913;return (b0+b1+b2+w*0.1848)*0.18;};}
+  function brownGen(r){var l=0;return function(){l=(l+0.02*(r()*2-1))/1.02;return l*3.5;};}
+  function mk(sec){var sr=ac.sampleRate,n=Math.floor(sr*sec);return {sr:sr,n:n,L:new Float32Array(n),R:new Float32Array(n)};}
+  function verb(B,wet,fb){var sc=B.sr/44100,cd=[1116,1188,1277,1356],ad=[556,441];
+    function side(inp,off){var out=new Float32Array(inp.length),cs=cd.map(function(d){return {b:new Float32Array(Math.floor((d+off)*sc)),i:0,f:0};}),as=ad.map(function(d){return {b:new Float32Array(Math.floor((d+off)*sc)),i:0};});
+      for(var n=0;n<inp.length;n++){var x=inp[n]*0.25,s=0;for(var c=0;c<4;c++){var C=cs[c],y=C.b[C.i];C.f=y*0.75+C.f*0.25;C.b[C.i]=x+C.f*fb;C.i=(C.i+1)%C.b.length;s+=y;}
+        for(var a=0;a<2;a++){var A=as[a],bo=A.b[A.i],v=-s+bo;A.b[A.i]=s+bo*0.5;A.i=(A.i+1)%A.b.length;s=v;}out[n]=s;}return out;}
+    var wl=side(B.L,0),wr=side(B.R,23);for(var n=0;n<B.n;n++){B.L[n]+=wl[n]*wet;B.R[n]+=wr[n]*wet;}}
+  /* the loop's end folds into its start; the level set to a quiet, even loudness, never clipping */
+  /* how loud a sound is to the ear (the weighting of ITU-R BS.1770: a high-pass near 38 Hz and a 4 dB shelf above about 1.7 kHz), so that every
+     place plays at the same calm level as the stream */
+  function loud(chs,sr){var A=Math.pow(10,4/40),w=2*Math.PI*1681.97/sr,cs=Math.cos(w),al=Math.sin(w)/(2*0.7072),sA=2*Math.sqrt(A)*al,a0=(A+1)-(A-1)*cs+sA,
+      F=[[A*((A+1)+(A-1)*cs+sA)/a0,-2*A*((A-1)+(A+1)*cs)/a0,A*((A+1)+(A-1)*cs-sA)/a0,2*((A-1)-(A+1)*cs)/a0,((A+1)-(A-1)*cs-sA)/a0]],w2=2*Math.PI*38.13/sr,c2=Math.cos(w2),a2=Math.sin(w2)/(2*0.5003),b0=1+a2,ms=0;
+    F.push([(1+c2)/2/b0,-(1+c2)/b0,(1+c2)/2/b0,-2*c2/b0,(1-a2)/b0]);
+    chs.forEach(function(x){var t=[0,0,0,0,0,0,0,0],q=0;for(var i=0;i<x.length;i++){var y=x[i];for(var k=0;k<2;k++){var c=F[k],o=k*4,v=c[0]*y+c[1]*t[o]+c[2]*t[o+1]-c[3]*t[o+2]-c[4]*t[o+3];t[o+1]=t[o];t[o]=y;t[o+3]=t[o+2];t[o+2]=v;y=v;}q+=y*y;}ms+=q/x.length;});
+    return 10*Math.log10(ms||1e-12)-0.691;}
+  var LEVEL=-34;
+  /* the loop's end folds into its start; the level set to the same calm loudness as the stream, never clipping */
+  function finish(B,fade,db){var f=Math.floor(B.sr*fade),n=B.n,m=n-f,k,pk=0;for(k=0;k<f;k++){var w=k/f;B.L[k]=B.L[k]*w+B.L[m+k]*(1-w);B.R[k]=B.R[k]*w+B.R[m+k]*(1-w);}
+    var L=B.L.subarray(0,m),R=B.R.subarray(0,m);for(k=0;k<m;k++)pk=Math.max(pk,Math.abs(L[k]),Math.abs(R[k]));var g=Math.pow(10,((LEVEL+db)-loud([L,R],B.sr))/20);if(pk*g>0.92)g=0.92/pk;
+    var ab=ac.createBuffer(2,m,B.sr),l=ab.getChannelData(0),r=ab.getChannelData(1);for(k=0;k<m;k++){l[k]=L[k]*g;r[k]=R[k]*g;}return ab;}
+  function burst(B,t0,dur,amp,pan,filt,r){var i0=Math.floor(t0*B.sr),len=Math.floor(dur*B.sr);for(var j=0;j<len&&i0+j<B.n;j++){var x=filt(r()*2-1)*amp*Math.exp(-j/(len*0.3));B.L[i0+j]+=x*(1-pan);B.R[i0+j]+=x*pan;}}
+  function tone(B,t0,dur,f0,f1,amp,pan,vib,lp){var i0=Math.floor(t0*B.sr),len=Math.floor(dur*B.sr),ph=0;for(var j=0;j<len&&i0+j<B.n;j++){var u=j/len,fr=f0+(f1-f0)*(u<0.5?2*u*u:1-2*(1-u)*(1-u))+vib*Math.sin(2*Math.PI*27*j/B.sr);ph+=2*Math.PI*fr/B.sr;
+      var x=(Math.sin(ph)+0.10*Math.sin(2*ph))*amp*Math.pow(Math.sin(Math.PI*u),0.7);if(lp)x=lp(x);B.L[i0+j]+=x*(1-pan);B.R[i0+j]+=x*pan;}}
+
+var K={mk:mk,rnd:rnd,biq:biq,pinkGen:pinkGen,brownGen:brownGen,verb:verb,finish:finish,burst:burst,tone:tone};
+/*R411_DEFS_START*/
+function defs_R411(K){
+  var PI2=2*Math.PI;
+  function note(B,t0,dur,f,amp,pan,o){o=o||{};var i0=Math.floor(t0*B.sr),len=Math.floor(dur*B.sr),ph=0,h2=o.h2==null?0.12:o.h2,h3=o.h3||0,at=o.at||0.18,lp=o.lp||null,fm=o.fm||0,fmr=o.fmr||0;
+    for(var j=0;j<len&&i0+j<B.n;j++){if(i0+j<0)continue;var u=j/len,fr=f(u)*(1+fm*Math.sin(PI2*fmr*j/B.sr));ph+=PI2*fr/B.sr;
+      var e=u<at?Math.sin(Math.PI/2*u/at):Math.pow(Math.cos(Math.PI/2*(u-at)/(1-at)),1.4);
+      var x=(Math.sin(ph)+h2*Math.sin(2*ph)+h3*Math.sin(3*ph))*amp*e;if(lp)x=lp(x);B.L[i0+j]+=x*(1-pan);B.R[i0+j]+=x*pan;}}
+  function glide(a,b,shape){return function(u){var s=shape==="up"?u*u:shape==="dn"?1-(1-u)*(1-u):shape==="arc"?Math.sin(Math.PI*u):u;return a+(b-a)*s;};}
+  function grain(B,t0,dur,amp,pan,filt,r,tau){var i0=Math.floor(t0*B.sr),len=Math.max(1,Math.floor(dur*B.sr)),tt=len*(tau||0.3);if(pan<0)pan=0;if(pan>1)pan=1;
+    for(var j=0;j<len&&i0+j<B.n;j++){if(i0+j<0)continue;var x=filt(r()*2-1)*amp*Math.min(1,j/(B.sr*0.0004))*Math.exp(-j/tt);B.L[i0+j]+=x*(1-pan);B.R[i0+j]+=x*pan;}}
+  function ping(B,t0,f0,rise,tau,amp,pan){var i0=Math.floor(t0*B.sr),len=Math.floor(tau*5*B.sr),ph=0;if(pan<0)pan=0;if(pan>1)pan=1;
+    for(var j=0;j<len&&i0+j<B.n;j++){var u=j/len;ph+=PI2*f0*(1+(rise-1)*u)/B.sr;var x=Math.sin(ph)*amp*Math.min(1,j/(B.sr*0.001))*Math.exp(-j/(tau*B.sr));B.L[i0+j]+=x*(1-pan);B.R[i0+j]+=x*pan;}}
+  function drift(r,sec,rate,sr){var pts=[],n=Math.ceil(sec*rate)+2,k;for(k=0;k<n;k++)pts.push(r());pts[n-1]=pts[0];pts[n-2]=pts[1];
+    return function(i){var x=i/sr*rate,a=Math.floor(x),f=x-a,p=pts[a%n],q=pts[(a+1)%n];return p+(q-p)*(0.5-0.5*Math.cos(Math.PI*f));};}
+  function bed(B,gen,filts,amp,mod){for(var i=0;i<B.n;i++){var m=mod?mod(i):1,xl=gen[0](),xr=gen[1]();for(var f=0;f<filts.length;f++){xl=filts[f][0](xl);xr=filts[f][1](xr);}B.L[i]+=xl*amp*m;B.R[i]+=xr*amp*m;}}
+  function pair(type,f,Q,sr){return [K.biq(type,f,Q,sr),K.biq(type,f,Q,sr)];}
+  /* a swell of filtered noise: quick to rise (att, a share of its length), slow to die away; a wave meeting stones, snow sliding */
+  function swell(B,t0,dur,amp,pan,filt,r,att){var i0=Math.floor(t0*B.sr),len=Math.max(1,Math.floor(dur*B.sr)),A=att||0.2;if(pan<0)pan=0;if(pan>1)pan=1;
+    for(var j=0;j<len&&i0+j<B.n;j++){if(i0+j<0)continue;var u=j/len,e=u<A?Math.sin(Math.PI/2*u/A):Math.pow(Math.cos(Math.PI/2*(u-A)/(1-A)),1.6);var x=filt(r()*2-1)*amp*e;B.L[i0+j]+=x*(1-pan);B.R[i0+j]+=x*pan;}}
+  /* a soft low thud, felt more than heard: snow packing down, a clump landing, a log settling */
+  function thud(B,t0,dur,amp,pan,filt,r){var i0=Math.floor(t0*B.sr),len=Math.max(1,Math.floor(dur*B.sr));if(pan<0)pan=0;if(pan>1)pan=1;
+    for(var j=0;j<len&&i0+j<B.n;j++){if(i0+j<0)continue;var u=j/len,e=Math.sin(Math.PI/2*Math.min(1,u*5))*Math.pow(1-u,2.2);var x=filt(r()*2-1)*amp*e;B.L[i0+j]+=x*(1-pan);B.R[i0+j]+=x*pan;}}
+  /* birds as r363 sings them (Morning birds, which she loves), far off */
+  function chickadee(B,r,t0,pan){var a=0.026,lp=K.biq("lp",4000,0.7,B.sr);
+    note(B,t0,0.36,glide(3980,3900,"dn"),a,pan,{h2:0.04,at:0.12,lp:lp});note(B,t0+0.5,0.42,glide(3420,3300,"dn"),a*0.9,pan,{h2:0.04,at:0.12,lp:lp,fm:0.01,fmr:9});return t0+1.0;}
+  /* crows far off, as r403 calls them in Autumn wind, which she loves */
+  function crows(B,r,t0,pan){var n=2+Math.floor(r()*3),t=t0,lp=K.biq("lp",2000,0.7,B.sr);
+    for(var k=0;k<n;k++){var c=640+r()*140,d=0.26+r()*0.12;note(B,t,d,glide(c*1.08,c*0.82,"dn"),0.022,pan,{h2:0.55,h3:0.35,at:0.08,fm:0.06,fmr:72+r()*20,lp:lp});t+=d+0.22+r()*0.2;}return t;}
+  /* snow slipping from a branch: the clump sliding off the needles, landing in the snow below, a little powder sifting after it */
+  function fall(B,r,t,pan,a){var sr=B.sr;a=a||1;
+    swell(B,t,0.32+r()*0.22,0.09*a,pan,K.biq("bp",800+r()*600,0.7,sr),r,0.45);
+    thud(B,t+0.34+r()*0.18,0.16+r()*0.08,0.8*a,pan,K.biq("lp",190+r()*110,0.8,sr),r);
+    var n=50+Math.floor(r()*70);for(var k=0;k<n;k++){var u=r();grain(B,t+0.12+u*(0.9+r()*0.6),0.001+r()*0.003,0.022*a*Math.pow(1-u,1.5)*Math.pow(r(),1.5),pan+(r()-0.5)*0.2,K.biq("bp",1500+r()*2000,1.0,sr),r,0.35);}}
+
+  /* ----- Fresh snow: slow footsteps through fresh snow in a still wood ----- */
+  function step(B,r,t,pan,a){var sr=B.sr,lp=K.biq("lp",3300,0.7,sr);
+    /* the boot pressing the snow down */
+    thud(B,t,0.10+r()*0.04,0.28*a,pan,K.biq("lp",230+r()*70,0.8,sr),r);
+    /* the crunch: the heel first, then the roll to the toe, the snow giving way in hundreds of small breaks, most at the start */
+    [[t+0.004,0.075+r()*0.03,1],[t+0.065+r()*0.025,0.15+r()*0.08,0.75]].forEach(function(q){var n=Math.floor((110+r()*90)*q[2]);
+      for(var k=0;k<n;k++){var u=Math.pow(r(),0.75),f=480*Math.pow(2,r()*2.4),bp=K.biq("bp",f,1.1,sr);
+        grain(B,q[0]+u*q[1],0.0004+r()*0.002,0.55*a*q[2]*Math.pow(1-u,1.1)*Math.pow(r(),1.7),pan+(r()-0.5)*0.05,function(x){return lp(bp(x));},r,0.35);}});}
+  function snowsteps(){var sec=60,B=K.mk(sec),sr=B.sr,r=K.rnd(3307),g=drift(r,sec,0.1,sr),k;
+    /* the wood, still: only a low hush, rising a little and settling */
+    bed(B,[K.brownGen(r),K.brownGen(r)],[pair("lp",260,0.6,sr),pair("hp",40,0.7,sr)],0.025,function(i){return 0.55+0.45*g(i);});
+    bed(B,[K.pinkGen(r),K.pinkGen(r)],[pair("bp",480,0.5,sr),pair("lp",1200,0.6,sr)],0.0035,function(i){return 0.3+0.7*g(i);});
+    /* walking slowly, then standing still to listen; a chickadee far off now and then while she stands */
+    var t=2.6,foot=0,stops=[];while(t<sec-4){var n=6+Math.floor(r()*5),per=1.06+r()*0.16;
+      for(var s=0;s<n&&t<sec-3;s++){step(B,r,t,foot?0.57:0.43,0.85+0.3*r());foot^=1;t+=per*(0.95+0.1*r());}
+      stops.push(t);t+=6+r()*6;}
+    stops.forEach(function(ts,i){if(i%2===0&&ts+2<sec-3)chickadee(B,r,ts+1.4+r()*1.5,0.15+0.7*r());});
+    if(stops.length>1)fall(B,r,stops[1]+3.2,0.75,0.8);
+    K.verb(B,0.22,0.82);return K.finish(B,1.5,-5);}
+
+  /* ----- Snowy pines: a soft wind in snowy pines; snow slipping from the branches ----- */
+  function pines(){var sec=50,B=K.mk(sec),sr=B.sr,r=K.rnd(3301),g=drift(r,sec,0.11,sr),gust=function(i){var v=g(i);return v*v;};
+    bed(B,[K.brownGen(r),K.brownGen(r)],[pair("lp",360,0.6,sr),pair("hp",45,0.7,sr)],0.075,function(i){return 0.22+0.78*gust(i);});
+    /* the needles' sigh, low and soft: snow takes the hiss out of a wood */
+    bed(B,[K.pinkGen(r),K.pinkGen(r)],[pair("bp",820,0.55,sr),pair("lp",2400,0.6,sr)],0.024,function(i){return 0.06+0.94*gust(i);});
+    var t=3+r()*3;while(t<sec-3){fall(B,r,t,0.15+0.7*r(),0.8+0.4*r());t+=7+r()*8;}
+    crows(B,r,19+r()*10,0.2+0.6*r());
+    K.verb(B,0.30,0.84);return K.finish(B,1.5,-3);}
+
+  /* ----- Winter cabin: a fire in the hearth, the wind outside, fine snow brushing the window ----- */
+  function cabin(){var sec=40,B=K.mk(sec),sr=B.sr,r=K.rnd(4409),g=drift(r,sec,0.3,sr),w=drift(r,sec,0.09,sr),gust=function(i){var v=w(i);return v*v;},k;
+    bed(B,[K.brownGen(r),K.brownGen(r)],[pair("lp",200,0.6,sr),pair("hp",30,0.7,sr)],0.085,function(i){return 0.25+0.75*gust(i);});
+    bed(B,[K.brownGen(r),K.brownGen(r)],[pair("lp",170,0.6,sr),pair("hp",35,0.7,sr)],0.055,function(i){return 0.7+0.3*g(i);});
+    /* the fire's crackles, fewer and softer than Campfire's, in a room */
+    var t=0;while(t<sec){t+=-Math.log(1-r())/6;var run=1+Math.floor(Math.pow(r(),2)*6),p=0.42+r()*0.16;
+      for(var q=0;q<run;q++)grain(B,t+q*(0.006+r()*0.03),0.0006+r()*0.0016,Math.pow(r(),2.4)*0.36,p+(r()-0.5)*0.06,K.biq("hp",1300+r()*1500,0.7,sr),r,0.35);}
+    for(k=0;k<sec*0.9;k++)grain(B,r()*sec,0.012+r()*0.02,0.08+r()*0.12,0.4+r()*0.2,K.biq("bp",380+r()*600,1.4,sr),r,0.3);
+    /* a log settling now and then */
+    [10+r()*5,28+r()*5].forEach(function(tl){thud(B,tl,0.2,0.32,0.5,K.biq("lp",240,0.8,sr),r);for(var q2=0;q2<12;q2++)grain(B,tl+0.06+q2*(0.02+r()*0.05),0.0008+r()*0.0015,0.2*Math.pow(r(),1.5),0.45+r()*0.1,K.biq("hp",1500+r()*1500,0.7,sr),r,0.35);});
+    /* fine snow brushing the window as the wind rises */
+    var ts=0;while(ts<sec){var gi=gust(Math.floor(ts*sr));ts+=-Math.log(1-r())/(1.5+30*gi*gi);grain(B,ts,0.0008+r()*0.0015,0.005*gi*Math.pow(r(),1.4),0.8+r()*0.15,K.biq("bp",2600+r()*2000,1.4,sr),r,0.35);}
+    K.verb(B,0.12,0.74);return K.finish(B,1.2,-2);}
+
+  /* ----- Lake shore: small waves lapping on a pebble shore ----- */
+  function lap(B,r,t,pan,a){var sr=B.sr,k;
+    swell(B,t,0.3+r()*0.2,0.15*a,pan,K.biq("bp",400+r()*240,0.9,sr),r,0.12);
+    swell(B,t+0.08,0.55+r()*0.3,0.045*a,pan+0.05,K.biq("bp",1000+r()*500,0.7,sr),r,0.3);
+    var n=10+Math.floor(r()*14);for(k=0;k<n;k++)grain(B,t+0.38+r()*0.9,0.001+r()*0.002,0.018*a*Math.pow(r(),1.5),pan+(r()-0.5)*0.2,K.biq("bp",1500+r()*1700,1.6,sr),r,0.4);
+    var m=3+Math.floor(r()*5);for(k=0;k<m;k++)ping(B,t+0.3+r()*0.8,480*Math.pow(2,r()*1.3),1.2+r()*0.4,0.006+r()*0.01,0.005+0.012*r(),pan+(r()-0.5)*0.2);}
+  function lake(){var sec=36,B=K.mk(sec),sr=B.sr,r=K.rnd(5501),g=drift(r,sec,0.12,sr);
+    bed(B,[K.brownGen(r),K.brownGen(r)],[pair("lp",300,0.6,sr),pair("hp",40,0.7,sr)],0.05,function(i){return 0.7+0.3*g(i);});
+    bed(B,[K.pinkGen(r),K.pinkGen(r)],[pair("bp",600,0.5,sr),pair("lp",1500,0.6,sr)],0.007,function(i){return 0.4+0.6*g(i);});
+    var t=1.5;while(t<sec-2){lap(B,r,t,0.25+0.5*r(),0.7+0.3*r());t+=2.2+r()*2.4;}
+    K.verb(B,0.22,0.80);return K.finish(B,1.2,-1);}
+
+  /* ----- Rain on a tent: soft rain on the canvas; heavier drops from the trees ----- */
+  function tent(){var sec=30,B=K.mk(sec),sr=B.sr,r=K.rnd(6607),g=drift(r,sec,0.15,sr),k;
+    bed(B,[K.pinkGen(r),K.pinkGen(r)],[pair("hp",150,0.7,sr),pair("lp",1100,0.6,sr)],0.055,function(i){return 0.75+0.25*g(i);});
+    for(k=0;k<sec*55;k++){var t0=r()*sec,p=0.15+r()*0.7,a=Math.pow(r(),2.2);grain(B,t0,0.004+r()*0.006,0.11*a,p,K.biq("bp",480+r()*480,1.3,sr),r,0.3);if(a>0.35)ping(B,t0+0.001,230+r()*140,0.92,0.012+r()*0.01,0.045*a,p);}
+    var tb=3+r()*3;while(tb<sec-2){var n=4+Math.floor(r()*8);for(var q=0;q<n;q++){var tq=tb+r()*1.6,p2=0.2+r()*0.6;grain(B,tq,0.01,0.15+r()*0.1,p2,K.biq("bp",320+r()*200,1.4,sr),r,0.3);ping(B,tq+0.001,190+r()*80,0.9,0.02,0.065,p2);}tb+=7+r()*7;}
+    K.verb(B,0.10,0.72);return K.finish(B,1.0,-1);}
+
+  /* ----- Night woods: a night breeze in the trees, a stream far off, an owl now and then ----- */
+  function owl(B,r,t0,pan){var lp=K.biq("lp",850,0.7,B.sr),f=300+r()*30,seq=[[0,0.42],[0.62,0.16],[0.82,0.30],[1.5,0.34],[2.12,0.36]];
+    seq.forEach(function(s,k){note(B,t0+s[0],s[1],glide(f*(k===1?1.06:1),f*0.93,"dn"),0.034*(k===1?0.8:1),pan,{h2:0.08,h3:0.02,at:0.25,lp:lp});});}
+  function nightwoods(){var sec=48,B=K.mk(sec),sr=B.sr,r=K.rnd(7703),g=drift(r,sec,0.1,sr),gust=function(i){var v=g(i);return v*v;};
+    bed(B,[K.brownGen(r),K.brownGen(r)],[pair("lp",340,0.6,sr),pair("hp",40,0.7,sr)],0.06,function(i){return 0.3+0.7*gust(i);});
+    bed(B,[K.pinkGen(r),K.pinkGen(r)],[pair("bp",880,0.55,sr),pair("lp",2400,0.6,sr)],0.013,function(i){return 0.1+0.9*gust(i);});
+    bed(B,[K.pinkGen(r),K.pinkGen(r)],[pair("bp",700,0.6,sr),pair("lp",1500,0.6,sr)],0.009,null);
+    var t=0;while(t<sec){t+=-Math.log(1-r())/6;ping(B,t,380*Math.pow(2,r()*1.3),1.2+r()*0.3,0.006+r()*0.01,0.003+r()*0.005,0.7+0.2*r());}
+    var to=4+r()*3;while(to<sec-4){owl(B,r,to,0.2+0.25*r());to+=13+r()*7;}
+    K.verb(B,0.32,0.86);return K.finish(B,1.5,-2);}
+
+  return [
+    {k:"snowsteps",name:"Fresh snow",desc:"Slow footsteps crunching through fresh snow in a still wood, a chickadee far off",group:"winter",make:snowsteps},
+    {k:"pines",name:"Snowy pines",desc:"A soft wind in snowy pines, snow slipping from the branches now and then",group:"winter",make:pines},
+    {k:"cabin",name:"Winter cabin",desc:"A fire in the hearth, the wind outside, fine snow brushing the window",group:"winter",make:cabin},
+    {k:"lake",name:"Lake shore",desc:"Small waves lapping on a pebble shore",group:"water",make:lake},
+    {k:"tent",name:"Rain on a tent",desc:"Soft rain on a tent, heavier drops falling from the trees",group:"rain",make:tent},
+    {k:"nightwoods",name:"Night woods",desc:"A night breeze in the trees, a stream far off, an owl now and then",group:"night",make:nightwoods}];}
+
+/*R403_DEFS_START*/
+function defs_R403(K){
+  var PI2=2*Math.PI;
+  function note(B,t0,dur,f,amp,pan,o){o=o||{};var i0=Math.floor(t0*B.sr),len=Math.floor(dur*B.sr),ph=0,h2=o.h2==null?0.12:o.h2,h3=o.h3||0,at=o.at||0.18,lp=o.lp||null,fm=o.fm||0,fmr=o.fmr||0,am=o.am||0,amr=o.amr||0;
+    for(var j=0;j<len&&i0+j<B.n;j++){if(i0+j<0)continue;var u=j/len,fr=f(u)*(1+fm*Math.sin(PI2*fmr*j/B.sr));ph+=PI2*fr/B.sr;
+      var e=u<at?Math.sin(Math.PI/2*u/at):Math.pow(Math.cos(Math.PI/2*(u-at)/(1-at)),1.4);if(am)e*=1-am*(0.5+0.5*Math.sin(PI2*amr*j/B.sr));
+      var x=(Math.sin(ph)+h2*Math.sin(2*ph)+h3*Math.sin(3*ph))*amp*e;if(lp)x=lp(x);B.L[i0+j]+=x*(1-pan);B.R[i0+j]+=x*pan;}}
+  function glide(a,b,shape){return function(u){var s=shape==="up"?u*u:shape==="dn"?1-(1-u)*(1-u):shape==="arc"?Math.sin(Math.PI*u):u;return a+(b-a)*s;};}
+  function grain(B,t0,dur,amp,pan,filt,r,tau){var i0=Math.floor(t0*B.sr),len=Math.max(1,Math.floor(dur*B.sr)),tt=len*(tau||0.3);
+    for(var j=0;j<len&&i0+j<B.n;j++){var x=filt(r()*2-1)*amp*Math.min(1,j/(B.sr*0.0004))*Math.exp(-j/tt);B.L[i0+j]+=x*(1-pan);B.R[i0+j]+=x*pan;}}
+  function drift(r,sec,rate,sr){var pts=[],n=Math.ceil(sec*rate)+2,k;for(k=0;k<n;k++)pts.push(r());pts[n-1]=pts[0];pts[n-2]=pts[1];
+    return function(i){var x=i/sr*rate,a=Math.floor(x),f=x-a,p=pts[a%n],q=pts[(a+1)%n];return p+(q-p)*(0.5-0.5*Math.cos(Math.PI*f));};}
+  function bed(B,gen,filts,amp,mod){for(var i=0;i<B.n;i++){var m=mod?mod(i):1,xl=gen[0](),xr=gen[1]();for(var f=0;f<filts.length;f++){xl=filts[f][0](xl);xr=filts[f][1](xr);}B.L[i]+=xl*amp*m;B.R[i]+=xr*amp*m;}}
+  function pair(type,f,Q,sr){return [K.biq(type,f,Q,sr),K.biq(type,f,Q,sr)];}
+  /* a crow far off: two to four rough caws */
+  function crows(B,r,t0,pan){var n=2+Math.floor(r()*3),t=t0,lp=K.biq("lp",2200,0.7,B.sr);
+    for(var k=0;k<n;k++){var c=640+r()*140,d=0.26+r()*0.12;note(B,t,d,glide(c*1.08,c*0.82,"dn"),0.03,pan,{h2:0.55,h3:0.35,at:0.08,fm:0.06,fmr:72+r()*20,lp:lp});t+=d+0.22+r()*0.2;}return t;}
+  function autumn(){var sec=40,B=K.mk(sec),sr=B.sr,r=K.rnd(1249),g=drift(r,sec,0.2,sr),gust=function(i){var v=g(i);return v*v*v;};
+    bed(B,[K.brownGen(r),K.brownGen(r)],[pair("lp",420,0.6,sr),pair("hp",50,0.7,sr)],0.085,function(i){return 0.25+0.75*gust(i);});
+    bed(B,[K.pinkGen(r),K.pinkGen(r)],[pair("hp",2200,0.7,sr),pair("lp",7500,0.6,sr)],0.03,function(i){return 0.1+0.9*gust(i);});
+    /* dry leaves: many small rustles as each gust comes, and runs of leaves skittering over the ground */
+    var t=0;while(t<sec){var gi=gust(Math.floor(t*sr));t+=-Math.log(1-r())/(30+420*gi);grain(B,t,0.001+r()*0.004,Math.pow(r(),2)*0.07*(0.25+gi),r(),K.biq("bp",2400+r()*5200,1.2,sr),r,0.35);}
+    for(var s=0;s<5;s++){var ts=r()*(sec-2),p=r();for(var q=0;q<18;q++)grain(B,ts+q*(0.02+r()*0.03),0.003+r()*0.004,0.03*r(),p+q*0.01,K.biq("bp",1800+r()*2500,1.5,sr),r,0.35);}
+    [8+r()*5,27+r()*6].forEach(function(tc){crows(B,r,tc,0.15+0.7*r());});
+    K.verb(B,0.3,0.84);return K.finish(B,1.5,-1);}
+
+  return [{k:"autumn",name:"Autumn wind",desc:"Gusts through dry leaves, leaves skittering, crows far off",group:"fire",make:autumn}];}
+
+/*R404_DEFS_START*/
+function defs_R404(K){
+  var PI2=2*Math.PI;
+  function note(B,t0,dur,f,amp,pan,o){o=o||{};var i0=Math.floor(t0*B.sr),len=Math.floor(dur*B.sr),ph=0,h2=o.h2==null?0.12:o.h2,h3=o.h3||0,at=o.at||0.18,lp=o.lp||null,fm=o.fm||0,fmr=o.fmr||0,am=o.am||0,amr=o.amr||0;
+    for(var j=0;j<len&&i0+j<B.n;j++){if(i0+j<0)continue;var u=j/len,fr=f(u)*(1+fm*Math.sin(PI2*fmr*j/B.sr));ph+=PI2*fr/B.sr;
+      var e=u<at?Math.sin(Math.PI/2*u/at):Math.pow(Math.cos(Math.PI/2*(u-at)/(1-at)),1.4);if(am)e*=1-am*(0.5+0.5*Math.sin(PI2*amr*j/B.sr));
+      var x=(Math.sin(ph)+h2*Math.sin(2*ph)+h3*Math.sin(3*ph))*amp*e;if(lp)x=lp(x);B.L[i0+j]+=x*(1-pan);B.R[i0+j]+=x*pan;}}
+  function glide(a,b,shape){return function(u){var s=shape==="up"?u*u:shape==="dn"?1-(1-u)*(1-u):shape==="arc"?Math.sin(Math.PI*u):u;return a+(b-a)*s;};}
+  function grain(B,t0,dur,amp,pan,filt,r,tau){var i0=Math.floor(t0*B.sr),len=Math.max(1,Math.floor(dur*B.sr)),tt=len*(tau||0.3);
+    for(var j=0;j<len&&i0+j<B.n;j++){var x=filt(r()*2-1)*amp*Math.min(1,j/(B.sr*0.0004))*Math.exp(-j/tt);B.L[i0+j]+=x*(1-pan);B.R[i0+j]+=x*pan;}}
+  function ping(B,t0,f0,rise,tau,amp,pan){var i0=Math.floor(t0*B.sr),len=Math.floor(tau*5*B.sr),ph=0;
+    for(var j=0;j<len&&i0+j<B.n;j++){var u=j/len;ph+=PI2*f0*(1+(rise-1)*u)/B.sr;var x=Math.sin(ph)*amp*Math.min(1,j/(B.sr*0.002))*Math.exp(-j/(tau*B.sr));B.L[i0+j]+=x*(1-pan);B.R[i0+j]+=x*pan;}}
+  function drift(r,sec,rate,sr){var pts=[],n=Math.ceil(sec*rate)+2,k;for(k=0;k<n;k++)pts.push(r());pts[n-1]=pts[0];pts[n-2]=pts[1];
+    return function(i){var x=i/sr*rate,a=Math.floor(x),f=x-a,p=pts[a%n],q=pts[(a+1)%n];return p+(q-p)*(0.5-0.5*Math.cos(Math.PI*f));};}
+  function bed(B,gen,filts,amp,mod){for(var i=0;i<B.n;i++){var m=mod?mod(i):1,xl=gen[0](),xr=gen[1]();for(var f=0;f<filts.length;f++){xl=filts[f][0](xl);xr=filts[f][1](xr);}B.L[i]+=xl*amp*m;B.R[i]+=xr*amp*m;}}
+  function pair(type,f,Q,sr){return [K.biq(type,f,Q,sr),K.biq(type,f,Q,sr)];}
+  /* ----- Noel: a winter brook at dawn, made of what she loves (Brook's water, Morning birds' singers), softer and quieter ----- */
+  /* the birds as r363 sings them in Morning birds, which she loves */
+  function robin(B,r,t0,pan,far){var n=5+Math.floor(r()*5),t=t0,a=far?0.035:0.085,lp=far?K.biq("lp",3400,0.7,B.sr):null;
+    for(var k=0;k<n;k++){var d=0.07+r()*0.14,c=2300+r()*1500,sh=r(),f=sh<0.35?glide(c*0.82,c*1.18,"up"):sh<0.7?glide(c*1.2,c*0.85,"dn"):glide(c*0.9,c*1.25,"arc");
+      note(B,t,d,f,a*(0.7+0.3*r()),pan,{h2:0.15,fm:0.035,fmr:42+r()*25,lp:lp});t+=d+0.035+r()*0.07;}return t;}
+  function noel(){var sec=60,B=K.mk(sec),sr=B.sr,r=K.rnd(2557),k,g=drift(r,sec,0.35,sr),g2=drift(r,sec,0.15,sr);
+    /* the brook, low and soft: an even murmur, darker than Brook's, and only a few quiet bubbles */
+    bed(B,[K.pinkGen(r),K.pinkGen(r)],[pair("bp",700,0.6,sr),pair("lp",1800,0.6,sr)],0.03,function(i){return 0.7+0.3*g(i);});
+    bed(B,[K.brownGen(r),K.brownGen(r)],[pair("lp",360,0.6,sr),pair("hp",60,0.7,sr)],0.055,function(i){return 0.8+0.2*g2(i);});
+    var t=0;while(t<sec){t+=-Math.log(1-r())/10;var f0=360*Math.pow(2,r()*1.4),d=0.02+r()*0.04;ping(B,t,f0,1.15+r()*0.25,d/3,(0.005+Math.pow(r(),1.8)*0.016),0.25+0.5*r());}
+    /* one robin far off, now and then: a short phrase, rounded off by the distance; nothing else sings */
+    var tb=5+r()*3;while(tb<sec-4){tb=robin(B,r,tb,0.2+0.6*r(),true)+14+r()*8;}
+    K.verb(B,0.24,0.82);return K.finish(B,1.6,-8);}
+  return [
+    {k:"noel",name:"Noel",desc:"A winter brook at dawn: soft, low water over stones, and a robin far off now and then",group:"winter",make:noel}];}
+
+var NEW=defs_R411(K),OLD=defs_R403(K).concat(defs_R404(K)).filter(function(p){return p.k==="noel"||p.k==="autumn";});
+var ICO=Object.assign({},{
+  snowsteps:'<path d="M7.2 4.5c1.6 0 2.4 1.6 2.4 3.4S8.7 11 7.3 11 5 9.6 5 7.8 5.7 4.5 7.2 4.5z"/><path d="M5.6 12.6h3.4"/><path d="M16.2 9.5c1.6 0 2.4 1.6 2.4 3.4S17.7 16 16.3 16 14 14.6 14 12.8s.7-3.3 2.2-3.3z"/><path d="M14.6 17.6h3.4"/><circle cx="19" cy="4.5" r=".7"/><circle cx="4.5" cy="18.5" r=".7"/><circle cx="11.5" cy="20" r=".6"/>',
+  pines:'<path d="M8 3l3.6 6H9.8l3 5H3.2l3-5H4.4z"/><path d="M8 14v4"/><path d="M17 7l2.8 4.6h-1.4l2.4 4H13.2l2.4-4h-1.4z"/><path d="M17 15.6V19"/><path d="M3 21h18"/>',
+  cabin:'<path d="M3.5 11L12 4.5l8.5 6.5"/><path d="M5.5 9.6V20h13V9.6"/><path d="M10 20v-4.5h4V20"/><path d="M16 6.3V3.5h2v4.3"/><circle cx="20.5" cy="14" r=".6"/><circle cx="3" cy="15.5" r=".6"/>',
+  lake:'<path d="M2.5 13c2.3-1.5 4.7-1.5 7 0s4.7 1.5 7 0 3.5-1.2 5-.7"/><circle cx="6" cy="18" r="1.2"/><circle cx="10.5" cy="18.6" r="1"/><circle cx="15" cy="17.8" r="1.3"/><circle cx="19" cy="18.6" r=".9"/><path d="M5 8.5c1.5-1 3-1 4.5 0"/>',
+  tent:'<path d="M12 4L3 19h18z"/><path d="M12 4v15"/><path d="M12 19l-3-5"/><path d="M5 5.5l-.8 1.8M8.5 3l-.8 1.8M19 4.5l-.8 1.8M16 2.5l-.8 1.8"/>',
+  nightwoods:'<path d="M17.8 9.2A4.2 4.2 0 0 1 12.6 4a4.2 4.2 0 1 0 5.2 5.2z"/><path d="M6.5 9l3 5H7.9l2.4 4H2.7l2.4-4H3.5z"/><path d="M6.5 18v2.5"/><path d="M13 20.5h8"/>'
+},{
+  noel:'<path d="M12 2.5l4.6 7.2h-2.6l3.8 6H6.2l3.8-6H7.4z"/><path d="M12 15.7V21"/><path d="M4 21h16"/><circle cx="5" cy="6" r=".7"/><circle cx="19" cy="5" r=".7"/><circle cx="18" cy="11" r=".6"/>'
+},{autumn:'<path d="M3 9h11a3 3 0 1 0-3-3"/><path d="M3 14h15a3 3 0 1 1-3 3"/><path d="M3 11.5h7"/>'});
+var PLAY='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>',STOP='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
+function card(p,host){var c=D.createElement("div");c.className="card";c.innerHTML='<span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICO[p.k]||"")+'</svg></span>'+
+  '<div class="nm"></div><p class="ds"></p><div class="row"><button type="button" class="play">'+PLAY+'<span>Play</span></button><span class="state" aria-live="polite"></span></div><div class="meter" aria-hidden="true"><i></i></div>';
+  c.querySelector(".nm").textContent=p.name;c.querySelector(".ds").textContent=p.desc;var b=c.querySelector(".play"),st=c.querySelector(".state");
+  b.addEventListener("click",function(){if(cur&&cur.k===p.k){stop();return;}stop();if(!ctx()){st.textContent="Sound is not available in this browser.";return;}
+    function go(buf){var s=ac.createBufferSource(),g=ac.createGain();s.buffer=buf;s.loop=true;g.gain.value=0.0001;s.connect(g);g.connect(mst);s.start();g.gain.setTargetAtTime(1,ac.currentTime,0.35);
+      cur={k:p.k,s:s,g:g,c:c,b:b,st:st};c.classList.add("playing");b.innerHTML=STOP+'<span>Stop</span>';st.textContent="Playing";}
+    if(BUF[p.k]){go(BUF[p.k]);return;}st.textContent="Making it…";b.disabled=true;
+    setTimeout(function(){var t0=performance.now(),buf=null;try{buf=p.make();}catch(e){st.textContent="It could not be made here.";b.disabled=false;return;}BUF[p.k]=buf;b.disabled=false;go(buf);},40);});
+  host.appendChild(c);}
+function stop(){if(!cur)return;var x=cur;cur=null;try{x.g.gain.setTargetAtTime(0.0001,ac.currentTime,0.25);setTimeout(function(){try{x.s.stop();}catch(e){}},900);}catch(e){}
+  x.c.classList.remove("playing");x.b.innerHTML=PLAY+'<span>Play</span>';x.st.textContent="";}
+NEW.forEach(function(p){card(p,D.getElementById(p.group==="winter"?"gWinter":"gMore"));});
+OLD.sort(function(a,b){return a.k==="noel"?-1:1;}).forEach(function(p){card(p,D.getElementById("gOld"));});
+D.getElementById("vol").addEventListener("input",function(e){var v=+e.target.value/100;if(mst)mst.gain.setTargetAtTime(v,ac.currentTime,0.05);});
+D.addEventListener("visibilitychange",function(){if(D.hidden)stop();});
+})();
+</script>

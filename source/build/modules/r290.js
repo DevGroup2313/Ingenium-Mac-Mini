@@ -1459,6 +1459,8 @@ function wireSeal(k){var busy=false,again=false,last="",count=0,downAt=0;
 function sealKey(cls,label,size){var hs=mk("div","hx-seal sk-seal"+(cls?" "+cls:"")),k=mk("button","r175-seal");k.type="button";k.setAttribute("aria-label",label);
   var g=mk("span","r175-glow"),fx=mk("span","r175-fx"),rp=mk("span","r175-ripple");g.setAttribute("aria-hidden","true");rp.setAttribute("aria-hidden","true");
   var se=sealCopy();if(se){se.style.setProperty("--S",(size||58)+"px");fx.appendChild(se);}k.appendChild(g);k.appendChild(fx);k.appendChild(rp);hs.appendChild(k);wireSeal(k);return hs;}
+/* 8.08 (r410): the same seal key, lent to the Sign-in Orbit for its heart */
+try{window.IngSealKey=sealKey;}catch(_){}
 /* ---------------- Lector's seal (6.94): a real vintage wax stamp of the engine logo ----------------
    Her words (13 November 2026): "The seal engine needs to look like a real vintage wax stamp, it looked too shiny and sparkly and smooth in
    the last design, it did not match the layered depth and animated look and effect." "The seal should not say Lector, instead it should
