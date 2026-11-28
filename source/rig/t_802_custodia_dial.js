@@ -119,7 +119,7 @@ const rot = (t) => { const m = /matrix\(([^)]+)\)/.exec(t || ''); if (!m) return
   // button to be fixed"): no sway of its own inside the dial, the ring on the seal's centre
   const ringDrift = await p.evaluate(async () => { const s = document.querySelector('#cuHead .cu-sealbox .isl'); if (!s) return { err: 'no seal' };
     const c = (el) => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }; let m = 0;
-    for (let i = 0; i < 12; i++) { const a = c(s.querySelector('.isl-base')), b = c(s.querySelector('.isl-ring > svg')); m = Math.max(m, Math.hypot(a[0] - b[0], a[1] - b[1])); await new Promise((r) => setTimeout(r, 200)); }
+    for (let i = 0; i < 12; i++) { const a = c(s.querySelector('.isl-back > svg')), b = c(s.querySelector('.isl-ring > svg'));   /* 8.07: measured on the seal's face (its coin edge, with .isl-base, is hidden since Struck) */ m = Math.max(m, Math.hypot(a[0] - b[0], a[1] - b[1])); await new Promise((r) => setTimeout(r, 200)); }
     const sway = document.getAnimations().some((x) => x.animationName === 'islSway' && x.effect && x.effect.target && x.effect.target.closest && x.effect.target.closest('.cu-sealbox'));
     return { max: +m.toFixed(3), sway }; });
   check(ringDrift.max < 0.3, "the seal's thin purple ring stays on the seal's centre", ringDrift);

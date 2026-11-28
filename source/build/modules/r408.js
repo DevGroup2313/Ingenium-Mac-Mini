@@ -224,9 +224,14 @@ body[data-theme="night"] .cu-gleam{background:conic-gradient(from 0deg,rgba(214,
 /* 8.02: the seal set into the face within a fine engraved ring, a shallow seat under it: the look she chose as "As before" on the live
    preview (27 November 2026: "Build the current Custodia's dial into the app with the \"As before\" look, we can come back to it later") */
 .cu-sealbox::before{content:"";position:absolute;inset:-11px;border-radius:50%;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(60,50,80,.26),0 0 0 1px rgba(255,255,255,.8)}
-.cu-sealbox::after{content:"";position:absolute;inset:-5px;border-radius:50%;pointer-events:none;box-shadow:inset 0 1px 3px rgba(40,22,68,.16)}
 body[data-theme="night"] .cu-sealbox::before{box-shadow:inset 0 0 0 1px rgba(0,0,0,.55),0 0 0 1px rgba(214,200,244,.14)}
-body[data-theme="night"] .cu-sealbox::after{box-shadow:inset 0 1px 3px rgba(0,0,0,.45)}
+/* 8.07: Struck, her choice on the live preview. Her words (28 November 2026): "I also want you to sink in the logo button in the middle of
+   the dial, I want it to look more built-in and not as a last minute addition"; then "I prefer the Struck look for the Custodia dial,
+   please add it to the app and push it everywhere." The seal's own disc gives way to the dial's face, so its ring, star and heart rise out
+   of the dial itself, as a die-struck emblem does. Nothing floats: no shadow cast beneath it, no coin edge, no seat round it; the fine
+   engraved ring stays, and the whole seal is still the key that plays Home's flourishes. */
+.cu-sealbox .isl .isl-back{opacity:0}
+.cu-sealbox .isl .isl-cast,.cu-sealbox .isl .isl-edge{display:none !important}
 /* the seal's thin purple ring, held in step. Her words (27 November 2026): "I also want the faint little purple circle from the engine button
    to be fixed." The cause is the compass's (r290, 13 and 14 November 2026): the seal swayed in 3D on a clock of its own inside a dial that
    leans on its own, and its ring lay lower than its star, so the ring slid about. So it is held as the compass's and Blend's are: no sway

@@ -395,6 +395,37 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.07 (28 November 2026): Custodia's seal struck into its dial; Memoria's Ingenium Cloud room raised, its drawing refined.
+
+- Custodia (`r408.js`). Her words (28 November 2026): "I also want you to sink in the logo button in the middle of the dial, I want it to
+  look more built-in and not as a last minute addition." A live preview offered four settings (Inlaid, Bezel, Countersunk, Struck) beside
+  the seal as it stood; her choice: "I prefer the Struck look for the Custodia dial, please add it to the app and push it everywhere." The
+  seal's own disc gives way to the dial's face (opacity 0), so its ring, star and heart rise out of the dial itself; its cast shadow, its
+  coin edge and the seat drawn round it are gone; the fine engraved ring stays, and the whole seal is still the key that plays Home's
+  flourishes.
+- Memoria, Ingenium Cloud (new `r409.js`). Her words: "All of the pages are flat on the Ingenium Cloud tab page in Memoria, please fix this
+  and slightly redesign the page, it looks so plain and motionless and doesn't fit with the other tab pages on the Memoria page"; of the
+  live preview (source/previews/cloud_room): "I approve of the previews for the Cloud room, please commit and push it everywhere".
+  - The room speaks the From your chats room's raised language (r271's tokens, raised cards and keys, counters, wells, toggles and orbs,
+    and the lean that r271 gives every .mr-pop): the room a slab; its head an eyebrow, a title, the Cloud's own words and its state in
+    raised counters (on or off and who keeps it, when work was last sent and brought in, how many choices wait); two columns, the three
+    steps as raised cards on the left, the devices in her Cloud as raised rows, what two devices both changed and the sync file on the
+    right; the times in a well at the foot. r255 and r394 still draw every part and do all the work: r409 dresses and places what they
+    draw, each time they draw it, and reads the Cloud's settings only to show them (IngCloud.settings()).
+  - Its drawing, at her words: "make the little drawing more 3D and animated, I want it to be clickable and interactive like the rest of
+    the app is"; then, of a first attempt that redrew it as an orrery: "I didn't want you to change the design of the drawing, I just
+    wanted it refined and improved, please only do that"; and "I don't want the lines to stay solid and attached to the bigger orb. I want
+    it to be like rays going in and out of the orbs." The same three spheres in the same places and the same line beneath; the spheres
+    are Home's own (IngOrrery), each at its own depth over a soft shadow, bobbing gently; the scene leans toward the pointer; no line
+    stays: while the Cloud is on, rays run from each device into the keeper and back out along the drawing's arcs, and each sphere glows
+    as a ray reaches it. Each sphere answers a press (a hop, a pulse or a wobble, and a ray of its own), says what it is, and before the
+    Cloud is set up opens the step it belongs to. The rays run only while the room is seen, never under Minimal motion or the system's
+    reduced motion.
+- Tests: rig/t_807_cloud_room.js (19 checks: not set up, in step from a Cloud seeded in the browser's own store with invented devices, a
+  choice waiting from an invented conversation in r394's store, Minimal motion); rig/t_807_custodia_struck.js (9 checks);
+  rig/t_802_custodia_dial.js 29/29 (its ring measured on the seal's face, since the coin edge is hidden); rig/t_794_memoria.js 9/9;
+  rig/t_792_conflicts.js 4/4.
+
 Ingenium 8.06 (28 November 2026): three fixes at her word: Vocatio's meanings say what each room does; no shadow over Clavis's
 astrolabe; no light following the pointer on Custodia's dial.
 
