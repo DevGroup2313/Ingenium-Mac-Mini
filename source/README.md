@@ -395,6 +395,16 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.10 (28 November 2026): Lake shore and Rain on a tent made again.
+
+- Nature sounds (`r411.js`). Her words on the 8.09 pair: "The Lake shore splash sounds horrible"; "the Rain on a tent sound too harsh and
+  fake, it sounds like popcorn or kringling sound"; on the next samples (source/previews/winter_sounds): "please reduce the crackling effect
+  on it a little bit because it sounds like static"; "please make it sound more like proper waves on a shore"; then "It sounds much better
+  now, please add it to the app and push it everywhere!" Lake shore: long, slow waves (a low swell, a rolling wash, a long backwash hiss),
+  overlapping, in the smooth delay network; Rain on a tent: about 140 soft, rounded taps a second (each rises over 2 to 5 ms instead of
+  clicking on), duller and gentler, the hiss outside lower, the heavier drops as soft thumps. No pitched note and no click in either.
+- Tests: rig/t_809_nature_sounds.js (Lake shore now 46 s long).
+
 Ingenium 8.09 (28 November 2026): the Cloud room's links carry waves of signal; nature sounds: Winter made again, Night woods, Rain on a
 tent, Lake shore.
 

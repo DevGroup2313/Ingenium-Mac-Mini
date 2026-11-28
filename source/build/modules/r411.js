@@ -17,6 +17,12 @@
      Rain: Rain on a tent made again (no drop rings a note now, the low falling notes that drowned it are gone: soft, dry taps on the
        canvas with the cloth's small thump, the rain outside as Light rain's, a few drops from the tent's edge, heavier drops from the trees);
      Water: Lake shore (small waves lapping on a pebble shore: each meets the stones, washes up and draws back over them).
+   8.10: her words on the 8.09 pair: "The Lake shore splash sounds horrible"; "the Rain on a tent sound too harsh and fake, it sounds like
+   popcorn or kringling sound"; then, on their next samples: "The rain on a tent sounds amazing, please reduce the crackling effect on it a
+   little bit because it sounds like static"; "I don't like sharp the wave sounds, please make it sound more like proper waves on a shore";
+   and: "It sounds much better now, please add it to the app and push it everywhere!" So Lake shore's waves are long and slow, gathering low,
+   breaking softly into a rolling wash, drawing back in a long quiet hiss; Rain on a tent is a dense, soft pitter-patter of rounded taps on
+   the cloth, heavier drops as soft thumps.
    Each is made on this device the first time it is chosen, sample by sample, with r295's kit (nothing is fetched or stored), in about
    two seconds. */
 (function(){"use strict";
@@ -115,34 +121,30 @@ function defs(K){
     var ts=0;while(ts<sec){var gi=gust(Math.floor(ts*sr));ts+=-Math.log(1-r())/(1.2+26*gi*gi);grain(B,ts,0.0008+r()*0.0015,0.004*gi*Math.pow(r(),1.4),0.12+r()*0.12,K.biq("bp",2600+r()*1800,1.4,sr),r,0.35);}
     room(B,0.2,0.75,0.5,0.42,0.008);var zl=K.biq("lp",11000,0.6,sr),zr=K.biq("lp",11000,0.6,sr);for(i=0;i<B.n;i++){B.L[i]=zl(B.L[i]);B.R[i]=zr(B.R[i]);}return K.finish(B,1.5,-2);}
 
-  /* ----- Rain on a tent, made again. Her word on the first: "I like the Rain on a tent one but it could be improved to sound more natural
-     right now it sounds like something is drowning." What drowned it: each drop rang a low note that fell in pitch, as a bubble does under
-     water, over a dark, heavily muffled bed. So no drop rings a note now: each is a soft, dry tap on the canvas with the cloth's small thump
-     under it; the rain outside is Light rain's own soft hiss on leaves, low; a few drops fall from the tent's edge; now and then the trees
-     shake heavier drops onto the canvas. ----- */
-  function tap(B,r,t,pan,a){var sr=B.sr;grain(B,t,0.003+r()*0.005,0.16*a,pan,K.biq("bp",850+r()*1300,0.9,sr),r,0.3);thud(B,t,0.018+r()*0.016,0.22*a,pan,K.biq("lp",170+r()*80,0.8,sr),r);}
-  function tent(){var sec=30,B=K.mk(sec),sr=B.sr,r=K.rnd(6619),g=drift(r,sec,0.15,sr),k;
-    bed(B,[K.pinkGen(r),K.pinkGen(r)],[pair("hp",600,0.7,sr),pair("lp",5000,0.6,sr)],0.009,function(i){return 0.7+0.3*g(i);});
-    bed(B,[K.brownGen(r),K.brownGen(r)],[pair("lp",160,0.6,sr),pair("hp",35,0.7,sr)],0.014,null);
-    /* the patter on the canvas */
-    for(k=0;k<sec*42;k++)tap(B,r,r()*sec,0.12+r()*0.76,Math.pow(r(),2.2));
-    /* drops from the tent's edge onto the ground: a soft plip now and then, as Light rain's are */
-    for(k=0;k<sec*0.35;k++){var t0=r()*sec,p=r()<0.5?0.08+0.1*r():0.82+0.1*r();grain(B,t0,0.006,0.03,p,K.biq("bp",1200+r()*500,1.4,sr),r,0.35);ping(B,t0+0.003,2000+r()*1200,1.2,0.01,0.01,p);}
-    /* the trees shake heavier drops onto the canvas */
-    var tb=3+r()*3;while(tb<sec-2){var n=4+Math.floor(r()*7);for(var q=0;q<n;q++)tap(B,r,tb+r()*1.4,0.2+r()*0.6,0.9+0.6*r());tb+=7+r()*7;}
-    K.verb(B,0.12,0.74);return K.finish(B,1.0,-1);}
-  /* ----- Lake shore: small waves lapping on a pebble shore ----- */
-  function lap(B,r,t,pan,a){var sr=B.sr,k;
-    swell(B,t,0.3+r()*0.2,0.15*a,pan,K.biq("bp",400+r()*240,0.9,sr),r,0.12);
-    swell(B,t+0.08,0.55+r()*0.3,0.045*a,pan+0.05,K.biq("bp",1000+r()*500,0.7,sr),r,0.3);
-    var n=10+Math.floor(r()*14);for(k=0;k<n;k++)grain(B,t+0.38+r()*0.9,0.001+r()*0.002,0.018*a*Math.pow(r(),1.5),pan+(r()-0.5)*0.2,K.biq("bp",1500+r()*1700,1.6,sr),r,0.4);
-    var m=3+Math.floor(r()*5);for(k=0;k<m;k++)ping(B,t+0.3+r()*0.8,480*Math.pow(2,r()*1.3),1.2+r()*0.4,0.006+r()*0.01,0.005+0.012*r(),pan+(r()-0.5)*0.2);}
-  function lake(){var sec=36,B=K.mk(sec),sr=B.sr,r=K.rnd(5501),g=drift(r,sec,0.12,sr);
-    bed(B,[K.brownGen(r),K.brownGen(r)],[pair("lp",300,0.6,sr),pair("hp",40,0.7,sr)],0.05,function(i){return 0.7+0.3*g(i);});
-    bed(B,[K.pinkGen(r),K.pinkGen(r)],[pair("bp",600,0.5,sr),pair("lp",1500,0.6,sr)],0.007,function(i){return 0.4+0.6*g(i);});
-    var t=1.5;while(t<sec-2){lap(B,r,t,0.25+0.5*r(),0.7+0.3*r());t+=2.2+r()*2.4;}
-    K.verb(B,0.22,0.80);return K.finish(B,1.2,-1);}
-
+  /* a soft grain: it rises over att seconds instead of clicking on, then dies away; drops that blend, never pop */
+  function soft(B,t0,dur,amp,pan,filt,r,att){var sr=B.sr,i0=Math.floor(t0*sr),len=Math.max(2,Math.floor(dur*sr)),A=Math.max(1,Math.floor((att||0.002)*sr)),tt=(len-A)*0.35;if(pan<0)pan=0;if(pan>1)pan=1;
+    for(var j=0;j<len&&i0+j<B.n;j++){if(i0+j<0)continue;var e=j<A?Math.sin(Math.PI/2*j/A):Math.exp(-(j-A)/tt);var x=filt(r()*2-1)*amp*e;B.L[i0+j]+=x*(1-pan);B.R[i0+j]+=x*pan;}}
+  /* ----- Lake shore, made a third time. Her word: "it sounds better but I don't like sharp the wave sounds, please make it sound more like
+     proper waves on a shore". So each wave is long and slow: it gathers as a low swell, breaks softly into a rolling wash that rises and
+     falls over two or three seconds, and draws back over the pebbles in a long, quiet hiss; waves overlap as they do on a shore ----- */
+  function wave(B,r,t,pan,a){var sr=B.sr,d=2.4+r()*1.2;
+    var l1=K.biq("lp",320+r()*80,0.7,sr),l2=K.biq("lp",360,0.7,sr);swell(B,t,d,0.12*a,pan,function(x){return l2(l1(x));},r,0.5);
+    var b1=K.biq("bp",700+r()*250,0.5,sr),b2=K.biq("lp",1600,0.6,sr);swell(B,t+d*0.35,d*1.1,0.042*a,pan+0.05,function(x){return b2(b1(x));},r,0.45);
+    var f1=K.biq("bp",1600+r()*600,0.5,sr),f2=K.biq("lp",4000,0.6,sr);swell(B,t+d*0.7,2.2+r()*1.0,0.019*a,pan-0.05,function(x){return f2(f1(x));},r,0.35);}
+  function lake(){var sec=48,B=K.mk(sec),sr=B.sr,r=K.rnd(5557),g=drift(r,sec,0.1,sr);
+    bed(B,[K.brownGen(r),K.brownGen(r)],[pair("lp",260,0.6,sr),pair("hp",35,0.7,sr)],0.045,function(i){return 0.7+0.3*g(i);});
+    bed(B,[K.pinkGen(r),K.pinkGen(r)],[pair("bp",500,0.5,sr),pair("lp",1200,0.6,sr)],0.005,function(i){return 0.4+0.6*g(i);});
+    var t=0.8;while(t<sec-3.5){wave(B,r,t,0.3+0.4*r(),0.75+0.25*r());t+=3.6+r()*2.6;}
+    room(B,0.3,2.0,0.6,1.0,0.025);return K.finish(B,2.0,-2);}
+  /* ----- Rain on a tent, made a third time. Her word: "too harsh and fake, it sounds like popcorn or kringling sound". So the patter is many
+     times denser and each drop far softer: a dull, rounded tap that rises instead of clicking on, so the drops blend into one pitter-patter on
+     the cloth; heavier drops from the trees fall as soft thumps; the rain outside as Light rain's, low; a small, close space ----- */
+  function tent(){var sec=30,B=K.mk(sec),sr=B.sr,r=K.rnd(6637),g=drift(r,sec,0.15,sr),k;
+    bed(B,[K.pinkGen(r),K.pinkGen(r)],[pair("hp",500,0.7,sr),pair("lp",2800,0.6,sr)],0.0075,function(i){return 0.75+0.25*g(i);});
+    bed(B,[K.brownGen(r),K.brownGen(r)],[pair("lp",180,0.6,sr),pair("hp",35,0.7,sr)],0.02,null);
+    for(k=0;k<sec*140;k++){var a=0.4+0.6*Math.pow(r(),1.3),f=420+r()*480;soft(B,r()*sec,0.009+r()*0.011,0.05*a,0.1+r()*0.8,K.biq("lp",f,0.7,sr),r,0.0025+r()*0.0025);}
+    var tb=3+r()*3;while(tb<sec-2){var n=3+Math.floor(r()*5);for(var q=0;q<n;q++)pumf(B,tb+r()*1.4,0.12+r()*0.08,0.2+r()*0.6,260+r()*80,0.03,r);tb+=7+r()*7;}
+    room(B,0.16,0.5,0.55,0.35,0.004);return K.finish(B,1.0,-2);}
   /* ----- Night woods: a night breeze in the trees, a stream far off, an owl now and then ----- */
   function owl(B,r,t0,pan){var lp=K.biq("lp",850,0.7,B.sr),f=300+r()*30,seq=[[0,0.42],[0.62,0.16],[0.82,0.30],[1.5,0.34],[2.12,0.36]];
     seq.forEach(function(s,k){note(B,t0+s[0],s[1],glide(f*(k===1?1.06:1),f*0.93,"dn"),0.034*(k===1?0.8:1),pan,{h2:0.08,h3:0.02,at:0.25,lp:lp});});}

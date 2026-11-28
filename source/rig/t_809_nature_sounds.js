@@ -27,7 +27,7 @@ const ok = (c, m, d) => { console.log((c ? 'PASS ' : 'FAIL ') + m + (c || d === 
   const inG = (label, k) => { const g = grp && grp.find((x) => x.label === label); return !!(g && g.keys.includes(k)); };
   ok(inG('Night', 'nightwoods') && inG('Rain', 'tent') && inG('Water', 'lake'), 'Night woods stands in Night, Rain on a tent in Rain, Lake shore in Water', grp && grp.map((g) => g.label + ': ' + g.keys.join(',')));
   const NAME = { pines: 'Snowy pines', cabin: 'Winter cabin', nightwoods: 'Night woods', tent: 'Rain on a tent', lake: 'Lake shore' };
-  for (const [k, len] of [['pines', 54.0], ['cabin', 46.5], ['nightwoods', 46.5], ['tent', 29.0], ['lake', 34.8]]) {
+  for (const [k, len] of [['pines', 54.0], ['cabin', 46.5], ['nightwoods', 46.5], ['tent', 29.0], ['lake', 46.0]]) {
     const r = await p.evaluate((k) => new Promise((res) => { const t0 = performance.now(); IngNature._render(k, (buf) => { if (!buf) { res(null); return; } const L = buf.getChannelData(0), R = buf.getChannelData(1); let pk = 0, ms = 0;
       for (let i = 0; i < L.length; i++) { pk = Math.max(pk, Math.abs(L[i]), Math.abs(R[i])); ms += L[i] * L[i] + R[i] * R[i]; }
       const head = Math.abs(L[0] - L[L.length - 1]) + Math.abs(R[0] - R[R.length - 1]);
