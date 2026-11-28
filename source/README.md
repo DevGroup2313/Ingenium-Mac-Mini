@@ -395,6 +395,26 @@ storage and do not show the card.
     python3 rig/t_682_drives.py <ingenium_app.py, patched>            # the app's own functions: 19 checks
     node rig/t_682_drives_page.js <run_app.py api port> <drive folder> # the card, bridged to the app: 16 checks
 
+Ingenium 8.12 (28 November 2026): the welcome on the Sign-in Orbit; the other editions free of Lakay's name.
+
+- The Sign-in Orbit (`r410.js`). Her words, with a picture of the welcome card: "Ingenium still does not have the sphere sign-in Orbit
+  page and I have been waiting all night for it from the other session. Please push it through!" Since 8.08 the orbit stood behind the
+  sign-in alone (a password set up, then the desk locked or signed out), so a copy without a sign-in, hers among them, still opened on
+  the welcome card and never showed it. Now the welcome itself stands on the orbit, in the approved design: the soft violet ground with
+  its stars and two rings, the date in Latin and the greeting at the head with the welcome's own words, Ingenium's seal at the heart as
+  the same key with Home's flourishes, her orb on the orbit (her name and "Opens straight away", or "Signed in"), and the welcome card
+  as the plate at the foot: its name, the tour, Enter, Open straight to the app, the lock key that turns a sign-in on and the theme
+  keys. Pressing her orb enters with one of the seal's flourishes, as Enter does; the orbit then gives way to the desk as it does after
+  a sign-in. The orbit takes the welcome's own layer, so whatever opens over the welcome opens over it as before (a sign-in being set
+  up keeps its own card). The logo in the top bar opens it again. "Open straight to the app" still goes straight to the desk.
+- The other editions no longer name Lakay anywhere in their code: the last nine lines that did (Lector's PDF, Fabrica's build reading
+  and order, the first start, Home's Fabrica, the library's list, the apps' order and, where there is a Fabrica, GitHub's logos) are
+  taken back to what they do without it (`editions.py`, _no_lakay_code).
+- Her approved Winter sounds: the 8.11 page already carries them, exactly as the last Winter Sounds preview plays them (Snowy pines,
+  Winter cabin and Night woods as approved for 8.09; Lake shore as proper waves and the softer Rain on a tent, approved for 8.10, which
+  had no page of its own, so 8.11 was their first release).
+- Tests: rig/t_812_welcome_orbit.js (15 checks); rig/t_808_signin_orbit.js for the sign-in's own orbit.
+
 Ingenium 8.11 (28 November 2026): every edition of her apps, for every device, made from the master edition.
 
 - Her words (28 November 2026): "I want all of the editions of all of my apps built into the master edition for all of my devices, not

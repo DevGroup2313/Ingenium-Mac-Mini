@@ -89,6 +89,33 @@ body.sio-on #profDoor.sio .r331-said,body.sio-on #profDoor.sio .r350-door{positi
 body.sio-on #profDoor.sio .r350-door{bottom:max(22px,env(safe-area-inset-bottom,0px));background:none;box-shadow:none;border:0;padding:0;margin:0}
 body.sio-on #profDoor.sio .r331-said{bottom:calc(max(22px,env(safe-area-inset-bottom,0px)) + 64px)}
 body.sio-on #profDoor.sio.r344-night .r331-said,body.sio-on #profDoor.sio.r344-night .r350-door{color:#cfc4e2}
+/* 8.12 · the welcome door on the orbit. Her words (28 November 2026), with a picture of the welcome card: "Ingenium still does not have the
+   sphere sign-in Orbit page and I have been waiting all night for it ... Please push it through!" The orbit stood only behind the sign-in
+   (a password set up, then locked), so on a copy without a sign-in it was never seen: the first screen was still the welcome card. Now the
+   welcome itself stands on the orbit: the ground, the stars and the two rings, the date in Latin and the greeting at the head with the
+   welcome's own words, the seal at the heart as the same key, her orb on the orbit (pressed, it enters), and the welcome card as the plate
+   at the foot: its name, the tour, Enter, Open straight to the app, and its two small keys in the corners. The orbit takes the welcome's own
+   place among the layers (just above the desk), so anything that opens over the welcome opens over it as before; nothing about how the
+   welcome works changes. */
+#sioStage.welcome{z-index:401}
+#sioStage.welcome .sio-sealed{display:none}
+#sioStage.welcome .sio-sub{max-width:62ch;text-wrap:pretty}
+body.sio-on #introDoor.sio{z-index:402;background:transparent !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important;pointer-events:none;
+  align-items:flex-end;padding:0 16px max(26px,env(safe-area-inset-bottom,0px)) !important}
+body.sio-on #introDoor.sio .intro-card{pointer-events:auto;position:relative !important;left:auto !important;top:auto !important;margin:0 !important;height:auto !important;
+  width:min(500px,100%) !important;max-width:100% !important;max-height:calc(100vh - 40px);overflow:auto;scrollbar-width:none;padding:20px 28px 16px !important;border-radius:26px !important;
+  border:0 !important;background:var(--sio-plate,rgba(255,255,255,.93)) !important;animation:none;
+  box-shadow:inset 0 0 0 1px var(--sio-line,rgba(106,63,181,.10)),0 1px 1px rgba(40,22,68,.04),0 4px 6px rgba(40,22,68,.04),0 14px 28px rgba(40,22,68,.07),0 34px 60px rgba(40,22,68,.10) !important}
+body.sio-on #introDoor.sio .intro-card::-webkit-scrollbar{display:none}
+body.sio-on #introDoor.sio .intro-card::after,body.sio-on #introDoor.sio .intro-card::before{display:none !important}
+body[data-theme="night"].sio-on #introDoor.sio .intro-card{--sio-plate:rgba(30,22,46,.92);--sio-line:rgba(205,184,240,.14);
+  box-shadow:inset 0 0 0 1px var(--sio-line),0 14px 28px rgba(0,0,0,.45),0 34px 60px rgba(0,0,0,.4) !important}
+body.sio-on #introDoor.sio .intro-seal,body.sio-on #introDoor.sio .intro-lede,body.sio-on #introDoor.sio .intro-grab,body.sio-on #introDoor.sio .intro-edge{display:none !important}
+body.sio-on #introDoor.sio .intro-word{font:500 32px/1.1 "Home Cormorant","Cormorant Garamond",Georgia,serif;letter-spacing:0;margin:2px 0 0}
+body.sio-on #introDoor.sio .intro-subword{margin:6px 0 14px}
+body.sio-on #introDoor.sio .intro-tourline{margin:0 auto 12px}
+body.sio-on #introDoor.sio .intro-straight{margin-top:12px}
+body.sio-on #introDoor.sio .intro-credit{margin-top:14px;padding-top:12px}
 </style>
 <script>
 (function(){"use strict";var W=window,D=document;try{(W.__ingParts=W.__ingParts||{})["p410"]="started";}catch(_){}
@@ -152,11 +179,25 @@ function orbs(pp,nar){var sig=pp.list.map(function(p){return p.id+":"+p.name+":"
     b.addEventListener("click",function(){press(p.id);});BOX.appendChild(b);ORBS.push(b);});}
 /* an orb pressed beside the sign-in's plate: your own takes you to its password; another opens Who is using Ingenium and chooses it */
 function press(id){var pp=people(),card=lockCard();
+  /* 8.12: on the welcome, her orb enters, with one of the seal's flourishes, as Enter does */
+  if(WELCOME&&!card){var en=$("introEnter");flourish();WGO=Date.now();setTimeout(function(){try{var dd=$("introDoor");if(en&&dd&&!dd.hasAttribute("hidden"))en.click();}catch(e){warn(e);}},300);return;}
   if(card){if(id===pp.cur||pp.list.length<2){var f=card.querySelector("#ildPw")||card.querySelector("input:not([type=hidden])");if(f){try{f.focus();}catch(e){}}flourish();return;}
     var e=card.querySelector(".r331-else");if(e){e.click();setTimeout(function(){var c=D.querySelector('#profDoor .r331-coin[data-door="'+String(id).replace(/"/g,"")+'"]');if(c)c.click();},60);}return;}
   var c2=D.querySelector('#profDoor .r331-coin[data-door="'+String(id).replace(/"/g,"")+'"]');if(c2)c2.click();}
 function lockCard(){var d=$("ingLockDoor");if(!d||d.hidden||d.classList.contains("ild-over")||d.classList.contains("ild-indoor"))return null;var c=d.querySelector(".ild-card");return c;}
 function profDoor(){var d=$("profDoor");return d&&!d.hidden?d:null;}
+/* 8.12: the welcome door, when it is open and nothing else is asked over it (a sign-in being set up keeps its own card, as before) */
+var WELCOME=false,WGO=0;
+function introCard(){var d=$("introDoor");if(!d||d.hasAttribute("hidden"))return null;var l=$("ingLockDoor");if(l&&!l.hidden)return null;
+  var c=d.querySelector(".intro-card");return c||null;}
+/* the name the welcome greets: the profile's own, else the one Home greets by (r261's hello: the persona's first name, else the author's) */
+function welcomeName(){var nm="";try{var pp=people();pp.list.forEach(function(p){if(p.id===pp.cur&&p.name&&p.name!=="You")nm=p.name;});}catch(e){}
+  if(!nm)try{nm=typeof W.personaGet==="function"?(W.personaGet().name||""):"";}catch(e){nm="";}
+  if(!nm)try{nm=typeof W.lxhAuthor==="function"?(W.lxhAuthor()||""):"";}catch(e){nm="";}
+  return String(nm||"").trim().split(/\s+/)[0]||"";}
+function welcomePeople(pp){var me=null;pp.list.forEach(function(p){if(p.id===pp.cur)me=p;});var nm=welcomeName()||"You";
+  return {list:[{id:me?me.id:"owner",name:nm,pw:"none"}],cur:me?me.id:"owner",out:false};}
+function signOn(){try{return !!(W.IngLock&&typeof IngLock.active==="function"&&IngLock.active());}catch(e){return false;}}
 function nightNow(){var l=$("ingLockDoor"),d=$("profDoor");if(l&&!l.hidden&&l.classList.contains("ild-night"))return true;if(d&&!d.hidden&&d.classList.contains("r344-night"))return true;return D.body.getAttribute("data-theme")==="night";}
 function lockedAt(){try{var t=+sessionStorage.getItem(LOCKK)||0;return t&&Date.now()-t<12*36e5?t:0;}catch(e){return 0;}}
 /* ---------- the sign-in's card dressed as the plate ---------- */
@@ -180,32 +221,47 @@ function dressDoor(d,pp){d.classList.add("sio");if(d.getAttribute("aria-label")!
     if(o){var r=o.getBoundingClientRect();if(r.width){c.style.setProperty("--ox",(r.left+r.width/2).toFixed(1)+"px");c.style.setProperty("--oy",(r.top+r.height/2).toFixed(1)+"px");c.style.setProperty("--k",K.toFixed(3));}}});}
 /* ---------- the orbit laid out for the screen it is on ---------- */
 var K=1;
-function place(card,door){var Wd=W.innerWidth,Hd=W.innerHeight,nar=Wd<760;ST.classList.toggle("nar",nar);var NW=nar?560:1240,n=ORBS.length||1,CH=n<=2?(nar?440:420):n<=4?(nar?560:560):(nar?600:640);
+function place(card,door,foot){var Wd=W.innerWidth,Hd=W.innerHeight,nar=Wd<760;ST.classList.toggle("nar",nar);var NW=nar?560:1240,n=ORBS.length||1,CH=n<=2?(nar?440:420):n<=4?(nar?560:560):(nar?600:640);
   var top=16,bottom=Hd-16;if(card){var cr=card.getBoundingClientRect();if(cr.height)bottom=cr.top-12;}else{var hr=HEAD.getBoundingClientRect();top=hr.bottom+8;
+    if(foot){var fr=foot.getBoundingClientRect();if(fr.height)bottom=Math.min(bottom,fr.top-12);}
     var low=door?[].slice.call(door.querySelectorAll(".r350-door,.r331-said")).filter(function(x){return x.textContent.trim();}):[];low.forEach(function(x){var q=x.getBoundingClientRect();if(q.height)bottom=Math.min(bottom,q.top-8);});}
   var avail=Math.max(150,bottom-top);K=Math.max(.3,Math.min(1,(Wd-24)/NW,avail/CH));BOX.style.setProperty("--k",K.toFixed(3));BOX.style.setProperty("--cy",(top+avail/2).toFixed(1)+"px");BOX.style.top=(top+avail/2).toFixed(1)+"px";}
 /* ---------- each moment: is the orbit up, and in which state ---------- */
 var WAS=false;
-function off(){D.body.classList.remove("sio-on");var l=$("ingLockDoor");if(l)l.classList.remove("sio");var dd=$("profDoor");if(dd)dd.classList.remove("sio");WAS=false;GOING=false;if(ST)ST.classList.remove("going");}
-function tick(){var card=lockCard(),door=profDoor(),pp=people();
-  /* signed in: the orbit stands until the door has closed, then gives way to the desk */
-  if(GOING){if(card||door)return;if(ST&&!ST.classList.contains("going")){ST.classList.add("going");setTimeout(off,520);}return;}
-  var want=!!((card&&(W.__ingLocked||!W.__ingReady))||(door&&(W.__ingLocked||pp.out||!W.__ingReady)));
-  var l=$("ingLockDoor");
+function off(){D.body.classList.remove("sio-on");var l=$("ingLockDoor");if(l)l.classList.remove("sio");var dd=$("profDoor");if(dd)dd.classList.remove("sio");var idr=$("introDoor");if(idr)idr.classList.remove("sio");
+  WAS=false;GOING=false;WELCOME=false;WGO=0;if(ST)ST.classList.remove("going","welcome");}
+function setText(sel,t){var e=ST.querySelector(sel);if(e&&e.textContent!==t)e.textContent=t;}
+function tick(){var card=lockCard(),door=profDoor(),pp=people(),intro=(!card&&!door)?introCard():null;
+  /* signed in: the orbit stands until the door has closed, then gives way to the desk (8.12: or to the welcome, where it opens next) */
+  if(GOING){if(card||door)return;if(intro)GOING=false;else{if(ST&&!ST.classList.contains("going")){ST.classList.add("going");setTimeout(off,520);}return;}}
+  /* 8.12: entered from the welcome (her orb, Enter or the tour): the orbit gives way to the desk the same way */
+  if(WGO&&!intro&&!card&&!door){if(WAS&&ST&&!ST.classList.contains("going")){ST.classList.add("going");setTimeout(off,520);}else if(!WAS)WGO=0;return;}
+  if(WGO&&(card||door))WGO=0;
+  var want=!!((card&&(W.__ingLocked||!W.__ingReady))||(door&&(W.__ingLocked||pp.out||!W.__ingReady))||intro);
+  var l=$("ingLockDoor"),idr=$("introDoor");
   if(!want){if(WAS)off();return;}
+  WELCOME=!!intro;
   stage();sealIn();if(!WAS){logFix();WAS=true;}D.body.classList.add("sio-on");
-  var plate=!!card&&!door;ST.classList.toggle("plate",plate);ST.classList.toggle("doorup",!!door);ST.classList.toggle("night",nightNow());
-  if(l)l.classList.toggle("sio",!!card);
-  ST.querySelector(".sio-date").textContent=latinDate();
-  ST.querySelector(".sio-hello").textContent=pp.out?"Signed out":door?"Who is using Ingenium?":"Welcome back";
-  ST.querySelector(".sio-sub").textContent=pp.out?"Everything is sealed until its profile signs in again. Press your orb.":door?"Each profile opens as its owner chose. Press your orb.":"Your password opens your desk.";
-  orbs(pp,W.innerWidth<760);
-  ORBS.forEach(function(b){var id=b.getAttribute("data-p"),p=null;pp.list.forEach(function(q){if(q.id===id)p=q;});var mine=id===pp.cur||pp.list.length<2;
-    b.classList.toggle("dim",!plate||!mine);var s=b.querySelector(".sio-stt"),t=plate&&mine?(lockedAt()?"Locked":"Signing in"):(p&&p.pw==="none"?"Opens straight away":"Needs its password");if(s.textContent!==t)s.textContent=t;
-    b.setAttribute("aria-label",(p?p.name:"Profile")+": "+t);});
+  var plate=!!card&&!door;ST.classList.toggle("plate",plate);ST.classList.toggle("doorup",!!door);ST.classList.toggle("welcome",WELCOME);ST.classList.toggle("night",nightNow());
+  if(l)l.classList.toggle("sio",!!card);if(idr)idr.classList.toggle("sio",WELCOME);
+  setText(".sio-date",latinDate());
+  var who=WELCOME?welcomeName():"",lede=WELCOME?((intro.querySelector(".intro-lede")||{}).textContent||"").trim():"";
+  setText(".sio-hello",WELCOME?greet()+(who?", "+who:""):pp.out?"Signed out":door?"Who is using Ingenium?":"Welcome back");
+  setText(".sio-sub",WELCOME?(lede?lede+" ":"")+"Press your orb to enter.":pp.out?"Everything is sealed until its profile signs in again. Press your orb.":door?"Each profile opens as its owner chose. Press your orb.":"Your password opens your desk.");
+  var ppl=WELCOME?welcomePeople(pp):pp;
+  orbs(ppl,W.innerWidth<760);
+  ORBS.forEach(function(b){var id=b.getAttribute("data-p"),p=null;ppl.list.forEach(function(q){if(q.id===id)p=q;});var mine=id===ppl.cur||ppl.list.length<2;
+    b.classList.toggle("dim",WELCOME?!mine:(!plate||!mine));var s=b.querySelector(".sio-stt"),t=WELCOME?(signOn()?"Signed in":"Opens straight away"):plate&&mine?(lockedAt()?"Locked":"Signing in"):(p&&p.pw==="none"?"Opens straight away":"Needs its password");if(s.textContent!==t)s.textContent=t;
+    b.setAttribute("aria-label",(p?p.name:"Profile")+": "+t+(WELCOME?". Press to enter.":""));});
   if(card)dressCard(card,pp);
-  place(plate?card:null,door);
+  place(plate?card:null,door,WELCOME?intro:null);
   if(door)dressDoor(door,pp);}
+/* 8.12: Enter and the tour close the welcome as before; the orbit then gives way as it does after a sign-in */
+D.addEventListener("click",function(e){try{var t=e.target&&e.target.closest?e.target.closest("#introEnter,#introTour"):null;if(t&&WELCOME)WGO=Date.now();}catch(_){}},true);
+/* the welcome opens at once on the orbit, wherever it is opened from (each start, or the logo in the top bar) */
+/* and while it stands, every quarter of a second, so that whatever opens over it (a sign-in being set up) is answered at once */
+var FAST=0;function fast(){if(FAST)return;FAST=setInterval(function(){if(!WAS){clearInterval(FAST);FAST=0;return;}try{tick();}catch(e){warn(e);}},250);}
+(function watch(){var d=$("introDoor");if(!d){setTimeout(watch,400);return;}try{new MutationObserver(function(){try{tick();}catch(e){warn(e);}if(WAS)fast();}).observe(d,{attributes:true,attributeFilter:["hidden"]});}catch(e){warn(e);}if(WAS)fast();})();
 /* signed in: a flourish of the seal, and the orbit gives way to the desk */
 W.addEventListener("ing-keys",function(e){var d=e&&e.detail||{};
   if(d.locking){try{sessionStorage.setItem(LOCKK,String(Date.now()));}catch(_){}logAdd("lock");return;}

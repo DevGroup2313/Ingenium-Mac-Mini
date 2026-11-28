@@ -778,10 +778,38 @@ def _no_lakay():
     ]
 
 
+def _no_lakay_code(ed):
+    """8.12 (28 November 2026): the last places the code named Lakay in the other editions, inert there (they only ever read a name the
+    master edition's library gives, or sorted a key no other edition has), found by the release's own check of 8.11. Her rule: "Lakay and
+    Clavis must not appear (in any letters) in the full, gift or demo editions." Each line is taken back to what it does without Lakay;
+    they run after _no_clavis, so each is read as that left it."""
+    E = [
+        ('try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!NAMES.lakay)NAMES.lakay=LIB_NAMES.lakay;}catch(e){}\n', "", "Lector's PDF without Lakay", 1),
+        ('  var lk=/<meta name="lakay-build" content="(\\d+)"/.exec(s.slice(0,40000));return lk?lk[1]:"";}', '  return "";}',
+         "Fabrica reads no Lakay build", 1),
+        ('  var order=["cd","forge","inkwell","lakay","ingenium","offline","offline3"];\n',
+         '  var order=["cd","forge","inkwell","ingenium","offline","offline3"];\n', "Fabrica's order without Lakay", 1),
+        ('var KEYS=["inkwell","forge","cd","lakay"].filter(function(k){return BI[k];}),DONE={},RUN=null;\n',
+         'var KEYS=["inkwell","forge","cd"].filter(function(k){return BI[k];}),DONE={},RUN=null;\n', "the first start without Lakay", 1),
+        ('try{if(window.LIB_NAMES&&LIB_NAMES.lakay&&!FAPPS.lakay)FAPPS.lakay=LIB_NAMES.lakay;}catch(e){}\n', "", "Home's Fabrica without Lakay", 1),
+        ('var BEYOND=(typeof ING_EDITION!=="string"||ING_EDITION==="master")?["lakay"]:[];\n', 'var BEYOND=[];\n',
+         "the library's list without Lakay", 1),
+        ('var ORDER=["cd","forge","ingenium","inkwell","lakay"];', 'var ORDER=["cd","forge","ingenium","inkwell"];', "the apps' order without Lakay", 1),
+    ]
+    if has_fabrica(ed):  # a repository brought from GitHub (modules/r276.js), where there is a Fabrica
+        E += [
+            ('  if(/lakay/.test(n))return "lakay";if(/offline[-_ ]?(pro|project)/.test(n))return "master";return null;}',
+             '  if(/offline[-_ ]?(pro|project)/.test(n))return "master";return null;}', "GitHub's logos without Lakay's name", 1),
+            ('  if(k&&k!=="lakay"&&k!=="master"&&W.IngSeal&&typeof IngSeal.el==="function")',
+             '  if(k&&k!=="master"&&W.IngSeal&&typeof IngSeal.el==="function")', "GitHub's logos: the seals, without Lakay", 1),
+        ]
+    return E
+
+
 def edits(ed):
     if ed == "master":
         return []
-    E = _no_clavis(ed) + _no_lakay() + _fixed_name()  # 7.65: Clavis first, so the lines naming Lakay are as _no_lakay knows them
+    E = _no_clavis(ed) + _no_lakay() + _no_lakay_code(ed) + _fixed_name()  # 7.65: Clavis first, so the lines naming Lakay are as _no_lakay knows them
     for old, new, label, times in _personal():
         if label == "the edition":
             new = 'var ING_EDITION="%s";' % ed
